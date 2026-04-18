@@ -5,46 +5,124 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>私について - My Portfolio</title>
+  <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../style.css">
 </head>
 
-<body>
+<body id="profile">
 
-  <header>
-    <div class="container header-container">
-      <div class="logo"><a href="../index.html" style="color: inherit;">Portfolio.</a></div>
-      <nav>
-        <ul>
-          <li><a href="../profile/index.html" style="color: var(--primary);">私について</a></li>
-          <li><a href="../portfolio/index.html">制作実績</a></li>
-          <li><a href="../contact/index.html">お問い合わせ</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <header data-depth="1"></header>
 
   <main class="container">
+    <article>
+      <h1>私について</h1>
       <section class="hero">
-        <h1>私について</h1>
-        <p>ここは詳しいプロフィールのページです。<br>これまでの経歴、得意なスキル、趣味などを記載します。</p>
-        <div style="margin-top: 3rem; text-align: left; background: var(--surface); padding: 2rem; border-radius: 1rem; max-width: 600px; width: 100%;">
-            <h3 style="margin-bottom: 1rem;">スキル</h3>
-            <ul style="list-style: inside; color: var(--text-muted); line-height: 2;">
-                <li>HTML / CSS / JavaScript</li>
-                <li>React / Vue.js</li>
-                <li>UI / UX デザイン</li>
-            </ul>
+        <p>
+          ここは私のプロフィールのページです。<br>
+          保有資格やスキルなどを記載します。</p>
+        <div class="profile-card">
+          <h3>使用したスキル・ツール</h3>
+          <ul>
+            <li>HTML / CSS / JavaScript</li>
+            <li>React / Vue.js</li>
+            <li>UI / UX デザイン</li>
+          </ul>
         </div>
       </section>
+
+      <section style="">
+        <h2>保有資格</h2>
+        <div class="cert-tree-container">
+          <div class="cert-tree">
+            <ul>
+              <li>
+                <div class="cert-node root">資格</div>
+                <ul>
+                  <!-- IT Route -->
+                  <li>
+                    <div class="cert-node acquired">
+                      <span class="cert-name">ITパスポート</span>
+                      <span class="cert-date">2024/10/12取得</span>
+                    </div>
+                    <ul>
+                      <li>
+                        <div class="cert-node">
+                          <span class="cert-name">基本情報技術者</span>
+                          <span class="cert-date">2025/05/10取得</span>
+                        </div>
+                        <ul>
+                          <li>
+                            <div class="cert-node">
+                              <span class="cert-name">応用情報技術者</span>
+                              <span class="cert-date"></span>
+                            </div>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <!-- Web Design Route -->
+                  <li>
+                    <div class="cert-node acquired">
+                      <span class="cert-name">3級ウェブデザイン技能士</span>
+                      <span class="cert-date">2024/05/10取得</span>
+                    </div>
+                    <ul>
+                      <li>
+                        <div class="cert-node">
+                          <span class="cert-name">2級ウェブデザイン技能士</span>
+                          <span class="cert-date"></span>
+                        </div>
+                        <ul>
+                          <li>
+                            <div class="cert-node">
+                              <span class="cert-name">1級ウェブデザイン技能士</span>
+                              <span class="cert-date"></span>
+                            </div>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                  <!-- FP Route -->
+                  <li>
+                    <div class="cert-node acquired">
+                      <span class="cert-name">3級FP技能士</span>
+                      <span class="cert-date">2026/04/20取得</span>
+                    </div>
+                    <ul>
+                      <li>
+                        <div class="cert-node">
+                          <span class="cert-name">2級FP技能士</span>
+                          <span class="cert-date"></span>
+                        </div>
+                        <ul>
+                          <li>
+                            <div class="cert-node">
+                              <span class="cert-name">1級FP技能士</span>
+                              <span class="cert-date"></span>
+                            </div>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </article>
   </main>
 
-  <footer class="container">
-    <p>&copy; 2026 Yui. All rights reserved.</p>
-  </footer>
+  <footer class="container"></footer>
 
+  <script src="../header.js"></script>
+  <script src="../footer.js"></script>
   <script src="../script.js"></script>
 </body>
 

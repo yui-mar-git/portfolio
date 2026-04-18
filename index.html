@@ -5,36 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Portfolio</title>
+  <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body id="home">
 
-  <header>
-    <div class="container header-container">
-      <div class="logo"><a href="index.html" style="color: inherit;">Portfolio.</a></div>
-      <nav>
-        <ul>
-          <li><a href="profile/index.html">私について</a></li>
-          <li><a href="portfolio/index.html">制作実績</a></li>
-          <li><a href="contact/index.html">お問い合わせ</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <header data-depth="0"></header>
 
   <main class="container">
+    <article>
+      <h1>こんにちは、Yuiです。</h1>
       <section class="hero">
-        <h1>こんにちは、Yuiです。</h1>
         <p>美しく機能的なデジタル体験を創り出すクリエイターです。<br>一緒に素晴らしいものを形にしましょう。</p>
         <a href="portfolio/index.html" class="btn">作品を見る</a>
       </section>
 
-      <section id="projects" class="projects">
-        <h2 class="section-title">制作実績</h2>
+      <section id="projects">
+        <h2>制作実績</h2>
         <div class="project-grid">
           <!-- Project 1 -->
           <div class="project-card">
@@ -56,12 +47,13 @@
           </div>
         </div>
       </section>
-    </main>
+    </article>
+  </main>
 
-    <footer id="contact" class="container">
-      <p>&copy; 2026 Yui. All rights reserved.</p>
-    </footer>
+    <footer class="container"></footer>
 
+  <script src="header.js"></script>
+  <script src="footer.js"></script>
   <script src="script.js"></script>
 </body>
 
