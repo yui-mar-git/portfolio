@@ -20,100 +20,25 @@
     <article>
       <span class="page-label">PROFILE</span>
       <h1>プロフィール</h1>
-      <section class="hero">
-        <p>
-          ここは私のプロフィールのページです。<br>
-          保有資格やスキルなどを記載します。</p>
-        <div class="profile-card">
-          <h3>使用したスキル・ツール</h3>
-          <ul>
-            <li>HTML / CSS / JavaScript</li>
-            <li>React / Vue.js</li>
-            <li>UI / UX デザイン</li>
-          </ul>
+
+      <section class="profile-intro">
+        <p id="profile-title" class="profile-title-text"></p>
+        <h2 id="profile-name-display" class="profile-name-text">読み込み中...</h2>
+        <p id="profile-bio" class="profile-bio-text"></p>
+      </section>
+
+      <section>
+        <h2>使用したスキル・ツール</h2>
+        <div id="skills-container">
+          <!-- スキルとツールがカテゴリ別にここに生成される -->
         </div>
       </section>
 
-      <section style="">
+      <section>
         <h2>保有資格・検定</h2>
         <div class="cert-tree-container">
-          <div class="cert-tree">
-            <ul>
-              <li>
-                <div class="cert-node root">資格</div>
-                <ul>
-                  <!-- IT Route -->
-                  <li>
-                    <div class="cert-node acquired">
-                      <span class="cert-name">ITパスポート</span>
-                      <span class="cert-date">2024/10/12取得</span>
-                    </div>
-                    <ul>
-                      <li>
-                        <div class="cert-node">
-                          <span class="cert-name">基本情報技術者</span>
-                          <span class="cert-date"><!--2025/05/10取得--></span>
-                        </div>
-                        <ul>
-                          <li>
-                            <div class="cert-node">
-                              <span class="cert-name">応用情報技術者</span>
-                              <span class="cert-date"></span>
-                            </div>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                  <!-- Web Design Route -->
-                  <li>
-                    <div class="cert-node acquired">
-                      <span class="cert-name">3級ウェブデザイン技能士</span>
-                      <span class="cert-date">2024/05/10取得</span>
-                    </div>
-                    <ul>
-                      <li>
-                        <div class="cert-node">
-                          <span class="cert-name">2級ウェブデザイン技能士</span>
-                          <span class="cert-date"></span>
-                        </div>
-                        <ul>
-                          <li>
-                            <div class="cert-node">
-                              <span class="cert-name">1級ウェブデザイン技能士</span>
-                              <span class="cert-date"></span>
-                            </div>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                  <!-- FP Route -->
-                  <li>
-                    <div class="cert-node acquired">
-                      <span class="cert-name">3級FP技能士</span>
-                      <span class="cert-date">2026/04/20取得</span>
-                    </div>
-                    <ul>
-                      <li>
-                        <div class="cert-node">
-                          <span class="cert-name">2級FP技能士</span>
-                          <span class="cert-date"></span>
-                        </div>
-                        <ul>
-                          <li>
-                            <div class="cert-node">
-                              <span class="cert-name">1級FP技能士</span>
-                              <span class="cert-date"></span>
-                            </div>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
+          <div class="cert-tree" id="cert-tree-root">
+            <!-- Dynamic certification tree will be generated here -->
           </div>
         </div>
       </section>
@@ -125,6 +50,8 @@
   <script src="../header.js"></script>
   <script src="../footer.js"></script>
   <script src="../script.js"></script>
+  <script src="../env.js"></script>
+  <script src="../profile/profile.js"></script>
 </body>
 
 </html>
