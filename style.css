@@ -138,12 +138,25 @@ section {
 }
 
 /* Article Title (h1 = page title) */
-article>h1 {
+.page-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  text-align: center;
+  padding-top: 4rem;
+  margin-bottom: 0.5rem; /* 自然な隙間 */
+}
+
+article > h1 {
   font-size: 2rem;
   font-weight: 800;
   line-height: 1.1;
   text-align: center;
-  padding: 4rem 0 1rem;
+  padding: 0 0 1.5rem; /* ラベルとの隙間を確保 */
 }
 
 /* Section Title (h2 = section title) */
@@ -534,6 +547,64 @@ nav a.active {
   padding: 0;
 }
 
+/* Credits Table */
+.credits-table-container {
+  overflow-x: auto;
+}
+
+.credits-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  table-layout: fixed; /* 列の幅を制御可能にする */
+}
+
+.credits-table thead th {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* 1列目（素材名）の幅を調整 */
+.credits-table th:nth-child(1),
+.credits-table td:nth-child(1) {
+  width: 30%;
+  min-width: 180px;
+}
+
+/* 2列目（提供元） */
+.credits-table th:nth-child(2),
+.credits-table td:nth-child(2) {
+  width: 25%;
+  min-width: 150px;
+}
+
+.credits-table tbody td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  vertical-align: middle;
+  word-wrap: break-word; /* 長い単語を折り返す */
+  overflow-wrap: break-word;
+}
+
+.credits-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.credits-table a {
+  color: var(--primary);
+}
+
+.credits-empty td {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+  opacity: 0.6;
+}
+
 /* Footer */
 footer {
   text-align: center;
@@ -595,9 +666,15 @@ footer p {
     padding: 2rem 0;
   }
 
-  article>h1 {
-    font-size: 2.5rem;
-    padding: 2rem 0 0.5rem;
+  .page-label {
+    font-size: 0.7rem;
+    padding-top: 2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  article > h1 {
+    font-size: 1.6rem;
+    padding: 0 0 1rem;
   }
 
   .hero p {
@@ -614,12 +691,18 @@ footer p {
     padding: 1rem 2rem;
   }
 
-  /* Accordion nav */
+  /* Accordion nav (Overlay style) */
   #global-nav {
     display: none;
+    position: absolute;
+    top: 100%; /* Headerの直下から開始 */
+    left: 0;
     width: 100%;
-    order: 3;
-    /* Push below logo + hamburger row */
+    background-color: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    z-index: 1000;
   }
 
   #global-nav.open {
@@ -630,17 +713,21 @@ footer p {
   #global-nav ul {
     flex-direction: column;
     gap: 0;
-    padding: 1rem 0 0.5rem;
+    padding: 1rem 2rem; /* 横の余白をcontainerに合わせる */
   }
 
   #global-nav ul li {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  #global-nav ul li:first-child {
+    border-top: none;
+  }
+
   #global-nav ul li a {
     display: block;
-    padding: 1rem 0;
-    font-size: 1rem;
+    padding: 1.2rem 0;
+    font-size: 1.1rem;
   }
 
   .project-grid {

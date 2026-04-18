@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ナビゲーションのリンク定義
   const navLinks = [
-    { href: `${prefix}profile/index.html`, label: '私について', id: 'profile' },
-    { href: `${prefix}portfolio/index.html`, label: '制作実績', id: 'portfolio' },
+    { href: `${prefix}profile/index.html`, label: 'プロフィール', id: 'profile' },
+    { href: `${prefix}portfolio/index.html`, label: '制作物', id: 'portfolio' },
+    { href: `${prefix}credits/index.html`, label: '使用素材', id: 'credits' },
     { href: `${prefix}contact/index.html`, label: 'お問い合わせ', id: 'contact' },
   ];
 
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ヘッダー全体のHTMLを生成
   header.innerHTML = `
     <div class="container header-container">
-      <div class="logo"><a href="${prefix}index.html">Portfolio.</a></div>
+      <div class="logo"><a href="${prefix}index.html">My Portfolio.</a></div>
       <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
