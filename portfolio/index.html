@@ -4,37 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Portfolio</title>
+  <title>制作実績 - My Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
 
   <header>
     <div class="container header-container">
-      <div class="logo"><a href="index.html" style="color: inherit;">Portfolio.</a></div>
+      <div class="logo"><a href="../index.html" style="color: inherit;">Portfolio.</a></div>
       <nav>
         <ul>
-          <li><a href="profile/index.html">私について</a></li>
-          <li><a href="portfolio/index.html">制作実績</a></li>
-          <li><a href="contact/index.html">お問い合わせ</a></li>
+          <li><a href="../profile/index.html">私について</a></li>
+          <li><a href="../portfolio/index.html" style="color: var(--primary);">制作実績</a></li>
+          <li><a href="../contact/index.html">お問い合わせ</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main class="container">
-      <section class="hero">
-        <h1>こんにちは、Yuiです。</h1>
-        <p>美しく機能的なデジタル体験を創り出すクリエイターです。<br>一緒に素晴らしいものを形にしましょう。</p>
-        <a href="portfolio/index.html" class="btn">作品を見る</a>
-      </section>
-
-      <section id="projects" class="projects">
-        <h2 class="section-title">制作実績</h2>
+      <section class="projects">
+        <h1 class="section-title" style="margin-top: 3rem;">すべての制作実績</h1>
         <div class="project-grid">
           <!-- Project 1 -->
           <div class="project-card">
@@ -54,15 +48,21 @@
             <p>枠にとらわれない発想と、結果を出す能力を示すクリエイティブな取り組みです。</p>
             <a href="#">詳細を見る →</a>
           </div>
+          <!-- Project 4 -->
+          <div class="project-card">
+            <h3>プロジェクト 04</h3>
+            <p>追加のプロジェクト。複数ページになったため、より多くの作品を載せることができます。</p>
+            <a href="#">詳細を見る →</a>
+          </div>
         </div>
       </section>
-    </main>
+  </main>
 
-    <footer id="contact" class="container">
-      <p>&copy; 2026 Yui. All rights reserved.</p>
-    </footer>
+  <footer class="container" style="margin-top: 5rem;">
+    <p>&copy; 2026 Yui. All rights reserved.</p>
+  </footer>
 
-  <script src="script.js"></script>
+  <script src="../script.js"></script>
 </body>
 
 </html>
