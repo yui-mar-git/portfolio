@@ -13,9 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const headers = {
-    'X-MICROCMS-API-KEY': CONFIG.MICROCMS_API_KEY
-  };
+  // headers の定義を削除
 
   /**
    * 日付フォーマット (YYYY/MM/DD取得)
@@ -34,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    */
   async function fetchSettings() {
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SETTINGS}`, { headers });
+      const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.SETTINGS}&limit=100`);
       if (!response.ok) throw new Error('Settings API failed');
       const data = await response.json();
 
@@ -54,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    */
   async function fetchProfileData() {
     try {
-      const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.PROFILE}?limit=100`, { headers });
+      const response = await fetch(`${CONFIG.BASE_URL}${CONFIG.ENDPOINTS.PROFILE}&limit=100`);
       if (!response.ok) throw new Error('Profile List API failed');
       const data = await response.json();
 

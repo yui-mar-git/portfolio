@@ -1,4 +1,4 @@
 .env
-env.js
+env.local.js
 node_modules/
 .DS_Store
