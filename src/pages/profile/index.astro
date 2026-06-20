@@ -1,0 +1,130 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import CertTree from '@/components/CertTree.astro';
+import { fetchMicroCMS } from '@/lib/microcms';
+import type { MicroCMSSettings, MicroCMSProfile, MicroCMSListResponse } from '@/types/microcms';
+
+const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
+const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
+const allProfileItems = profileResponse.contents;
+
+// スキル・ツールの抽出
+const skills = allProfileItems.filter(item => {
+  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+  return cat === 'スキル';
+});
+const tools = allProfileItems.filter(item => {
+  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+  return cat === 'ツール';
+});
+
+// 資格のグルーピング
+const certs = allProfileItems.filter(item => {
+  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+  return cat && (cat.includes('資格') || cat.includes('検定'));
+});
+
+const rankDefinitions = [
+  { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
+  { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
+  { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
+  { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
+  { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
+];
+
+const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
+
+certs.forEach(cert => {
+  let systemName = '';
+  let rank = 99;
+
+  const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
+  
+  if (def) {
+    systemName = def.system;
+    if (def.gradeBased) {
+      const gradeMatch = cert.name.match(/([123])級/);
+      rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+    } else {
+      rank = def.rank as number;
+    }
+  } else {
+    const gradeMatch = cert.name.match(/([123])級/);
+    rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+    systemName = cert.name.replace(/[123]級/, '').trim();
+  }
+
+  if (!systems[systemName]) {
+    systems[systemName] = [];
+  }
+  systems[systemName].push({ ...cert, rank });
+});
+
+// 各系統をランク順にソート
+Object.keys(systems).forEach(name => {
+  systems[name].sort((a, b) => b.rank - a.rank);
+});
+---
+
+<BaseLayout title="Profile" pageId="profile">
+  <Header activeId="profile" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">PROFILE</span>
+      <h1>プロフィール</h1>
+
+      <section class="profile-intro">
+        <p id="profile-title" class="profile-title-text">{settings.title}</p>
+        <h2 id="profile-name-display" class="profile-name-text">{settings.name}</h2>
+        <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>')} />
+      </section>
+
+      {skills.length > 0 && (
+        <section>
+          <h2>使用したスキル</h2>
+          <div class="profile-card">
+            <h3>スキル</h3>
+            <ul>
+              {skills.map(item => <li>{item.name}</li>)}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {tools.length > 0 && (
+        <section>
+          <h2>使用したツール</h2>
+          <div class="profile-card">
+            <h3>ツール</h3>
+            <ul>
+              {tools.map(item => <li>{item.name}</li>)}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h2>保有資格・検定</h2>
+        <div class="cert-tree-container">
+          <div class="cert-tree" id="cert-tree-root">
+            <ul>
+              <li>
+                <div class="cert-node root">資格</div>
+                <ul>
+                  {Object.keys(systems).map(sysName => (
+                    <CertTree items={systems[sysName]} />
+                  ))}
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>

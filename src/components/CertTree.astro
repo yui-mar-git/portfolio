@@ -1,0 +1,55 @@
+---
+import type { MicroCMSProfile } from '@/types/microcms';
+
+interface Props {
+  items: (MicroCMSProfile & { rank: number })[];
+}
+
+const { items } = Astro.props;
+
+if (items.length === 0) return null;
+
+const item = items[0];
+const remainingItems = items.slice(1);
+
+const isAcquired = Array.isArray(item.status) 
+  ? (item.status[0] === '取得済' || item.status[0] === '取得済み')
+  : (item.status === '取得済' || item.status === '取得済み');
+const isPartial = Array.isArray(item.status) 
+  ? (item.status[0] === '一部合格' || item.status[0] === '一部取得')
+  : (item.status === '一部合格' || item.status === '一部取得');
+const isChallenge = Array.isArray(item.status)
+  ? item.status[0] === '挑戦中'
+  : item.status === '挑戦中';
+
+// YYYY/MM/DD 形式に変換（取得済みは「取得」付き、部分合格は「一部合格」付き）
+const formatDate = (dateString: string | undefined, partial: boolean = false) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return partial ? `${y}/${m}/${d} 一部合格` : `${y}/${m}/${d} 取得`;
+};
+
+const displayDate = item.acquired_date
+  ? formatDate(item.acquired_date, isPartial)
+  : '';
+---
+
+<li class={isAcquired ? 'li-acquired' : isPartial ? 'li-partial' : isChallenge ? 'li-challenge' : ''}>
+  <div class={`cert-node ${isAcquired ? 'acquired' : ''} ${isPartial ? 'partial' : ''} ${isChallenge ? 'challenge' : ''}`}>
+    <span class="cert-name">{item.name}</span>
+    {(isAcquired || isPartial) && displayDate && (
+      <span class="cert-date">{displayDate}</span>
+    )}
+    {isChallenge && (
+      <span class="cert-date">挑戦中</span>
+    )}
+  </div>
+  {remainingItems.length > 0 && (
+    <ul>
+      <Astro.self items={remainingItems} />
+    </ul>
+  )}
+</li>

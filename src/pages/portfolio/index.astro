@@ -1,0 +1,52 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { fetchMicroCMS } from '@/lib/microcms';
+import type { MicroCMSPortfolio, MicroCMSListResponse } from '@/types/microcms';
+
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio', { limit: '100' });
+const projects = portfolioResponse.contents;
+---
+
+<BaseLayout title="Portfolio" pageId="portfolio">
+  <Header activeId="portfolio" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">PORTFOLIO</span>
+      <h1>制作物</h1>
+      <section>
+        <div class="project-grid" id="project-grid">
+          {projects.length > 0 ? (
+            projects.map((project) => (
+              <div class="project-card">
+                {project.thumbnail && (
+                  <img src={project.thumbnail.url} alt={project.title} class="project-thumbnail" />
+                )}
+                <h3>{project.title}</h3>
+                {project.tags && (
+                  <div class="project-tags">
+                    <span>{project.tags}</span>
+                  </div>
+                )}
+                <p>{project.description}</p>
+                {project.url && (
+                  <a href={project.url} target="_blank" rel="noopener noreferrer">
+                    詳細を見る →
+                  </a>
+                )}
+              </div>
+            ))
+          ) : (
+            <p class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--text-color-light); font-size: 1.1rem;">
+              鋭意制作中です。
+            </p>
+          )}
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>

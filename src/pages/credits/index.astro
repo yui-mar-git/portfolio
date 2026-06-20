@@ -1,0 +1,89 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { fetchMicroCMS } from '@/lib/microcms';
+import type { MicroCMSCredits, MicroCMSListResponse } from '@/types/microcms';
+
+const creditsResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSCredits>>('credits', { limit: '100' });
+const allCredits = creditsResponse.contents;
+
+const categories = [
+  { label: '画像', fullLabel: '画像・イラスト', emptyMsg: '現在、画像・イラストは使用していません。' },
+  { label: 'フォント', fullLabel: 'フォント', emptyMsg: '現在、フォントは使用していません。' },
+  { label: 'SE', fullLabel: 'SE・BGM', emptyMsg: '現在、SE・BGMは使用していません。' },
+  { label: 'アイコン', fullLabel: 'アイコン', emptyMsg: '現在、アイコンは使用していません。' }
+];
+
+const getItemsByCategory = (label: string, fullLabel: string) => {
+  return allCredits.filter(item => {
+    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+    if (!cat) return false;
+    return cat.includes(label) || fullLabel.includes(cat);
+  });
+};
+---
+
+<BaseLayout title="Credits" pageId="credits">
+  <Header activeId="credits" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">CREDITS</span>
+      <h1>使用素材</h1>
+      <section class="hero">
+        <p>
+          当サイトで使用している素材の一覧です。<br>
+          各素材は提供元の利用規約に基づき使用しています。
+        </p>
+      </section>
+
+      {categories.map(cat => {
+        const items = getItemsByCategory(cat.label, cat.fullLabel);
+        return (
+          <section>
+            <h2>{cat.fullLabel}</h2>
+            <div class="credits-table-container">
+              <table class="credits-table">
+                <thead>
+                  <tr>
+                    <th>素材名</th>
+                    <th>提供元</th>
+                    <th>使用箇所</th>
+                    <th>ライセンス</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.length > 0 ? (
+                    items.map(item => (
+                      <tr>
+                        <td>{item.name || '-'}</td>
+                        <td>
+                          {item.author && item.url ? (
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.author}</a>
+                          ) : item.url ? (
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">リンク</a>
+                          ) : (
+                            item.author || '-'
+                          )}
+                        </td>
+                        <td>{item.usage || '-'}</td>
+                        <td>{item.license || '-'}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr class="credits-empty">
+                      <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-color-light);">{cat.emptyMsg}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        );
+      })}
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
