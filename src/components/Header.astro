@@ -6,10 +6,10 @@ interface Props {
 const { activeId } = Astro.props;
 
 const navLinks = [
-  { href: '/portfolio/profile/index.html', label: 'プロフィール', id: 'profile' },
-  { href: '/portfolio/portfolio/index.html', label: '制作物', id: 'portfolio' },
-  { href: '/portfolio/credits/index.html', label: '使用素材', id: 'credits' },
-  { href: '/portfolio/contact/index.html', label: 'お問い合わせ', id: 'contact' },
+  { href: `${import.meta.env.BASE_URL}profile/index.html`, label: 'プロフィール', id: 'profile' },
+  { href: `${import.meta.env.BASE_URL}portfolio/index.html`, label: '制作物', id: 'portfolio' },
+  { href: `${import.meta.env.BASE_URL}credits/index.html`, label: '使用素材', id: 'credits' },
+  { href: `${import.meta.env.BASE_URL}contact/index.html`, label: 'お問い合わせ', id: 'contact' },
 ];
 
 const currentActiveId = activeId === 'thanks' ? 'contact' : activeId;
@@ -17,7 +17,7 @@ const currentActiveId = activeId === 'thanks' ? 'contact' : activeId;
 
 <header>
   <div class="container header-container">
-    <div class="logo"><a href="/portfolio/index.html">My Portfolio.</a></div>
+    <div class="logo"><a href={`${import.meta.env.BASE_URL}index.html`}>My Portfolio.</a></div>
     <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false">
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>

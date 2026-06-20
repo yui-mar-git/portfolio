@@ -18,7 +18,7 @@ import Footer from '@/components/Footer.astro';
             お問い合わせありがとうございます。<br>
             （※これはデモ画面です。実際にはどこにも送信されていません）
           </p>
-          <a href="/portfolio/contact/index.html" class="btn btn-secondary">フォームに戻る</a>
+          <a href={`${import.meta.env.BASE_URL}contact/index.html`} class="btn btn-secondary">フォームに戻る</a>
         </div>
       </section>
     </article>
