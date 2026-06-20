@@ -27,7 +27,7 @@ import Footer from '@/components/Footer.astro';
             <label class="form-label">メッセージ</label>
             <textarea rows="5" class="form-control" placeholder="ご用件をご記入ください"></textarea>
           </div>
-          <a href={`${import.meta.env.BASE_URL}contact/thanks/index.html`} class="btn btn-full">送信する</a>
+          <a href={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/contact/thanks/index.html`} class="btn btn-full">送信する</a>
           <p class="dummy-notice">
             ※このフォームはポートフォリオ用のデモ（ダミー）です。<br>
             実際にはどこにもメールは送信されず、データが保存されることもありません。<br>
