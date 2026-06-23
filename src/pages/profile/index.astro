@@ -10,15 +10,15 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
 const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
 const allProfileItems = profileResponse.contents;
 
-// スキル・ツールの抽出
-const skills = allProfileItems.filter(item => {
+// 資格以外のアイテムをカテゴリごとにグループ化
+const groupedSkills = allProfileItems.reduce((acc, item) => {
   const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-  return cat === 'スキル';
-});
-const tools = allProfileItems.filter(item => {
-  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-  return cat === 'ツール';
-});
+  if (cat && !cat.includes('資格') && !cat.includes('検定')) {
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+  }
+  return acc;
+}, {} as Record<string, MicroCMSProfile[]>);
 
 // 資格のグルーピング
 const certs = allProfileItems.filter(item => {
@@ -82,26 +82,18 @@ Object.keys(systems).forEach(name => {
         <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>')} />
       </section>
 
-      {skills.length > 0 && (
+      {Object.keys(groupedSkills).length > 0 && (
         <section>
-          <h2>使用したスキル</h2>
-          <div class="profile-card">
-            <h3>スキル</h3>
-            <ul>
-              {skills.map(item => <li>{item.name}</li>)}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {tools.length > 0 && (
-        <section>
-          <h2>使用したツール</h2>
-          <div class="profile-card">
-            <h3>ツール</h3>
-            <ul>
-              {tools.map(item => <li>{item.name}</li>)}
-            </ul>
+          <h2>使用技術・ツール</h2>
+          <div class="skill-grid">
+            {Object.entries(groupedSkills).map(([category, items]) => (
+              <div class="profile-card skill-card">
+                <h3>{category}</h3>
+                <ul>
+                  {items.map(item => <li>{item.name}</li>)}
+                </ul>
+              </div>
+            ))}
           </div>
         </section>
       )}

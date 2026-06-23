@@ -1,0 +1,186 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+---
+
+<BaseLayout title="タップでスコアアタック！" pageId="minigame">
+  <Header activeId="portfolio" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">MINI GAME</span>
+      <h1>タップでスコアアタック！</h1>
+      <p>30秒間でどれだけ丸をタップできるか挑戦しましょう。</p>
+
+      <div class="game-container">
+        <!-- スコア・時間表示 -->
+        <div class="game-hud">
+          <div class="score-display">スコア: <span id="score">0</span></div>
+          <div class="time-display">残り時間: <span id="time">30</span>秒</div>
+        </div>
+
+        <!-- ゲームエリア -->
+        <div class="game-area" id="game-area">
+          <div class="start-screen" id="start-screen">
+            <h2>準備はいいですか？</h2>
+            <button id="start-btn" class="btn btn-full">ゲームスタート</button>
+          </div>
+          
+          <div class="result-screen" id="result-screen" style="display: none;">
+            <h2>タイムアップ！</h2>
+            <p>あなたのスコアは <span id="final-score" class="highlight">0</span> 点でした！</p>
+            <button id="retry-btn" class="btn btn-secondary">もう一度遊ぶ</button>
+          </div>
+
+          <!-- タップする的 -->
+          <div id="target" class="target" style="display: none;"></div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .game-container {
+    margin-top: 2rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-hud {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+
+  .game-area {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: var(--bg-primary);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .start-screen, .result-screen {
+    text-align: center;
+    z-index: 10;
+  }
+
+  .start-screen h2, .result-screen h2 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+
+  .highlight {
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: 800;
+  }
+
+  .target {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, var(--primary-color) 30%, #ff4b4b 100%);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 75, 75, 0.5);
+    transition: transform 0.1s;
+  }
+
+  .target:active {
+    transform: scale(0.9);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const target = document.getElementById('target');
+    const scoreElement = document.getElementById('score');
+    const timeElement = document.getElementById('time');
+    const startScreen = document.getElementById('start-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const finalScoreElement = document.getElementById('final-score');
+    const gameArea = document.getElementById('game-area');
+
+    let score = 0;
+    let timeLeft = 30;
+    let gameInterval;
+    let isPlaying = false;
+
+    function moveTarget() {
+      // ゲームエリアのサイズを取得
+      const areaWidth = gameArea.clientWidth;
+      const areaHeight = gameArea.clientHeight;
+      const targetSize = 50;
+
+      // ランダムな位置を計算 (はみ出さないようにマージンを引く)
+      const maxX = areaWidth - targetSize;
+      const maxY = areaHeight - targetSize;
+      
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+
+      target.style.left = `${randomX}px`;
+      target.style.top = `${randomY}px`;
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      isPlaying = true;
+      scoreElement.textContent = score;
+      timeElement.textContent = timeLeft;
+
+      startScreen.style.display = 'none';
+      resultScreen.style.display = 'none';
+      target.style.display = 'block';
+
+      moveTarget();
+
+      gameInterval = setInterval(() => {
+        timeLeft--;
+        timeElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      clearInterval(gameInterval);
+      target.style.display = 'none';
+      finalScoreElement.textContent = score;
+      resultScreen.style.display = 'block';
+    }
+
+    // 的をタップした時の処理
+    target.addEventListener('click', () => {
+      if (!isPlaying) return;
+      score++;
+      scoreElement.textContent = score;
+      moveTarget(); // タップしたらすぐ次の場所へ移動
+    });
+
+    startBtn.addEventListener('click', startGame);
+    retryBtn.addEventListener('click', startGame);
+  });
+</script>
