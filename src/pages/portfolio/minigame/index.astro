@@ -27,9 +27,9 @@ import Footer from '@/components/Footer.astro';
             <h2>準備はいいですか？</h2>
             <div class="legend">
               <p><span style="color:#007bff">■青</span>: +10点</p>
-              <p><span style="color:#fd7e14">■橙</span>: +10秒 </p>
+              <p><span style="color:#fd7e14">■橙</span>: +5秒</p>
               <p><span style="color:#dc3545">■赤</span>: -30点
-              <p><span style="color:#6f42c1">■紫</span>: -10秒 </p>
+              <p><span style="color:#6f42c1">■紫</span>: -5秒 </p>
               <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃうぞ)</p>
               <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
             </div>
@@ -41,8 +41,8 @@ import Footer from '@/components/Footer.astro';
             <p>あなたのスコアは <span id="final-score" class="highlight">0</span> 点でした！</p>
             <div class="result-actions">
               <button id="retry-btn" class="btn btn-secondary">もう一度遊ぶ</button>
-              <a id="share-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary"
-                style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェアする</a>
+              <!-- SNSシェアボタン：endGame()内でクリックイベントを登録し、window.openで確実に開く -->
+              <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェアする</button>
             </div>
           </div>
         </div>
@@ -313,10 +313,10 @@ import Footer from '@/components/Footer.astro';
       { id: 'normal', cssClass: 'target-normal', score: 10, time: 0, size: 60, baseDuration: 1200, prob: 0.50, special: null },
       // 赤: -30点
       { id: 'minusScore', cssClass: 'target-minus-time', score: -30, time: 0, size: 60, baseDuration: 1800, prob: 0.07, special: null },
-      // 橙: +10秒
-      { id: 'heal', cssClass: 'target-heal', score: 0, time: 10, size: 55, baseDuration: 1200, prob: 0.08, special: null },
-      // 紫: -10秒
-      { id: 'minusTime', cssClass: 'target-minus-score', score: 0, time: -10, size: 60, baseDuration: 1500, prob: 0.10, special: null },
+      // 橙: +5秒
+      { id: 'heal', cssClass: 'target-heal', score: 0, time: 5, size: 55, baseDuration: 1200, prob: 0.08, special: null },
+      // 紫: -5秒
+      { id: 'minusTime', cssClass: 'target-minus-score', score: 0, time: -5, size: 60, baseDuration: 1500, prob: 0.10, special: null },
       // 黄: 高得点・速い
       { id: 'high', cssClass: 'target-high', score: 50, time: 0, size: 45, baseDuration: 600, prob: 0.12, special: null },
       // 緑: スロー効果
@@ -576,9 +576,17 @@ import Footer from '@/components/Footer.astro';
       finalScoreElement.textContent = score.toString();
       const shareText = `私のスコアは ${score} 点でした！(ハイスコア: ${highScore}点) #MyPortfolioMinigame`;
       const shareUrl = window.location.href;
+      // ゲーム終了ごとに最新のスコアを含むシェアURLを生成してボタンに登録する
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
       if (shareBtn) {
-        shareBtn.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        // 古いイベントリスナーが残らないよう、いったん置き換える
+        const newShareBtn = shareBtn.cloneNode(true);
+        shareBtn.parentNode.replaceChild(newShareBtn, shareBtn);
+        newShareBtn.addEventListener('click', () => {
+          // window.openでXの投稿画面を新しいタブで開く
+          window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+        });
       }
 
       resultScreen.style.display = 'block';
