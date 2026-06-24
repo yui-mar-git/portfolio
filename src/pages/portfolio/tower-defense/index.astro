@@ -43,7 +43,7 @@ const materials = [
             </div>
           </div>
           <!-- スタート画面 -->
-          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
+          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <h2>タワーディフェンス</h2>
             <p>マナを消費して出撃し、拠点を防衛しよう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
@@ -51,6 +51,14 @@ const materials = [
             <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
           </div>
           <!-- 遊び方モーダル -->
+          <div class="overlay" id="result-screen" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+            <h2>ゲームオーバー</h2>
+            <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+              <button class="btn btn-secondary" id="btn-retry" style="width: 100%;">リトライ</button>
+              <button class="btn btn-secondary" id="btn-title" style="width: 100%;">タイトルへ</button>
+              <button class="btn btn-primary" id="btn-share" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
+            </div>
+          </div>
           <div id="howto-modal" class="config-modal">
             <h3>遊び方</h3>
             <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
@@ -405,6 +413,11 @@ const materials = [
         if (ally.hp <= 0) {
           ally.destroy();
           enemy.state = 'walk';
+          document.getElementById('result-screen').style.display = 'flex';
+          this.scene.pause();
+          // プレイヤー陣地（今回はally）が倒されたらゲームオーバー扱い
+          document.getElementById('result-screen').style.display = 'flex';
+          this.scene.pause();
         }
       }
     }
@@ -437,6 +450,14 @@ const materials = [
     const closeConfigBtn = document.getElementById('close-config-btn');
     const configModal = document.getElementById('config-modal');
     const modalOverlay = document.getElementById('modal-overlay');
+    const resultScreen = document.getElementById('result-screen');
+    const btnRetry = document.getElementById('btn-retry');
+    const btnTitle = document.getElementById('btn-title');
+    const btnShare = document.getElementById('btn-share');
+    const resultScreen = document.getElementById('result-screen');
+    const btnRetry = document.getElementById('btn-retry');
+    const btnTitle = document.getElementById('btn-title');
+    const btnShare = document.getElementById('btn-share');
 
     if (howtoBtn) howtoBtn.addEventListener('click', () => {
       howtoModal.classList.add('active');
@@ -455,12 +476,57 @@ const materials = [
       modalOverlay.classList.remove('active');
     });
 
+    if (btnRetry) btnRetry.addEventListener('click', () => {
+      resultScreen.style.display = 'none';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.resume('MainScene'); }, 100);
+    });
+
+    if (btnTitle) btnTitle.addEventListener('click', () => {
+      resultScreen.style.display = 'none';
+      startScreen.style.display = 'flex';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.pause('MainScene'); }, 100);
+    });
+
+    if (btnShare) btnShare.addEventListener('click', () => {
+      const text = encodeURIComponent('タワーディフェンスで遊びました！\n#ミニゲーム #ポートフォリオ');
+      const url = encodeURIComponent(window.location.href);
+      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+    });
+
+    if (btnRetry) btnRetry.addEventListener('click', () => {
+      resultScreen.style.display = 'none';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.resume('MainScene'); }, 100);
+    });
+
+    if (btnTitle) btnTitle.addEventListener('click', () => {
+      resultScreen.style.display = 'none';
+      startScreen.style.display = 'flex';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.pause('MainScene'); }, 100);
+    });
+
+    if (btnShare) btnShare.addEventListener('click', () => {
+      const text = encodeURIComponent('タワーディフェンスで遊びました！\n#ミニゲーム #ポートフォリオ');
+      const url = encodeURIComponent(window.location.href);
+      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+    });
+
     if (startBtn) startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       game.scene.resume('MainScene');
     });
 
   </script>
+
+
+
 
 
 

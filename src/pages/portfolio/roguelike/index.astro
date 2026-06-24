@@ -83,13 +83,17 @@ const materials = [
           </div>
 
           <!-- ゲームオーバー/クリア画面 -->
-          <div class="overlay" id="result-overlay" style="display: none;">
+          <div class="overlay" id="result-overlay" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
             <h2 id="result-title">戦闘終了</h2>
-            <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
+            <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+              <button class="btn btn-secondary" id="btn-next" style="width: 100%;">次の戦闘へ</button>
+              <button class="btn btn-secondary" id="btn-title" style="width: 100%;">タイトルへ</button>
+              <button class="btn btn-primary" id="btn-share" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
+            </div>
           </div>
 
           <!-- スタート画面 -->
-          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
+          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <h2>カード＆育成RPG</h2>
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
@@ -411,6 +415,8 @@ const materials = [
     const overlay = document.getElementById('result-overlay');
     const resultTitle = document.getElementById('result-title');
     const btnNext = document.getElementById('btn-next');
+    const btnTitle = document.getElementById('btn-title');
+    const btnShare = document.getElementById('btn-share');
 
     // --- 2. 状態（State）の定義 ---
     // 【学習・カスタマイズポイント】
@@ -590,6 +596,17 @@ const materials = [
     });
 
     // 次の戦闘へ・またはリトライボタン
+    if (btnTitle) btnTitle.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      startScreen.style.display = 'flex';
+    });
+
+    if (btnShare) btnShare.addEventListener('click', () => {
+      const text = encodeURIComponent('ローグライクRPGで戦闘を完了しました！\n#ミニゲーム #ポートフォリオ');
+      const url = encodeURIComponent(window.location.href);
+      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+    });
+
     btnNext.addEventListener('click', () => {
       if (player.hp <= 0) {
         // ゲームオーバーからのリトライ時はステータスを全回復
@@ -632,4 +649,5 @@ const materials = [
     });
 
   </script>
+
 

@@ -47,14 +47,13 @@ const materials = [
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
-            <div class="result-screen" id="result-screen" style="display: none;">
+            <div class="result-screen" id="result-screen" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
               <h2>タイムアップ！</h2>
               <p>あなたのスコアは <span id="final-score" class="highlight">0</span> 点でした！</p>
-              <div class="result-actions">
-                <button id="retry-btn" class="btn btn-secondary">もう一度遊ぶ</button>
-                <!-- SNSシェアボタン：endGame()内でクリックイベントを登録し、window.openで確実に開く -->
-                <button id="share-btn" class="btn btn-primary"
-                  style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェアする</button>
+              <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+                <button id="retry-btn" class="btn btn-secondary" style="width: 100%;">リトライ</button>
+                <button id="title-btn" class="btn btn-secondary" style="width: 100%;">タイトルへ</button>
+                <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェアする</button>
               </div>
             </div>
 
@@ -412,6 +411,7 @@ const materials = [
 
       const startBtn = document.getElementById('start-btn');
       const retryBtn = document.getElementById('retry-btn');
+      const titleBtn = document.getElementById('title-btn');
       const shareBtn = document.getElementById('share-btn');
       const howtoBtn = document.getElementById('howto-btn');
       const closeHowtoBtn = document.getElementById('close-howto-btn');
@@ -735,6 +735,10 @@ const materials = [
 
       if (startBtn) startBtn.addEventListener('click', startGame);
       if (retryBtn) retryBtn.addEventListener('click', startGame);
+      if (titleBtn) titleBtn.addEventListener('click', () => {
+        resultScreen.style.display = 'none';
+        startScreen.style.display = 'flex';
+      });
       if (shareBtn) shareBtn.addEventListener('click', shareScore);
       if (howtoBtn) howtoBtn.addEventListener('click', () => {
         howtoModal.classList.add('active');
@@ -762,5 +766,6 @@ const materials = [
       });
     })(); // 即時関数の終わり
   </script>
+
 
 

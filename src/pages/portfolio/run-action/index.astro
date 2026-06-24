@@ -34,7 +34,7 @@ const materials = [
           <!-- Game Area (Canvas) -->
           <div class="canvas-wrapper" id="canvas-wrapper" style="position: relative;">
             <!-- HUD (Score / Highscore) -->
-            <div class="game-hud" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between;">
+            <div class="game-hud" id="game-hud" style="position: absolute; display: none; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between;">
               <div class="time-display">生存時間: <span id="survival-time">0.0</span>秒</div>
               <div class="highscore-display">ベスト: <span id="highscore">0.0</span>秒</div>
             </div>
@@ -49,13 +49,13 @@ const materials = [
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
-            <div class="overlay" id="result-screen" style="display: none;">
+            <div class="overlay" id="result-screen" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
               <h2>ゲームオーバー</h2>
               <p>記録: <span id="final-time" class="highlight">0.0</span> 秒</p>
-              <div class="result-actions">
-                <button id="retry-btn" class="btn btn-secondary">もう一度</button>
-                <button id="share-btn" class="btn btn-primary"
-                  style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェア</button>
+              <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+                <button id="retry-btn" class="btn btn-secondary" style="width: 100%;">リトライ</button>
+                <button id="title-btn" class="btn btn-secondary" style="width: 100%;">タイトルへ</button>
+                <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
               </div>
             </div>
 
@@ -276,8 +276,10 @@ const materials = [
       const timeElement = document.getElementById('survival-time');
       const highscoreElement = document.getElementById('highscore');
       const finalTimeElement = document.getElementById('final-time');
+      const gameHud = document.getElementById('game-hud');
       const startBtn = document.getElementById('start-btn');
       const retryBtn = document.getElementById('retry-btn');
+      const titleBtn = document.getElementById('title-btn');
       const shareBtn = document.getElementById('share-btn');
       const howtoBtn = document.getElementById('howto-btn');
       const closeHowtoBtn = document.getElementById('close-howto-btn');
@@ -512,6 +514,7 @@ const materials = [
       wrapper.addEventListener('touchstart', handleTap, { passive: false });
 
       function startGame() {
+        if (gameHud) gameHud.style.display = 'flex';
         gameState = 'playing';
         startScreen.style.display = 'none';
         resultScreen.style.display = 'none';
@@ -554,6 +557,7 @@ const materials = [
       }
 
       function gameOver() {
+        if (gameHud) gameHud.style.display = 'none';
         gameState = 'gameover';
         resultScreen.style.display = 'flex';
 
@@ -580,6 +584,11 @@ const materials = [
 
       startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
       retryBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+      if (titleBtn) titleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resultScreen.style.display = 'none';
+        startScreen.style.display = 'flex';
+      });
       if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
       if (howtoBtn) howtoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -606,5 +615,6 @@ const materials = [
       requestAnimationFrame(loop);
     })();
   </script>
+
 
 
