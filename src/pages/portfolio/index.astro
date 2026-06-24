@@ -32,9 +32,17 @@ const projects = portfolioResponse.contents;
                 )}
                 <p>{project.description}</p>
                 {project.url && (
-                  <a href={project.url} target="_blank" rel="noopener noreferrer">
-                    詳細を見る →
-                  </a>
+                  // URLが http から始まる場合は外部サイトとして新しいタブで開く
+                  // それ以外（自サイト内の相対パス）は同じウィンドウで遷移する
+                  project.url.startsWith('http') ? (
+                    <a href={project.url} target="_blank" rel="noopener noreferrer">
+                      詳細を見る →
+                    </a>
+                  ) : (
+                    <a href={project.url}>
+                      詳細を見る →
+                    </a>
+                  )
                 )}
               </div>
             ))
