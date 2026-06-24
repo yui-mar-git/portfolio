@@ -88,11 +88,34 @@ const materials = [
             <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
           </div>
 
+          <!-- スタート画面 -->
+          <div class="overlay" id="start-screen">
+            <h2>カード＆育成RPG</h2>
+            <p>コマンドを選んで敵を倒そう</p>
+            <button id="start-btn" class="btn btn-full">スタート</button>
+            <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
+          </div>
+
+          <!-- コンフィグモーダル（ダミー） -->
+          <div id="modal-overlay" class="modal-overlay"></div>
+          <div id="config-modal" class="config-modal">
+            <h3>設定（コンフィグ）</h3>
+            <div class="config-item">
+              <label for="bgm-volume">BGM音量</label>
+              <input type="range" id="bgm-volume" min="0" max="100" value="50">
+            </div>
+            <div class="config-item">
+              <label for="se-volume">SE音量</label>
+              <input type="range" id="se-volume" min="0" max="100" value="50">
+            </div>
+            <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+          </div>
+
         </div>
 
         <!-- ゲーム概要・使用技術セクション -->
         <section class="project-details">
-          <h2>プロジェクト概要</h2>
+          <h2>概要</h2>
         {projectData && projectData.description ? (
           <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
         ) : (
@@ -109,6 +132,7 @@ const materials = [
         </div>
 
         <h2>使用技術・ツール</h2>
+        <div class="table-responsive">
           <table class="tech-table">
             <tbody>
               {techStack.map((tech) => (
@@ -119,6 +143,7 @@ const materials = [
               ))}
             </tbody>
           </table>
+        </div>
 
           <h2>使用素材</h2>
           <div class="materials-list">
@@ -552,17 +577,35 @@ const materials = [
       });
     });
 
-    // 次の戦闘へ（またはリトライ）ボタン
+    // 次の戦闘へ・またはリトライボタン
     btnNext.addEventListener('click', () => {
       if (player.hp <= 0) {
-        // ゲームオーバーからのリトライ：ステータスを全回復
+        // ゲームオーバーからのリトライ時はステータスを全回復
         player.hp = player.maxHp;
         player.mp = player.maxMp;
       }
       startBattle();
     });
 
-    // 初回起動時の初期化
-    startBattle();
+    // タイトル画面とコンフィグの制御
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const configBtn = document.getElementById('config-btn');
+    const closeConfigBtn = document.getElementById('close-config-btn');
+    const configModal = document.getElementById('config-modal');
+    const modalOverlay = document.getElementById('modal-overlay');
+
+    if (startBtn) startBtn.addEventListener('click', () => {
+      startScreen.style.display = 'none';
+      startBattle();
+    });
+    if (configBtn) configBtn.addEventListener('click', () => {
+      configModal.classList.add('active');
+      modalOverlay.classList.add('active');
+    });
+    if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
+      configModal.classList.remove('active');
+      modalOverlay.classList.remove('active');
+    });
 
   </script>

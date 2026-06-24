@@ -51,6 +51,7 @@ const materials = [
                 <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
               </div>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
+              <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
             <div class="result-screen" id="result-screen" style="display: none;">
@@ -63,12 +64,27 @@ const materials = [
                   style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェアする</button>
               </div>
             </div>
+
+            <!-- コンフィグモーダル（ダミー） -->
+            <div id="modal-overlay" class="modal-overlay"></div>
+            <div id="config-modal" class="config-modal">
+              <h3>設定（コンフィグ）</h3>
+              <div class="config-item">
+                <label for="bgm-volume">BGM音量</label>
+                <input type="range" id="bgm-volume" min="0" max="100" value="50">
+              </div>
+              <div class="config-item">
+                <label for="se-volume">SE音量</label>
+                <input type="range" id="se-volume" min="0" max="100" value="50">
+              </div>
+              <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+            </div>
           </div>
         </div>
 
         <!-- ゲーム概要・使用技術セクション -->
         <section class="project-details">
-          <h2>プロジェクト概要</h2>
+          <h2>概要</h2>
           {projectData && projectData.description ? (
           <p class="description" set:html={projectData.description.replace(/\n/g, '<br>' )} />
           ) : (
@@ -85,16 +101,18 @@ const materials = [
           </div>
 
           <h2>使用技術・ツール</h2>
-          <table class="tech-table">
-            <tbody>
-              {techStack.map((tech) => (
-              <tr>
-                <th>{tech.category}</th>
-                <td>{tech.items}</td>
-              </tr>
-              ))}
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="tech-table">
+              <tbody>
+                {techStack.map((tech) => (
+                <tr>
+                  <th>{tech.category}</th>
+                  <td>{tech.items}</td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <h2>使用素材</h2>
           <div class="materials-list">
@@ -385,6 +403,10 @@ const materials = [
       const startBtn = document.getElementById('start-btn');
       const retryBtn = document.getElementById('retry-btn');
       const shareBtn = document.getElementById('share-btn');
+      const configBtn = document.getElementById('config-btn');
+      const closeConfigBtn = document.getElementById('close-config-btn');
+      const configModal = document.getElementById('config-modal');
+      const modalOverlay = document.getElementById('modal-overlay');
       const scoreElement = document.getElementById('score');
       const timeElement = document.getElementById('time');
       const highscoreElement = document.getElementById('highscore');
@@ -697,5 +719,14 @@ const materials = [
 
       if (startBtn) startBtn.addEventListener('click', startGame);
       if (retryBtn) retryBtn.addEventListener('click', startGame);
+      if (shareBtn) shareBtn.addEventListener('click', shareScore);
+      if (configBtn) configBtn.addEventListener('click', () => {
+        configModal.classList.add('active');
+        modalOverlay.classList.add('active');
+      });
+      if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
+        configModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+      });
     })(); // 即時関数の終わり
   </script>
