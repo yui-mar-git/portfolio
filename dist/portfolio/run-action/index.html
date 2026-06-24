@@ -67,6 +67,8 @@
 
     let blocks = [];
     let obstacles = [];
+    let mountains = [];
+    let clouds = [];
     let nextBlockX = 0;
     const blockWidth = 60;
     const blockHeight = 40;
@@ -95,12 +97,31 @@
       player.vy += gravity;
       player.y += player.vy;
 
-      // --- 地形・障害物のスクロール ---
+      // --- 地形・障害物・背景のスクロール ---
       for (let i = 0; i < blocks.length; i++) {
         blocks[i].x -= scrollSpeed;
       }
       for (let i = 0; i < obstacles.length; i++) {
         obstacles[i].x -= scrollSpeed;
+      }
+      // 山のスクロール（速度は地面の0.5倍＝パララックス効果）
+      for (let i = 0; i < mountains.length; i++) {
+        mountains[i].x -= scrollSpeed * 0.5;
+        // 画面左外に出たら右側にループさせる
+        if (mountains[i].x + mountains[i].width < 0) {
+          mountains[i].x = canvas.width + Math.random() * 150;
+          // 高さと幅を再設定
+          mountains[i].width = 150 + Math.random() * 100;
+          mountains[i].y = canvas.height - blockHeight - (80 + Math.random() * 70); 
+        }
+      }
+      // 雲のスクロール（速度は地面の0.2倍）
+      for (let i = 0; i < clouds.length; i++) {
+        clouds[i].x -= scrollSpeed * 0.2;
+        if (clouds[i].x + clouds[i].size * 2 < 0) {
+          clouds[i].x = canvas.width + Math.random() * 100;
+          clouds[i].y = Math.random() * (canvas.height / 2);
+        }
       }
 
       // --- 当たり判定（地面） ---
@@ -178,6 +199,26 @@
 
       if (gameState === 'start') return;
 
+      // Draw Mountains (背景・奥)
+      ctx.fillStyle = '#2e8b57'; // 海洋緑っぽい色（背景の山用）
+      for (const m of mountains) {
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y); // 山の頂点
+        ctx.lineTo(m.x - m.width / 2, canvas.height - blockHeight); // 左下（地面の高さ）
+        ctx.lineTo(m.x + m.width / 2, canvas.height - blockHeight); // 右下
+        ctx.fill();
+      }
+
+      // Draw Clouds (背景・空)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      for (const c of clouds) {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+        ctx.arc(c.x + c.size, c.y - c.size * 0.2, c.size * 0.8, 0, Math.PI * 2);
+        ctx.arc(c.x + c.size * 1.5, c.y, c.size * 0.9, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // Draw Blocks (Ground)
       ctx.fillStyle = '#28a745'; // 緑色
       for (const block of blocks) {
@@ -241,6 +282,27 @@
       // Reset World (初期状態は穴なしで地面を敷き詰める)
       blocks = [];
       obstacles = [];
+      
+      // 背景の初期配置
+      mountains = [];
+      for(let i=0; i<3; i++) {
+        const w = 150 + Math.random() * 100;
+        mountains.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height - blockHeight - (80 + Math.random() * 70), // 山の高さ
+          width: w
+        });
+      }
+      
+      clouds = [];
+      for(let i=0; i<4; i++) {
+        clouds.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * (canvas.height / 2),
+          size: 20 + Math.random() * 20
+        });
+      }
+
       nextBlockX = 0;
       for (let x = 0; x < canvas.width + blockWidth; x += blockWidth) {
         blocks.push({
