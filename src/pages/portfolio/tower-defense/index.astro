@@ -1,0 +1,273 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+---
+
+<BaseLayout title="タワーディフェンス - My Portfolio" pageId="tower-defense">
+  <!-- Phaser 3 の CDN 読み込み -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+  <Header activeId="portfolio" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">TOWER DEFENSE</span>
+      <h1>タワーディフェンス（Phaser.js雛形）</h1>
+      <p>本格的な2Dゲームエンジン「Phaser 3」を使った衝突判定とオブジェクト管理の基礎です。<br>このコードは、あなたと一緒にAIが構築した**「学習用プロトタイプ」**です。</p>
+
+      <div class="game-ui">
+        <div class="status-bar">
+          <span>所持マナ: <strong id="mana-display">0</strong></span>
+          <button class="btn btn-primary" id="btn-spawn">出撃 (コスト: 50)</button>
+        </div>
+      </div>
+
+      <!-- ここにPhaserのCanvasが挿入されます -->
+      <div id="game-container"></div>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .game-ui {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 1.2rem;
+  }
+
+  #game-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    border: 4px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Phaserが生成するcanvas要素をコンテナに合わせる */
+  #game-container canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>
+
+<script is:inline>
+  /**
+   * ==========================================
+   * タワーディフェンス（横スクロール）の基礎ロジック
+   * ==========================================
+   * 
+   * このコードは本格的なゲームエンジン「Phaser 3」を使用しています。
+   * 自作すると大変な「重なり判定」「大量のオブジェクト管理」「描画ループ」を
+   * Phaserが裏側で全て処理してくれます。
+   */
+
+  // --- ゲームの状態（HTMLと共有する変数） ---
+  let mana = 0;
+  const manaDisplay = document.getElementById('mana-display');
+  const btnSpawn = document.getElementById('btn-spawn');
+
+  // --- Phaser メインシーンの定義 ---
+  class MainScene extends Phaser.Scene {
+    constructor() {
+      // シーンの名前を定義
+      super({ key: 'MainScene' });
+    }
+
+    // 1. 画像や音声の読み込み（今回は図形を使うため省略）
+    preload() {
+      // 【学習ポイント】
+      // 素材ができたら、ここで this.load.image('cat', 'assets/cat.png'); のように読み込みます。
+    }
+
+    // 2. 初期配置（ゲーム開始時に1回だけ実行）
+    create() {
+      // 背景色を空色に設定
+      this.cameras.main.setBackgroundColor('#87CEEB');
+
+      // 地面を描画
+      const ground = this.add.rectangle(400, 550, 800, 100, 0x228B22);
+
+      // 【重要】オブジェクトグループ（配列の強化版）を作成
+      // 味方と敵をグループで管理することで、一括処理や当たり判定が超簡単になります。
+      this.allies = this.physics.add.group();
+      this.enemies = this.physics.add.group();
+
+      // 当たり判定（Overlap）の設定
+      // 味方と敵が重なった時に `handleCombat` メソッドを呼び出す
+      this.physics.add.overlap(this.allies, this.enemies, this.handleCombat, null, this);
+
+      // --- 定期実行タイマー ---
+      // 1秒ごとにマナを回復するタイマー
+      this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          mana += 10;
+          this.updateUI();
+        },
+        loop: true
+      });
+
+      // 3秒ごとに敵を自動生成するタイマー
+      this.time.addEvent({
+        delay: 3000,
+        callback: this.spawnEnemy,
+        callbackScope: this,
+        loop: true
+      });
+
+      // HTMLの出撃ボタンとPhaserの処理を連携
+      btnSpawn.addEventListener('click', () => {
+        if (mana >= 50) {
+          mana -= 50;
+          this.updateUI();
+          this.spawnAlly();
+        }
+      });
+    }
+
+    // 3. 毎フレーム実行される処理（通常は1秒間に60回）
+    update(time, delta) {
+      // 各キャラクターの行動（歩行か攻撃か）を毎フレーム更新する
+      
+      // 味方の処理
+      this.allies.getChildren().forEach(ally => {
+        if (ally.state === 'walk') {
+          ally.body.setVelocityX(50); // 右へ歩く
+        } else if (ally.state === 'attack') {
+          ally.body.setVelocityX(0);  // 立ち止まる
+        }
+      });
+
+      // 敵の処理
+      this.enemies.getChildren().forEach(enemy => {
+        if (enemy.state === 'walk') {
+          enemy.body.setVelocityX(-40); // 左へ歩く
+        } else if (enemy.state === 'attack') {
+          enemy.body.setVelocityX(0);   // 立ち止まる
+        }
+      });
+
+      // 画面外（左や右）に出たキャラクターを削除してメモリを節約
+      this.allies.getChildren().forEach(ally => {
+        if (ally.x > 850) ally.destroy();
+      });
+      this.enemies.getChildren().forEach(enemy => {
+        if (enemy.x < -50) enemy.destroy(); // プレイヤーの拠点に到達したら本当はダメージ
+      });
+    }
+
+    // --- カスタムメソッド ---
+
+    // HTMLの表示を更新する
+    updateUI() {
+      manaDisplay.textContent = mana;
+      btnSpawn.disabled = (mana < 50);
+    }
+
+    // 味方の生成
+    spawnAlly() {
+      // 【カスタマイズポイント】
+      // this.add.sprite(...) に変えれば画像で表示できます！
+      const ally = this.add.rectangle(50, 480, 40, 40, 0x0000FF);
+      this.physics.add.existing(ally); // 物理エンジン（当たり判定）を付与
+      
+      ally.hp = 100;
+      ally.attackPower = 10;
+      ally.lastAttackTime = 0; // 最後に攻撃した時間（クールダウン管理用）
+      ally.state = 'walk';     // 初期状態は「歩行」
+      
+      this.allies.add(ally);
+    }
+
+    // 敵の生成
+    spawnEnemy() {
+      const enemy = this.add.rectangle(850, 480, 40, 40, 0xFF0000);
+      this.physics.add.existing(enemy);
+      
+      enemy.hp = 80;
+      enemy.attackPower = 5;
+      enemy.lastAttackTime = 0;
+      enemy.state = 'walk';
+      
+      this.enemies.add(enemy);
+    }
+
+    // 衝突時の戦闘処理（毎フレーム重なっている間呼ばれ続ける）
+    handleCombat(ally, enemy) {
+      // 状態を「攻撃」に変更し、歩行を止める
+      ally.state = 'attack';
+      enemy.state = 'attack';
+
+      // Phaserの現在時刻を取得
+      const currentTime = this.time.now;
+
+      // 味方の攻撃（クールダウン：1秒 = 1000ms）
+      if (currentTime - ally.lastAttackTime > 1000) {
+        enemy.hp -= ally.attackPower;
+        ally.lastAttackTime = currentTime;
+        
+        // 攻撃したことを視覚的に表現（一瞬だけ白くする）
+        enemy.fillColor = 0xFFFFFF;
+        this.time.delayedCall(100, () => { if (enemy.active) enemy.fillColor = 0xFF0000; });
+      }
+
+      // 敵の攻撃（クールダウン：1.5秒 = 1500ms）
+      if (currentTime - enemy.lastAttackTime > 1500) {
+        ally.hp -= enemy.attackPower;
+        enemy.lastAttackTime = currentTime;
+        
+        ally.fillColor = 0xFFFFFF;
+        this.time.delayedCall(100, () => { if (ally.active) ally.fillColor = 0x0000FF; });
+      }
+
+      // HPが0以下になったら死亡処理
+      if (enemy.hp <= 0) {
+        enemy.destroy(); // オブジェクトを完全に削除
+        ally.state = 'walk'; // 敵が死んだので再び歩き出す
+        mana += 20; // 敵を倒した報酬
+        this.updateUI();
+      }
+
+      if (ally.hp <= 0) {
+        ally.destroy();
+        enemy.state = 'walk';
+      }
+    }
+  }
+
+  // --- Phaser ゲームの設定と起動 ---
+  const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'game-container', // 描画先のHTML要素のID
+    physics: {
+      default: 'arcade', // 標準の物理エンジン
+      arcade: {
+        debug: false // trueにすると当たり判定の枠（緑の線）が見えるようになります
+      }
+    },
+    scene: [MainScene]
+  };
+
+  // ゲームインスタンスの作成（これで画面にCanvasが描画される）
+  const game = new Phaser.Game(config);
+
+</script>
