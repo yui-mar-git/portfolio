@@ -14,210 +14,210 @@
     } else {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
-  </script><link rel="stylesheet" href="/portfolio/_astro/index.C4JhAub5.css">
+  </script><link rel="stylesheet" href="/portfolio/_astro/index.Cv-wHs9f.css">
 <style>.game-ui[data-astro-cid-gveqvgul]{margin-top:2rem;margin-bottom:1rem;background:var(--bg-secondary);padding:1rem;border-radius:8px;display:flex;justify-content:space-between;align-items:center}.status-bar[data-astro-cid-gveqvgul]{display:flex;align-items:center;gap:1.5rem;font-size:1.2rem}#game-container[data-astro-cid-gveqvgul]{width:100%;max-width:800px;margin:0 auto;border:4px solid var(--border-color);border-radius:8px;overflow:hidden}#game-container[data-astro-cid-gveqvgul] canvas[data-astro-cid-gveqvgul]{display:block;width:100%;height:auto}.project-details[data-astro-cid-gveqvgul]{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border-color)}.project-details[data-astro-cid-gveqvgul] h2[data-astro-cid-gveqvgul]{font-size:1.5rem;margin-bottom:1rem}.project-details[data-astro-cid-gveqvgul] h3[data-astro-cid-gveqvgul]{font-size:1.25rem;margin-top:2rem;margin-bottom:1rem}.description[data-astro-cid-gveqvgul]{line-height:1.8;color:var(--text-color)}.tech-table[data-astro-cid-gveqvgul]{width:100%;border-collapse:collapse;margin-top:1rem}.tech-table[data-astro-cid-gveqvgul] th[data-astro-cid-gveqvgul],.tech-table[data-astro-cid-gveqvgul] td[data-astro-cid-gveqvgul]{padding:1rem;border:1px solid var(--border-color);text-align:left}.tech-table[data-astro-cid-gveqvgul] th[data-astro-cid-gveqvgul]{background-color:var(--bg-secondary);width:30%;font-weight:700}
 </style><script type="module">const e=document.getElementById("hamburger"),n=document.getElementById("global-nav"),o=document.getElementById("theme-toggle");e&&n&&(e.addEventListener("click",()=>{const t=n.classList.toggle("open");e.classList.toggle("open"),e.setAttribute("aria-expanded",t.toString()),e.setAttribute("aria-label",t?"メニューを閉じる":"メニューを開く")}),n.querySelectorAll("a").forEach(t=>{t.addEventListener("click",()=>{n.classList.remove("open"),e.classList.remove("open"),e.setAttribute("aria-expanded","false")})}));o&&o.addEventListener("click",()=>{const a=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",a),localStorage.setItem("theme",a)});
-</script></head> <body id="tower-defense">   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script> <header> <div class="container header-container"> <div class="logo"><a href="/portfolio/index.html">My Portfolio.</a></div> <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false"> <span class="hamburger-line"></span> <span class="hamburger-line"></span> <span class="hamburger-line"></span> </button> <button id="theme-toggle" class="theme-toggle" aria-label="テーマを切り替える"> <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="5"></circle> <line x1="12" y1="1" x2="12" y2="3"></line> <line x1="12" y1="21" x2="12" y2="23"></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line> <line x1="1" y1="12" x2="3" y2="12"></line> <line x1="21" y1="12" x2="23" y2="12"></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line> </svg> <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path> </svg> </button> <nav id="global-nav"> <ul> <li> <a href="/portfolio/profile/index.html" class=""> プロフィール </a> </li><li> <a href="/portfolio/portfolio/index.html" class="active"> 制作物 </a> </li><li> <a href="/portfolio/credits/index.html" class=""> 使用素材 </a> </li><li> <a href="/portfolio/contact/index.html" class=""> お問い合わせ </a> </li> </ul> </nav> </div> </header>  <main class="container" data-astro-cid-gveqvgul> <article data-astro-cid-gveqvgul> <span class="page-label" data-astro-cid-gveqvgul>TOWER DEFENSE</span> <h1 data-astro-cid-gveqvgul>タワーディフェンス（Phaser.js雛形）</h1> <p data-astro-cid-gveqvgul>本格的な2Dゲームエンジン「Phaser 3」を使った衝突判定とオブジェクト管理の基礎です。<br data-astro-cid-gveqvgul>このコードは、あなたと一緒にAIが構築した**「学習用プロトタイプ」**です。</p> <div class="game-ui" data-astro-cid-gveqvgul> <div class="status-bar" data-astro-cid-gveqvgul> <span data-astro-cid-gveqvgul>所持マナ: <strong id="mana-display" data-astro-cid-gveqvgul>0</strong></span> <button class="btn btn-primary" id="btn-spawn" data-astro-cid-gveqvgul>出撃 (コスト: 50)</button> </div> </div> <!-- ここにPhaserのCanvasが挿入されます --> <div id="game-container" data-astro-cid-gveqvgul></div> <!-- ゲーム概要・使用技術セクション --> <section class="project-details" data-astro-cid-gveqvgul> <h2 data-astro-cid-gveqvgul>プロジェクト概要</h2> <p class="description" data-astro-cid-gveqvgul>時間経過で貯まるコストを消費してユニットを召喚し、敵を迎撃するタワーディフェンスゲームです。 <br>本格的な2Dゲームエンジン「Phaser 3」を採用し、物理エンジンを用いたキャラクター同士の衝突判定と、状態遷移（歩行・攻撃の切り替え）を実装しています。</p> <h3 data-astro-cid-gveqvgul>使用技術・ツール</h3> <table class="tech-table" data-astro-cid-gveqvgul> <tbody data-astro-cid-gveqvgul> <tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>開発言語</th> <td data-astro-cid-gveqvgul>JavaScript, HTML, CSS</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>フレームワーク</th> <td data-astro-cid-gveqvgul>Astro, Phaser 3 (ゲームエンジン)</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>その他ツール</th> <td data-astro-cid-gveqvgul>Gemini (AIペアプログラミング)</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>学習テーマ</th> <td data-astro-cid-gveqvgul>ゲームエンジン基礎, Arcade Physics衝突判定</td> </tr> </tbody> </table> </section> </article> </main> <footer class="container"> <div class="footer-sns"> <a href="#" class="sns-icon" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="https://github.com/yui-mar-git" class="sns-icon linked" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a href="#" class="sns-icon" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a><a href="#" class="sns-icon" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" class="sns-icon" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a> </div> <p>&copy; 2026 Yui. All rights reserved.</p> </footer>  <script src="/portfolio/script.js"></script> </body> </html>   <script>
-  /**
-   * ==========================================
-   * タワーディフェンス（横スクロール）の基礎ロジック
-   * ==========================================
-   * 
-   * このコードは本格的なゲームエンジン「Phaser 3」を使用しています。
-   * 自作すると大変な「重なり判定」「大量のオブジェクト管理」「描画ループ」を
-   * Phaserが裏側で全て処理してくれます。
-   */
+</script></head> <body id="tower-defense">   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script> <header> <div class="container header-container"> <div class="logo"><a href="/portfolio/index.html">My Portfolio.</a></div> <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false"> <span class="hamburger-line"></span> <span class="hamburger-line"></span> <span class="hamburger-line"></span> </button> <button id="theme-toggle" class="theme-toggle" aria-label="テーマを切り替える"> <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="5"></circle> <line x1="12" y1="1" x2="12" y2="3"></line> <line x1="12" y1="21" x2="12" y2="23"></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line> <line x1="1" y1="12" x2="3" y2="12"></line> <line x1="21" y1="12" x2="23" y2="12"></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line> </svg> <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path> </svg> </button> <nav id="global-nav"> <ul> <li> <a href="/portfolio/profile/index.html" class=""> プロフィール </a> </li><li> <a href="/portfolio/portfolio/index.html" class="active"> 制作物 </a> </li><li> <a href="/portfolio/credits/index.html" class=""> 使用素材 </a> </li><li> <a href="/portfolio/contact/index.html" class=""> お問い合わせ </a> </li> </ul> </nav> </div> </header>  <main class="container" data-astro-cid-gveqvgul> <article data-astro-cid-gveqvgul> <span class="page-label" data-astro-cid-gveqvgul>TOWER DEFENSE</span> <h1 data-astro-cid-gveqvgul>横スクロールタワーディフェンス</h1> <div class="game-ui" data-astro-cid-gveqvgul> <div class="status-bar" data-astro-cid-gveqvgul> <span data-astro-cid-gveqvgul>所持マナ: <strong id="mana-display" data-astro-cid-gveqvgul>0</strong></span> <button class="btn btn-primary" id="btn-spawn" data-astro-cid-gveqvgul>出撃 (コスト: 50)</button> </div> </div> <!-- ここにPhaserのCanvasが挿入されます --> <div id="game-container" data-astro-cid-gveqvgul></div> <!-- ゲーム概要・使用技術セクション --> <section class="project-details" data-astro-cid-gveqvgul> <h2 data-astro-cid-gveqvgul>概要</h2> <p class="description" data-astro-cid-gveqvgul>時間経過で貯まるコストを消費してユニットを召喚し、敵を迎撃するタワーディフェンスゲームです。 <br>本格的な2Dゲームエンジン「Phaser 3」を採用し、物理エンジンを用いたキャラクター同士の衝突判定と、状態遷移（歩行・攻撃の切り替え）を実装しています。</p> <h3 data-astro-cid-gveqvgul>使用技術・ツール</h3> <table class="tech-table" data-astro-cid-gveqvgul> <tbody data-astro-cid-gveqvgul> <tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>開発言語</th> <td data-astro-cid-gveqvgul>JavaScript, HTML, CSS</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>フレームワーク</th> <td data-astro-cid-gveqvgul>Astro, Phaser 3 (ゲームエンジン)</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>その他ツール</th> <td data-astro-cid-gveqvgul>Gemini (AIペアプログラミング)</td> </tr><tr data-astro-cid-gveqvgul> <th data-astro-cid-gveqvgul>学習テーマ</th> <td data-astro-cid-gveqvgul>ゲームエンジン基礎, Arcade Physics衝突判定</td> </tr> </tbody> </table> </section> </article> </main> <footer class="container"> <div class="footer-sns"> <a href="#" class="sns-icon" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="https://github.com/yui-mar-git" class="sns-icon linked" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a href="#" class="sns-icon" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a><a href="#" class="sns-icon" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" class="sns-icon" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a> </div> <p>&copy; 2026 Yui. All rights reserved.</p> </footer>  <script src="/portfolio/script.js"></script> </body> </html>   <script>
+    /**
+     * ==========================================
+     * タワーディフェンス（横スクロール）の基礎ロジック
+     * ==========================================
+     * 
+     * このコードは本格的なゲームエンジン「Phaser 3」を使用しています。
+     * 自作すると大変な「重なり判定」「大量のオブジェクト管理」「描画ループ」を
+     * Phaserが裏側で全て処理してくれます。
+     */
 
-  // --- ゲームの状態（HTMLと共有する変数） ---
-  let mana = 0;
-  const manaDisplay = document.getElementById('mana-display');
-  const btnSpawn = document.getElementById('btn-spawn');
+    // --- ゲームの状態（HTMLと共有する変数） ---
+    let mana = 0;
+    const manaDisplay = document.getElementById('mana-display');
+    const btnSpawn = document.getElementById('btn-spawn');
 
-  // --- Phaser メインシーンの定義 ---
-  class MainScene extends Phaser.Scene {
-    constructor() {
-      // シーンの名前を定義
-      super({ key: 'MainScene' });
-    }
-
-    // 1. 画像や音声の読み込み（今回は図形を使うため省略）
-    preload() {
-      // 【学習ポイント】
-      // 素材ができたら、ここで this.load.image('cat', 'assets/cat.png'); のように読み込みます。
-    }
-
-    // 2. 初期配置（ゲーム開始時に1回だけ実行）
-    create() {
-      // 背景色を空色に設定
-      this.cameras.main.setBackgroundColor('#87CEEB');
-
-      // 地面を描画
-      const ground = this.add.rectangle(400, 550, 800, 100, 0x228B22);
-
-      // 【重要】オブジェクトグループ（配列の強化版）を作成
-      // 味方と敵をグループで管理することで、一括処理や当たり判定が超簡単になります。
-      this.allies = this.physics.add.group();
-      this.enemies = this.physics.add.group();
-
-      // 当たり判定（Overlap）の設定
-      // 味方と敵が重なった時に `handleCombat` メソッドを呼び出す
-      this.physics.add.overlap(this.allies, this.enemies, this.handleCombat, null, this);
-
-      // --- 定期実行タイマー ---
-      // 1秒ごとにマナを回復するタイマー
-      this.time.addEvent({
-        delay: 1000,
-        callback: () => {
-          mana += 10;
-          this.updateUI();
-        },
-        loop: true
-      });
-
-      // 3秒ごとに敵を自動生成するタイマー
-      this.time.addEvent({
-        delay: 3000,
-        callback: this.spawnEnemy,
-        callbackScope: this,
-        loop: true
-      });
-
-      // HTMLの出撃ボタンとPhaserの処理を連携
-      btnSpawn.addEventListener('click', () => {
-        if (mana >= 50) {
-          mana -= 50;
-          this.updateUI();
-          this.spawnAlly();
-        }
-      });
-    }
-
-    // 3. 毎フレーム実行される処理（通常は1秒間に60回）
-    update(time, delta) {
-      // 各キャラクターの行動（歩行か攻撃か）を毎フレーム更新する
-      
-      // 味方の処理
-      this.allies.getChildren().forEach(ally => {
-        if (ally.state === 'walk') {
-          ally.body.setVelocityX(50); // 右へ歩く
-        } else if (ally.state === 'attack') {
-          ally.body.setVelocityX(0);  // 立ち止まる
-        }
-      });
-
-      // 敵の処理
-      this.enemies.getChildren().forEach(enemy => {
-        if (enemy.state === 'walk') {
-          enemy.body.setVelocityX(-40); // 左へ歩く
-        } else if (enemy.state === 'attack') {
-          enemy.body.setVelocityX(0);   // 立ち止まる
-        }
-      });
-
-      // 画面外（左や右）に出たキャラクターを削除してメモリを節約
-      this.allies.getChildren().forEach(ally => {
-        if (ally.x > 850) ally.destroy();
-      });
-      this.enemies.getChildren().forEach(enemy => {
-        if (enemy.x < -50) enemy.destroy(); // プレイヤーの拠点に到達したら本当はダメージ
-      });
-    }
-
-    // --- カスタムメソッド ---
-
-    // HTMLの表示を更新する
-    updateUI() {
-      manaDisplay.textContent = mana;
-      btnSpawn.disabled = (mana < 50);
-    }
-
-    // 味方の生成
-    spawnAlly() {
-      // 【カスタマイズポイント】
-      // this.add.sprite(...) に変えれば画像で表示できます！
-      const ally = this.add.rectangle(50, 480, 40, 40, 0x0000FF);
-      this.physics.add.existing(ally); // 物理エンジン（当たり判定）を付与
-      
-      ally.hp = 100;
-      ally.attackPower = 10;
-      ally.lastAttackTime = 0; // 最後に攻撃した時間（クールダウン管理用）
-      ally.state = 'walk';     // 初期状態は「歩行」
-      
-      this.allies.add(ally);
-    }
-
-    // 敵の生成
-    spawnEnemy() {
-      const enemy = this.add.rectangle(850, 480, 40, 40, 0xFF0000);
-      this.physics.add.existing(enemy);
-      
-      enemy.hp = 80;
-      enemy.attackPower = 5;
-      enemy.lastAttackTime = 0;
-      enemy.state = 'walk';
-      
-      this.enemies.add(enemy);
-    }
-
-    // 衝突時の戦闘処理（毎フレーム重なっている間呼ばれ続ける）
-    handleCombat(ally, enemy) {
-      // 状態を「攻撃」に変更し、歩行を止める
-      ally.state = 'attack';
-      enemy.state = 'attack';
-
-      // Phaserの現在時刻を取得
-      const currentTime = this.time.now;
-
-      // 味方の攻撃（クールダウン：1秒 = 1000ms）
-      if (currentTime - ally.lastAttackTime > 1000) {
-        enemy.hp -= ally.attackPower;
-        ally.lastAttackTime = currentTime;
-        
-        // 攻撃したことを視覚的に表現（一瞬だけ白くする）
-        enemy.fillColor = 0xFFFFFF;
-        this.time.delayedCall(100, () => { if (enemy.active) enemy.fillColor = 0xFF0000; });
+    // --- Phaser メインシーンの定義 ---
+    class MainScene extends Phaser.Scene {
+      constructor() {
+        // シーンの名前を定義
+        super({ key: 'MainScene' });
       }
 
-      // 敵の攻撃（クールダウン：1.5秒 = 1500ms）
-      if (currentTime - enemy.lastAttackTime > 1500) {
-        ally.hp -= enemy.attackPower;
-        enemy.lastAttackTime = currentTime;
-        
-        ally.fillColor = 0xFFFFFF;
-        this.time.delayedCall(100, () => { if (ally.active) ally.fillColor = 0x0000FF; });
+      // 1. 画像や音声の読み込み（今回は図形を使うため省略）
+      preload() {
+        // 【学習ポイント】
+        // 素材ができたら、ここで this.load.image('cat', 'assets/cat.png'); のように読み込みます。
       }
 
-      // HPが0以下になったら死亡処理
-      if (enemy.hp <= 0) {
-        enemy.destroy(); // オブジェクトを完全に削除
-        ally.state = 'walk'; // 敵が死んだので再び歩き出す
-        mana += 20; // 敵を倒した報酬
-        this.updateUI();
+      // 2. 初期配置（ゲーム開始時に1回だけ実行）
+      create() {
+        // 背景色を空色に設定
+        this.cameras.main.setBackgroundColor('#87CEEB');
+
+        // 地面を描画
+        const ground = this.add.rectangle(400, 550, 800, 100, 0x228B22);
+
+        // 【重要】オブジェクトグループ（配列の強化版）を作成
+        // 味方と敵をグループで管理することで、一括処理や当たり判定が超簡単になります。
+        this.allies = this.physics.add.group();
+        this.enemies = this.physics.add.group();
+
+        // 当たり判定（Overlap）の設定
+        // 味方と敵が重なった時に `handleCombat` メソッドを呼び出す
+        this.physics.add.overlap(this.allies, this.enemies, this.handleCombat, null, this);
+
+        // --- 定期実行タイマー ---
+        // 1秒ごとにマナを回復するタイマー
+        this.time.addEvent({
+          delay: 1000,
+          callback: () => {
+            mana += 10;
+            this.updateUI();
+          },
+          loop: true
+        });
+
+        // 3秒ごとに敵を自動生成するタイマー
+        this.time.addEvent({
+          delay: 3000,
+          callback: this.spawnEnemy,
+          callbackScope: this,
+          loop: true
+        });
+
+        // HTMLの出撃ボタンとPhaserの処理を連携
+        btnSpawn.addEventListener('click', () => {
+          if (mana >= 50) {
+            mana -= 50;
+            this.updateUI();
+            this.spawnAlly();
+          }
+        });
       }
 
-      if (ally.hp <= 0) {
-        ally.destroy();
+      // 3. 毎フレーム実行される処理（通常は1秒間に60回）
+      update(time, delta) {
+        // 各キャラクターの行動（歩行か攻撃か）を毎フレーム更新する
+
+        // 味方の処理
+        this.allies.getChildren().forEach(ally => {
+          if (ally.state === 'walk') {
+            ally.body.setVelocityX(50); // 右へ歩く
+          } else if (ally.state === 'attack') {
+            ally.body.setVelocityX(0);  // 立ち止まる
+          }
+        });
+
+        // 敵の処理
+        this.enemies.getChildren().forEach(enemy => {
+          if (enemy.state === 'walk') {
+            enemy.body.setVelocityX(-40); // 左へ歩く
+          } else if (enemy.state === 'attack') {
+            enemy.body.setVelocityX(0);   // 立ち止まる
+          }
+        });
+
+        // 画面外（左や右）に出たキャラクターを削除してメモリを節約
+        this.allies.getChildren().forEach(ally => {
+          if (ally.x > 850) ally.destroy();
+        });
+        this.enemies.getChildren().forEach(enemy => {
+          if (enemy.x < -50) enemy.destroy(); // プレイヤーの拠点に到達したら本当はダメージ
+        });
+      }
+
+      // --- カスタムメソッド ---
+
+      // HTMLの表示を更新する
+      updateUI() {
+        manaDisplay.textContent = mana;
+        btnSpawn.disabled = (mana < 50);
+      }
+
+      // 味方の生成
+      spawnAlly() {
+        // 【カスタマイズポイント】
+        // this.add.sprite(...) に変えれば画像で表示できます！
+        const ally = this.add.rectangle(50, 480, 40, 40, 0x0000FF);
+        this.physics.add.existing(ally); // 物理エンジン（当たり判定）を付与
+
+        ally.hp = 100;
+        ally.attackPower = 10;
+        ally.lastAttackTime = 0; // 最後に攻撃した時間（クールダウン管理用）
+        ally.state = 'walk';     // 初期状態は「歩行」
+
+        this.allies.add(ally);
+      }
+
+      // 敵の生成
+      spawnEnemy() {
+        const enemy = this.add.rectangle(850, 480, 40, 40, 0xFF0000);
+        this.physics.add.existing(enemy);
+
+        enemy.hp = 80;
+        enemy.attackPower = 5;
+        enemy.lastAttackTime = 0;
         enemy.state = 'walk';
+
+        this.enemies.add(enemy);
+      }
+
+      // 衝突時の戦闘処理（毎フレーム重なっている間呼ばれ続ける）
+      handleCombat(ally, enemy) {
+        // 状態を「攻撃」に変更し、歩行を止める
+        ally.state = 'attack';
+        enemy.state = 'attack';
+
+        // Phaserの現在時刻を取得
+        const currentTime = this.time.now;
+
+        // 味方の攻撃（クールダウン：1秒 = 1000ms）
+        if (currentTime - ally.lastAttackTime > 1000) {
+          enemy.hp -= ally.attackPower;
+          ally.lastAttackTime = currentTime;
+
+          // 攻撃したことを視覚的に表現（一瞬だけ白くする）
+          enemy.fillColor = 0xFFFFFF;
+          this.time.delayedCall(100, () => { if (enemy.active) enemy.fillColor = 0xFF0000; });
+        }
+
+        // 敵の攻撃（クールダウン：1.5秒 = 1500ms）
+        if (currentTime - enemy.lastAttackTime > 1500) {
+          ally.hp -= enemy.attackPower;
+          enemy.lastAttackTime = currentTime;
+
+          ally.fillColor = 0xFFFFFF;
+          this.time.delayedCall(100, () => { if (ally.active) ally.fillColor = 0x0000FF; });
+        }
+
+        // HPが0以下になったら死亡処理
+        if (enemy.hp <= 0) {
+          enemy.destroy(); // オブジェクトを完全に削除
+          ally.state = 'walk'; // 敵が死んだので再び歩き出す
+          mana += 20; // 敵を倒した報酬
+          this.updateUI();
+        }
+
+        if (ally.hp <= 0) {
+          ally.destroy();
+          enemy.state = 'walk';
+        }
       }
     }
-  }
 
-  // --- Phaser ゲームの設定と起動 ---
-  const config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    parent: 'game-container', // 描画先のHTML要素のID
-    physics: {
-      default: 'arcade', // 標準の物理エンジン
-      arcade: {
-        debug: false // trueにすると当たり判定の枠（緑の線）が見えるようになります
-      }
-    },
-    scene: [MainScene]
-  };
+    // --- Phaser ゲームの設定と起動 ---
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      parent: 'game-container', // 描画先のHTML要素のID
+      physics: {
+        default: 'arcade', // 標準の物理エンジン
+        arcade: {
+          debug: false // trueにすると当たり判定の枠（緑の線）が見えるようになります
+        }
+      },
+      scene: [MainScene]
+    };
 
-  // ゲームインスタンスの作成（これで画面にCanvasが描画される）
-  const game = new Phaser.Game(config);
+    // ゲームインスタンスの作成（これで画面にCanvasが描画される）
+    const game = new Phaser.Game(config);
 
-</script>
+  </script>

@@ -6,502 +6,538 @@ import { fetchMicroCMS } from '../../../lib/microcms';
 import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
 
 const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
-const projectData = portfolioResponse.contents.find((c) => c.url.includes('/roguelike/'));
+  const projectData = portfolioResponse.contents.find((c) => c.url.includes('/roguelike/'));
 
-const techStack = [
+  const techStack = [
   { category: "開発言語", items: "JavaScript, HTML, CSS" },
   { category: "フレームワーク", items: "Astro" },
   { category: "その他ツール", items: "Gemini (AIペアプログラミング)" },
   { category: "学習テーマ", items: "状態管理, ダメージ計算, ターン制ロジック" }
-];
----
+  ];
+  ---
 
-<BaseLayout title="カード＆育成RPG - My Portfolio" pageId="roguelike">
-  <Header activeId="portfolio" />
+  <BaseLayout title="カード＆育成RPG - My Portfolio" pageId="roguelike">
+    <Header activeId="portfolio" />
 
-  <main class="container">
-    <article>
-      <span class="page-label">TURN-BASED RPG</span>
-      <h1>ローグライクRPG（雛形）</h1>
-      <p>状態管理とダメージ計算の基礎を学ぶためのターン制バトルの土台です。<br>パラメータや計算式をいじって、あなただけのゲームバランスを作ってみましょう！</p>
+    <main class="container">
+      <article>
+        <span class="page-label">TURN-BASED RPG</span>
+        <h1>{projectData ? projectData.title : 'ローグライクRPG（雛形）'}</h1>
 
-      <div class="game-container">
-        
-        <!-- 敵ステータスエリア -->
-        <div class="character-panel enemy-panel">
-          <h2 id="enemy-name">スライム</h2>
-          <div class="status-bar">
-            <label>HP:</label>
-            <div class="bar-bg">
-              <div class="bar-fill hp-fill" id="enemy-hp-bar"></div>
-            </div>
-            <span id="enemy-hp-text">40 / 40</span>
-          </div>
-        </div>
+        <div class="game-container">
 
-        <!-- バトルログ（戦闘の履歴） -->
-        <div class="battle-log" id="battle-log">
-          <p>野生のスライムが現れた！</p>
-        </div>
-
-        <!-- プレイヤーステータスエリア -->
-        <div class="character-panel player-panel">
-          <h2>プレイヤー</h2>
-          <div class="status-grid">
+          <!-- 敵ステータスエリア -->
+          <div class="character-panel enemy-panel">
+            <h2 id="enemy-name">スライム</h2>
             <div class="status-bar">
               <label>HP:</label>
               <div class="bar-bg">
-                <div class="bar-fill hp-fill" id="player-hp-bar"></div>
+                <div class="bar-fill hp-fill" id="enemy-hp-bar"></div>
               </div>
-              <span id="player-hp-text">100 / 100</span>
-            </div>
-            <div class="status-bar">
-              <label>MP:</label>
-              <div class="bar-bg">
-                <div class="bar-fill mp-fill" id="player-mp-bar"></div>
-              </div>
-              <span id="player-mp-text">30 / 30</span>
+              <span id="enemy-hp-text">40 / 40</span>
             </div>
           </div>
-        </div>
 
-        <!-- コマンド（行動）選択エリア -->
-        <div class="command-panel" id="command-panel">
-          <!-- 
+          <!-- バトルログ（戦闘の履歴） -->
+          <div class="battle-log" id="battle-log">
+            <p>野生のスライムが現れた！</p>
+          </div>
+
+          <!-- プレイヤーステータスエリア -->
+          <div class="character-panel player-panel">
+            <h2>プレイヤー</h2>
+            <div class="status-grid">
+              <div class="status-bar">
+                <label>HP:</label>
+                <div class="bar-bg">
+                  <div class="bar-fill hp-fill" id="player-hp-bar"></div>
+                </div>
+                <span id="player-hp-text">100 / 100</span>
+              </div>
+              <div class="status-bar">
+                <label>MP:</label>
+                <div class="bar-bg">
+                  <div class="bar-fill mp-fill" id="player-mp-bar"></div>
+                </div>
+                <span id="player-mp-text">30 / 30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- コマンド（行動）選択エリア -->
+          <div class="command-panel" id="command-panel">
+            <!-- 
             【学習・カスタマイズポイント】
             ここに新しいボタン（例えば「防御する」「アイテム」など）をHTMLで追加し、
             下のJavaScriptでクリックイベントを紐付けることで、行動のバリエーションを増やせます。
           -->
-          <button class="btn btn-action" id="btn-attack">⚔️ たたかう</button>
-          <button class="btn btn-action btn-magic" id="btn-heal">✨ 回復魔法 (MP: 10)</button>
-          <button class="btn btn-action btn-special" id="btn-fire">🔥 炎の魔法 (MP: 15)</button>
+            <button class="btn btn-action" id="btn-attack">⚔️ たたかう</button>
+            <button class="btn btn-action btn-magic" id="btn-heal">✨ 回復魔法 (MP: 10)</button>
+            <button class="btn btn-action btn-special" id="btn-fire">🔥 炎の魔法 (MP: 15)</button>
+          </div>
+
+          <!-- ゲームオーバー/クリア画面 -->
+          <div class="overlay" id="result-overlay" style="display: none;">
+            <h2 id="result-title">戦闘終了</h2>
+            <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
+          </div>
+
         </div>
 
-        <!-- ゲームオーバー/クリア画面 -->
-        <div class="overlay" id="result-overlay" style="display: none;">
-          <h2 id="result-title">戦闘終了</h2>
-          <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
-        </div>
-
-      </div>
-
-      <!-- ゲーム概要・使用技術セクション -->
-      <section class="project-details">
-        <h2>プロジェクト概要</h2>
-        {projectData && projectData.description ? (
-          <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
-        ) : (
+        <!-- ゲーム概要・使用技術セクション -->
+        <section class="project-details">
+          <h2>概要</h2>
+          {projectData && projectData.description ? (
+          <p class="description" set:html={projectData.description.replace(/\n/g, '<br>' )} />
+          ) : (
           <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
-        )}
+          )}
 
-        <h3>使用技術・ツール</h3>
-        <table class="tech-table">
-          <tbody>
-            {techStack.map((tech) => (
+          <h3>使用技術・ツール</h3>
+          <table class="tech-table">
+            <tbody>
+              {techStack.map((tech) => (
               <tr>
                 <th>{tech.category}</th>
                 <td>{tech.items}</td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-    </article>
-  </main>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      </article>
+    </main>
 
-  <Footer />
-</BaseLayout>
+    <Footer />
+  </BaseLayout>
 
-<style>
-  .game-container {
-    margin-top: 2rem;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .character-panel {
-    background: var(--bg-color);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 2px solid var(--border-color);
-    margin-bottom: 1rem;
-  }
-
-  .enemy-panel {
-    border-color: #dc3545;
-    text-align: center;
-  }
-
-  .player-panel {
-    border-color: #007bff;
-  }
-
-  .character-panel h2 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-  }
-
-  .status-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .status-bar label {
-    font-weight: bold;
-    width: 30px;
-  }
-
-  .bar-bg {
-    flex-grow: 1;
-    height: 16px;
-    background: #e9ecef;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  /* ダークモード時のゲージ背景調整 */
-  :global([data-theme="dark"]) .bar-bg {
-    background: #343a40;
-  }
-
-  .bar-fill {
-    height: 100%;
-    transition: width 0.3s ease-out;
-  }
-
-  .hp-fill { background: #28a745; }
-  .mp-fill { background: #007bff; }
-
-  .status-bar span {
-    font-size: 0.9rem;
-    width: 60px;
-    text-align: right;
-  }
-
-  .battle-log {
-    height: 150px;
-    background: #111;
-    color: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-    font-family: monospace;
-    line-height: 1.5;
-  }
-
-  .battle-log p {
-    margin: 0 0 0.5rem 0;
-    border-bottom: 1px solid #333;
-    padding-bottom: 0.5rem;
-  }
-
-  .log-damage { color: #ff6b6b; }
-  .log-heal { color: #51cf66; }
-  .log-system { color: #fcc419; }
-
-  .command-panel {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-  }
-
-  .btn-action {
-    padding: 1rem;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-
-  .btn-magic { background-color: #17a2b8; border-color: #17a2b8; color: white; }
-  .btn-special { background-color: #fd7e14; border-color: #fd7e14; color: white; }
-
-  .btn-magic:hover { background-color: #138496; }
-  .btn-special:hover { background-color: #e8590c; }
-
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    filter: grayscale(100%);
-  }
-
-  .overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-
-  .overlay h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* --- 追加：プロジェクト概要セクションのスタイル --- */
-  .project-details {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-  }
-  .project-details h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .project-details h3 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-  }
-  .description {
-    line-height: 1.8;
-    color: var(--text-color);
-  }
-  .tech-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-  .tech-table th, .tech-table td {
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    text-align: left;
-  }
-  .tech-table th {
-    background-color: var(--bg-secondary);
-    width: 30%;
-    font-weight: bold;
-  }
-</style>
-
-<script is:inline>
-  /**
-   * ==========================================
-   * ローグライク（ターン制RPG）の基礎ロジック
-   * ==========================================
-   * DOMの取得から状態管理（State）、計算ロジック、画面更新までを管理します。
-   * コメントを参考に、数字を変えたり新しい機能を足してみてください！
-   */
-
-  // --- 1. DOM要素の取得 ---
-  const enemyNameEl = document.getElementById('enemy-name');
-  const enemyHpBar = document.getElementById('enemy-hp-bar');
-  const enemyHpText = document.getElementById('enemy-hp-text');
-
-  const playerHpBar = document.getElementById('player-hp-bar');
-  const playerHpText = document.getElementById('player-hp-text');
-  const playerMpBar = document.getElementById('player-mp-bar');
-  const playerMpText = document.getElementById('player-mp-text');
-
-  const battleLog = document.getElementById('battle-log');
-  const btnAttack = document.getElementById('btn-attack');
-  const btnHeal = document.getElementById('btn-heal');
-  const btnFire = document.getElementById('btn-fire');
-
-  const overlay = document.getElementById('result-overlay');
-  const resultTitle = document.getElementById('result-title');
-  const btnNext = document.getElementById('btn-next');
-
-  // --- 2. 状態（State）の定義 ---
-  // 【学習・カスタマイズポイント】
-  // ここに「素早さ (speed)」や「毒状態 (isPoisoned)」などの変数を増やすことで、
-  // より複雑なゲームシステムに発展させることができます。
-
-  let player = {
-    name: "プレイヤー",
-    hp: 100,
-    maxHp: 100,
-    mp: 30,
-    maxMp: 30,
-    attack: 15,
-    defense: 5
-  };
-
-  let enemy = null;
-  
-  // 敵のテンプレート（ここからランダムに敵を選びます）
-  // 攻撃力や防御力のバランスをいじってみましょう。
-  const enemyTemplates = [
-    { name: "スライム", hp: 40, maxHp: 40, attack: 8, defense: 2 },
-    { name: "ゴブリン", hp: 60, maxHp: 60, attack: 12, defense: 4 },
-    { name: "ドラゴン", hp: 150, maxHp: 150, attack: 25, defense: 10 }
-  ];
-
-  let isGameOver = false;
-
-  // --- 3. ユーティリティ・画面更新関数 ---
-
-  // ログにメッセージを追加する関数
-  function logMessage(msg, className = '') {
-    const p = document.createElement('p');
-    p.innerHTML = msg;
-    if (className) p.classList.add(className);
-    battleLog.appendChild(p);
-    // 常に一番下へスクロールする
-    battleLog.scrollTop = battleLog.scrollHeight;
-  }
-
-  // 画面のHP/MPバーや数値を最新の状態に更新する関数
-  function updateUI() {
-    // Player
-    playerHpText.textContent = `${player.hp} / ${player.maxHp}`;
-    playerHpBar.style.width = `${(player.hp / player.maxHp) * 100}%`;
-    
-    playerMpText.textContent = `${player.mp} / ${player.maxMp}`;
-    playerMpBar.style.width = `${(player.mp / player.maxMp) * 100}%`;
-
-    // Enemy
-    if (enemy) {
-      enemyNameEl.textContent = enemy.name;
-      enemyHpText.textContent = `${enemy.hp} / ${enemy.maxHp}`;
-      enemyHpBar.style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+  <style>
+    .game-container {
+      margin-top: 2rem;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    // MPが足りない場合はボタンを無効化する
-    btnHeal.disabled = (player.mp < 10) || isGameOver;
-    btnFire.disabled = (player.mp < 15) || isGameOver;
-    btnAttack.disabled = isGameOver;
-  }
+    .character-panel {
+      background: var(--bg-color);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      margin-bottom: 1rem;
+    }
 
-  // 新しい戦闘の準備
-  function startBattle() {
-    isGameOver = false;
-    overlay.style.display = 'none';
+    .enemy-panel {
+      border-color: #dc3545;
+      text-align: center;
+    }
 
-    // 敵をランダムに選んでコピー（参照渡しを防ぐためスプレッド構文を使用）
-    const randomEnemy = enemyTemplates[Math.floor(Math.random() * enemyTemplates.length)];
-    enemy = { ...randomEnemy };
+    .player-panel {
+      border-color: #007bff;
+    }
 
-    // ログをクリア
-    battleLog.innerHTML = '';
-    logMessage('野生の <' + 'span class="log-system">' + enemy.name + '<' + '/span> が現れた！');
+    .character-panel h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+    }
 
-    updateUI();
-  }
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
 
+    .status-bar label {
+      font-weight: bold;
+      width: 30px;
+    }
 
-  // --- 4. 戦闘ロジック ---
+    .bar-bg {
+      flex-grow: 1;
+      height: 16px;
+      background: #e9ecef;
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-  // ダメージ計算式
-  // 【学習・カスタマイズポイント】
-  // 「会心の一撃（クリティカル）」のロジックを入れたり、
-  // 属性相性（炎はスライムに強い等）を入れるとより本格的になります。
-  function calculateDamage(attackerAttack, defenderDefense) {
-    // 基礎ダメージ = 攻撃力 - 防御力
-    let baseDamage = attackerAttack - defenderDefense;
-    // ダメージのブレ（±20%）
-    let variance = baseDamage * 0.2;
-    let randomVariance = (Math.random() * variance * 2) - variance;
-    
-    let finalDamage = Math.floor(baseDamage + randomVariance);
-    // どんなに硬くても最低1ダメージは与える
-    return Math.max(1, finalDamage);
-  }
+    /* ダークモード時のゲージ背景調整 */
+    :global([data-theme="dark"]) .bar-bg {
+      background: #343a40;
+    }
 
-  // ターンを進行させる関数（プレイヤー行動 → 敵行動）
-  function processTurn(playerActionCallback) {
-    if (isGameOver) return;
+    .bar-fill {
+      height: 100%;
+      transition: width 0.3s ease-out;
+    }
 
-    // ① プレイヤーの行動（ボタンごとに異なる処理をCallbackで受け取る）
-    playerActionCallback();
+    .hp-fill {
+      background: #28a745;
+    }
 
-    // もし敵を倒していたら
-    if (enemy.hp <= 0) {
-      enemy.hp = 0;
+    .mp-fill {
+      background: #007bff;
+    }
+
+    .status-bar span {
+      font-size: 0.9rem;
+      width: 60px;
+      text-align: right;
+    }
+
+    .battle-log {
+      height: 150px;
+      background: #111;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      font-family: monospace;
+      line-height: 1.5;
+    }
+
+    .battle-log p {
+      margin: 0 0 0.5rem 0;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.5rem;
+    }
+
+    .log-damage {
+      color: #ff6b6b;
+    }
+
+    .log-heal {
+      color: #51cf66;
+    }
+
+    .log-system {
+      color: #fcc419;
+    }
+
+    .command-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .btn-magic {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+      color: white;
+    }
+
+    .btn-special {
+      background-color: #fd7e14;
+      border-color: #fd7e14;
+      color: white;
+    }
+
+    .btn-magic:hover {
+      background-color: #138496;
+    }
+
+    .btn-special:hover {
+      background-color: #e8590c;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(100%);
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .overlay h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* --- 追加：プロジェクト概要セクションのスタイル --- */
+    .project-details {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .project-details h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .project-details h3 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .description {
+      line-height: 1.8;
+      color: var(--text-color);
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .tech-table th,
+    .tech-table td {
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .tech-table th {
+      background-color: var(--bg-secondary);
+      width: 30%;
+      font-weight: bold;
+    }
+  </style>
+
+  <script is:inline>
+    /**
+     * ==========================================
+     * ローグライク（ターン制RPG）の基礎ロジック
+     * ==========================================
+     * DOMの取得から状態管理（State）、計算ロジック、画面更新までを管理します。
+     * コメントを参考に、数字を変えたり新しい機能を足してみてください！
+     */
+
+    // --- 1. DOM要素の取得 ---
+    const enemyNameEl = document.getElementById('enemy-name');
+    const enemyHpBar = document.getElementById('enemy-hp-bar');
+    const enemyHpText = document.getElementById('enemy-hp-text');
+
+    const playerHpBar = document.getElementById('player-hp-bar');
+    const playerHpText = document.getElementById('player-hp-text');
+    const playerMpBar = document.getElementById('player-mp-bar');
+    const playerMpText = document.getElementById('player-mp-text');
+
+    const battleLog = document.getElementById('battle-log');
+    const btnAttack = document.getElementById('btn-attack');
+    const btnHeal = document.getElementById('btn-heal');
+    const btnFire = document.getElementById('btn-fire');
+
+    const overlay = document.getElementById('result-overlay');
+    const resultTitle = document.getElementById('result-title');
+    const btnNext = document.getElementById('btn-next');
+
+    // --- 2. 状態（State）の定義 ---
+    // 【学習・カスタマイズポイント】
+    // ここに「素早さ (speed)」や「毒状態 (isPoisoned)」などの変数を増やすことで、
+    // より複雑なゲームシステムに発展させることができます。
+
+    let player = {
+      name: "プレイヤー",
+      hp: 100,
+      maxHp: 100,
+      mp: 30,
+      maxMp: 30,
+      attack: 15,
+      defense: 5
+    };
+
+    let enemy = null;
+
+    // 敵のテンプレート（ここからランダムに敵を選びます）
+    // 攻撃力や防御力のバランスをいじってみましょう。
+    const enemyTemplates = [
+      { name: "スライム", hp: 40, maxHp: 40, attack: 8, defense: 2 },
+      { name: "ゴブリン", hp: 60, maxHp: 60, attack: 12, defense: 4 },
+      { name: "ドラゴン", hp: 150, maxHp: 150, attack: 25, defense: 10 }
+    ];
+
+    let isGameOver = false;
+
+    // --- 3. ユーティリティ・画面更新関数 ---
+
+    // ログにメッセージを追加する関数
+    function logMessage(msg, className = '') {
+      const p = document.createElement('p');
+      p.innerHTML = msg;
+      if (className) p.classList.add(className);
+      battleLog.appendChild(p);
+      // 常に一番下へスクロールする
+      battleLog.scrollTop = battleLog.scrollHeight;
+    }
+
+    // 画面のHP/MPバーや数値を最新の状態に更新する関数
+    function updateUI() {
+      // Player
+      playerHpText.textContent = `${player.hp} / ${player.maxHp}`;
+      playerHpBar.style.width = `${(player.hp / player.maxHp) * 100}%`;
+
+      playerMpText.textContent = `${player.mp} / ${player.maxMp}`;
+      playerMpBar.style.width = `${(player.mp / player.maxMp) * 100}%`;
+
+      // Enemy
+      if (enemy) {
+        enemyNameEl.textContent = enemy.name;
+        enemyHpText.textContent = `${enemy.hp} / ${enemy.maxHp}`;
+        enemyHpBar.style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+      }
+
+      // MPが足りない場合はボタンを無効化する
+      btnHeal.disabled = (player.mp < 10) || isGameOver;
+      btnFire.disabled = (player.mp < 15) || isGameOver;
+      btnAttack.disabled = isGameOver;
+    }
+
+    // 新しい戦闘の準備
+    function startBattle() {
+      isGameOver = false;
+      overlay.style.display = 'none';
+
+      // 敵をランダムに選んでコピー（参照渡しを防ぐためスプレッド構文を使用）
+      const randomEnemy = enemyTemplates[Math.floor(Math.random() * enemyTemplates.length)];
+      enemy = { ...randomEnemy };
+
+      // ログをクリア
+      battleLog.innerHTML = '';
+      logMessage('野生の <' + 'span class="log-system">' + enemy.name + '<' + '/span> が現れた！');
+
       updateUI();
-      logMessage('<' + 'span class="log-system">' + enemy.name + ' を倒した！<' + '/span>');
-      
-      // 戦闘終了処理
-      isGameOver = true;
-      setTimeout(() => {
-        resultTitle.textContent = "勝利！";
-        btnNext.textContent = "次の戦闘へ";
-        // 勝利報酬：MPを少し回復
-        player.mp = Math.min(player.maxMp, player.mp + 5);
-        overlay.style.display = 'flex';
-      }, 1000);
-      return;
     }
 
-    // ② 敵の行動（反撃）
-    // ちょっと間を空けて敵が攻撃してくるようにする（setTimeout）
-    setTimeout(() => {
+
+    // --- 4. 戦闘ロジック ---
+
+    // ダメージ計算式
+    // 【学習・カスタマイズポイント】
+    // 「会心の一撃（クリティカル）」のロジックを入れたり、
+    // 属性相性（炎はスライムに強い等）を入れるとより本格的になります。
+    function calculateDamage(attackerAttack, defenderDefense) {
+      // 基礎ダメージ = 攻撃力 - 防御力
+      let baseDamage = attackerAttack - defenderDefense;
+      // ダメージのブレ（±20%）
+      let variance = baseDamage * 0.2;
+      let randomVariance = (Math.random() * variance * 2) - variance;
+
+      let finalDamage = Math.floor(baseDamage + randomVariance);
+      // どんなに硬くても最低1ダメージは与える
+      return Math.max(1, finalDamage);
+    }
+
+    // ターンを進行させる関数（プレイヤー行動 → 敵行動）
+    function processTurn(playerActionCallback) {
       if (isGameOver) return;
-      
-      const damage = calculateDamage(enemy.attack, player.defense);
-      player.hp = Math.max(0, player.hp - damage);
-      logMessage(enemy.name + 'の攻撃！ プレイヤーに <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
-      
-      updateUI();
 
-      // ゲームオーバー判定
-      if (player.hp <= 0) {
-        logMessage('<' + 'span class="log-damage">プレイヤーは力尽きた...<' + '/span>');
+      // ① プレイヤーの行動（ボタンごとに異なる処理をCallbackで受け取る）
+      playerActionCallback();
+
+      // もし敵を倒していたら
+      if (enemy.hp <= 0) {
+        enemy.hp = 0;
+        updateUI();
+        logMessage('<' + 'span class="log-system">' + enemy.name + ' を倒した！<' + '/span>');
+
+        // 戦闘終了処理
         isGameOver = true;
         setTimeout(() => {
-          resultTitle.textContent = "ゲームオーバー";
-          btnNext.textContent = "最初からやり直す";
+          resultTitle.textContent = "勝利！";
+          btnNext.textContent = "次の戦闘へ";
+          // 勝利報酬：MPを少し回復
+          player.mp = Math.min(player.maxMp, player.mp + 5);
           overlay.style.display = 'flex';
         }, 1000);
+        return;
       }
-    }, 500); // 0.5秒後に敵のターン
-  }
 
-  // --- 5. イベントリスナー（ボタン押下時の処理） ---
+      // ② 敵の行動（反撃）
+      // ちょっと間を空けて敵が攻撃してくるようにする（setTimeout）
+      setTimeout(() => {
+        if (isGameOver) return;
 
-  // たたかうボタン
-  btnAttack.addEventListener('click', () => {
-    processTurn(() => {
-      const damage = calculateDamage(player.attack, enemy.defense);
-      enemy.hp -= damage;
-      logMessage('プレイヤーの攻撃！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
-    });
-  });
+        const damage = calculateDamage(enemy.attack, player.defense);
+        player.hp = Math.max(0, player.hp - damage);
+        logMessage(enemy.name + 'の攻撃！ プレイヤーに <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
 
-  // 回復魔法ボタン
-  btnHeal.addEventListener('click', () => {
-    processTurn(() => {
-      player.mp -= 10;
-      const healAmount = 30 + Math.floor(Math.random() * 10); // 30〜39回復
-      player.hp = Math.min(player.maxHp, player.hp + healAmount);
-      logMessage('プレイヤーは回復魔法を唱えた！ HPが <' + 'span class="log-heal">' + healAmount + '回復<' + '/span>した！');
-    });
-  });
+        updateUI();
 
-  // 炎の魔法ボタン
-  btnFire.addEventListener('click', () => {
-    processTurn(() => {
-      player.mp -= 15;
-      // 炎の魔法は相手の防御力を無視して大ダメージを与える固定式
-      const damage = 25 + Math.floor(Math.random() * 10); // 25〜34ダメージ
-      enemy.hp -= damage;
-      logMessage('プレイヤーの炎の魔法！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
-    });
-  });
-
-  // 次の戦闘へ（またはリトライ）ボタン
-  btnNext.addEventListener('click', () => {
-    if (player.hp <= 0) {
-      // ゲームオーバーからのリトライ：ステータスを全回復
-      player.hp = player.maxHp;
-      player.mp = player.maxMp;
+        // ゲームオーバー判定
+        if (player.hp <= 0) {
+          logMessage('<' + 'span class="log-damage">プレイヤーは力尽きた...<' + '/span>');
+          isGameOver = true;
+          setTimeout(() => {
+            resultTitle.textContent = "ゲームオーバー";
+            btnNext.textContent = "最初からやり直す";
+            overlay.style.display = 'flex';
+          }, 1000);
+        }
+      }, 500); // 0.5秒後に敵のターン
     }
+
+    // --- 5. イベントリスナー（ボタン押下時の処理） ---
+
+    // たたかうボタン
+    btnAttack.addEventListener('click', () => {
+      processTurn(() => {
+        const damage = calculateDamage(player.attack, enemy.defense);
+        enemy.hp -= damage;
+        logMessage('プレイヤーの攻撃！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
+      });
+    });
+
+    // 回復魔法ボタン
+    btnHeal.addEventListener('click', () => {
+      processTurn(() => {
+        player.mp -= 10;
+        const healAmount = 30 + Math.floor(Math.random() * 10); // 30〜39回復
+        player.hp = Math.min(player.maxHp, player.hp + healAmount);
+        logMessage('プレイヤーは回復魔法を唱えた！ HPが <' + 'span class="log-heal">' + healAmount + '回復<' + '/span>した！');
+      });
+    });
+
+    // 炎の魔法ボタン
+    btnFire.addEventListener('click', () => {
+      processTurn(() => {
+        player.mp -= 15;
+        // 炎の魔法は相手の防御力を無視して大ダメージを与える固定式
+        const damage = 25 + Math.floor(Math.random() * 10); // 25〜34ダメージ
+        enemy.hp -= damage;
+        logMessage('プレイヤーの炎の魔法！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
+      });
+    });
+
+    // 次の戦闘へ（またはリトライ）ボタン
+    btnNext.addEventListener('click', () => {
+      if (player.hp <= 0) {
+        // ゲームオーバーからのリトライ：ステータスを全回復
+        player.hp = player.maxHp;
+        player.mp = player.maxMp;
+      }
+      startBattle();
+    });
+
+    // 初回起動時の初期化
     startBattle();
-  });
 
-  // 初回起動時の初期化
-  startBattle();
-
-</script>
+  </script>
