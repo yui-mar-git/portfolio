@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -83,7 +83,7 @@ const materials = [
           </div>
 
           <!-- ゲームオーバー/クリア画面 -->
-          <div class="overlay" id="result-overlay" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="overlay" id="result-overlay" style="display: none; background-color: var(--bg-primary); z-index: 99; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
             <h2 id="result-title">戦闘終了</h2>
             <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
               <button class="btn btn-secondary" id="btn-next" style="width: 100%;">次の戦闘へ</button>
@@ -93,7 +93,7 @@ const materials = [
           </div>
 
           <!-- スタート画面 -->
-          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
             <h2>カード＆育成RPG</h2>
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>

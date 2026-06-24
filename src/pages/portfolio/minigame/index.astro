@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
@@ -32,14 +32,15 @@ const materials = [
 
         <div class="game-container">
           <!-- スコア・時間・ハイスコア表示 -->
-          <div class="game-hud">
-            <div class="score-display">スコア: <span id="score">0</span></div>
-            <div class="time-display">残り時間: <span id="time" class="">30</span>秒</div>
-          </div>
-          <div class="highscore-display">ハイスコア: <span id="highscore">0</span></div>
+          <!-- HUDはゲームエリア内に移動 -->
 
           <!-- ゲームエリア -->
-          <div class="game-area" id="game-area">
+          <div class="game-area" id="game-area" style="position: relative;">
+            <div class="game-hud" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; z-index: 5; pointer-events: none; color: white; display: flex; justify-content: space-between;">
+              <div class="score-display">スコア: <span id="score">0</span></div>
+              <div class="time-display">残り時間: <span id="time" class="">30</span>秒</div>
+            </div>
+            <div class="highscore-display" style="position: absolute; top: 3.5rem; left: 0; width: 100%; box-sizing: border-box; text-align: center; color: white; z-index: 5; pointer-events: none; opacity: 0.8;">ハイスコア: <span id="highscore">0</span></div>
             <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
               <h2>準備はいいですか？</h2>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
@@ -766,6 +767,7 @@ const materials = [
       });
     })(); // 即時関数の終わり
   </script>
+
 
 
 

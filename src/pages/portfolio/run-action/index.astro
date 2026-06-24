@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -49,7 +49,7 @@ const materials = [
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
-            <div class="overlay" id="result-screen" style="display: none; background-color: var(--bg-primary); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.8); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
               <h2>ゲームオーバー</h2>
               <p>記録: <span id="final-time" class="highlight">0.0</span> 秒</p>
               <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
@@ -163,7 +163,7 @@ const materials = [
       position: relative;
       width: 100%;
       /* アスペクト比を固定しつつレスポンシブにするためのハック、今回は固定高さにする */
-      height: 400px;
+      height: 450px;
       background: #87CEEB;
       /* 空の色のモック */
       border: 4px solid var(--border-color);

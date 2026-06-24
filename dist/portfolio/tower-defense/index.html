@@ -242,10 +242,8 @@
     const btnRetry = document.getElementById('btn-retry');
     const btnTitle = document.getElementById('btn-title');
     const btnShare = document.getElementById('btn-share');
-    const resultScreen = document.getElementById('result-screen');
-    const btnRetry = document.getElementById('btn-retry');
-    const btnTitle = document.getElementById('btn-title');
-    const btnShare = document.getElementById('btn-share');
+    
+    
 
     if (howtoBtn) howtoBtn.addEventListener('click', () => {
       howtoModal.classList.add('active');
@@ -262,27 +260,6 @@
     if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
       configModal.classList.remove('active');
       modalOverlay.classList.remove('active');
-    });
-
-    if (btnRetry) btnRetry.addEventListener('click', () => {
-      resultScreen.style.display = 'none';
-      game.scene.stop('MainScene');
-      game.scene.start('MainScene');
-      setTimeout(() => { game.scene.resume('MainScene'); }, 100);
-    });
-
-    if (btnTitle) btnTitle.addEventListener('click', () => {
-      resultScreen.style.display = 'none';
-      startScreen.style.display = 'flex';
-      game.scene.stop('MainScene');
-      game.scene.start('MainScene');
-      setTimeout(() => { game.scene.pause('MainScene'); }, 100);
-    });
-
-    if (btnShare) btnShare.addEventListener('click', () => {
-      const text = encodeURIComponent('タワーディフェンスで遊びました！\n#ミニゲーム #ポートフォリオ');
-      const url = encodeURIComponent(window.location.href);
-      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
     });
 
     if (btnRetry) btnRetry.addEventListener('click', () => {
