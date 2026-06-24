@@ -33,17 +33,17 @@ const materials = [
         <span class="page-label">TOWER DEFENSE</span>
         <h1>{projectData ? projectData.title : 'タワーディフェンス（Phaser.js雛形）'}</h1>
 
-        <div class="game-ui">
-          <div class="status-bar">
-            <span>所持マナ: <strong id="mana-display">0</strong></span>
-            <button class="btn btn-primary" id="btn-spawn">出撃 (コスト: 50)</button>
-          </div>
-        </div>
-
         <!-- ここにPhaserのCanvasが挿入されます -->
         <div id="game-container" style="position: relative;">
+          <!-- HUD (所持マナと出撃ボタン) -->
+          <div class="game-ui" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between; align-items: center;">
+            <div class="status-bar" style="display: flex; gap: 1rem; align-items: center;">
+              <span>所持マナ: <strong id="mana-display">0</strong></span>
+              <button class="btn btn-primary" id="btn-spawn">出撃 (コスト: 50)</button>
+            </div>
+          </div>
           <!-- スタート画面 -->
-          <div class="overlay" id="start-screen">
+          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
             <h2>タワーディフェンス</h2>
             <p>マナを消費して出撃し、拠点を防衛しよう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
@@ -461,4 +461,6 @@ const materials = [
     });
 
   </script>
+
+
 

@@ -33,7 +33,7 @@ const materials = [
         <div class="game-container">
 
           <!-- 敵ステータスエリア -->
-          <div class="character-panel enemy-panel">
+          <div class="character-panel enemy-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
             <h2 id="enemy-name">スライム</h2>
             <div class="status-bar">
               <label>HP:</label>
@@ -45,12 +45,12 @@ const materials = [
           </div>
 
           <!-- バトルログ（戦闘の履歴） -->
-          <div class="battle-log" id="battle-log">
+          <div class="battle-log" id="battle-log" style="background: rgba(0,0,0,0.8); color: white; border: 1px solid #444;">
             <p>野生のスライムが現れた！</p>
           </div>
 
           <!-- プレイヤーステータスエリア -->
-          <div class="character-panel player-panel">
+          <div class="character-panel player-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
             <h2>プレイヤー</h2>
             <div class="status-grid">
               <div class="status-bar">
@@ -71,7 +71,7 @@ const materials = [
           </div>
 
           <!-- コマンド（行動）選択エリア -->
-          <div class="command-panel" id="command-panel">
+          <div class="command-panel" id="command-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
             <!-- 
             【学習・カスタマイズポイント】
             ここに新しいボタン（例えば「防御する」「アイテム」など）をHTMLで追加し、
@@ -89,7 +89,7 @@ const materials = [
           </div>
 
           <!-- スタート画面 -->
-          <div class="overlay" id="start-screen">
+          <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
             <h2>カード＆育成RPG</h2>
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
@@ -632,3 +632,4 @@ const materials = [
     });
 
   </script>
+

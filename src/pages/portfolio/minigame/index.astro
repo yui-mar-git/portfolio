@@ -40,7 +40,7 @@ const materials = [
 
           <!-- ゲームエリア -->
           <div class="game-area" id="game-area">
-            <div class="start-screen" id="start-screen">
+            <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
               <h2>準備はいいですか？</h2>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
               <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
@@ -762,4 +762,5 @@ const materials = [
       });
     })(); // 即時関数の終わり
   </script>
+
 
