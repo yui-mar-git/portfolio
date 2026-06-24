@@ -42,8 +42,15 @@ const materials = [
           <div class="game-area" id="game-area">
             <div class="start-screen" id="start-screen">
               <h2>準備はいいですか？</h2>
+              <div class="legend">
+                <p><span style="color:#007bff">■青</span>: +10点</p>
+                <p><span style="color:#fd7e14">■橙</span>: +5秒</p>
+                <p><span style="color:#dc3545">■赤</span>: -30点
+                <p><span style="color:#6f42c1">■紫</span>: -5秒 </p>
+                <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃうぞ)</p>
+                <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
+              </div>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
-              <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
@@ -64,12 +71,7 @@ const materials = [
               <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
                 <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
                 <div class="legend" style="margin-top: 1rem; font-size: 0.9rem;">
-                  <p><span style="color:#007bff">■青</span>: +10点</p>
-                  <p><span style="color:#fd7e14">■橙</span>: +5秒</p>
-                  <p><span style="color:#dc3545">■赤</span>: -30点</p>
-                  <p><span style="color:#6f42c1">■紫</span>: -5秒</p>
-                  <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃう)</p>
-                  <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
+                  XXX_LEGEND_XXX
                 </div>
               </div>
               <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
@@ -236,7 +238,7 @@ const materials = [
     .start-screen h2,
     .result-screen h2 {
       margin-bottom: 1rem;
-      color: var(--text-muted);
+      color: var(--text-color);
     }
 
     .highlight {
@@ -382,7 +384,7 @@ const materials = [
 
     .description {
       line-height: 1.8;
-      color: var(--text-muted);
+      color: var(--text-color);
     }
 
     .tech-table {
@@ -413,9 +415,6 @@ const materials = [
       const startBtn = document.getElementById('start-btn');
       const retryBtn = document.getElementById('retry-btn');
       const shareBtn = document.getElementById('share-btn');
-      const howtoBtn = document.getElementById('howto-btn');
-      const closeHowtoBtn = document.getElementById('close-howto-btn');
-      const howtoModal = document.getElementById('howto-modal');
       const howtoBtn = document.getElementById('howto-btn');
       const closeHowtoBtn = document.getElementById('close-howto-btn');
       const howtoModal = document.getElementById('howto-modal');
@@ -736,14 +735,6 @@ const materials = [
       if (startBtn) startBtn.addEventListener('click', startGame);
       if (retryBtn) retryBtn.addEventListener('click', startGame);
       if (shareBtn) shareBtn.addEventListener('click', shareScore);
-      if (howtoBtn) howtoBtn.addEventListener('click', () => {
-        howtoModal.classList.add('active');
-        modalOverlay.classList.add('active');
-      });
-      if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
-        howtoModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
-      });
       if (howtoBtn) howtoBtn.addEventListener('click', () => {
         howtoModal.classList.add('active');
         modalOverlay.classList.add('active');

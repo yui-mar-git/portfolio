@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -46,6 +46,7 @@ const materials = [
               <h2>準備はいいですか？</h2>
               <p>画面タップでジャンプ<br>（2段ジャンプ可）</p>
               <button id="start-btn" class="btn btn-full">スタート</button>
+              <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
@@ -57,6 +58,17 @@ const materials = [
                 <button id="share-btn" class="btn btn-primary"
                   style="background-color: #1DA1F2; border-color: #1DA1F2;">Xでシェア</button>
               </div>
+            </div>
+
+            <!-- 遊び方モーダル -->
+            <div id="howto-modal" class="config-modal">
+              <h3>遊び方</h3>
+              <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                <p>画面をタップするとキャラクターがジャンプします。</p>
+                <p>空中でもう一度タップすると2段ジャンプが可能です。</p>
+                <p>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p>
+              </div>
+              <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
             </div>
 
             <!-- コンフィグモーダル（ダミー） -->
@@ -229,9 +241,9 @@ const materials = [
     margin-top: 0;
   }
   .description {
-      line-height: 1.8;
-      color: var(--text-color);
-    }
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
 
     .tech-table {
       width: 100%;
@@ -268,6 +280,9 @@ const materials = [
       const startBtn = document.getElementById('start-btn');
       const retryBtn = document.getElementById('retry-btn');
       const shareBtn = document.getElementById('share-btn');
+      const howtoBtn = document.getElementById('howto-btn');
+      const closeHowtoBtn = document.getElementById('close-howto-btn');
+      const howtoModal = document.getElementById('howto-modal');
       const configBtn = document.getElementById('config-btn');
       const closeConfigBtn = document.getElementById('close-config-btn');
       const configModal = document.getElementById('config-modal');
@@ -567,6 +582,16 @@ const materials = [
       startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
       retryBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
       if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
+      if (howtoBtn) howtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        howtoModal.classList.add('active');
+        modalOverlay.classList.add('active');
+      });
+      if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        howtoModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+      });
       if (configBtn) configBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         configModal.classList.add('active');

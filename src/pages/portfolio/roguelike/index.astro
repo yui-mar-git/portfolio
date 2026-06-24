@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -93,7 +93,19 @@ const materials = [
             <h2>カード＆育成RPG</h2>
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
+            <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
             <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
+          </div>
+
+          <!-- 遊び方モーダル -->
+          <div id="howto-modal" class="config-modal">
+            <h3>遊び方</h3>
+            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+              <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+              <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+            </div>
+            <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
           </div>
 
           <!-- コンフィグモーダル（ダミー） -->
@@ -349,7 +361,7 @@ const materials = [
 
     .description {
       line-height: 1.8;
-      color: var(--text-color);
+      color: var(--text-muted);
     }
 
     .tech-table {
@@ -590,6 +602,9 @@ const materials = [
     // タイトル画面とコンフィグの制御
     const startScreen = document.getElementById('start-screen');
     const startBtn = document.getElementById('start-btn');
+    const howtoBtn = document.getElementById('howto-btn');
+    const closeHowtoBtn = document.getElementById('close-howto-btn');
+    const howtoModal = document.getElementById('howto-modal');
     const configBtn = document.getElementById('config-btn');
     const closeConfigBtn = document.getElementById('close-config-btn');
     const configModal = document.getElementById('config-modal');
@@ -598,6 +613,14 @@ const materials = [
     if (startBtn) startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       startBattle();
+    });
+    if (howtoBtn) howtoBtn.addEventListener('click', () => {
+      howtoModal.classList.add('active');
+      modalOverlay.classList.add('active');
+    });
+    if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
+      howtoModal.classList.remove('active');
+      modalOverlay.classList.remove('active');
     });
     if (configBtn) configBtn.addEventListener('click', () => {
       configModal.classList.add('active');

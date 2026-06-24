@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -47,8 +47,20 @@ const materials = [
             <h2>タワーディフェンス</h2>
             <p>マナを消費して出撃し、拠点を防衛しよう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
+            <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
             <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
           </div>
+          <!-- 遊び方モーダル -->
+          <div id="howto-modal" class="config-modal">
+            <h3>遊び方</h3>
+            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <p>時間経過で貯まるマナを消費して味方を出撃させましょう。</p>
+              <p>味方は自動で前進して敵と戦ってくれます。</p>
+              <p>強力なユニットをタイミングよく出撃させ、迫りくる敵を倒して拠点を防衛してください！</p>
+            </div>
+            <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+          </div>
+
           <!-- コンフィグモーダル（ダミー） -->
           <div id="modal-overlay" class="modal-overlay"></div>
           <div id="config-modal" class="config-modal">
@@ -186,7 +198,7 @@ const materials = [
   }
   .description {
       line-height: 1.8;
-      color: var(--text-color);
+      color: var(--text-muted);
     }
 
     .tech-table {
@@ -412,11 +424,22 @@ const materials = [
     // --- タイトル画面とコンフィグ制御 ---
     const startScreen = document.getElementById('start-screen');
     const startBtn = document.getElementById('start-btn');
+    const howtoBtn = document.getElementById('howto-btn');
+    const closeHowtoBtn = document.getElementById('close-howto-btn');
+    const howtoModal = document.getElementById('howto-modal');
     const configBtn = document.getElementById('config-btn');
     const closeConfigBtn = document.getElementById('close-config-btn');
     const configModal = document.getElementById('config-modal');
     const modalOverlay = document.getElementById('modal-overlay');
 
+    if (howtoBtn) howtoBtn.addEventListener('click', () => {
+      howtoModal.classList.add('active');
+      modalOverlay.classList.add('active');
+    });
+    if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
+      howtoModal.classList.remove('active');
+      modalOverlay.classList.remove('active');
+    });
     if (configBtn) configBtn.addEventListener('click', () => {
       configModal.classList.add('active');
       modalOverlay.classList.add('active');
