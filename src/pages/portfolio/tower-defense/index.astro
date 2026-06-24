@@ -294,6 +294,9 @@ const materials = [
             this.spawnAlly();
           }
         });
+
+        // 初期状態はポーズしておく
+        this.scene.pause();
       }
 
       // 3. 毎フレーム実行される処理（通常は1秒間に60回）
@@ -411,15 +414,18 @@ const materials = [
       type: Phaser.AUTO,
       width: 800,
       height: 600,
-      parent: 'game-container', // 描画先のHTML要素のID
+      parent: 'game-container',
       physics: {
-        default: 'arcade', // 標準の物理エンジン
+        default: 'arcade',
         arcade: {
-          debug: false // trueにすると当たり判定の枠（緑の線）が見えるようになります
+          debug: false
         }
       },
       scene: [MainScene]
     };
+
+    // ゲームインスタンスの作成（初期状態でポーズされる）
+    const game = new Phaser.Game(config);
 
     // --- タイトル画面とコンフィグ制御 ---
     const startScreen = document.getElementById('start-screen');
@@ -451,8 +457,8 @@ const materials = [
 
     if (startBtn) startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
-      // ゲームインスタンスの作成（これで画面にCanvasが描画される）
-      const game = new Phaser.Game(config);
+      game.scene.resume('MainScene');
     });
 
   </script>
+
