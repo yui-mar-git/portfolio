@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -41,7 +41,7 @@ const materials = [
             <canvas id="game-canvas"></canvas>
 
             <!-- Screens -->
-            <div class="overlay" id="start-screen" style="background-color: var(--bg-primary); z-index: 10;">
+            <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10;">
               <h2>準備はいいですか？</h2>
               <p>画面タップでジャンプ<br>（2段ジャンプ可）</p>
               <button id="start-btn" class="btn btn-full">スタート</button>
@@ -49,7 +49,7 @@ const materials = [
               <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
             </div>
 
-            <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.8); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.6); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
               <h2>ゲームオーバー</h2>
               <p>記録: <span id="final-time" class="highlight">0.0</span> 秒</p>
               <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
@@ -615,6 +615,8 @@ const materials = [
       requestAnimationFrame(loop);
     })();
   </script>
+
+
 
 
 

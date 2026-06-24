@@ -1008,7 +1008,7 @@ footer p {
 
 /* === 追加：スタート画面（オーバーレイ）の統一スタイル === */
 .start-screen, .overlay {
-  background: var(--bg-primary) !important;
+  background: var(--bg-color);
   z-index: 10;
 }
 .start-screen button, .overlay button {
@@ -1033,3 +1033,5 @@ ul {
     padding: 1rem !important;
   }
 }
+
+
