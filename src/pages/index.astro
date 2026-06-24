@@ -39,9 +39,15 @@ const projects = portfolioResponse.contents;
                 )}
                 <p>{project.description}</p>
                 {project.url && (
-                  <a href={project.url} target="_blank" rel="noopener noreferrer">
-                    詳細を見る →
-                  </a>
+                  project.url.startsWith('http') ? (
+                    <a href={project.url} target="_blank" rel="noopener noreferrer">
+                      詳細を見る →
+                    </a>
+                  ) : (
+                    <a href={project.url}>
+                      詳細を見る →
+                    </a>
+                  )
                 )}
               </div>
             ))
