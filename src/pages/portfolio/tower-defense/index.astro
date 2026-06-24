@@ -2,6 +2,18 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
+import { fetchMicroCMS } from '../../../lib/microcms';
+import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
+
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+const projectData = portfolioResponse.contents.find((c) => c.url.includes('/tower-defense/'));
+
+const techStack = [
+  { category: "開発言語", items: "JavaScript, HTML, CSS" },
+  { category: "フレームワーク", items: "Astro, Phaser 3 (ゲームエンジン)" },
+  { category: "その他ツール", items: "Gemini (AIペアプログラミング)" },
+  { category: "学習テーマ", items: "ゲームエンジン基礎, Arcade Physics衝突判定" }
+];
 ---
 
 <BaseLayout title="タワーディフェンス - My Portfolio" pageId="tower-defense">
@@ -25,6 +37,28 @@ import Footer from '../../../components/Footer.astro';
 
       <!-- ここにPhaserのCanvasが挿入されます -->
       <div id="game-container"></div>
+
+      <!-- ゲーム概要・使用技術セクション -->
+      <section class="project-details">
+        <h2>プロジェクト概要</h2>
+        {projectData && projectData.description ? (
+          <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
+        ) : (
+          <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
+        )}
+
+        <h3>使用技術・ツール</h3>
+        <table class="tech-table">
+          <tbody>
+            {techStack.map((tech) => (
+              <tr>
+                <th>{tech.category}</th>
+                <td>{tech.items}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </article>
   </main>
 
@@ -64,6 +98,41 @@ import Footer from '../../../components/Footer.astro';
     display: block;
     width: 100%;
     height: auto;
+  }
+  
+  /* --- 追加：プロジェクト概要セクションのスタイル --- */
+  .project-details {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .project-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .project-details h3 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  .description {
+    line-height: 1.8;
+    color: var(--text-color);
+  }
+  .tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  .tech-table th, .tech-table td {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+  .tech-table th {
+    background-color: var(--bg-secondary);
+    width: 30%;
+    font-weight: bold;
   }
 </style>
 

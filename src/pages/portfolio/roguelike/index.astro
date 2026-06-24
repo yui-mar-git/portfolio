@@ -2,6 +2,18 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
+import { fetchMicroCMS } from '../../../lib/microcms';
+import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
+
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+const projectData = portfolioResponse.contents.find((c) => c.url.includes('/roguelike/'));
+
+const techStack = [
+  { category: "開発言語", items: "JavaScript, HTML, CSS" },
+  { category: "フレームワーク", items: "Astro" },
+  { category: "その他ツール", items: "Gemini (AIペアプログラミング)" },
+  { category: "学習テーマ", items: "状態管理, ダメージ計算, ターン制ロジック" }
+];
 ---
 
 <BaseLayout title="カード＆育成RPG - My Portfolio" pageId="roguelike">
@@ -72,6 +84,28 @@ import Footer from '../../../components/Footer.astro';
         </div>
 
       </div>
+
+      <!-- ゲーム概要・使用技術セクション -->
+      <section class="project-details">
+        <h2>プロジェクト概要</h2>
+        {projectData && projectData.description ? (
+          <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
+        ) : (
+          <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
+        )}
+
+        <h3>使用技術・ツール</h3>
+        <table class="tech-table">
+          <tbody>
+            {techStack.map((tech) => (
+              <tr>
+                <th>{tech.category}</th>
+                <td>{tech.items}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </article>
   </main>
 
@@ -215,6 +249,41 @@ import Footer from '../../../components/Footer.astro';
     font-size: 2rem;
     margin-bottom: 1.5rem;
   }
+  
+  /* --- 追加：プロジェクト概要セクションのスタイル --- */
+  .project-details {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .project-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .project-details h3 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  .description {
+    line-height: 1.8;
+    color: var(--text-color);
+  }
+  .tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  .tech-table th, .tech-table td {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+  .tech-table th {
+    background-color: var(--bg-secondary);
+    width: 30%;
+    font-weight: bold;
+  }
 </style>
 
 <script is:inline>
@@ -317,7 +386,7 @@ import Footer from '../../../components/Footer.astro';
 
     // ログをクリア
     battleLog.innerHTML = '';
-    logMessage(`野生の <span class="log-system">${enemy.name}</span> が現れた！`);
+    logMessage('野生の <' + 'span class="log-system">' + enemy.name + '<' + '/span> が現れた！');
 
     updateUI();
   }
@@ -352,7 +421,7 @@ import Footer from '../../../components/Footer.astro';
     if (enemy.hp <= 0) {
       enemy.hp = 0;
       updateUI();
-      logMessage(`<span class="log-system">${enemy.name} を倒した！</span>`);
+      logMessage('<' + 'span class="log-system">' + enemy.name + ' を倒した！<' + '/span>');
       
       // 戦闘終了処理
       isGameOver = true;
@@ -373,13 +442,13 @@ import Footer from '../../../components/Footer.astro';
       
       const damage = calculateDamage(enemy.attack, player.defense);
       player.hp = Math.max(0, player.hp - damage);
-      logMessage(`${enemy.name}の攻撃！ プレイヤーに <span class="log-damage">${damage}のダメージ</span>！`);
+      logMessage(enemy.name + 'の攻撃！ プレイヤーに <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
       
       updateUI();
 
       // ゲームオーバー判定
       if (player.hp <= 0) {
-        logMessage(`<span class="log-damage">プレイヤーは力尽きた...</span>`);
+        logMessage('<' + 'span class="log-damage">プレイヤーは力尽きた...<' + '/span>');
         isGameOver = true;
         setTimeout(() => {
           resultTitle.textContent = "ゲームオーバー";
@@ -397,7 +466,7 @@ import Footer from '../../../components/Footer.astro';
     processTurn(() => {
       const damage = calculateDamage(player.attack, enemy.defense);
       enemy.hp -= damage;
-      logMessage(`プレイヤーの攻撃！ ${enemy.name}に <span class="log-damage">${damage}のダメージ</span>！`);
+      logMessage('プレイヤーの攻撃！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
     });
   });
 
@@ -407,7 +476,7 @@ import Footer from '../../../components/Footer.astro';
       player.mp -= 10;
       const healAmount = 30 + Math.floor(Math.random() * 10); // 30〜39回復
       player.hp = Math.min(player.maxHp, player.hp + healAmount);
-      logMessage(`プレイヤーは回復魔法を唱えた！ HPが <span class="log-heal">${healAmount}回復</span>した！`);
+      logMessage('プレイヤーは回復魔法を唱えた！ HPが <' + 'span class="log-heal">' + healAmount + '回復<' + '/span>した！');
     });
   });
 
@@ -418,7 +487,7 @@ import Footer from '../../../components/Footer.astro';
       // 炎の魔法は相手の防御力を無視して大ダメージを与える固定式
       const damage = 25 + Math.floor(Math.random() * 10); // 25〜34ダメージ
       enemy.hp -= damage;
-      logMessage(`プレイヤーの炎の魔法！ ${enemy.name}に <span class="log-damage">${damage}のダメージ</span>！`);
+      logMessage('プレイヤーの炎の魔法！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
     });
   });
 
