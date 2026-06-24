@@ -9,11 +9,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   const projectData = portfolioResponse.contents.find((c) => c.url.includes('/run-action/'));
 
   const techStack = [
-  { category: "開発言語", items: "JavaScript, HTML, CSS" },
+  { category: "開発言語", items: "HTML, CSS, JavaScript" },
   { category: "フレームワーク", items: "Astro" },
-  { category: "その他ツール", items: "Gemini (AIペアプログラミング)" },
-  { category: "使用素材", items: "Google Fonts, Simple Icons" }
-  ];
+  { category: "その他ツール", items: "Claude, Gemini" }
+];
+
+const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
+
+const materials = [
+  { name: "Google Fonts", url: "https://fonts.google.com/" },
+  { name: "Simple Icons", url: "https://simpleicons.org/" }
+];
   ---
 
   <BaseLayout title="エンドレス・ラン - My Portfolio" pageId="run-action">
@@ -56,14 +62,23 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
         <!-- ゲーム概要・使用技術セクション -->
         <section class="project-details">
-          <h2>概要</h2>
+          <h2>プロジェクト概要</h2>
           {projectData && projectData.description ? (
           <p class="description" set:html={projectData.description.replace(/\n/g, '<br>' )} />
           ) : (
           <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
           )}
 
-          <h3>使用技術・ツール</h3>
+          <h2>学習テーマ</h2>
+          <div class="materials-list">
+            <ul>
+              {learningThemes.map((theme) => (
+                <li>{theme}</li>
+              ))}
+            </ul>
+          </div>
+
+          <h2>使用技術・ツール</h2>
           <table class="tech-table">
             <tbody>
               {techStack.map((tech) => (
@@ -74,6 +89,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               ))}
             </tbody>
           </table>
+
+          <h2>使用素材</h2>
+          <div class="materials-list">
+            <ul>
+              {materials.map((material) => (
+                <li>
+                  <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
       </article>
     </main>
@@ -170,23 +196,21 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     /* --- 追加：プロジェクト概要セクションのスタイル --- */
     .project-details {
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .project-details h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .project-details h3 {
-      font-size: 1.25rem;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .description {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .project-details h2 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .project-details h2:first-of-type {
+    margin-top: 0;
+  }
+  .description {
       line-height: 1.8;
       color: var(--text-color);
     }
