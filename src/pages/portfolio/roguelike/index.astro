@@ -1,4 +1,4 @@
----
+﻿---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -100,7 +100,6 @@ const materialCategories = [
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
             <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
-            <span id="credits-btn" class="link-credits">クレジット</span>
                 <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
           </div>
 
@@ -140,7 +139,9 @@ const materialCategories = [
               <label for="se-volume">SE音量</label>
               <input type="range" id="se-volume" min="0" max="100" value="50">
             </div>
-            <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+            
+                <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
+                <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
           </div>
 
         </div>
@@ -735,7 +736,8 @@ const materialCategories = [
     if (_credBtn) {
       _credBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('credits-modal')?.classList.add('active');
+        document.getElementById('config-modal')?.classList.remove('active');
+              document.getElementById('credits-modal')?.classList.add('active');
         document.getElementById('modal-overlay')?.classList.add('active');
       });
       _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -752,3 +754,5 @@ const materialCategories = [
       _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
     }
   </script>
+
+

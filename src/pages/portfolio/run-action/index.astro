@@ -12,14 +12,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   { category: "開発言語", items: "HTML, CSS, JavaScript" },
   { category: "フレームワーク", items: "Astro" },
   { category: "その他ツール", items: "Claude, Gemini" }
-];
+  ];
 
-const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
+  const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
 
-const materials = [
+  const materials = [
   { name: "Google Fonts", url: "https://fonts.google.com/" },
   { name: "Simple Icons", url: "https://simpleicons.org/" }
-];
+  ];
   ---
 
   <BaseLayout title="エンドレス・ラン - My Portfolio" pageId="run-action">
@@ -34,7 +34,8 @@ const materials = [
           <!-- Game Area (Canvas) -->
           <div class="canvas-wrapper" id="canvas-wrapper" style="position: relative;">
             <!-- HUD (Score / Highscore) -->
-            <div class="game-hud" id="game-hud" style="position: absolute; display: none; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between;">
+            <div class="game-hud" id="game-hud"
+              style="position: absolute; display: none; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between;">
               <div class="time-display">生存時間: <span id="survival-time">0.0</span>秒</div>
               <div class="highscore-display">ベスト: <span id="highscore">0.0</span>秒</div>
             </div>
@@ -42,28 +43,31 @@ const materials = [
 
             <!-- Screens -->
             <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10;">
-              <h2>準備はいいですか？</h2>
-              <p>画面タップでジャンプ<br>（2段ジャンプ可）</p>
-              <button id="start-btn" class="btn btn-full">スタート</button>
-              <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
-              <span id="credits-btn" class="link-credits">クレジット</span>
+              <h2>エンドレス・ラン！
+                <p>スタートで走り出します</p>
+                <button id="start-btn" class="btn btn-full">スタート</button>
+                <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
                 <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
             </div>
 
-            <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.6); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="overlay" id="result-screen"
+              style="display: none; background-color: rgba(0,0,0,0.6); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
               <h2>ゲームオーバー</h2>
               <p>記録: <span id="final-time" class="highlight">0.0</span> 秒</p>
-              <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+              <div class="result-actions"
+                style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
                 <button id="retry-btn" class="btn btn-secondary" style="width: 100%;">リトライ</button>
                 <button id="title-btn" class="btn btn-secondary" style="width: 100%;">タイトルへ</button>
-                <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
+                <button id="share-btn" class="btn btn-primary"
+                  style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
               </div>
             </div>
 
             <!-- 遊び方モーダル -->
             <div id="howto-modal" class="config-modal">
               <h3>遊び方</h3>
-              <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <div class="howto-content"
+                style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
                 <p>画面をタップするとキャラクターがジャンプします。</p>
                 <p>空中でもう一度タップすると2段ジャンプが可能です。</p>
                 <p>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p>
@@ -83,20 +87,26 @@ const materials = [
                 <label for="se-volume">SE音量</label>
                 <input type="range" id="se-volume" min="0" max="100" value="50">
               </div>
+
+              <button id="credits-btn" class="btn btn-secondary"
+                style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
               <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
             </div>
-          <!-- クレジットモーダル -->
-          <div id="credits-modal" class="config-modal">
-            <h3>クレジット・使用素材</h3>
-            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-              <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-              <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
-                <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple Icons</a></li>
-              </ul>
+            <!-- クレジットモーダル -->
+            <div id="credits-modal" class="config-modal">
+              <h3>クレジット・使用素材</h3>
+              <div class="howto-content"
+                style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                  <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google
+                      Fonts</a></li>
+                  <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple
+                      Icons</a></li>
+                </ul>
+              </div>
+              <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
             </div>
-            <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
-          </div>
           </div>
         </div>
 
@@ -113,7 +123,7 @@ const materials = [
           <div class="materials-list">
             <ul>
               {learningThemes.map((theme) => (
-                <li>{theme}</li>
+              <li>{theme}</li>
               ))}
             </ul>
           </div>
@@ -136,9 +146,9 @@ const materials = [
           <div class="materials-list">
             <ul>
               {materials.map((material) => (
-                <li>
-                  <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
-                </li>
+              <li>
+                <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
+              </li>
               ))}
             </ul>
           </div>
@@ -238,24 +248,27 @@ const materials = [
 
     /* --- 追加：プロジェクト概要セクションのスタイル --- */
     .project-details {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-  }
-  .project-details h2 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  .project-details h2:first-of-type {
-    margin-top: 0;
-  }
-  .description {
-    line-height: 1.8;
-    color: var(--text-muted);
-  }
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .project-details h2 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .project-details h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .description {
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
 
     .tech-table {
       width: 100%;
@@ -298,12 +311,12 @@ const materials = [
       const closeHowtoBtn = document.getElementById('close-howto-btn');
       const howtoModal = document.getElementById('howto-modal');
       const configBtn = document.getElementById('config-btn');
-        const closeConfigBtn = document.getElementById('close-config-btn');
-        const configModal = document.getElementById('config-modal');
-      
-        const creditsBtn = document.getElementById('credits-btn');
-        const closeCreditsBtn = document.getElementById('close-credits-btn');
-        const creditsModal = document.getElementById('credits-modal');
+      const closeConfigBtn = document.getElementById('close-config-btn');
+      const configModal = document.getElementById('config-modal');
+
+      const creditsBtn = document.getElementById('credits-btn');
+      const closeCreditsBtn = document.getElementById('close-credits-btn');
+      const creditsModal = document.getElementById('credits-modal');
       const modalOverlay = document.getElementById('modal-overlay');
 
       // State
@@ -617,53 +630,54 @@ const materials = [
         howtoModal.classList.remove('active');
         modalOverlay.classList.remove('active');
       });
-      
-      
+
+
 
       // Start loop
       requestAnimationFrame(loop);
-    
-        
-        const _cfgBtn = document.getElementById('config-btn');
-        if (_cfgBtn) {
-          _cfgBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('config-modal')?.classList.add('active');
-            document.getElementById('modal-overlay')?.classList.add('active');
-          });
-          _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-          _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-        }
-        const _closeCfgBtn = document.getElementById('close-config-btn');
-        if (_closeCfgBtn) {
-          _closeCfgBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('config-modal')?.classList.remove('active');
-            document.getElementById('modal-overlay')?.classList.remove('active');
-          });
-          _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-          _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-        }
 
-        const _credBtn = document.getElementById('credits-btn');
-        if (_credBtn) {
-          _credBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('credits-modal')?.classList.add('active');
-            document.getElementById('modal-overlay')?.classList.add('active');
-          });
-          _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-          _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-        }
-        const _closeCredBtn = document.getElementById('close-credits-btn');
-        if (_closeCredBtn) {
-          _closeCredBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('credits-modal')?.classList.remove('active');
-            document.getElementById('modal-overlay')?.classList.remove('active');
-          });
-          _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-          _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-        }
+
+      const _cfgBtn = document.getElementById('config-btn');
+      if (_cfgBtn) {
+        _cfgBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.getElementById('config-modal')?.classList.add('active');
+          document.getElementById('modal-overlay')?.classList.add('active');
+        });
+        _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+      }
+      const _closeCfgBtn = document.getElementById('close-config-btn');
+      if (_closeCfgBtn) {
+        _closeCfgBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.getElementById('config-modal')?.classList.remove('active');
+          document.getElementById('modal-overlay')?.classList.remove('active');
+        });
+        _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+      }
+
+      const _credBtn = document.getElementById('credits-btn');
+      if (_credBtn) {
+        _credBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.getElementById('config-modal')?.classList.remove('active');
+          document.getElementById('credits-modal')?.classList.add('active');
+          document.getElementById('modal-overlay')?.classList.add('active');
+        });
+        _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+      }
+      const _closeCredBtn = document.getElementById('close-credits-btn');
+      if (_closeCredBtn) {
+        _closeCredBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.getElementById('credits-modal')?.classList.remove('active');
+          document.getElementById('modal-overlay')?.classList.remove('active');
+        });
+        _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+        _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+      }
     })();
   </script>
