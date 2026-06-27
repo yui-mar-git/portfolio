@@ -45,7 +45,8 @@ const materials = [
               <h2>準備はいいですか？</h2>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
               <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
-              <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
+              <span id="credits-btn" class="link-credits">クレジット</span>
+                <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
             </div>
 
             <div class="result-screen" id="result-screen" style="display: none; background-color: var(--bg-color); z-index: 10; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
@@ -89,6 +90,18 @@ const materials = [
               </div>
               <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
             </div>
+          <!-- クレジットモーダル -->
+          <div id="credits-modal" class="config-modal">
+            <h3>クレジット・使用素材</h3>
+            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+              <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
+                <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple Icons</a></li>
+              </ul>
+            </div>
+            <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+          </div>
           </div>
         </div>
 
@@ -418,8 +431,12 @@ const materials = [
         const closeHowtoBtn = document.getElementById('close-howto-btn');
         const howtoModal = document.getElementById('howto-modal');
       const configBtn = document.getElementById('config-btn');
-      const closeConfigBtn = document.getElementById('close-config-btn');
-      const configModal = document.getElementById('config-modal');
+        const closeConfigBtn = document.getElementById('close-config-btn');
+        const configModal = document.getElementById('config-modal');
+      
+        const creditsBtn = document.getElementById('credits-btn');
+        const closeCreditsBtn = document.getElementById('close-credits-btn');
+        const creditsModal = document.getElementById('credits-modal');
       const modalOverlay = document.getElementById('modal-overlay');
       const scoreElement = document.getElementById('score');
       const timeElement = document.getElementById('time');
@@ -758,20 +775,35 @@ const materials = [
         howtoModal.classList.remove('active');
         modalOverlay.classList.remove('active');
       });
-      if (configBtn) configBtn.addEventListener('click', () => {
-        configModal.classList.add('active');
-        modalOverlay.classList.add('active');
-      });
-      if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
-        configModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
-      });
-    })(); // 即時関数の終わり
+      
+        
+      
+
+        
+        
+    
+        const _cfgBtn = document.getElementById('config-btn');
+        if (_cfgBtn) _cfgBtn.addEventListener('click', () => {
+          document.getElementById('config-modal')?.classList.add('active');
+          document.getElementById('modal-overlay')?.classList.add('active');
+        });
+        const _closeCfgBtn = document.getElementById('close-config-btn');
+        if (_closeCfgBtn) _closeCfgBtn.addEventListener('click', () => {
+          document.getElementById('config-modal')?.classList.remove('active');
+          document.getElementById('modal-overlay')?.classList.remove('active');
+        });
+
+        const _credBtn = document.getElementById('credits-btn');
+        if (_credBtn) _credBtn.addEventListener('click', () => {
+          document.getElementById('credits-modal')?.classList.add('active');
+          document.getElementById('modal-overlay')?.classList.add('active');
+        });
+        const _closeCredBtn = document.getElementById('close-credits-btn');
+        if (_closeCredBtn) _closeCredBtn.addEventListener('click', () => {
+          document.getElementById('credits-modal')?.classList.remove('active');
+          document.getElementById('modal-overlay')?.classList.remove('active');
+        });
+    })();
+
   </script>
-
-
-
-
-
-
 

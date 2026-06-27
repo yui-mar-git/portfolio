@@ -100,8 +100,8 @@ const materialCategories = [
             <p>コマンドを選んで敵を倒そう</p>
             <button id="start-btn" class="btn btn-full">スタート</button>
             <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
-            <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
-            <button id="credits-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">クレジット</button>
+            <span id="credits-btn" class="link-credits">クレジット</span>
+                <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
           </div>
 
           <!-- 遊び方モーダル -->
@@ -709,24 +709,12 @@ const materialCategories = [
       howtoModal.classList.remove('active');
       modalOverlay.classList.remove('active');
     });
-    if (configBtn) configBtn.addEventListener('click', () => {
-        configModal.classList.add('active');
-        modalOverlay.classList.add('active');
-      });
-      if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
-        configModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
-      });
+    
+      
     
 
-      if (creditsBtn) creditsBtn.addEventListener('click', () => {
-        creditsModal.classList.add('active');
-        modalOverlay.classList.add('active');
-      });
-      if (closeCreditsBtn) closeCreditsBtn.addEventListener('click', () => {
-        creditsModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
-      });
+      
+      
 
   </script>
 
@@ -736,5 +724,14 @@ const materialCategories = [
 
 
 
+
+
+
+
+
+
+
+
+  </script>
 
 
