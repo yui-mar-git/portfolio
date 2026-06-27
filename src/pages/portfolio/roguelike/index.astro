@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -709,29 +709,46 @@ const materialCategories = [
       howtoModal.classList.remove('active');
       modalOverlay.classList.remove('active');
     });
-    
-      
-    
 
-      
-      
+    const _cfgBtn = document.getElementById('config-btn');
+    if (_cfgBtn) {
+      _cfgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('config-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+      _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+    const _closeCfgBtn = document.getElementById('close-config-btn');
+    if (_closeCfgBtn) {
+      _closeCfgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('config-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+      _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
 
+    const _credBtn = document.getElementById('credits-btn');
+    if (_credBtn) {
+      _credBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('credits-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+      _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+    const _closeCredBtn = document.getElementById('close-credits-btn');
+    if (_closeCredBtn) {
+      _closeCredBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('credits-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+      _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
   </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  </script>
-
-

@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
@@ -36,11 +36,11 @@ const materials = [
 
           <!-- ゲームエリア -->
           <div class="game-area" id="game-area" style="position: relative;">
-            <div class="game-hud" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; z-index: 5; pointer-events: none; color: white; display: flex; justify-content: space-between;">
+            <div class="game-hud" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; z-index: 5; pointer-events: none; color: white; display: none; justify-content: space-between;">
               <div class="score-display">スコア: <span id="score">0</span></div>
               <div class="time-display">残り時間: <span id="time" class="">30</span>秒</div>
             </div>
-            <div class="highscore-display" style="position: absolute; top: 3.5rem; left: 0; width: 100%; box-sizing: border-box; text-align: center; color: white; z-index: 5; pointer-events: none; opacity: 0.8;">ハイスコア: <span id="highscore">0</span></div>
+            <div class="highscore-display" style="position: absolute; top: 3.5rem; left: 0; width: 100%; box-sizing: border-box; text-align: center; color: white; z-index: 5; pointer-events: none; opacity: 0.8; display: none;">ハイスコア: <span id="highscore">0</span></div>
             <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10;">
               <h2>準備はいいですか？</h2>
               <button id="start-btn" class="btn btn-full">ゲームスタート</button>
@@ -694,6 +694,11 @@ const materials = [
 
         startScreen.style.display = 'none';
         resultScreen.style.display = 'none';
+        
+        const hud = document.querySelector('.game-hud');
+        if(hud) hud.style.display = 'flex';
+        const hsDisplay = document.querySelector('.highscore-display');
+        if(hsDisplay) hsDisplay.style.display = 'block';
 
         clearAllTargets();
 
@@ -753,15 +758,10 @@ const materials = [
       if (titleBtn) titleBtn.addEventListener('click', () => {
         resultScreen.style.display = 'none';
         startScreen.style.display = 'flex';
-      });
-      if (shareBtn) shareBtn.addEventListener('click', () => {
-          const text = encodeURIComponent('スコアアタックで ' + score + ' 点取りました！\n#ミニゲーム #ポートフォリオ');
-          const url = encodeURIComponent(window.location.href);
-          window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
-        });
-      if (howtoBtn) howtoBtn.addEventListener('click', () => {
-        howtoModal.classList.add('active');
-        modalOverlay.classList.add('active');
+        const hud = document.querySelector('.game-hud');
+        if(hud) hud.style.display = 'none';
+        const hsDisplay = document.querySelector('.highscore-display');
+        if(hsDisplay) hsDisplay.style.display = 'none';
       });
       if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
         howtoModal.classList.remove('active');
@@ -770,10 +770,6 @@ const materials = [
       if (howtoBtn) howtoBtn.addEventListener('click', () => {
         howtoModal.classList.add('active');
         modalOverlay.classList.add('active');
-      });
-      if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
-        howtoModal.classList.remove('active');
-        modalOverlay.classList.remove('active');
       });
       
         
@@ -782,28 +778,47 @@ const materials = [
         
         
     
+        
         const _cfgBtn = document.getElementById('config-btn');
-        if (_cfgBtn) _cfgBtn.addEventListener('click', () => {
-          document.getElementById('config-modal')?.classList.add('active');
-          document.getElementById('modal-overlay')?.classList.add('active');
-        });
+        if (_cfgBtn) {
+          _cfgBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('config-modal')?.classList.add('active');
+            document.getElementById('modal-overlay')?.classList.add('active');
+          });
+          _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+          _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+        }
         const _closeCfgBtn = document.getElementById('close-config-btn');
-        if (_closeCfgBtn) _closeCfgBtn.addEventListener('click', () => {
-          document.getElementById('config-modal')?.classList.remove('active');
-          document.getElementById('modal-overlay')?.classList.remove('active');
-        });
+        if (_closeCfgBtn) {
+          _closeCfgBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('config-modal')?.classList.remove('active');
+            document.getElementById('modal-overlay')?.classList.remove('active');
+          });
+          _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+          _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+        }
 
         const _credBtn = document.getElementById('credits-btn');
-        if (_credBtn) _credBtn.addEventListener('click', () => {
-          document.getElementById('credits-modal')?.classList.add('active');
-          document.getElementById('modal-overlay')?.classList.add('active');
-        });
+        if (_credBtn) {
+          _credBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('credits-modal')?.classList.add('active');
+            document.getElementById('modal-overlay')?.classList.add('active');
+          });
+          _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+          _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+        }
         const _closeCredBtn = document.getElementById('close-credits-btn');
-        if (_closeCredBtn) _closeCredBtn.addEventListener('click', () => {
-          document.getElementById('credits-modal')?.classList.remove('active');
-          document.getElementById('modal-overlay')?.classList.remove('active');
-        });
+        if (_closeCredBtn) {
+          _closeCredBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('credits-modal')?.classList.remove('active');
+            document.getElementById('modal-overlay')?.classList.remove('active');
+          });
+          _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+          _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+        }
     })();
-
   </script>
-
