@@ -16,9 +16,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
 const learningThemes = ["状態管理", "ダメージ計算", "ターン制ロジック"];
 
-const materials = [
-  { name: "Google Fonts", url: "https://fonts.google.com/" },
-  { name: "Simple Icons", url: "https://simpleicons.org/" }
+const materialCategories = [
+  { category: "画像素材", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
+  { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+  { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] }
 ];
 ---
 
@@ -34,6 +35,7 @@ const materials = [
 
           <!-- 敵ステータスエリア -->
           <div class="character-panel enemy-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
+            <img id="enemy-image" src="" alt="敵" style="max-height: 150px; display: block; margin: 0 auto 1rem;" />
             <h2 id="enemy-name">スライム</h2>
             <div class="status-bar">
               <label>HP:</label>
@@ -99,6 +101,7 @@ const materials = [
             <button id="start-btn" class="btn btn-full">スタート</button>
             <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
             <button id="config-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">コンフィグ</button>
+            <button id="credits-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">クレジット</button>
           </div>
 
           <!-- 遊び方モーダル -->
@@ -110,6 +113,19 @@ const materials = [
               <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
             </div>
             <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+          </div>
+          <!-- クレジットモーダル -->
+          <div id="credits-modal" class="config-modal">
+            <h3>クレジット・使用素材</h3>
+            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+              <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <li>画像素材: <a href="https://www.irasutoya.com/" target="_blank" rel="noopener noreferrer">いらすとや</a></li>
+                <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
+                <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple Icons</a></li>
+              </ul>
+            </div>
+            <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
           </div>
 
           <!-- コンフィグモーダル（ダミー） -->
@@ -162,14 +178,24 @@ const materials = [
         </div>
 
           <h2>使用素材</h2>
-          <div class="materials-list">
-            <ul>
-              {materials.map((material) => (
-              <li>
-                <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
-              </li>
-              ))}
-            </ul>
+          <div class="table-responsive">
+            <table class="tech-table">
+              <tbody>
+                {materialCategories.map((mat) => (
+                <tr>
+                  <th>{mat.category}</th>
+                  <td>
+                    {mat.items.map((item, index) => (
+                      <span key={item.name}>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                        {index < mat.items.length - 1 ? " / " : ""}
+                      </span>
+                    ))}
+                  </td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </article>
@@ -385,7 +411,7 @@ const materials = [
       background-color: var(--bg-secondary);
       width: 30%;
       font-weight: bold;
-    }
+    }`n`n    .shake { animation: shake 0.5s; }`n    @keyframes shake {`n      0% { transform: translate(1px, 1px) rotate(0deg); }`n      10% { transform: translate(-1px, -2px) rotate(-1deg); }`n      20% { transform: translate(-3px, 0px) rotate(1deg); }`n      30% { transform: translate(3px, 2px) rotate(0deg); }`n      40% { transform: translate(1px, -1px) rotate(1deg); }`n      50% { transform: translate(-1px, 2px) rotate(-1deg); }`n      60% { transform: translate(-3px, 1px) rotate(0deg); }`n      70% { transform: translate(3px, 1px) rotate(-1deg); }`n      80% { transform: translate(-1px, -1px) rotate(1deg); }`n      90% { transform: translate(1px, 2px) rotate(0deg); }`n      100% { transform: translate(1px, -2px) rotate(-1deg); }`n    }
   </style>
 
   <script is:inline>
@@ -399,6 +425,7 @@ const materials = [
 
     // --- 1. DOM要素の取得 ---
     const enemyNameEl = document.getElementById('enemy-name');
+    const enemyImageEl = document.getElementById('enemy-image');
     const enemyHpBar = document.getElementById('enemy-hp-bar');
     const enemyHpText = document.getElementById('enemy-hp-text');
 
@@ -434,14 +461,34 @@ const materials = [
     };
 
     let enemy = null;
+    let battleCount = 1;
 
-    // 敵のテンプレート（ここからランダムに敵を選びます）
-    // 攻撃力や防御力のバランスをいじってみましょう。
-    const enemyTemplates = [
-      { name: "スライム", hp: 40, maxHp: 40, attack: 8, defense: 2 },
-      { name: "ゴブリン", hp: 60, maxHp: 60, attack: 12, defense: 4 },
-      { name: "ドラゴン", hp: 150, maxHp: 150, attack: 25, defense: 10 }
-    ];
+    // 敵のテンプレート（序盤、中盤、ボス、レア）
+    const enemyTemplates = {
+      early: [
+        { name: "スライム", hp: 40, maxHp: 40, attack: 8, defense: 2, image: "/portfolio/roguelike/assets/fantasy_game_character_slime.png" },
+        { name: "カラス", hp: 35, maxHp: 35, attack: 10, defense: 1, image: "/portfolio/roguelike/assets/bird_karasu_kowai.png" },
+        { name: "ヒグマ", hp: 70, maxHp: 70, attack: 15, defense: 3, image: "/portfolio/roguelike/assets/animal_bear_higuma.png" },
+        { name: "オオカミ", hp: 50, maxHp: 50, attack: 12, defense: 2, image: "/portfolio/roguelike/assets/animal_ookami.png" }
+      ],
+      mid: [
+        { name: "ゴブリン", hp: 80, maxHp: 80, attack: 18, defense: 5, image: "/portfolio/roguelike/assets/fantasy_goblin.png" },
+        { name: "オーク", hp: 120, maxHp: 120, attack: 22, defense: 8, image: "/portfolio/roguelike/assets/fantasy_orc.png" },
+        { name: "ハーピー", hp: 70, maxHp: 70, attack: 25, defense: 3, image: "/portfolio/roguelike/assets/fantasy_harpy.png" }
+      ],
+      late: [
+        { name: "オーガ", hp: 180, maxHp: 180, attack: 30, defense: 10, image: "/portfolio/roguelike/assets/fantasy_ogre.png" },
+        { name: "ゴーレム", hp: 250, maxHp: 250, attack: 20, defense: 20, image: "/portfolio/roguelike/assets/fantasy_golem.png" },
+        { name: "ドラキュラ", hp: 150, maxHp: 150, attack: 35, defense: 8, image: "/portfolio/roguelike/assets/fantasy_dracula2.png" }
+      ],
+      boss: [
+        { name: "ドラゴン", hp: 300, maxHp: 300, attack: 40, defense: 15, image: "/portfolio/roguelike/assets/fantasy_dragon.png" },
+        { name: "リヴァイアサン", hp: 350, maxHp: 350, attack: 35, defense: 18, image: "/portfolio/roguelike/assets/fantasy_leviathan.png" }
+      ],
+      rare: [
+        { name: "ミミック", hp: 30, maxHp: 30, attack: 5, defense: 50, image: "/portfolio/roguelike/assets/character_game_mimic.png" }
+      ]
+    };
 
     let isGameOver = false;
 
@@ -484,13 +531,33 @@ const materials = [
       isGameOver = false;
       overlay.style.display = 'none';
 
-      // 敵をランダムに選んでコピー（参照渡しを防ぐためスプレッド構文を使用）
-      const randomEnemy = enemyTemplates[Math.floor(Math.random() * enemyTemplates.length)];
+      let pool = [];
+      const rand = Math.random();
+
+      if (battleCount % 5 === 0) {
+        pool = enemyTemplates.boss;
+        logMessage('<span class="log-system">ボス戦だ！ 強敵の気配がする...</span>');
+      } else if (rand < 0.05) {
+        pool = enemyTemplates.rare;
+        logMessage('<span class="log-system">レアモンスターが現れた！</span>');
+      } else if (battleCount < 5) {
+        pool = enemyTemplates.early;
+      } else if (battleCount < 10) {
+        pool = enemyTemplates.mid;
+      } else {
+        pool = enemyTemplates.late;
+      }
+
+      const randomEnemy = pool[Math.floor(Math.random() * pool.length)];
       enemy = { ...randomEnemy };
 
-      // ログをクリア
+      if (enemyImageEl && enemy.image) {
+        enemyImageEl.src = enemy.image;
+        enemyImageEl.style.display = "block";
+      }
+
       battleLog.innerHTML = '';
-      logMessage('野生の <' + 'span class="log-system">' + enemy.name + '<' + '/span> が現れた！');
+      logMessage('第 ' + battleCount + ' 戦：野生の <span class="log-system">' + enemy.name + '</span> が現れた！');
 
       updateUI();
     }
@@ -625,6 +692,9 @@ const materials = [
     const configBtn = document.getElementById('config-btn');
     const closeConfigBtn = document.getElementById('close-config-btn');
     const configModal = document.getElementById('config-modal');
+      const creditsBtn = document.getElementById('credits-btn');
+      const closeCreditsBtn = document.getElementById('close-credits-btn');
+      const creditsModal = document.getElementById('credits-modal');
     const modalOverlay = document.getElementById('modal-overlay');
 
     if (startBtn) startBtn.addEventListener('click', () => {
@@ -640,15 +710,31 @@ const materials = [
       modalOverlay.classList.remove('active');
     });
     if (configBtn) configBtn.addEventListener('click', () => {
-      configModal.classList.add('active');
-      modalOverlay.classList.add('active');
-    });
-    if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
-      configModal.classList.remove('active');
-      modalOverlay.classList.remove('active');
-    });
+        configModal.classList.add('active');
+        modalOverlay.classList.add('active');
+      });
+      if (closeConfigBtn) closeConfigBtn.addEventListener('click', () => {
+        configModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+      });
+    
+
+      if (creditsBtn) creditsBtn.addEventListener('click', () => {
+        creditsModal.classList.add('active');
+        modalOverlay.classList.add('active');
+      });
+      if (closeCreditsBtn) closeCreditsBtn.addEventListener('click', () => {
+        creditsModal.classList.remove('active');
+        modalOverlay.classList.remove('active');
+      });
 
   </script>
+
+
+
+
+
+
 
 
 
