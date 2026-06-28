@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -12,154 +12,512 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   { category: "開発言語", items: "HTML, CSS, JavaScript" },
   { category: "フレームワーク", items: "Astro" },
   { category: "その他ツール", items: "Claude, Gemini" }
-];
+  ];
 
-const learningThemes = ["状態管理", "ダメージ計算", "ターン制ロジック"];
+  const learningThemes = ["状態管理", "ダメージ計算", "ターン制ロジック", "デッキ構築", "ローグライク設計"];
 
-const materialCategories = [
+  const materialCategories = [
   { category: "画像素材", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
   { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
   { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] }
-];
----
+  ];
+  ---
 
   <BaseLayout title="カード＆育成RPG - My Portfolio" pageId="roguelike">
     <Header activeId="portfolio" />
 
     <main class="container">
-      <article>
-        <span class="page-label">TURN-BASED RPG</span>
-        <h1>{projectData ? projectData.title : 'ローグライクRPG（雛形）'}</h1>
+      <div class="game-container" style="position: relative; height: 580px; overflow: hidden;">
 
-        <div class="game-container">
-
-          <!-- 敵ステータスエリア -->
-          <div class="character-panel enemy-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
-            <img id="enemy-image" src="" alt="敵" style="max-height: 150px; display: block; margin: 0 auto 1rem;" />
-            <h2 id="enemy-name">スライム</h2>
-            <div class="status-bar">
-              <label>HP:</label>
-              <div class="bar-bg">
-                <div class="bar-fill hp-fill" id="enemy-hp-bar"></div>
-              </div>
-              <span id="enemy-hp-text">40 / 40</span>
-            </div>
+        <!-- ゲームヘッダーバー（ステータス常時表示） -->
+        <div id="game-header" class="game-header-bar"
+          style="display: none; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.95); border-bottom: 1px solid #333; padding: 0.4rem 0.8rem; font-size: 0.78rem; z-index: 100;">
+          <div class="header-status" style="display: flex; gap: 0.8rem; align-items: center;">
+            <span id="header-floor" style="font-weight: bold; color: #ffb84d;">エリア 1 - 0層</span>
+            <span class="gold-badge" style="color: #ffd700; font-weight: bold;">💰<span
+                id="header-gold">50</span></span>
+            <span class="hp-badge" style="color: #ff6b6b; font-weight: bold;">❤️<span id="header-hp">10/10</span></span>
+            <span class="mp-badge" style="color: #7cc5ff; font-weight: bold;">💧<span id="header-mp">5/5</span></span>
           </div>
-
-          <!-- バトルログ（戦闘の履歴） -->
-          <div class="battle-log" id="battle-log" style="background: rgba(0,0,0,0.8); color: white; border: 1px solid #444;">
-            <p>野生のスライムが現れた！</p>
+          <div class="header-relics" style="display: flex; gap: 4px; align-items: center;">
+            <span style="font-size: 0.7rem; color: var(--text-muted);">レリック:</span>
+            <div id="header-relics-list" style="display: flex; gap: 4px;"></div>
           </div>
-
-          <!-- プレイヤーステータスエリア -->
-          <div class="character-panel player-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
-            <h2>プレイヤー</h2>
-            <div class="status-grid">
-              <div class="status-bar">
-                <label>HP:</label>
-                <div class="bar-bg">
-                  <div class="bar-fill hp-fill" id="player-hp-bar"></div>
-                </div>
-                <span id="player-hp-text">100 / 100</span>
-              </div>
-              <div class="status-bar">
-                <label>MP:</label>
-                <div class="bar-bg">
-                  <div class="bar-fill mp-fill" id="player-mp-bar"></div>
-                </div>
-                <span id="player-mp-text">30 / 30</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- コマンド（行動）選択エリア -->
-          <div class="command-panel" id="command-panel" style="background: rgba(0,0,0,0.6); color: white; border: 1px solid #444;">
-            <!-- 
-            【学習・カスタマイズポイント】
-            ここに新しいボタン（例えば「防御する」「アイテム」など）をHTMLで追加し、
-            下のJavaScriptでクリックイベントを紐付けることで、行動のバリエーションを増やせます。
-          -->
-            <button class="btn btn-action" id="btn-attack">⚔️ たたかう</button>
-            <button class="btn btn-action btn-magic" id="btn-heal">✨ 回復魔法 (MP: 10)</button>
-            <button class="btn btn-action btn-special" id="btn-fire">🔥 炎の魔法 (MP: 15)</button>
-          </div>
-
-          <!-- ゲームオーバー/クリア画面 -->
-          <div class="overlay" id="result-overlay" style="display: none; background-color: var(--bg-color); z-index: 99; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
-            <h2 id="result-title">戦闘終了</h2>
-            <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
-              <button class="btn btn-secondary" id="btn-next" style="width: 100%;">次の戦闘へ</button>
-              <button class="btn btn-secondary" id="btn-title" style="width: 100%;">タイトルへ</button>
-              <button class="btn btn-primary" id="btn-share" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
-            </div>
-          </div>
-
-          <!-- スタート画面 -->
-          <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
-            <h2>カード＆育成RPG</h2>
-            <p>コマンドを選んで敵を倒そう</p>
-            <button id="start-btn" class="btn btn-full">スタート</button>
-            <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
-                <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
-          </div>
-
-          <!-- 遊び方モーダル -->
-          <div id="howto-modal" class="config-modal">
-            <h3>遊び方</h3>
-            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-              <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
-              <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
-              <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
-            </div>
-            <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
-          </div>
-          <!-- クレジットモーダル -->
-          <div id="credits-modal" class="config-modal">
-            <h3>クレジット・使用素材</h3>
-            <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-              <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-              <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                <li>画像素材: <a href="https://www.irasutoya.com/" target="_blank" rel="noopener noreferrer">いらすとや</a></li>
-                <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
-                <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple Icons</a></li>
-              </ul>
-            </div>
-            <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
-          </div>
-
-          <!-- コンフィグモーダル（ダミー） -->
-          <div id="modal-overlay" class="modal-overlay"></div>
-          <div id="config-modal" class="config-modal">
-            <h3>設定（コンフィグ）</h3>
-            <div class="config-item">
-              <label for="bgm-volume">BGM音量</label>
-              <input type="range" id="bgm-volume" min="0" max="100" value="50">
-            </div>
-            <div class="config-item">
-              <label for="se-volume">SE音量</label>
-              <input type="range" id="se-volume" min="0" max="100" value="50">
-            </div>
-            
-                <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
-                <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
-          </div>
-
         </div>
 
-        <!-- ゲーム概要・使用技術セクション -->
-        <section class="project-details">
-          <h2>概要</h2>
+        <!-- ゲームオーバー/クリア画面 -->
+        <div class="overlay" id="result-overlay"
+          style="display: none; background-color: rgba(0,0,0,0.95); z-index: 200;">
+          <h2 id="result-title">戦闘終了</h2>
+          <p id="result-details"
+            style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center; line-height: 1.5;">
+          </p>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
+            <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
+            <button class="btn" id="btn-share"
+              style="background-color: #1DA1F2; border-color: #1DA1F2; color:white;">Xでシェア</button>
+          </div>
+        </div>
+
+        <!-- カード選択報酬画面 -->
+        <div class="overlay" id="reward-overlay"
+          style="display: none; background-color: rgba(0,0,0,0.95); z-index: 180;">
+          <h2>🎉 戦闘勝利！</h2>
+          <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
+          <div id="reward-cards" class="reward-cards"></div>
+          <button class="btn btn-secondary" id="btn-skip-reward" style="margin-top:1rem;">スキップ</button>
+        </div>
+
+        <!-- デッキ閲覧モーダル -->
+        <div class="overlay" id="deck-viewer-overlay"
+          style="display: none; background-color: rgba(0,0,0,0.95); justify-content: flex-start; padding-top: 2.5rem; z-index: 190;">
+          <h2 style="color: white; margin-bottom: 0.5rem; font-size: 1.2rem;">デッキ確認</h2>
+          <div class="deck-viewer-tabs">
+            <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
+            <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
+            <button class="deck-tab" data-target="hand-list">手札 (<span id="dv-hand-count">0</span>)</button>
+          </div>
+          <div id="deck-list" class="dv-card-list active"></div>
+          <div id="discard-list" class="dv-card-list"></div>
+          <div id="hand-list" class="dv-card-list"></div>
+          <button class="btn btn-secondary" id="close-deck-viewer" style="margin-top:0.8rem; width:100%;">閉じる</button>
+        </div>
+
+        <!-- スタート画面 -->
+        <div id="start-screen"
+          style="position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
+          <span id="config-btn" class="icon-config" title="コンフィグ"
+            style="position:absolute; top:0.5rem; right:0.5rem;">⚙️</span>
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.3rem;">カード＆育成RPG</h2>
+          <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">職業・属性・状態異常・ゴールドを駆使する本格ローグライク</p>
+          <button id="start-btn" class="btn btn-full">冒険を始める</button>
+          <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
+        </div>
+
+        <!-- 職業選択画面 -->
+        <div id="class-select-screen"
+          style="position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:98; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; overflow-y:auto;">
+          <h2 style="font-size: 1.2rem; text-align: center; margin-bottom: 0.4rem; color: #ffb84d;">冒険者の選択</h2>
+          <p style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-bottom: 0.8rem;">
+            あなたの戦闘スタイルを選んで旅立ちましょう。</p>
+          <div style="flex: 1;">
+            <div class="class-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+              <div class="class-card" data-class="yuusya">
+                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_yuusya.png"
+                  style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+                <div style="font-size: 0.85rem; font-weight: bold;">勇者</div>
+                <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP10 /
+                  MP5<br>初期レリックが+1個</div>
+              </div>
+              <div class="class-card" data-class="kenshi">
+                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_kenshi.png"
+                  style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+                <div style="font-size: 0.85rem; font-weight: bold;">戦士</div>
+                <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP15 /
+                  MP4<br>毎ターンHP+1回復</div>
+              </div>
+              <div class="class-card" data-class="mahoutsukai">
+                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_mahoutsukai.png"
+                  style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+                <div style="font-size: 0.85rem; font-weight: bold;">魔法使い</div>
+                <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP7 /
+                  MP7<br>毎ターンMP+1回復</div>
+              </div>
+              <div class="class-card" data-class="butouka">
+                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_butouka.png"
+                  style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+                <div style="font-size: 0.85rem; font-weight: bold;">格闘家</div>
+                <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP8 /
+                  MP4<br>毎ターン行動回数+1</div>
+              </div>
+            </div>
+            <p id="class-select-preview"
+              style="font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem;">
+              勇者が選択されています</p>
+          </div>
+
+          <button id="btn-game-start" class="btn btn-full" style="margin-top: 0.5rem;">冒険の旅へ出る</button>
+        </div>
+
+        <!-- マップ進行画面（横スクロール双六マップ） -->
+        <div id="map-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#0f0f1a; z-index:80; display:none; flex-direction:column; padding:1rem; box-sizing:border-box; justify-content: space-between;">
+          <div style="text-align: center; margin-bottom: 0.3rem;">
+            <h3 style="font-size: 1.1rem; color: #ffb84d; margin-bottom: 0.1rem;">マップ</h3>
+          </div>
+
+          <!-- 横スクロールすごろく本体 -->
+          <div id="map-scroll-wrapper"
+            style="flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem; margin-bottom: 0.8rem; position: relative;">
+            <div id="map-board"
+              style="display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content;">
+              <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
+            </div>
+          </div>
+
+          <div
+            style="border-top: 1px solid #333; padding-top: 0.4rem; display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" id="btn-map-view-deck"
+              style="font-size: 0.72rem; padding: 0.3rem 0.8rem;">デッキ確認</button>
+            <span style="font-size: 0.65rem; color: var(--text-muted);">接続された次のマスへ進めます</span>
+          </div>
+        </div>
+
+        <!-- 宿（回復）画面 -->
+        <div id="inn-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#0c1513; z-index:81; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; text-align:center;">
+          <img src="/portfolio/roguelike/assets/map/building_hotel_pet.png"
+            style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 1rem;" />
+          <h3 style="color: #51cf66; font-size: 1.2rem; margin-bottom: 0.5rem;">旅人の宿</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%;">
+            15ゴールドを支払って、宿屋でぐっすり休むことができます。<br>
+            <strong>効果: HP全回復 ＋ 毒/麻痺の全治</strong>
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+            <button id="btn-inn-rest" class="btn btn-primary" style="width: 100%;">休む (💰15)</button>
+            <button id="btn-inn-leave" class="btn btn-secondary" style="width: 100%;">立ち去る</button>
+          </div>
+        </div>
+
+        <!-- 妖精（強化）画面 -->
+        <div id="fairy-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#150f1a; z-index:82; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
+          <div style="text-align: center;">
+            <img src="/portfolio/roguelike/assets/characters/fantasy_pixy2.png"
+              style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 0.5rem;" />
+            <h3 style="color: #cc5de8; font-size: 1.2rem; margin-bottom: 0.2rem;">祝福の妖精</h3>
+            <p id="fairy-desc" style="font-size: 0.75rem; color: var(--text-muted);">
+              20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。</p>
+          </div>
+
+          <!-- 強化対象カード選択リスト -->
+          <div id="fairy-card-list"
+            style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
+            <!-- 所持カードがボタンとして並びます -->
+          </div>
+
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <button id="btn-fairy-leave" class="btn btn-secondary" style="flex: 1;">立ち去る</button>
+          </div>
+        </div>
+
+        <!-- 街（ショップ）画面 -->
+        <div id="town-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#1a150f; z-index:83; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
+          <div style="text-align: center;">
+            <img src="/portfolio/roguelike/assets/map/omise_shop_tatemono.png"
+              style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 0.5rem;" />
+            <h3 style="color: #ff922b; font-size: 1.2rem; margin-bottom: 0.2rem;">よろず街の商い</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
+          </div>
+
+          <div
+            style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px;">
+            <div>
+              <p
+                style="font-size: 0.72rem; color: #ff922b; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+                販売カード (各 💰15)</p>
+              <div id="town-cards" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+            </div>
+            <div>
+              <p
+                style="font-size: 0.72rem; color: #ffd8a8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+                販売アイテム (各 💰20)</p>
+              <div id="town-items" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+            </div>
+          </div>
+
+          <button id="btn-town-leave" class="btn btn-secondary" style="width: 100%;">街を出る</button>
+        </div>
+
+        <!-- イベント画面 -->
+        <div id="event-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#11111a; z-index:84; display:none; flex-direction:column; padding:1.5rem; box-sizing:border-box; justify-content: space-between; text-align: center;">
+          <div>
+            <img id="event-image" src="/portfolio/roguelike/assets/icons/no_image_square.jpg"
+              style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #444;" />
+            <h3 id="event-title" style="color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.5rem;">未知のイベント</h3>
+            <p id="event-text"
+              style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto;">
+            </p>
+          </div>
+
+          <div id="event-options" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+            <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
+          </div>
+        </div>
+
+        <!-- アイテム使用確認モーダル -->
+        <div id="item-confirm-modal"
+          style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
+          <div
+            style="background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center;">
+            <h4 style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem;">アイテムの使用確認</h4>
+            <p id="item-confirm-text"
+              style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem;"></p>
+            <div style="display: flex; gap: 10px;">
+              <button id="btn-item-confirm-yes" class="btn btn-primary" style="flex: 1; padding: 0.4rem 0;">はい</button>
+              <button id="btn-item-confirm-no" class="btn btn-secondary"
+                style="flex: 1; padding: 0.4rem 0;">いいえ</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 戦闘中マップ確認モーダル -->
+        <div id="battle-map-overlay" class="overlay"
+          style="display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column;">
+          <h3 style="color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">現在地確認 🗺️</h3>
+          <div id="battle-map-scroll-wrapper"
+            style="flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem;">
+            <div id="battle-map-board"
+              style="display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content;"></div>
+          </div>
+          <button class="btn btn-secondary" id="btn-close-battle-map"
+            style="margin-top: 0.8rem; width: 100%;">閉じる</button>
+        </div>
+
+        <!-- 王様遭遇イベントモーダル -->
+        <div id="king-event-modal" class="overlay"
+          style="display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center;">
+          <img src="/portfolio/roguelike/assets/characters/royal_king.png"
+            style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 1rem;" />
+          <h3 style="color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem;">謁見の間：王からの餞別</h3>
+          <p
+            style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%;">
+            「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
+          </p>
+          <div id="king-relic-choices" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+            <!-- 3つのレリック選択カードがJSで挿入されます -->
+          </div>
+        </div>
+
+        <!-- 汎用カットシーンモーダル -->
+        <div id="cutscene-modal" class="overlay"
+          style="display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem;">
+          <!-- 背景イメージ -->
+          <div id="cutscene-bg"
+            style="position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none;">
+          </div>
+          <!-- キャラクターポートレート群 -->
+          <div id="cutscene-portraits"
+            style="position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2;">
+          </div>
+          <!-- セリフウィンドウ -->
+          <div
+            style="position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4);">
+            <div id="cutscene-speaker"
+              style="font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em;"></div>
+            <div id="cutscene-text" style="font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em;"></div>
+            <div style="text-align:right; margin-top:0.5rem;">
+              <button id="btn-cutscene-next" class="btn btn-primary" style="font-size:0.7rem; padding:0.25rem 1rem;">次へ
+                ▶</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ゲーム内汎用メッセージダイアログ -->
+
+        <div id="game-dialog-modal" class="overlay"
+          style="display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem;">
+          <div
+            style="background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+            <h4 id="dialog-title" style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold;">通知
+            </h4>
+            <p id="dialog-message" style="font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem;">
+            </p>
+            <div id="dialog-buttons" style="display: flex; gap: 10px; justify-content: center;">
+              <button id="btn-dialog-ok" class="btn btn-primary" style="padding: 0.3rem 1.5rem;">OK</button>
+              <button id="btn-dialog-yes" class="btn btn-primary"
+                style="display:none; flex:1; padding: 0.3rem 0;">はい</button>
+              <button id="btn-dialog-no" class="btn btn-secondary"
+                style="display:none; flex:1; padding: 0.3rem 0;">いいえ</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- バトル画面本体 -->
+        <div class="battle-layout"
+          style="top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem;">
+
+          <!-- ポケモン式4象限バトルフィールド -->
+          <div class="battle-field"
+            style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+
+            <!-- ① 左上：敵ステータス -->
+            <div class="enemy-status-panel"
+              style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
+              <div
+                style="font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+                <span id="enemy-name">敵</span>
+                <span id="enemy-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+                <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
+                <div
+                  style="flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+                  <div id="enemy-hp-bar"
+                    style="height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s;">
+                  </div>
+                </div>
+                <span id="enemy-hp-text"
+                  style="font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0;">40/40</span>
+              </div>
+              <div id="enemy-intent"
+                style="font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666;">
+                ⚔️ 5</div>
+            </div>
+
+            <!-- ② 右上：敵画像 -->
+            <div style="display: flex; align-items: center; justify-content: center; position: relative;">
+              <img id="enemy-image" src="" alt="敵"
+                style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));" />
+            </div>
+
+            <!-- ③ 左下：自分画像 -->
+            <div
+              style="display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative;">
+              <img id="player-battle-image" src="" alt="自分"
+                style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8));" />
+            </div>
+
+            <!-- ④ 右下：自分ステータス -->
+            <div class="player-status-panel"
+              style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6);">
+              <div
+                style="font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+                <span id="player-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+                <span id="player-class-name">あなた</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+                <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
+                <div
+                  style="flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+                  <div id="player-hp-bar"
+                    style="height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s;">
+                  </div>
+                </div>
+                <span id="player-hp-text"
+                  style="font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0;">10/10</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem;">
+                <span style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">MP</span>
+                <div id="player-mp-orbs" style="display: flex; gap: 2px; flex: 1;"></div>
+                <span id="player-mp-text" style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">5/5</span>
+              </div>
+              <div style="font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem;">
+                行動: <span id="player-actions">1</span>回
+              </div>
+            </div>
+
+          </div><!-- /.battle-field -->
+
+          <!-- バトルログ (コンパクト) -->
+          <div class="battle-log-panel" id="battle-log"
+            style="height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box;">
+            <p class="log-system">戦闘開始！</p>
+          </div>
+
+          <!-- レリック・アイテムエリア -->
+          <div
+            style="display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%;">
+            <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+              <span
+                style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">レリック:</span>
+              <div id="player-relics" style="display: flex; gap: 4px; overflow-x: auto;"></div>
+            </div>
+            <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+              <span
+                style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
+              <div id="player-items" style="display: flex; gap: 4px;"></div>
+            </div>
+          </div>
+
+          <!-- 手札エリア -->
+          <div style="display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-secondary" id="btn-view-deck"
+                style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem;">
+                山札 (<span id="deck-count">0</span>)
+              </button>
+              <button class="btn btn-secondary" id="btn-battle-view-map"
+                style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d;">
+                マップ 🗺️
+              </button>
+            </div>
+            <div id="hand-area" class="hand-area"
+              style="height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start;">
+              <!-- カードがJSで挿入されます -->
+            </div>
+            <div style="margin-top: 0.1rem; width: 100%;">
+              <button class="btn btn-end-turn" id="btn-end-turn" style="width: 100%; padding: 0.4rem;">様子見</button>
+            </div>
+          </div>
+
+        </div><!-- /.battle-layout -->
+
+
+        <!-- 遊び方モーダル -->
+        <div id="howto-modal" class="config-modal">
+          <h3>遊び方</h3>
+          <div class="howto-content"
+            style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+            <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+            <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+            <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+          </div>
+          <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+        </div>
+
+        <!-- コンフィグモーダル -->
+        <div id="modal-overlay" class="modal-overlay"></div>
+        <div id="config-modal" class="config-modal">
+          <h3>設定（コンフィグ）</h3>
+          <div class="config-item">
+            <label for="bgm-volume">BGM音量</label>
+            <input type="range" id="bgm-volume" min="0" max="100" value="50">
+          </div>
+          <div class="config-item">
+            <label for="se-volume">SE音量</label>
+            <input type="range" id="se-volume" min="0" max="100" value="50">
+          </div>
+          <button id="credits-btn" class="btn btn-secondary"
+            style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
+          <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+        </div>
+
+        <!-- クレジットモーダル -->
+        <div id="credits-modal" class="config-modal">
+          <h3>クレジット・使用素材</h3>
+          <div class="howto-content"
+            style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+            <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+            <ul style="padding-left: 1.2rem; margin-top: 0.5rem;">
+              <li><strong>画像素材:</strong> いらすとや 様</li>
+              <li><strong>背景素材:</strong> みんちりえ 様</li>
+              <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
+              <li><strong>フォント:</strong> Google Fonts</li>
+            </ul>
+          </div>
+          <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+        </div>
+
+      </div><!-- /.game-container -->
+
+      <!-- ゲーム概要・使用技術セクション -->
+      <section class="project-details">
+        <h2>概要</h2>
         {projectData && projectData.description ? (
-          <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
+        <p class="description" set:html={projectData.description.replace(/\n/g, '<br>' )} />
         ) : (
-          <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
+        <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
         )}
 
         <h2>学習テーマ</h2>
         <div class="materials-list">
           <ul>
             {learningThemes.map((theme) => (
-              <li>{theme}</li>
+            <li>{theme}</li>
             ))}
           </ul>
         </div>
@@ -178,27 +536,26 @@ const materialCategories = [
           </table>
         </div>
 
-          <h2>使用素材</h2>
-          <div class="table-responsive">
-            <table class="tech-table">
-              <tbody>
-                {materialCategories.map((mat) => (
-                <tr>
-                  <th>{mat.category}</th>
-                  <td>
-                    {mat.items.map((item, index) => (
-                      <span key={item.name}>
-                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-                        {index < mat.items.length - 1 ? " / " : ""}
-                      </span>
-                    ))}
-                  </td>
-                </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <h2>使用素材</h2>
+        <div class="table-responsive">
+          <table class="tech-table">
+            <tbody>
+              {materialCategories.map((mat) => (
+              <tr>
+                <th>{mat.category}</th>
+                <td>
+                  {mat.items.map((item, index) => (
+                  <span key={item.name}>
+                    <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                    {index < mat.items.length - 1 ? " / " : "" } </span>
+                      ))}
+                </td>
+              </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
       </article>
     </main>
 
@@ -206,102 +563,307 @@ const materialCategories = [
   </BaseLayout>
 
   <style>
+    /* =============================
+       ゲームコンテナ
+       ============================= */
     .game-container {
       margin-top: 2rem;
       background: var(--bg-secondary);
       border-radius: 12px;
-      padding: 1.5rem;
+      padding: 0;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       position: relative;
       overflow: hidden;
-      max-width: 600px;
+      max-width: 640px;
       margin-left: auto;
       margin-right: auto;
+      height: 580px;
+      flex-shrink: 0;
+      box-sizing: border-box;
     }
 
-    .character-panel {
-      background: var(--bg-color);
-      padding: 1rem;
+    /* 職業選択カード */
+    .class-card {
+      border: 1px solid #444;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.6rem;
       border-radius: 8px;
-      border: 2px solid var(--border-color);
-      margin-bottom: 1rem;
-    }
-
-    .enemy-panel {
-      border-color: #dc3545;
+      cursor: pointer;
       text-align: center;
+      transition: all 0.2s ease;
     }
 
-    .player-panel {
-      border-color: #007bff;
+    .class-card:hover {
+      border-color: #ffd700 !important;
+      background: rgba(255, 215, 0, 0.06) !important;
+      transform: translateY(-2px);
     }
 
-    .character-panel h2 {
-      margin-top: 0;
+    .class-card.selected {
+      border-color: #ff922b !important;
+      border-width: 2px !important;
+      background: rgba(255, 146, 43, 0.18) !important;
+      box-shadow: 0 0 10px rgba(255, 146, 43, 0.35);
+    }
+
+    /* 属性・特殊カラーテーマ (Vite動的生成用グローバルセレクタ) */
+    /* card-cost: 全カード共通（青丸） */
+    :global(.card-cost) {
+      background: #3d5af1 !important;
+      color: white !important;
+    }
+
+    /* ===== 属性カラードット（card-descの下・右下に出る小さな丸） ===== */
+    /* .card-color-dot はJS側でcardに.card-color-dot要素を追加して使う */
+    :global(.card-color-dot) {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    /* 白 (回復・能昇) */
+    :global(.color-dot-white) {
+      background: #e9ecef;
+      box-shadow: 0 0 4px rgba(233, 236, 239, 0.8);
+    }
+
+    /* 黒 (状態異常・能降) */
+    :global(.color-dot-black) {
+      background: #495057;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    }
+
+    /* 赤 (炎) */
+    :global(.color-dot-red) {
+      background: #ff6b6b;
+      box-shadow: 0 0 4px rgba(255, 107, 107, 0.8);
+    }
+
+    /* 青 (水) */
+    :global(.color-dot-blue) {
+      background: #4dabf7;
+      box-shadow: 0 0 4px rgba(77, 171, 247, 0.8);
+    }
+
+    /* 緑 (風) */
+    :global(.color-dot-green) {
+      background: #51cf66;
+      box-shadow: 0 0 4px rgba(81, 207, 102, 0.8);
+    }
+
+    /* 橙 (土) */
+    :global(.color-dot-orange) {
+      background: #ff922b;
+      box-shadow: 0 0 4px rgba(255, 146, 43, 0.8);
+    }
+
+    /* 黄 (雷) */
+    :global(.color-dot-yellow) {
+      background: #fcc419;
+      box-shadow: 0 0 4px rgba(252, 196, 25, 0.8);
+    }
+
+    /* 紫 (特殊・スペシャル) */
+    :global(.color-dot-purple) {
+      background: #cc5de8;
+      box-shadow: 0 0 6px rgba(204, 93, 232, 0.9);
+    }
+
+    /* 紫カードのみ特殊グロー背景 */
+    :global(.color-purple) {
+      background: linear-gradient(135deg, rgba(20, 20, 35, 0.85), rgba(50, 15, 70, 0.6)) !important;
+      box-shadow: 0 0 8px rgba(204, 93, 232, 0.4) !important;
+    }
+
+
+
+
+
+    /* =============================
+       オーバーレイ共通
+       ============================= */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-secondary);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .overlay h2 {
+      font-size: 1.5rem;
       margin-bottom: 0.5rem;
-      font-size: 1.25rem;
     }
 
-    .status-bar {
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 280px;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .reward-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .reward-cards {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* =============================
+       デッキ閲覧
+       ============================= */
+    .deck-viewer-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      flex-wrap: nowrap;
+      justify-content: center;
+    }
+
+    .deck-tab {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 0.4rem 0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      flex: 1;
+      max-width: 120px;
+      white-space: nowrap;
+    }
+
+    .deck-tab.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .dv-card-list {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      justify-content: center;
+      width: 100%;
+      padding-bottom: 0.5rem;
+    }
+
+    .dv-card-list.active {
+      display: flex;
+    }
+
+    /* =============================
+       バトルレイアウト（2段）
+       ============================= */
+    /* =============================
+       バトルレイアウト（2段）
+       ============================= */
+    .battle-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      height: 100%;
+      overflow: hidden;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    /* 上段：敵 + ログ横並び */
+    .battle-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      align-items: stretch;
+    }
+
+    /* 敵エリア */
+    .enemy-panel {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #dc3545;
+      border-radius: 8px;
+      padding: 0.6rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      min-height: 160px;
+    }
+
+    .enemy-intent {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #dc3545;
+      color: white;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .enemy-image {
+      max-height: 80px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .enemy-name-row {
+      font-weight: bold;
+      font-size: 0.9rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
+      gap: 0.3rem;
+      color: white;
     }
 
-    .status-bar label {
-      font-weight: bold;
-      width: 30px;
-    }
-
-    .bar-bg {
-      flex-grow: 1;
-      height: 16px;
-      background: #e9ecef;
+    /* バトルログ */
+    .battle-log-panel {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid #444;
       border-radius: 8px;
-      overflow: hidden;
-    }
-
-    /* ダークモード時のゲージ背景調整 */
-    :global([data-theme="dark"]) .bar-bg {
-      background: #343a40;
-    }
-
-    .bar-fill {
-      height: 100%;
-      transition: width 0.3s ease-out;
-    }
-
-    .hp-fill {
-      background: #28a745;
-    }
-
-    .mp-fill {
-      background: #007bff;
-    }
-
-    .status-bar span {
-      font-size: 0.9rem;
-      width: 60px;
-      text-align: right;
-    }
-
-    .battle-log {
-      height: 150px;
-      background: #111;
-      color: #fff;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 0.6rem;
       overflow-y: auto;
-      margin-bottom: 1rem;
+      max-height: 160px;
       font-family: monospace;
+      font-size: 0.78rem;
       line-height: 1.5;
+      color: white;
     }
 
-    .battle-log p {
-      margin: 0 0 0.5rem 0;
+    .battle-log-panel p {
+      margin: 0 0 0.3rem 0;
       border-bottom: 1px solid #333;
-      padding-bottom: 0.5rem;
+      padding-bottom: 0.2rem;
     }
 
     .log-damage {
@@ -316,69 +878,536 @@ const materialCategories = [
       color: #fcc419;
     }
 
-    .command-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .log-poison {
+      color: #a9e34b;
+    }
+
+    /* =============================
+       HPバー（共通）
+       ============================= */
+    .hp-row {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      width: 100%;
+      font-size: 0.75rem;
+      color: white;
+    }
+
+    .bar-bg {
+      flex-grow: 1;
+      height: 10px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      min-width: 40px;
+    }
+
+    .bar-inline {
+      flex-grow: 1;
+      min-width: 60px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.3s ease-out;
+    }
+
+    .hp-fill {
+      background: #28a745;
+    }
+
+    :global([data-theme="dark"]) .bar-bg {
+      background: #343a40;
+    }
+
+    .hp-num {
+      font-size: 0.72rem;
+      white-space: nowrap;
+      min-width: 42px;
+      text-align: right;
+    }
+
+    /* =============================
+       プレイヤーエリア
+       ============================= */
+    .player-panel {
+      background: rgba(0, 0, 50, 0.5);
+      border: 1px solid #007bff;
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+      color: white;
+    }
+
+    .player-top-row {
+      display: flex;
+      align-items: center;
       gap: 0.5rem;
+      flex-wrap: nowrap;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
     }
 
-    .btn-action {
-      padding: 1rem;
-      font-size: 1rem;
+    .player-name {
       font-weight: bold;
+      white-space: nowrap;
     }
 
-    .btn-magic {
-      background-color: #17a2b8;
-      border-color: #17a2b8;
+    .player-hp-inline {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex: 1;
+      font-size: 0.78rem;
+    }
+
+    .shield-inline {
+      font-size: 0.85rem;
+      white-space: nowrap;
+      font-weight: bold;
+      color: #17a2b8;
+    }
+
+    /* AP行 */
+    .ap-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .ap-label {
+      font-weight: bold;
+      color: #7cc5ff;
+      white-space: nowrap;
+    }
+
+    .ap-orbs {
+      display: flex;
+      gap: 4px;
+    }
+
+    :global(.ap-orb) {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #333;
+      border: 2px solid #555;
+    }
+
+    :global(.ap-orb.active) {
+      background: #007bff;
+      box-shadow: 0 0 6px #007bff;
+    }
+
+    .ap-num {
+      color: #7cc5ff;
+      font-size: 0.78rem;
+    }
+
+    /* =============================
+       手札エリア
+       ============================= */
+    .hand-section {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+
+    .hand-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hand-area {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0 4px;
+      min-height: 140px;
+      scrollbar-width: thin;
+    }
+
+    .end-turn-row {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn-end-turn {
+      background: linear-gradient(135deg, var(--primary-color), #5046e5);
       color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 3rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
 
-    .btn-special {
-      background-color: #fd7e14;
-      border-color: #fd7e14;
-      color: white;
+    .btn-end-turn:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(80, 70, 229, 0.4);
     }
 
-    .btn-magic:hover {
-      background-color: #138496;
+    .btn-end-turn:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    .btn-special:hover {
-      background-color: #e8590c;
-    }
-
-    .btn:disabled {
+    .btn-end-turn:disabled {
+      background: #444;
+      color: #888;
       opacity: 0.5;
       cursor: not-allowed;
-      filter: grayscale(100%);
+      transform: none;
+      box-shadow: none;
+      border-color: transparent;
     }
 
-    .overlay {
+    /* =============================
+       カード（新デザイン）
+       縦型: MP丸、カード画像、名前帯、テキスト、属性ドット行
+       ============================= */
+    :global(.battle-card) {
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+      border: 2px solid #3a3a5a;
+      border-radius: 10px;
+      width: 90px;
+      min-width: 90px;
+      height: 145px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
+      user-select: none;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    :global(.battle-card:hover) {
+      transform: translateY(-12px) scale(1.04);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+      border-color: #7cc5ff;
+      z-index: 10;
+    }
+
+    :global(.battle-card.disabled) {
+      opacity: 0.38;
+      cursor: not-allowed;
+      filter: grayscale(70%);
+    }
+
+    :global(.battle-card.disabled:hover) {
+      transform: none;
+      box-shadow: none;
+      border-color: #3a3a5a;
+    }
+
+    /* MP消費バッジ（左上丸） */
+    :global(.card-cost) {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 3px;
+      left: 3px;
+      background: #3d5af1;
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.72rem;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      z-index: 3;
+    }
+
+    /* カード中央画像エリア */
+    :global(.card-image-wrap) {
       width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      height: 56px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    :global(.card-image-wrap img) {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    /* カード名帯（画像の下半分に重なるように） */
+    :global(.card-name) {
+      font-weight: bold;
+      font-size: 0.65rem;
+      text-align: center;
+      color: #fff;
+      padding: 1px 2px;
+      line-height: 1.1;
+      background: rgba(0, 0, 0, 0.75);
+      position: relative;
+      margin-top: -12px;
+      z-index: 2;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 効果テキスト */
+    :global(.card-desc) {
+      font-size: 0.58rem;
+      color: #ccc !important;
+      text-align: center;
+      padding: 2px 4px 0;
+      line-height: 1.25;
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: white;
+      overflow: hidden;
     }
 
-    .overlay h2 {
-      font-size: 2rem;
-      margin-bottom: 1.5rem;
+    :global(.card-desc .desc-main) {
+      color: #ddd;
+      font-size: 0.58rem;
     }
 
-    /* --- 追加：プロジェクト概要セクションのスタイル --- */
+    :global(.card-desc .desc-sub) {
+      color: #aaa;
+      font-size: 0.55rem;
+      margin-top: 1px;
+    }
+
+    /* タグUI */
+    :global(.card-tags) {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 2px;
+      padding: 0 4px 4px;
+      width: 100%;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    :global(.card-tag) {
+      font-size: 0.45rem;
+      padding: 2px 4px;
+      border-radius: 2px;
+      color: #fff;
+      font-weight: bold;
+      line-height: 1.1;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.6);
+      white-space: nowrap;
+      text-align: center;
+      display: inline-block;
+    }
+
+    :global(.tag-purple) {
+      color: #d477ff;
+      border-color: #d477ff;
+    }
+
+    :global(.tag-white) {
+      color: #fff;
+      border-color: #fff;
+    }
+
+    :global(.tag-buff-up) {
+      color: #fff;
+      border-color: #fff;
+    }
+
+    :global(.tag-buff-down) {
+      color: #bbb;
+      border-color: #777;
+    }
+
+    :global(.tag-poison) {
+      color: #bbb;
+      border-color: #777;
+    }
+
+    :global(.tag-paralyze) {
+      color: #bbb;
+      border-color: #777;
+    }
+
+    :global(.tag-fire) {
+      color: #ff6666;
+      border-color: #ff6666;
+    }
+
+    :global(.tag-ice) {
+      color: #66ccff;
+      border-color: #66ccff;
+    }
+
+    :global(.tag-thunder) {
+      color: #ffee66;
+      border-color: #ffee66;
+    }
+
+    :global(.tag-wind) {
+      color: #88ff88;
+      border-color: #88ff88;
+    }
+
+    :global(.tag-stone) {
+      color: #ffaa66;
+      border-color: #ffaa66;
+    }
+
+    /* 紫カード特殊背景 */
+    :global(.color-purple) {
+      background: linear-gradient(160deg, #1a0a25 0%, #2d0a4a 100%) !important;
+      border-color: #9b3fbf !important;
+      box-shadow: 0 0 10px rgba(155, 63, 191, 0.4) !important;
+    }
+
+
+
+    /* すごろくマップノード・接続 */
+    :global(.map-node) {
+      width: 54px;
+      height: 54px;
+      border-radius: 8px;
+      background: #1e1e30;
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      z-index: 2;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    :global(.map-node img.node-icon) {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+    }
+
+    :global(.map-node.elite),
+    :global(.map-node.mimic) {
+      background: #4a1010;
+      border-color: #dc3545;
+    }
+
+    :global(.map-node.active) {
+      border-color: #ffd700;
+      box-shadow: 0 0 10px #ffd700;
+      animation: pulseActive 1.5s infinite;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    :global(.map-node.completed) {
+      background: #4dabf7 !important;
+      border-color: #4dabf7 !important;
+      opacity: 0.6;
+    }
+
+    :global(.map-node:hover) {
+      transform: scale(1.15);
+    }
+
+    /* プレイヤーコマ */
+    :global(.player-token) {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      z-index: 5;
+      animation: float-avatar 2s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes float-avatar {
+
+      0%,
+      100% {
+        transform: translate(-50%, 0);
+      }
+
+      50% {
+        transform: translate(-50%, -6px);
+      }
+    }
+
+    @keyframes pulseActive {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(255, 215, 0, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+      }
+    }
+
+    /* マップの接続線 */
+    :global(.map-connection-line) {
+      position: absolute;
+      height: 3px;
+      background: #444;
+      transform-origin: 0 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    :global(.map-connection-line.active) {
+      background: #ffd700 !important;
+      box-shadow: 0 0 6px rgba(255, 215, 0, 0.6) !important;
+    }
+
     .project-details {
       margin-top: 3rem;
       padding-top: 2rem;
       border-top: 1px solid var(--border-color);
     }
+
     .project-details h2 {
       font-size: 1.25rem;
       margin-top: 2rem;
@@ -386,6 +1415,7 @@ const materialCategories = [
       padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border-color);
     }
+
     .project-details h2:first-of-type {
       margin-top: 0;
     }
@@ -412,347 +1442,2339 @@ const materialCategories = [
       background-color: var(--bg-secondary);
       width: 30%;
       font-weight: bold;
-    }`n`n    .shake { animation: shake 0.5s; }`n    @keyframes shake {`n      0% { transform: translate(1px, 1px) rotate(0deg); }`n      10% { transform: translate(-1px, -2px) rotate(-1deg); }`n      20% { transform: translate(-3px, 0px) rotate(1deg); }`n      30% { transform: translate(3px, 2px) rotate(0deg); }`n      40% { transform: translate(1px, -1px) rotate(1deg); }`n      50% { transform: translate(-1px, 2px) rotate(-1deg); }`n      60% { transform: translate(-3px, 1px) rotate(0deg); }`n      70% { transform: translate(3px, 1px) rotate(-1deg); }`n      80% { transform: translate(-1px, -1px) rotate(1deg); }`n      90% { transform: translate(1px, 2px) rotate(0deg); }`n      100% { transform: translate(1px, -2px) rotate(-1deg); }`n    }
+    }
+
+    .materials-list ul {
+      padding-left: 1.5rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .materials-list li {
+      margin-bottom: 0.5rem;
+    }
   </style>
 
-  <script is:inline>
-    /**
-     * ==========================================
-     * ローグライク（ターン制RPG）の基礎ロジック
-     * ==========================================
-     * DOMの取得から状態管理（State）、計算ロジック、画面更新までを管理します。
-     * コメントを参考に、数字を変えたり新しい機能を足してみてください！
-     */
+  <script>
+    // ===================================================
+    // ローグライク カードバトル JS
+    // ===================================================
+
+    import { CARD_DB, REWARD_POOL, INITIAL_DECKS, upgradeCard } from '../../../data/roguelike/cards';
+    import { RELIC_DB } from '../../../data/roguelike/relics';
+    import { ITEM_DB } from '../../../data/roguelike/items';
+    import { enemyTemplates, getEnemyTemplate } from '../../../data/roguelike/enemies';
 
     // --- 1. DOM要素の取得 ---
+    const gameHeader = document.getElementById('game-header');
+    const headerFloor = document.getElementById('header-floor');
+    const headerGold = document.getElementById('header-gold');
+    const headerHp = document.getElementById('header-hp');
+    const headerMp = document.getElementById('header-mp');
+    const headerRelicsList = document.getElementById('header-relics-list');
+
     const enemyNameEl = document.getElementById('enemy-name');
     const enemyImageEl = document.getElementById('enemy-image');
     const enemyHpBar = document.getElementById('enemy-hp-bar');
     const enemyHpText = document.getElementById('enemy-hp-text');
+    const enemyIntentEl = document.getElementById('enemy-intent');
+    const enemyPoisonEl = document.getElementById('enemy-poison-badge');
 
     const playerHpBar = document.getElementById('player-hp-bar');
     const playerHpText = document.getElementById('player-hp-text');
-    const playerMpBar = document.getElementById('player-mp-bar');
     const playerMpText = document.getElementById('player-mp-text');
+    const playerMpOrbs = document.getElementById('player-mp-orbs');
+    const playerActionsText = document.getElementById('player-actions');
+    const playerRelicsEl = document.getElementById('player-relics');
+    const playerItemsEl = document.getElementById('player-items');
+    const playerPoisonEl = document.getElementById('player-poison-badge');
+    const playerBattleImage = document.getElementById('player-battle-image');
 
     const battleLog = document.getElementById('battle-log');
-    const btnAttack = document.getElementById('btn-attack');
-    const btnHeal = document.getElementById('btn-heal');
-    const btnFire = document.getElementById('btn-fire');
+    const handArea = document.getElementById('hand-area');
+    const deckCountEl = document.getElementById('deck-count');
+    const btnEndTurn = document.getElementById('btn-end-turn');
 
     const overlay = document.getElementById('result-overlay');
     const resultTitle = document.getElementById('result-title');
+    const resultDetails = document.getElementById('result-details');
     const btnNext = document.getElementById('btn-next');
     const btnTitle = document.getElementById('btn-title');
     const btnShare = document.getElementById('btn-share');
 
-    // --- 2. 状態（State）の定義 ---
-    // 【学習・カスタマイズポイント】
-    // ここに「素早さ (speed)」や「毒状態 (isPoisoned)」などの変数を増やすことで、
-    // より複雑なゲームシステムに発展させることができます。
+    const rewardOverlay = document.getElementById('reward-overlay');
+    const rewardSubtitleText = document.getElementById('reward-subtitle-text');
+    const rewardCards = document.getElementById('reward-cards');
+    const btnSkipReward = document.getElementById('btn-skip-reward');
 
-    let player = {
-      name: "プレイヤー",
-      hp: 100,
-      maxHp: 100,
-      mp: 30,
-      maxMp: 30,
-      attack: 15,
-      defense: 5
+    const deckViewerOverlay = document.getElementById('deck-viewer-overlay');
+    const btnViewDeck = document.getElementById('btn-view-deck');
+    const closeDeckViewer = document.getElementById('close-deck-viewer');
+
+    const startScreen = document.getElementById('start-screen');
+    const classSelectScreen = document.getElementById('class-select-screen');
+    const mapScreen = document.getElementById('map-screen');
+    const innScreen = document.getElementById('inn-screen');
+    const fairyScreen = document.getElementById('fairy-screen');
+    const townScreen = document.getElementById('town-screen');
+    const eventScreen = document.getElementById('event-screen');
+    const itemConfirmModal = document.getElementById('item-confirm-modal');
+    const itemConfirmText = document.getElementById('item-confirm-text');
+
+    // すごろくマップ関連DOM
+    const mapScrollWrapper = document.getElementById('map-scroll-wrapper');
+    const mapBoard = document.getElementById('map-board');
+    const btnMapViewDeck = document.getElementById('btn-map-view-deck');
+    const btnBattleViewMap = document.getElementById('btn-battle-view-map');
+    const battleMapOverlay = document.getElementById('battle-map-overlay');
+    const btnCloseBattleMap = document.getElementById('btn-close-battle-map');
+    const battleMapBoard = document.getElementById('battle-map-board');
+
+    // 王様・インゲームメッセージモーダルDOM
+    const kingEventModal = document.getElementById('king-event-modal');
+    const kingRelicChoices = document.getElementById('king-relic-choices');
+    const gameDialogModal = document.getElementById('game-dialog-modal');
+    const dialogTitle = document.getElementById('dialog-title');
+    const dialogMessage = document.getElementById('dialog-message');
+    const btnDialogOk = document.getElementById('btn-dialog-ok');
+    const btnDialogYes = document.getElementById('btn-dialog-yes');
+    const btnDialogNo = document.getElementById('btn-dialog-no');
+    // カットシーン
+    const cutsceneModal = document.getElementById('cutscene-modal');
+    const cutsceneBg = document.getElementById('cutscene-bg');
+    const cutscenePortraits = document.getElementById('cutscene-portraits');
+    const cutsceneSpeaker = document.getElementById('cutscene-speaker');
+    const cutsceneText = document.getElementById('cutscene-text');
+    let btnCutsceneNext = document.getElementById('btn-cutscene-next');
+
+    /**
+     * カットシーンを順番に表示するユーティリティ。
+     * @param {Array<{bg?, portraits:[{src,flip?}], speaker:string, lines:string[]}>} scenes
+     * @param {Function} onComplete 全シーン完了後のコールバック
+     */
+    function showCutscene(scenes, onComplete) {
+      if (!cutsceneModal || scenes.length === 0) { onComplete?.(); return; }
+      let si = 0; // scene index
+      let li = 0; // line index
+
+      function render() {
+        const s = scenes[si];
+        // 背景
+        if (cutsceneBg) cutsceneBg.style.backgroundImage = s.bg ? `url('${s.bg}')` : 'none';
+        // ポートレート
+        if (cutscenePortraits) {
+          cutscenePortraits.innerHTML = '';
+          (s.portraits || []).forEach(p => {
+            const img = document.createElement('img');
+            img.src = p.src;
+            img.style.cssText = `height:${p.size || '120px'}; object-fit:contain; ${p.flip ? 'transform:scaleX(-1);' : ''} image-rendering:auto;`;
+            cutscenePortraits.appendChild(img);
+          });
+        }
+        // スピーカー名
+        if (cutsceneSpeaker) cutsceneSpeaker.textContent = s.speaker || '';
+        // テキスト（改行対応）
+        if (cutsceneText) cutsceneText.innerHTML = s.lines[li].replace(/\n/g, '<br>');
+      }
+
+      function onNext() {
+        li++;
+        if (li >= scenes[si].lines.length) {
+          si++;
+          li = 0;
+        }
+        if (si >= scenes.length) {
+          // 全完了
+          if (cutsceneModal) cutsceneModal.style.display = 'none';
+          if (btnCutsceneNext) btnCutsceneNext.removeEventListener('click', onNext);
+          onComplete?.();
+          return;
+        }
+        render();
+      }
+
+      render();
+      if (cutsceneModal) cutsceneModal.style.display = 'flex';
+      if (btnCutsceneNext) {
+        // 重複リスナー防止のためcloneで置換
+        const newBtn = btnCutsceneNext.cloneNode(true);
+        btnCutsceneNext.parentNode.replaceChild(newBtn, btnCutsceneNext);
+        btnCutsceneNext = newBtn;
+        btnCutsceneNext.addEventListener('click', onNext);
+      }
+    }
+
+    // --- 2. ゲーム状態管理 ---
+    const player = {
+      class: 'yuusya',
+      maxHp: 10,
+      hp: 10,
+      maxMp: 5,
+      mp: 5,
+      gold: 50,
+      deck: [],
+      hand: [],
+      discard: [],
+      relics: [],
+      items: [
+        { id: 'sandwich', used: false },
+        { id: 'elixir', used: false },
+        { id: 'perfume', used: false }
+      ],
+      actions: 1,
+      poison: 0,
+      paralyze: 0,
+      buffUp: 0,
+      buffDown: 0
     };
 
     let enemy = null;
-    let battleCount = 1;
+    let isGameOver = false;
+    let isPlayerTurn = true;
 
-    // 敵のテンプレート（序盤、中盤、ボス、レア）
-    const enemyTemplates = {
-      early: [
-        { name: "スライム", hp: 40, maxHp: 40, attack: 8, defense: 2, image: "/portfolio/roguelike/assets/fantasy_game_character_slime.png" },
-        { name: "カラス", hp: 35, maxHp: 35, attack: 10, defense: 1, image: "/portfolio/roguelike/assets/bird_karasu_kowai.png" },
-        { name: "ヒグマ", hp: 70, maxHp: 70, attack: 15, defense: 3, image: "/portfolio/roguelike/assets/animal_bear_higuma.png" },
-        { name: "オオカミ", hp: 50, maxHp: 50, attack: 12, defense: 2, image: "/portfolio/roguelike/assets/animal_ookami.png" }
-      ],
-      mid: [
-        { name: "ゴブリン", hp: 80, maxHp: 80, attack: 18, defense: 5, image: "/portfolio/roguelike/assets/fantasy_goblin.png" },
-        { name: "オーク", hp: 120, maxHp: 120, attack: 22, defense: 8, image: "/portfolio/roguelike/assets/fantasy_orc.png" },
-        { name: "ハーピー", hp: 70, maxHp: 70, attack: 25, defense: 3, image: "/portfolio/roguelike/assets/fantasy_harpy.png" }
-      ],
-      late: [
-        { name: "オーガ", hp: 180, maxHp: 180, attack: 30, defense: 10, image: "/portfolio/roguelike/assets/fantasy_ogre.png" },
-        { name: "ゴーレム", hp: 250, maxHp: 250, attack: 20, defense: 20, image: "/portfolio/roguelike/assets/fantasy_golem.png" },
-        { name: "ドラキュラ", hp: 150, maxHp: 150, attack: 35, defense: 8, image: "/portfolio/roguelike/assets/fantasy_dracula2.png" }
-      ],
-      boss: [
-        { name: "ドラゴン", hp: 300, maxHp: 300, attack: 40, defense: 15, image: "/portfolio/roguelike/assets/fantasy_dragon.png" },
-        { name: "リヴァイアサン", hp: 350, maxHp: 350, attack: 35, defense: 18, image: "/portfolio/roguelike/assets/fantasy_leviathan.png" }
-      ],
-      rare: [
-        { name: "ミミック", hp: 30, maxHp: 30, attack: 5, defense: 50, image: "/portfolio/roguelike/assets/character_game_mimic.png" }
-      ]
+    // 進行ステート
+    let currentArea = 1;
+    let currentFloor = 0;
+    let currentRow = 0;
+    let currentPathType = '';
+    let generatedMap = [];
+
+    // キャラクターアバターアセットパス定義
+    const AVATAR_IMAGES = {
+      yuusya: '/portfolio/roguelike/assets/characters/figure_rpg_character_yuusya.png',
+      kenshi: '/portfolio/roguelike/assets/characters/figure_rpg_character_kenshi.png',
+      mahoutsukai: '/portfolio/roguelike/assets/characters/figure_rpg_character_mahoutsukai.png',
+      butouka: '/portfolio/roguelike/assets/characters/figure_rpg_character_butouka.png'
     };
 
-    let isGameOver = false;
+    // --- 3. インゲーム汎用ダイアログ ---
+    let currentDialogCallback = null;
+    let currentDialogCancelCallback = null;
 
-    // --- 3. ユーティリティ・画面更新関数 ---
+    function showGameAlert(title, message, onOk = null) {
+      if (dialogTitle) dialogTitle.innerHTML = title;
+      if (dialogMessage) dialogMessage.innerHTML = message;
+      if (btnDialogOk) {
+        btnDialogOk.style.display = 'inline-block';
+        btnDialogOk.setAttribute('style', 'display: inline-block !important; padding: 0.3rem 1.5rem;');
+      }
+      if (btnDialogYes) {
+        btnDialogYes.style.display = 'none';
+        btnDialogYes.setAttribute('style', 'display: none !important');
+      }
+      if (btnDialogNo) {
+        btnDialogNo.style.display = 'none';
+        btnDialogNo.setAttribute('style', 'display: none !important');
+      }
+      currentDialogCallback = onOk;
+      if (gameDialogModal) gameDialogModal.style.display = 'flex';
+    }
 
-    // ログにメッセージを追加する関数
-    function logMessage(msg, className = '') {
+    function showGameConfirm(title, message, onYes, onNo = null) {
+      if (dialogTitle) dialogTitle.innerHTML = title;
+      if (dialogMessage) dialogMessage.innerHTML = message;
+      if (btnDialogOk) {
+        btnDialogOk.style.display = 'none';
+        btnDialogOk.setAttribute('style', 'display: none !important');
+      }
+      if (btnDialogYes) {
+        btnDialogYes.style.display = 'inline-block';
+        btnDialogYes.setAttribute('style', 'display: inline-block !important; flex: 1; padding: 0.4rem 0;');
+      }
+      if (btnDialogNo) {
+        btnDialogNo.style.display = 'inline-block';
+        btnDialogNo.setAttribute('style', 'display: inline-block !important; flex: 1; padding: 0.4rem 0;');
+      }
+      currentDialogCallback = onYes;
+      currentDialogCancelCallback = onNo;
+      if (gameDialogModal) gameDialogModal.style.display = 'flex';
+    }
+
+    if (btnDialogOk) {
+      btnDialogOk.addEventListener('click', () => {
+        if (gameDialogModal) gameDialogModal.style.display = 'none';
+        if (currentDialogCallback) currentDialogCallback();
+      });
+    }
+    if (btnDialogYes) {
+      btnDialogYes.addEventListener('click', () => {
+        if (gameDialogModal) gameDialogModal.style.display = 'none';
+        if (currentDialogCallback) currentDialogCallback();
+      });
+    }
+    if (btnDialogNo) {
+      btnDialogNo.addEventListener('click', () => {
+        if (gameDialogModal) gameDialogModal.style.display = 'none';
+        if (currentDialogCancelCallback) currentDialogCancelCallback();
+      });
+    }
+
+    // --- 4. ユーティリティ・共通ロジック ---
+    function logMessage(msg, cls = '') {
+      if (!battleLog) return;
       const p = document.createElement('p');
       p.innerHTML = msg;
-      if (className) p.classList.add(className);
+      if (cls) p.classList.add(cls);
       battleLog.appendChild(p);
-      // 常に一番下へスクロールする
+      while (battleLog.children.length > 12) battleLog.removeChild(battleLog.firstChild);
       battleLog.scrollTop = battleLog.scrollHeight;
     }
 
-    // 画面のHP/MPバーや数値を最新の状態に更新する関数
-    function updateUI() {
-      // Player
-      playerHpText.textContent = `${player.hp} / ${player.maxHp}`;
-      playerHpBar.style.width = `${(player.hp / player.maxHp) * 100}%`;
-
-      playerMpText.textContent = `${player.mp} / ${player.maxMp}`;
-      playerMpBar.style.width = `${(player.mp / player.maxMp) * 100}%`;
-
-      // Enemy
-      if (enemy) {
-        enemyNameEl.textContent = enemy.name;
-        enemyHpText.textContent = `${enemy.hp} / ${enemy.maxHp}`;
-        enemyHpBar.style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
-
-      // MPが足りない場合はボタンを無効化する
-      btnHeal.disabled = (player.mp < 10) || isGameOver;
-      btnFire.disabled = (player.mp < 15) || isGameOver;
-      btnAttack.disabled = isGameOver;
+      return arr;
     }
 
-    // 新しい戦闘の準備
-    function startBattle() {
+    // --- 5. 画面切り替え ---
+    function showScreen(target) {
+      const screens = [
+        startScreen, classSelectScreen, mapScreen, innScreen,
+        fairyScreen, townScreen, eventScreen, document.querySelector('.battle-layout')
+      ];
+      screens.forEach(s => {
+        if (s) s.style.display = 'none';
+      });
+      if (target) {
+        target.style.display = (target === mapScreen) ? 'flex' : 'block';
+        if (target === mapScreen || target === document.querySelector('.battle-layout')) {
+          if (gameHeader) gameHeader.style.display = 'flex';
+          updateHeaderBar();
+        } else {
+          if (gameHeader) gameHeader.style.display = 'none';
+        }
+      }
+    }
+
+    function updateHeaderBar() {
+      if (headerFloor) headerFloor.textContent = `エリア ${currentArea} - ${currentFloor}層`;
+      if (headerGold) headerGold.textContent = player.gold;
+      if (headerHp) headerHp.textContent = `${player.hp}/${player.maxHp}`;
+      if (headerMp) headerMp.textContent = `${player.mp}/${player.maxMp}`;
+
+      if (headerRelicsList) {
+        headerRelicsList.innerHTML = '';
+        player.relics.forEach(relicId => {
+          const relic = RELIC_DB[relicId];
+          if (relic) {
+            const img = document.createElement('img');
+            img.src = relic.image;
+            img.alt = relic.name;
+            img.title = `${relic.name}: ${relic.desc.replace(/<br>/g, ' ')}`;
+            img.style.cssText = 'width: 20px; height: 20px; object-fit: contain; border: 1px solid #444; border-radius: 3px; background: rgba(255,255,255,0.05);';
+            headerRelicsList.appendChild(img);
+          }
+        });
+      }
+    }
+
+    // --- 7. 王様遇遇レリックイベント (Floor 0) ---
+    function showKingEvent() {
+      if (kingRelicChoices) kingRelicChoices.innerHTML = '';
+
+      const allRelicKeys = Object.keys(RELIC_DB).filter(k => !RELIC_DB[k].isFixed);
+      shuffle(allRelicKeys);
+      const picks = allRelicKeys.slice(0, 3);
+
+      picks.forEach(relicId => {
+        const relic = RELIC_DB[relicId];
+        const el = document.createElement('div');
+        el.style.cssText = 'border: 2px solid #ffd700; width: 96px; min-width: 96px; height: 128px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 0.4rem; position: relative; background: rgba(15,12,5,0.9); border-radius: 8px; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: transform 0.15s; flex-shrink: 0;';
+
+        const imgEl = document.createElement('img');
+        imgEl.src = relic.image || '';
+        imgEl.alt = relic.name;
+        imgEl.style.cssText = 'width: 36px; height: 36px; object-fit: contain; margin-top: 0.3rem; margin-bottom: 0.2rem;';
+
+        const nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size: 0.55rem; font-weight: bold; color: #ffd700; text-align: center; line-height: 1.2; margin-bottom: 0.15rem;';
+        nameEl.textContent = relic.name;
+
+        const descEl = document.createElement('div');
+        descEl.style.cssText = 'font-size: 0.52rem; color: var(--text-muted); text-align: center; line-height: 1.2; padding: 0 2px;';
+        descEl.innerHTML = relic.desc;
+
+        el.appendChild(imgEl);
+        el.appendChild(nameEl);
+        el.appendChild(descEl);
+
+        el.addEventListener('mouseenter', () => { el.style.transform = 'scale(1.07)'; });
+        el.addEventListener('mouseleave', () => { el.style.transform = 'none'; });
+
+        el.addEventListener('click', () => {
+          showGameConfirm(
+            'レリック選択',
+            `レリック「${relic.name}」を選択しますか？<br><br><span style="font-size:0.75rem; color:var(--text-muted);">${relic.desc}</span>`,
+            () => {
+              // はい
+              player.relics.push(relicId);
+              if (player.class === 'yuusya') {
+                const remaining = allRelicKeys.filter(r => r !== relicId);
+                const extra = remaining[0];
+                player.relics.push(extra);
+                showGameAlert('王からの餞別 ', `さらに勇者の幸運により「${RELIC_DB[extra].name}」も追加で手に入りました！`, () => {
+                  if (kingEventModal) kingEventModal.style.display = 'none';
+                  enterFloorNode();
+                });
+              } else {
+                if (kingEventModal) kingEventModal.style.display = 'none';
+                enterFloorNode();
+              }
+            },
+            null  // いいえ → 何もしない（再び選べる）
+          );
+        });
+        if (kingRelicChoices) kingRelicChoices.appendChild(el);
+      });
+
+      if (kingEventModal) kingEventModal.style.display = 'flex';
+    }
+
+    // --- 6. 職業選択画面制御 ---
+    let selectedClass = 'yuusya';
+    const CLASS_NAMES = {
+      yuusya: '勇者',
+      kenshi: '戦士',
+      mahoutsukai: '魔法使い',
+      butouka: '格闘家'
+    };
+
+    function setupClassSelection() {
+
+      // 初期化：全カードからselectedをすべて削除
+      const classCards = document.querySelectorAll('.class-card');
+      classCards.forEach(card => {
+        card.classList.remove('selected');
+        // inline styleの先顔をリセットした上で初期状態を適用
+        card.style.border = '';
+        card.style.background = '';
+        card.style.boxShadow = '';
+      });
+
+      selectedClass = 'yuusya';
+      const defaultCard = document.querySelector('.class-card[data-class="yuusya"]');
+      if (defaultCard) defaultCard.classList.add('selected');
+
+      const preview = document.getElementById('class-select-preview');
+      if (preview) preview.textContent = '勇者が選択されています';
+
+      classCards.forEach(card => {
+        card.addEventListener('click', () => {
+          // 全カードからselectedを削除
+          classCards.forEach(c => c.classList.remove('selected'));
+          // クリックしたカードにselectedを履用
+          card.classList.add('selected');
+          selectedClass = card.dataset.class;
+          if (preview) preview.textContent = `${CLASS_NAMES[selectedClass] || selectedClass}が選択されています`;
+        });
+      });
+    }
+
+    function initGame() {
       isGameOver = false;
-      overlay.style.display = 'none';
+      player.class = selectedClass;
+      player.relics = [];
+      player.gold = 50;
+      currentArea = 1;
+      currentFloor = 0;
+      currentRow = 0;
 
-      let pool = [];
-      const rand = Math.random();
+      if (player.class === 'yuusya') {
+        player.maxHp = 10;
+        player.maxMp = 5;
+      } else if (player.class === 'kenshi') {
+        player.maxHp = 15;
+        player.maxMp = 4;
+      } else if (player.class === 'mahoutsukai') {
+        player.maxHp = 7;
+        player.maxMp = 7;
+      } else if (player.class === 'butouka') {
+        player.maxHp = 8;
+        player.maxMp = 4;
+      }
+      player.hp = player.maxHp;
+      player.mp = player.maxMp;
 
-      if (battleCount % 5 === 0) {
-        pool = enemyTemplates.boss;
-        logMessage('<span class="log-system">ボス戦だ！ 強敵の気配がする...</span>');
-      } else if (rand < 0.05) {
-        pool = enemyTemplates.rare;
-        logMessage('<span class="log-system">レアモンスターが現れた！</span>');
-      } else if (battleCount < 5) {
-        pool = enemyTemplates.early;
-      } else if (battleCount < 10) {
-        pool = enemyTemplates.mid;
+      player.deck = INITIAL_DECKS[player.class].map(id => ({ ...CARD_DB[id] }));
+      player.discard = [];
+      player.hand = [];
+      player.items.forEach(i => i.used = false);
+
+      if (playerBattleImage) playerBattleImage.src = AVATAR_IMAGES[player.class];
+
+      currentPathType = 'start';
+      generateAreaMap();
+      showKingEvent();
+    }
+
+    // --- 8. 双六マップ生成・描画ロジック ---
+    const NODE_TYPES = {
+      start: { label: 'お城', class: 'start' },
+      normal: { label: '敵の気配', class: 'normal' },
+      elite: { label: '強敵の気配', class: 'elite' },
+      mimic: { label: '強敵の気配', class: 'mimic' },
+      inn: { label: '宿屋 ⛺', class: 'inn' },
+      fairy: { label: '神秘的な森', class: 'fairy' },
+      event: { label: '？？？', class: 'event' },
+      town: { label: '町', class: 'town' },
+      midboss: { label: '威圧的な気配', class: 'midboss' },
+      boss: { label: '威圧的な気配', class: 'boss' },
+      lastboss: { label: '魔王の気配', class: 'lastboss' }
+    };
+
+
+    function generateAreaMap() {
+      generatedMap = [];
+      const nonNormals = ['elite', 'mimic', 'inn', 'fairy', 'event'];
+
+      function getRandomNonNormal() {
+        return nonNormals[Math.floor(Math.random() * nonNormals.length)];
+      }
+
+      function generateRoute3() {
+        const patterns = [
+          ['normal', 'X', 'normal'],
+          ['X', 'normal', 'X']
+        ];
+        const p = patterns[Math.floor(Math.random() * patterns.length)];
+        return p.map(x => x === 'X' ? getRandomNonNormal() : 'normal');
+      }
+
+      const routes1 = [generateRoute3(), generateRoute3(), generateRoute3()];
+      const routes2 = [generateRoute3(), generateRoute3(), generateRoute3()];
+
+      for (let f = 0; f <= 9; f++) {
+        const floorNodes = [];
+        if (f === 0) {
+          floorNodes.push({ type: 'start', col: 0, row: 0 });
+        } else if (f === 4) {
+          floorNodes.push({ type: 'town', col: 4, row: 0 });
+        } else if (f === 5) {
+          floorNodes.push({ type: 'midboss', col: 5, row: 0 });
+        } else if (f === 9) {
+          const type = (currentArea === 3) ? 'lastboss' : 'boss';
+          floorNodes.push({ type: type, col: 9, row: 0 });
+        } else if (f >= 1 && f <= 3) {
+          const step = f - 1;
+          for (let r = -1; r <= 1; r++) {
+            floorNodes.push({ type: routes1[r + 1][step], col: f, row: r });
+          }
+        } else if (f >= 6 && f <= 8) {
+          const step = f - 6;
+          for (let r = -1; r <= 1; r++) {
+            floorNodes.push({ type: routes2[r + 1][step], col: f, row: r });
+          }
+        }
+        generatedMap.push(floorNodes);
+      }
+    }
+
+    function renderBoardMap(container, isBattleModal = false) {
+      if (!container) return;
+      container.innerHTML = '';
+
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.style.cssText = 'position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;';
+      container.appendChild(svg);
+
+      const nodeElements = [];
+
+      generatedMap.forEach((floorNodes, fIndex) => {
+        const columnDiv = document.createElement('div');
+        columnDiv.style.cssText = 'display: flex; flex-direction: column; justify-content: center; gap: 30px; height: 100%; position: relative;';
+
+        floorNodes.forEach((node, nIndex) => {
+          const btn = document.createElement('div');
+          btn.className = 'map-node';
+          if (node.type === 'elite' || node.type === 'mimic') {
+            btn.classList.add(node.type);
+          }
+          const imgPath = getMapImageForType(node.type);
+          btn.innerHTML = `<img src="${imgPath}" class="node-icon" alt="${NODE_TYPES[node.type].label}">`;
+          btn.title = NODE_TYPES[node.type].label;
+
+          if (fIndex < currentFloor) {
+            btn.classList.add('completed');
+          } else if (fIndex === currentFloor) {
+            if (node.row === currentRow) {
+              btn.classList.add('completed');
+              const token = document.createElement('img');
+              token.className = 'player-token';
+              token.src = AVATAR_IMAGES[player.class];
+              btn.appendChild(token);
+            }
+          }
+
+          const isNextTarget = (fIndex === currentFloor + 1 && !isGameOver);
+          if (isNextTarget) {
+            let canMove = false;
+            if (currentFloor === 0 || currentFloor === 4 || currentFloor === 5) {
+              canMove = true;
+            } else if (fIndex === 4 || fIndex === 5 || fIndex === 9) {
+              canMove = true;
+            } else {
+              canMove = (String(node.row) === String(currentRow));
+            }
+
+            if (canMove) {
+              btn.classList.add('active');
+            }
+            btn.style.cursor = canMove ? 'pointer' : 'not-allowed';
+
+            btn.addEventListener('click', () => {
+              if (!canMove) {
+                showGameAlert('移動不可', '現在のルートから外れることはできません。<br>直進するマス（現在地と同じ行のマス）を選んでください。');
+                return;
+              }
+              showGameConfirm(
+                '移動の確認',
+                `「${NODE_TYPES[node.type].label}」へ移動しますか？`,
+                () => {
+                  currentFloor = fIndex;
+                  currentRow = node.row;
+                  currentPathType = node.type;
+                  enterFloorNode();
+                },
+                null
+              );
+            });
+          }
+
+          columnDiv.appendChild(btn);
+          nodeElements.push({ f: fIndex, r: node.row, element: btn });
+        });
+
+        container.appendChild(columnDiv);
+      });
+
+      setTimeout(() => {
+        const containerRect = container.getBoundingClientRect();
+        for (let f = 0; f < generatedMap.length - 1; f++) {
+          const currentNodes = nodeElements.filter(n => n.f === f);
+          const nextNodes = nodeElements.filter(n => n.f === f + 1);
+
+          currentNodes.forEach(curr => {
+            const currRect = curr.element.getBoundingClientRect();
+            const currX = (currRect.left + currRect.width / 2) - containerRect.left + container.scrollLeft;
+            const currY = (currRect.top + currRect.height / 2) - containerRect.top;
+
+            nextNodes.forEach(nxt => {
+              if (currentNodes.length > 1 && nextNodes.length > 1) {
+                if (curr.r !== nxt.r) return;
+              }
+
+              const nxtRect = nxt.element.getBoundingClientRect();
+              const nxtX = (nxtRect.left + nxtRect.width / 2) - containerRect.left + container.scrollLeft;
+              const nxtY = (nxtRect.top + nxtRect.height / 2) - containerRect.top;
+
+              const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+              line.setAttribute('x1', currX);
+              line.setAttribute('y1', currY);
+              line.setAttribute('x2', nxtX);
+              line.setAttribute('y2', nxtY);
+              line.setAttribute('stroke', '#444');
+              line.setAttribute('stroke-width', '2');
+
+              if (curr.f === currentFloor && nxt.f === currentFloor + 1 && !isBattleModal) {
+                line.setAttribute('stroke', '#ffd700');
+                line.setAttribute('stroke-width', '3');
+                line.style.animation = 'map-pulse 1.5s infinite';
+              } else if (curr.f < currentFloor) {
+                line.setAttribute('stroke', '#4dabf7');
+              }
+              svg.appendChild(line);
+            });
+          });
+        }
+      }, 50);
+    }
+
+    function getMapImageForType(type) {
+      const base = '/portfolio/roguelike/assets/map/';
+      switch (type) {
+        case 'start': return base + 'castle.png';
+        case 'normal': return base + 'mark_chuui.png';
+        case 'elite': return base + 'mark_chuui.png';
+        case 'mimic': return base + 'mark_chuui.png';
+        case 'inn': return base + 'building_hotel_pet.png';
+        case 'fairy': return base + 'mori.png';
+        case 'event': return base + 'mark_question.png';
+        case 'town': return base + 'omise_shop_tatemono.png';
+        case 'midboss':
+          if (currentArea === 1) return base + 'doukutsu.png'; // エリア1中ボス：バンディットリーダー
+          if (currentArea === 2) return base + 'mon_gate_western_close.png';
+          if (currentArea === 3) return base + 'arashi.png';
+          return base + 'yama_kiri.png';
+        case 'boss':
+          if (currentArea === 1) return base + 'yama_kiri.png'; // エリア1ボス：ダークエルフの森
+          return base + 'building_europe_kojou.png';
+        case 'lastboss': return base + 'building_europe_kojou.png';
+        default: return '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+      }
+    }
+
+    function showMapScreen() {
+      showScreen(mapScreen);
+      renderBoardMap(mapBoard, false);
+      if (mapScrollWrapper) {
+        setTimeout(() => {
+          mapScrollWrapper.scrollLeft = currentFloor * 70;
+        }, 100);
+      }
+    }
+
+    // --- 9. 各種マス（Node）進入処理 ---
+    // --- カットシーンデータ定義 ---
+    const BASE_CH = '/portfolio/roguelike/assets/characters/';
+    const BASE_MAP = '/portfolio/roguelike/assets/map/';
+
+    const CUTSCENE_PRE = {
+      bandit: [
+        {
+          bg: BASE_MAP + 'doukutsu.png',
+          portraits: [{ src: '/portfolio/roguelike/assets/monsters/character_sanzoku.png', size: '130px' }],
+          speaker: '山賊',
+          lines: [
+            'この一帯を荒らし回っているのはこのオレだ…！',
+            'お前みたいな旅人は格好の獲物だ。生きて帰しちゃいけねぇ！'
+          ]
+        }
+      ],
+      boss_area1: [
+        {
+          bg: BASE_MAP + 'yama_kiri.png',
+          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '130px' }],
+          speaker: 'ダークエルフ',
+          lines: [
+            'オマエ…\nコノ森ヲ\u30fb\u30fb\u30fb荒ラス者\u30fb\u30fb\u30fb？',
+            'タチサレ\u30fb\u30fb\u30fb\nタチサレ\u30fb\u30fb\u30fb！\n（正気を失った目でこちらを睨みつけてくる）'
+          ]
+        }
+      ],
+      midboss_area2: [
+        {
+          bg: BASE_MAP + 'mon_gate_western_close.png',
+          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_golem.png', size: '130px' }],
+          speaker: '─── 状況 ───',
+          lines: [
+            '町の入口前に、石造りの巨体が立ち塞がっている。',
+            'なんと、ゴーレムが突然こちらに向かって動き出した！\n…戦うしかないようだ。'
+          ]
+        }
+      ],
+      boss_area2: [
+        {
+          bg: BASE_MAP + 'building_europe_kojou.png',
+          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dracula2.png', size: '130px' }],
+          speaker: 'ヴァンパイア',
+          lines: [
+            'おやおや…\nこんな辺鄙な城までご足労いただけるとは。',
+            'まさか単身で姫を取り返しにきたのかな？\n感心はするが、そうはいかない。',
+            '招かざる客人には\u2015\u2015\nお引き取り願おうか。'
+          ]
+        }
+      ],
+      midboss_area3: [
+        {
+          bg: BASE_MAP + 'arashi.png',
+          portraits: [],
+          speaker: '─── 状況 ───',
+          lines: [
+            '荒れ狂う波の間から、巨大な影が近づいてくる\u30fb\u30fb\u30fb。',
+            '海底から湧き上がるような咆哮が、空気を震わせた！'
+          ]
+        }
+      ]
+    };
+
+    // エリア1中ボス（バンディットリーダー）の戦闘前カットシーン
+    const CUTSCENE_PRE_MIDBOSS_AREA1 = [
+      {
+        bg: BASE_MAP + 'doukutsu.png',
+        portraits: [{ src: '/portfolio/roguelike/assets/monsters/character_sanzoku.png', size: '140px' }],
+        speaker: 'バンディットリーダー',
+        lines: [
+          'ほぉ…よくここまで来たな。部下を散々やっつけてくれて。',
+          'だが、ここからはオレが直々に相手してやる。\nこの洞窟の奥まで来て、生きて帰れると思うなよ！'
+        ]
+      }
+    ];
+
+    function getPreBattleCutscene() {
+      if (currentPathType === 'midboss' && currentArea === 1) return CUTSCENE_PRE_MIDBOSS_AREA1;
+      if (currentPathType === 'boss' && currentArea === 1) return CUTSCENE_PRE.boss_area1;
+      if (currentPathType === 'midboss' && currentArea === 2) return CUTSCENE_PRE.midboss_area2;
+      if (currentPathType === 'boss' && currentArea === 2) return CUTSCENE_PRE.boss_area2;
+      if (currentPathType === 'midboss' && currentArea === 3) return CUTSCENE_PRE.midboss_area3;
+      return null;
+    }
+
+
+    function enterFloorNode() {
+      updateHeaderBar();
+      if (currentPathType === 'start') {
+        showMapScreen();
+      } else if (currentPathType === 'inn') {
+        showInnScreen();
+      } else if (currentPathType === 'fairy') {
+        showFairyScreen();
+      } else if (currentPathType === 'town') {
+        showTownScreen();
+      } else if (currentPathType === 'event') {
+        triggerEventNode();
       } else {
-        pool = enemyTemplates.late;
+        // 戦闘系：カットシーンがあれば先に表示
+        const scenes = getPreBattleCutscene();
+        if (scenes) {
+          showCutscene(scenes, () => startBattle());
+        } else {
+          startBattle();
+        }
+      }
+    }
+
+    // --- 10. 宿（回復） ---
+    const btnInnRest = document.getElementById('btn-inn-rest');
+    const btnInnLeave = document.getElementById('btn-inn-leave');
+
+    function showInnScreen() {
+      showScreen(innScreen);
+    }
+
+    if (btnInnRest) {
+      btnInnRest.addEventListener('click', () => {
+        if (player.gold >= 15) {
+          showGameConfirm('宿での休息', '15ゴールドを支払い休息しますか？<br>(HPが全回復し、状態異常が全解除されます)', () => {
+            player.gold -= 15;
+            player.hp = player.maxHp;
+            player.poison = 0;
+            player.paralyze = 0;
+            showGameAlert('休息完了', '体力が完全に回復しました！', () => {
+              proceedNextFloor();
+            });
+          });
+        } else {
+          showGameAlert('宿での休息', 'ゴールドが足りません！');
+        }
+      });
+    }
+
+    if (btnInnLeave) {
+      btnInnLeave.addEventListener('click', () => {
+        proceedNextFloor();
+      });
+    }
+
+    // --- 11. 妖精（カード強化） ---
+    const btnFairyLeave = document.getElementById('btn-fairy-leave');
+    const fairyCardList = document.getElementById('fairy-card-list');
+
+    function showFairyScreen() {
+      showScreen(fairyScreen);
+      const desc = document.getElementById('fairy-desc');
+      if (desc) desc.textContent = '20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。';
+
+      if (fairyCardList) {
+        fairyCardList.innerHTML = '';
+        const targets = [...player.deck, ...player.discard, ...player.hand];
+
+        if (targets.length === 0) {
+          fairyCardList.innerHTML = '<div style="grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem;">カードがありません</div>';
+        } else {
+          // unique id
+          const uniqueIds = Array.from(new Set(targets.map(c => c.id)));
+          uniqueIds.forEach(id => {
+            const cardInstance = targets.find(c => c.id === id);
+            const isUpgraded = id.endsWith('+');
+            const btn = makeCardEl(cardInstance, () => {
+              if (isUpgraded) return;
+              if (player.gold >= 20) {
+                showGameConfirm('カードの強化', `「${cardInstance.name}」を 20ゴールドで強化しますか？`, () => {
+                  player.gold -= 20;
+                  let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
+                  if (index !== -1) {
+                    player.deck[index] = upgradeCard(player.deck[index]);
+                  } else {
+                    index = player.discard.findIndex(c => c.id === id && !c.upgraded);
+                    if (index !== -1) {
+                      player.discard[index] = upgradeCard(player.discard[index]);
+                    } else {
+                      index = player.hand.findIndex(c => c.id === id && !c.upgraded);
+                      if (index !== -1) player.hand[index] = upgradeCard(player.hand[index]);
+                    }
+                  }
+                  showGameAlert('強化成功', `「${cardInstance.name}」が強化され「${cardInstance.name}+」になりました！`, () => {
+                    proceedNextFloor();
+                  });
+                });
+              }
+            });
+            btn.style.cursor = isUpgraded ? 'not-allowed' : 'pointer';
+            if (isUpgraded) {
+              const mask = document.createElement('div');
+              mask.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10; border-radius:4px;';
+              btn.appendChild(mask);
+            } else if (player.gold < 20) {
+              btn.style.opacity = '0.5';
+            }
+            fairyCardList.appendChild(btn);
+          });
+        }
+      }
+    }
+
+    if (btnFairyLeave) {
+      btnFairyLeave.addEventListener('click', () => {
+        proceedNextFloor();
+      });
+    }
+
+    // --- 12. 街（カード/アイテム購入ショップ） ---
+    const townCards = document.getElementById('town-cards');
+    const townItems = document.getElementById('town-items');
+    const btnTownLeave = document.getElementById('btn-town-leave');
+    let shopCardsPool = [];
+    let shopItemsPool = [];
+
+    function showTownScreen() {
+      showScreen(townScreen);
+      const pool = [...REWARD_POOL];
+      shuffle(pool);
+      shopCardsPool = pool.slice(0, 3).map(id => ({ id, bought: false }));
+      const allItemKeys = Object.keys(ITEM_DB);
+      shuffle(allItemKeys);
+      shopItemsPool = allItemKeys.slice(0, 3).map(id => ({ id, bought: false }));
+      renderShop();
+    }
+
+    function renderShop() {
+      if (townCards) {
+        townCards.innerHTML = '';
+        shopCardsPool.forEach(item => {
+          const card = CARD_DB[item.id];
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; flex-direction: column; align-items: center;';
+          const el = document.createElement('div');
+          el.className = `battle-card color-${card.color}`;
+          el.style.cssText = 'width: 80px; height: 110px; cursor: pointer; margin: 0; border-width:2px;';
+          el.innerHTML = `
+            <div class="card-cost">${card.cost}</div>
+            <div class="card-name" style="font-size:0.65rem; margin-top:0.6rem;">${card.name}</div>
+            <div class="card-desc" style="font-size:0.52rem; line-height:1.2;">${card.desc}</div>
+          `;
+          if (item.bought) {
+            el.style.opacity = '0.2';
+            el.style.cursor = 'not-allowed';
+            const boughtText = document.createElement('span');
+            boughtText.style.cssText = 'font-size: 0.65rem; color: #ffb84d; margin-top: 2px;';
+            boughtText.textContent = '売約済';
+            div.appendChild(el);
+            div.appendChild(boughtText);
+          } else {
+            el.addEventListener('click', () => {
+              if (player.gold >= 15) {
+                showGameConfirm('商品の購入', `「${card.name}」を15ゴールドで購入しますか？`, () => {
+                  player.gold -= 15;
+                  player.discard.push({ ...CARD_DB[item.id] });
+                  item.bought = true;
+                  showGameAlert('購入完了', `「${card.name}」を購入し、デッキに追加しました！`, () => {
+                    renderShop();
+                    updateHeaderBar();
+                  });
+                });
+              } else {
+                showGameAlert('ショップ', 'ゴールドが足りません！');
+              }
+            });
+            const priceText = document.createElement('span');
+            priceText.style.cssText = 'font-size: 0.65rem; color: #ffd700; margin-top: 2px;';
+            priceText.textContent = '💰15';
+            div.appendChild(el);
+            div.appendChild(priceText);
+          }
+          townCards.appendChild(div);
+        });
       }
 
-      const randomEnemy = pool[Math.floor(Math.random() * pool.length)];
-      enemy = { ...randomEnemy };
+      if (townItems) {
+        townItems.innerHTML = '';
+        shopItemsPool.forEach(shopItem => {
+          const item = ITEM_DB[shopItem.id];
+          const div = document.createElement('div');
+          div.style.cssText = 'display: flex; flex-direction: column; align-items: center; cursor: pointer;';
+          const btn = document.createElement('button');
+          btn.style.cssText = 'width: 44px; height: 44px; border: 1px solid #444; border-radius: 6px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 4px;';
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.alt = item.name;
+          img.style.cssText = 'width: 100%; height: 100%; object-fit: contain;';
+          btn.appendChild(img);
+          if (shopItem.bought) {
+            btn.style.opacity = '0.2';
+            btn.style.cursor = 'not-allowed';
+            const boughtText = document.createElement('span');
+            boughtText.style.cssText = 'font-size: 0.65rem; color: #ffb84d; margin-top: 2px;';
+            boughtText.textContent = '売約済';
+            div.appendChild(btn);
+            div.appendChild(boughtText);
+          } else {
+            btn.addEventListener('click', () => {
+              if (player.gold >= 20) {
+                const target = player.items.find(i => i.id === shopItem.id);
+                if (target) {
+                  if (!target.used) {
+                    showGameAlert('ショップ', '同じアイテムをすでに所持しています！');
+                    return;
+                  }
+                  showGameConfirm('商品の購入', `「${item.name}」を20ゴールドで購入・補充しますか？`, () => {
+                    player.gold -= 20;
+                    target.used = false;
+                    shopItem.bought = true;
+                    showGameAlert('購入完了', `「${item.name}」を補充しました！`, () => {
+                      renderShop();
+                      updateHeaderBar();
+                    });
+                  });
+                }
+              } else {
+                showGameAlert('ショップ', 'ゴールドが足りません！');
+              }
+            });
+            const priceText = document.createElement('span');
+            priceText.style.cssText = 'font-size: 0.65rem; color: #ffd700; margin-top: 2px;';
+            priceText.textContent = '💰20';
+            div.appendChild(btn);
+            div.appendChild(priceText);
+          }
+          townItems.appendChild(div);
+        });
+      }
+    }
 
-      if (enemyImageEl && enemy.image) {
-        enemyImageEl.src = enemy.image;
-        enemyImageEl.style.display = "block";
+    if (btnTownLeave) {
+      btnTownLeave.addEventListener('click', () => {
+        proceedNextFloor();
+      });
+    }
+
+    // --- 13. 未知のイベント ---
+    const eventsList = [
+      {
+        title: '怪しい泉',
+        image: '/portfolio/roguelike/assets/icons/water_shizuku.png',
+        text: '暗く澱んだ泉を見つけました。泉の底でなにかがきらりと光っています。手を伸ばしますか？',
+        options: [
+          {
+            text: '手を突っ込んでみる (HPを 3 失い、💰30 獲得)',
+            action: () => {
+              player.hp = Math.max(1, player.hp - 3);
+              player.gold += 30;
+              showGameAlert('泉の怪我', '冷たい泉に手を突っ込み、30ゴールドを掴み出しました！が、鋭い岩で腕を怪我しました。');
+            }
+          },
+          {
+            text: 'なにもせず離れる',
+            action: () => {
+              showGameAlert('平和な選択', 'あなたは慎重に泉を通り過ぎました。');
+            }
+          }
+        ]
+      },
+      {
+        title: '金細工師のチェスト',
+        image: '/portfolio/roguelike/assets/characters/job_nihontou_katanakaji.png',
+        text: '打ち捨てられた台座の上に、豪華な金のチェストが置かれています。罠でしょうか？',
+        options: [
+          {
+            text: 'こじ開けてみる (50%の確率で 💰40 獲得 / 50%の確率でミミックに襲われる！)',
+            action: () => {
+              if (Math.random() < 0.5) {
+                player.gold += 40;
+                showGameAlert('チェスト発見', 'チェストはただの古びた箱でした！中から40ゴールドを発見しました。', () => {
+                  proceedNextFloor();
+                });
+              } else {
+                showGameAlert('トラップ発動！', '箱がいきなり牙を剥きました！ミミックとの戦闘が開始されます！', () => {
+                  currentPathType = 'mimic';
+                  enterFloorNode();
+                });
+              }
+            },
+            isCustomNav: true
+          },
+          {
+            text: '無視して進む',
+            action: () => {
+              showGameAlert('用心深さ', 'あなたは用心深くその場を離れました。', () => {
+                proceedNextFloor();
+              });
+            },
+            isCustomNav: true
+          }
+        ]
+      },
+      {
+        title: '妖精の悪戯',
+        image: '/portfolio/roguelike/assets/characters/fantasy_pixy2.png',
+        text: '空中を浮遊する小さな悪戯妖精が現れました。「力と引き換えに、何かを貰うよ？」',
+        options: [
+          {
+            text: '妖精に呪文を唱えてもらう (手札のランダムなカード1枚強化 ➔ 最大HP -1)',
+            action: () => {
+              player.maxHp = Math.max(5, player.maxHp - 1);
+              player.hp = Math.min(player.hp, player.maxHp);
+              const unupgraded = player.deck.filter(c => !c.upgraded);
+              if (unupgraded.length > 0) {
+                shuffle(unupgraded);
+                const target = unupgraded[0];
+                const index = player.deck.findIndex(c => c === target);
+                if (index !== -1) {
+                  player.deck[index] = upgradeCard(player.deck[index]);
+                  showGameAlert('妖精の祝福と代償', `最大HPが1減少しましたが、カード「${target.name}」が「${target.name}+」に強化されました！`);
+                }
+              } else {
+                showGameAlert('代償のみ', '最大HPが1減少しましたが、強化できるカードがありませんでした！');
+              }
+            }
+          },
+          {
+            text: '断って追い払う',
+            action: () => {
+              showGameAlert('拒絶', '妖精はつまらなそうに去っていきました。');
+            }
+          }
+        ]
+      }
+    ];
+
+    function triggerEventNode() {
+      showScreen(eventScreen);
+      const evt = eventsList[Math.floor(Math.random() * eventsList.length)];
+      if (document.getElementById('event-image')) {
+        document.getElementById('event-image').src = evt.image || '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+      }
+      if (document.getElementById('event-title')) document.getElementById('event-title').textContent = evt.title;
+      if (document.getElementById('event-text')) document.getElementById('event-text').textContent = evt.text;
+      const container = document.getElementById('event-options');
+      if (container) {
+        container.innerHTML = '';
+        evt.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-primary';
+          btn.style.width = '100%';
+          btn.textContent = opt.text;
+          btn.addEventListener('click', () => {
+            opt.action();
+            if (!opt.isCustomNav) proceedNextFloor();
+          });
+          container.appendChild(btn);
+        });
+      }
+    }
+
+    function proceedNextFloor() {
+      // マップへ戻るときは必ず isGameOver をリセット（これがないと次マスが選択不能になる）
+      isGameOver = false;
+      if (currentFloor >= 9) {
+        if (currentPathType === 'boss') {
+          currentArea++;
+          currentFloor = 0;
+          player.hp = Math.min(player.maxHp, player.hp + Math.floor(player.maxHp / 2));
+          generateAreaMap();
+
+          // ===== エリア開始カットシーン =====
+          if (currentArea === 2) {
+            const scenes = [{
+              portraits: [{ src: BASE_CH + 'royal_daijin.png', size: '130px' }],
+              speaker: '大臣',
+              lines: [
+                '聖剣に選ばれし者よ、お耳を拝借いたします。',
+                'ヴァンパイアにさらわれたこの国の姫を、どうかお救いいただけませぬでしょうか。',
+                'ヴァンパイアの城へ向かった我が国の兵どころか、\n途中の街に駐在しております兵からの連絡すら途絶えております。',
+                '気丈に振る舞っておられる王の心境を思うと、\n臣下として居ても立ってもいられぬのです。\nどうか、よろしくお願い申し上げます。'
+              ]
+            }];
+            showMapScreen();
+            showCutscene(scenes, () => {
+              showGameAlert('エリア2へ', `エリア 2 に到達しました！<br>HPが最大値の半分回復しました。`);
+            });
+          } else if (currentArea === 3) {
+            const scenes = [
+              {
+                portraits: [
+                  { src: BASE_CH + 'royal_king.png', size: '130px' },
+                  { src: BASE_CH + 'royal_princess.png', size: '130px' },
+                  { src: BASE_CH + 'royal_daijin.png', size: '130px' }
+                ],
+                speaker: '王',
+                lines: [
+                  '姫を救い出してくれたこと、誠に感謝するぞ。',
+                  '残るは魔王のみ。余はお前の力を信じておる。\nどうか、ご無事で。'
+                ]
+              },
+              {
+                portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
+                speaker: '姫',
+                lines: [
+                  'どうかご無事に帰ってきてくださいまし。\nわたくしたちはいつもあなたのことを祈っております。'
+                ]
+              }
+            ];
+            showMapScreen();
+            showCutscene(scenes, () => {
+              showGameAlert('エリア3へ', `エリア 3 に到達しました！<br>HPが最大値の半分回復しました。`);
+            });
+          } else {
+            showMapScreen();
+            showGameAlert('エリアクリア！', `次のエリア ${currentArea} に到達しました！<br>HPが最大値の半分回復しました。`);
+          }
+        }
+      } else {
+        showMapScreen();
+      }
+    }
+
+
+    // --- 14. アイテム確認ダイアログ & 使用 ---
+    let pendingUseItemId = '';
+
+    function renderRelicsAndItems() {
+      if (playerRelicsEl) {
+        playerRelicsEl.innerHTML = '';
+        if (player.relics.length === 0) {
+          playerRelicsEl.innerHTML = '<span style="font-size:0.7rem; color:var(--text-muted);">なし</span>';
+        } else {
+          player.relics.forEach(relicId => {
+            const relic = RELIC_DB[relicId];
+            if (relic) {
+              const img = document.createElement('img');
+              img.src = relic.image;
+              img.alt = relic.name;
+              img.title = `${relic.name}: ${relic.desc.replace(/<br>/g, ' ')}`;
+              img.style.cssText = 'width:24px; height:24px; object-fit:contain; border:1px solid #555; border-radius:4px; background:rgba(255,255,255,0.05);';
+              playerRelicsEl.appendChild(img);
+            }
+          });
+        }
       }
 
-      battleLog.innerHTML = '';
-      logMessage('第 ' + battleCount + ' 戦：野生の <span class="log-system">' + enemy.name + '</span> が現れた！');
+      if (playerItemsEl) {
+        playerItemsEl.innerHTML = '';
+        player.items.forEach(itemState => {
+          const item = ITEM_DB[itemState.id];
+          if (item) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-item';
+            btn.title = `${item.name}: ${item.desc}`;
+            btn.style.cssText = `width:28px; height:28px; padding:2px; border:1px solid #444; border-radius:4px; background:rgba(0,0,0,0.5); cursor:${itemState.used ? 'not-allowed' : 'pointer'}; display:flex; align-items:center; justify-content:center; opacity:${itemState.used ? '0.25' : '1'};`;
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = item.name;
+            img.style.cssText = 'width:100%; height:100%; object-fit:contain;';
+            btn.appendChild(img);
+            if (!itemState.used && isPlayerTurn && !isGameOver) {
+              btn.addEventListener('click', () => {
+                pendingUseItemId = itemState.id;
+                if (itemConfirmText && itemConfirmModal) {
+                  itemConfirmText.innerHTML = `<strong>${item.name}</strong>を使用しますか？<br><br><span style="font-size:0.7rem; color:var(--text-muted);">${item.desc}</span>`;
+                  itemConfirmModal.style.display = 'flex';
+                }
+              });
+            }
+            playerItemsEl.appendChild(btn);
+          }
+        });
+      }
+    }
 
+    if (document.getElementById('btn-item-confirm-yes')) {
+      document.getElementById('btn-item-confirm-yes').addEventListener('click', () => {
+        if (itemConfirmModal) itemConfirmModal.style.display = 'none';
+        executeUseItem(pendingUseItemId);
+      });
+    }
+    if (document.getElementById('btn-item-confirm-no')) {
+      document.getElementById('btn-item-confirm-no').addEventListener('click', () => {
+        if (itemConfirmModal) itemConfirmModal.style.display = 'none';
+      });
+    }
+
+    function executeUseItem(itemId) {
+      if (!isPlayerTurn || isGameOver) return;
+      const itemState = player.items.find(i => i.id === itemId);
+      if (!itemState || itemState.used) return;
+      itemState.used = true;
+
+      if (itemId === 'sandwich') {
+        player.hp = Math.min(player.maxHp, player.hp + 3);
+        logMessage('アイテム「サンドイッチ」を使用し、HPが 3 回復した！', 'log-heal');
+      } else if (itemId === 'elixir') {
+        player.poison = 0;
+        player.paralyze = 0;
+        player.hp = Math.min(player.maxHp, player.hp + 1);
+        logMessage('アイテム「万能薬」を使用し、状態異常を解除してHPが 1 回復した！', 'log-heal');
+      } else if (itemId === 'perfume') {
+        if (enemy) {
+          if (enemy.isGolem || enemy.isVampire) {
+            logMessage(`${enemy.name} は毒を無効化した！`, 'log-system');
+          } else if (enemy.isMaou && Math.random() < 0.5) {
+            logMessage('魔王は状態異常を防いだ！', 'log-system');
+          } else {
+            enemy.poison = (enemy.poison || 0) + 1;
+            logMessage('アイテム「香水」を使用し、敵に毒1を付与した！', 'log-poison');
+          }
+        }
+      }
       updateUI();
     }
 
+    // ===== カード画像マッピング =====
+    const CARD_IMAGES = {
+      strike: '',
+      heal: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
+      smite: '',
+      rush: '',
+      fire: '/portfolio/roguelike/assets/icons/honoo_hi_fire.png',
+      ice: '/portfolio/roguelike/assets/icons/water_shizuku.png',
+      wind: '/portfolio/roguelike/assets/icons/tenki_typhoon.png',
+      earth: '/portfolio/roguelike/assets/icons/ishi_stone.png',
+      stone: '/portfolio/roguelike/assets/icons/ishi_stone.png',
+      thunder: '/portfolio/roguelike/assets/icons/mark_tenkiu_kaminari.png',
+      venom: '/portfolio/roguelike/assets/icons/medical_doku.png',
+      fortify: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
+      draw_card: '/portfolio/roguelike/assets/icons/cardgame_deck_hiku.png',
+      buff_up: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
+      buff_down: '/portfolio/roguelike/assets/icons/math_mark02_minus.png',
+      meteor: '/portfolio/roguelike/assets/icons/kanden_gaikotsu.png',
+    };
 
-    // --- 4. 戦闘ロジック ---
+    // 属性→ドットクラスのマッピング
+    const COLOR_DOT_MAP = {
+      white: 'dot-white', black: 'dot-black',
+      red: 'dot-red', blue: 'dot-blue',
+      green: 'dot-green', orange: 'dot-orange',
+      yellow: 'dot-yellow', purple: 'dot-purple'
+    };
 
-    // ダメージ計算式
-    // 【学習・カスタマイズポイント】
-    // 「会心の一撃（クリティカル）」のロジックを入れたり、
-    // 属性相性（炎はスライムに強い等）を入れるとより本格的になります。
-    function calculateDamage(attackerAttack, defenderDefense) {
-      // 基礎ダメージ = 攻撃力 - 防御力
-      let baseDamage = attackerAttack - defenderDefense;
-      // ダメージのブレ（±20%）
-      let variance = baseDamage * 0.2;
-      let randomVariance = (Math.random() * variance * 2) - variance;
+    // カード要素を生成する関数（新デザイン）
+    function makeCardEl(card, onClick) {
+      const div = document.createElement('div');
+      div.className = `battle-card reward-card color-${card.color} card-type-${card.type}`;
 
-      let finalDamage = Math.floor(baseDamage + randomVariance);
-      // どんなに硬くても最低1ダメージは与える
-      return Math.max(1, finalDamage);
+      // MPコスト（左上丸）
+      const cost = document.createElement('div');
+      cost.className = 'card-cost';
+      cost.textContent = getCardCost(card);
+      div.appendChild(cost);
+
+      // カード画像エリア
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'card-image-wrap';
+      let imgSrc = CARD_IMAGES[card.id] || (card.id.endsWith('+') ? CARD_IMAGES[card.id.slice(0, -1)] : '');
+      if (!imgSrc) {
+        if (card.type === 'attack' && card.element === 'none') {
+          imgSrc = '/portfolio/roguelike/assets/relics/game_ken.png';
+        } else {
+          imgSrc = '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+        }
+      }
+      if (imgSrc) {
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = card.name;
+        imgWrap.appendChild(img);
+      }
+      div.appendChild(imgWrap);
+
+      // カード名帯
+      const name = document.createElement('div');
+      name.className = 'card-name';
+      name.textContent = card.name;
+      div.appendChild(name);
+
+      // 効果テキスト（主効果 + 追加効果）
+      const desc = document.createElement('div');
+      desc.className = 'card-desc';
+
+      // 主テキスト（威力・属性）を1行で
+      const mainLine = buildCardMainText(card);
+      const mainEl = document.createElement('span');
+      mainEl.className = 'desc-main';
+      mainEl.textContent = mainLine;
+      desc.appendChild(mainEl);
+
+      // 追加効果テキスト（状態異常/バフ等）
+      const subLines = buildCardSubTexts(card);
+      subLines.forEach(line => {
+        const subEl = document.createElement('span');
+        subEl.className = 'desc-sub';
+        subEl.textContent = line;
+        desc.appendChild(subEl);
+      });
+      div.appendChild(desc);
+
+      // タグ（特殊、回復、バフデバフ、属性）
+      const tags = document.createElement('div');
+      tags.className = 'card-tags';
+
+      function addTag(text, colorClass) {
+        const span = document.createElement('span');
+        span.className = `card-tag tag-${colorClass}`;
+        span.textContent = text;
+        tags.appendChild(span);
+      }
+
+      // 属性
+      if (card.element && card.element !== 'none') {
+        const elemMap = { fire: '炎', ice: '氷', thunder: '雷', wind: '風', stone: '土' };
+        if (elemMap[card.element]) addTag(elemMap[card.element], card.element);
+      }
+      // 状態異常（毒、麻痺）
+      if (card.poison) addTag('毒', 'poison');
+      if (card.paralyze) addTag('麻痺', 'paralyze');
+      // バフ/デバフ
+      if (card.buffUp) addTag('能昇', 'buff-up');
+      if (card.buffDown) addTag('能降', 'buff-down');
+      // 回復
+      if (card.healSelf) addTag('回復', 'white');
+      // 特殊
+      if (card.color === 'purple') addTag('特殊', 'purple');
+
+      if (tags.children.length > 0) div.appendChild(tags);
+
+      if (onClick) div.addEventListener('click', onClick);
+      return div;
     }
 
-    // ターンを進行させる関数（プレイヤー行動 → 敵行動）
-    function processTurn(playerActionCallback) {
-      if (isGameOver) return;
+    function buildCardMainText(card) {
+      if (card.type === 'attack') {
+        const hits = card.hits ? `×${card.hits}` : '';
+        const elem = card.element && card.element !== 'none' ? ` [${getElemLabel(card.element)}]` : '';
+        return `⚔️ ${card.value}${hits}ダメージ${elem}`;
+      } else if (card.healSelf) {
+        return `HP +${card.healSelf} 回復`;
+      } else if (card.draw) {
+        return `カードを${card.draw}枚引き、行動回数+1`;
+      } else if (card.buffUp) {
+        return `能昇 ${card.buffUp}ターン付与`;
+      } else if (card.buffDown) {
+        return `敵に能降 ${card.buffDown}ターン`;
+      }
+      return card.desc || '';
+    }
 
-      // ① プレイヤーの行動（ボタンごとに異なる処理をCallbackで受け取る）
-      playerActionCallback();
+    function buildCardSubTexts(card) {
+      const lines = [];
+      if (card.poison) lines.push(`毒${card.poison}付与`);
+      if (card.paralyze) lines.push('30%で麻痺付与');
+      if (card.oncePerBattle) lines.push('1戦闘1回のみ');
+      return lines;
+    }
 
-      // もし敵を倒していたら
-      if (enemy.hp <= 0) {
-        enemy.hp = 0;
+    function getElemLabel(elem) {
+      const map = { fire: '炎', ice: '氷', thunder: '雷', wind: '風', earth: '土', stone: '土' };
+      return map[elem] || elem;
+    }
+
+    function getColorLabel(color) {
+      const map = { white: '白(回復)', black: '黒(状異)', red: '赤(炎)', blue: '青(水)', green: '緑(風)', orange: '橙(土)', yellow: '黄(雷)', purple: '紫(特殊)' };
+      return map[color] || color;
+    }
+
+    // 旧COLOR_TO_DOT（後方互換で残す）
+    const COLOR_TO_DOT = {};
+
+
+
+    // --- 15. バトルシステム & ダメージ計算 ---
+    function setEnemyIntent() {
+      if (!enemy || enemy.hp <= 0) return;
+
+      const availableSkills = enemy.skills.length > 0 ? enemy.skills : ['attack'];
+      const chosen = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+
+      let dmg = enemy.attackBase + Math.floor((battleCount - 1) / 3);
+      if (chosen === 'fire_attack') {
+        enemy.intent = { type: 'fire_attack', damage: dmg + 2, desc: '火炎ブレス' };
+      } else if (chosen === 'ice_attack') {
+        enemy.intent = { type: 'ice_attack', damage: dmg + 1, desc: '絶対零度' };
+      } else if (chosen === 'rush') {
+        enemy.intent = { type: 'rush', damage: Math.max(1, Math.floor(dmg / 2)), hits: 2, desc: '突進連撃' };
+      } else if (chosen === 'paralyze') {
+        enemy.intent = { type: 'paralyze', damage: 0, desc: '痺れ粉 (麻痺付与)' };
+      } else if (chosen === 'poison') {
+        enemy.intent = { type: 'poison', damage: 0, desc: '毒液' };
+      } else if (chosen === 'heal') {
+        enemy.intent = { type: 'heal', damage: 0, desc: '自己再生' };
+      } else if (chosen === 'buff_up') {
+        enemy.intent = { type: 'buff_up', damage: 0, desc: '魔力昇華 (能昇)' };
+      } else if (chosen === 'buff_down') {
+        enemy.intent = { type: 'buff_down', damage: 0, desc: '重力波 (能降)' };
+      } else {
+        enemy.intent = { type: 'attack', damage: dmg, desc: '通常攻撃' };
+      }
+    }
+
+    function addRelic(relicId) {
+      player.relics.push(relicId);
+      if (relicId === 'yubiwa_gold') {
+        player.maxHp += 1;
+        player.hp += 1;
         updateUI();
-        logMessage('<' + 'span class="log-system">' + enemy.name + ' を倒した！<' + '/span>');
+      } else if (relicId === 'yubiwa_silver') {
+        player.maxMp += 1;
+        player.mp += 1;
+        updateUI();
+      }
+    }
 
-        // 戦闘終了処理
-        isGameOver = true;
-        setTimeout(() => {
-          resultTitle.textContent = "勝利！";
-          btnNext.textContent = "次の戦闘へ";
-          // 勝利報酬：MPを少し回復
-          player.mp = Math.min(player.maxMp, player.mp + 5);
-          overlay.style.display = 'flex';
-        }, 1000);
+    function getCardCost(card) {
+      let cost = card.cost;
+      if (card.type === 'attack' && card.element && card.element !== 'none' && player.relics.includes('book_madousyo')) {
+        cost = Math.max(0, cost - 1);
+      }
+      return cost;
+    }
+
+    function calculateDamage(baseVal, element, isPlayerAttacking) {
+      let bonus = 0;
+
+      if (isPlayerAttacking) {
+        if (player.relics.includes('game_ken') && element === 'none') bonus += 1;
+        if (player.relics.includes('game_ken_seiken') && element === 'none') bonus += 1;
+        if (player.buffUp > 0) bonus += 1;
+        if (player.buffDown > 0) bonus -= 1;
+
+        let dmg = baseVal + bonus;
+
+        if (element === 'fire' && CARD_DB['meteor'] && CARD_DB['meteor'].id === 'meteor') {
+          const hasWeakness = enemy.weaknesses.includes('fire') || enemy.weaknesses.includes('ice') || enemy.weaknesses.includes('thunder');
+          if (hasWeakness) dmg = Math.floor(dmg * 1.5);
+        } else {
+          if (enemy.weaknesses.includes(element)) {
+            dmg = Math.floor(dmg * 1.5);
+            logMessage('弱点属性！ダメージ1.5倍！', 'log-heal');
+          } else if (enemy.resistances.includes(element)) {
+            dmg = Math.floor(dmg * 0.5);
+            logMessage('耐性あり。ダメージ半減', 'log-poison');
+          } else if (enemy.immunities.includes(element)) {
+            dmg = 0;
+            logMessage('無効化されました！', 'log-poison');
+          }
+        }
+
+        if (enemy.isGolem) {
+          dmg = Math.floor(dmg / 2);
+          logMessage('ゴーレムの鉄壁！被ダメージ半減。', 'log-poison');
+        }
+
+        return Math.max(0, dmg);
+      } else {
+        if (player.buffUp > 0) bonus -= 1;
+        if (player.buffDown > 0) bonus += 1;
+        if (player.relics.includes('game_tate')) bonus -= 1;
+        if (player.relics.includes('yubiwa_diamond')) bonus -= 1;
+
+        let dmg = baseVal + bonus;
+        return Math.max(0, dmg);
+      }
+    }
+
+    function drawCards(count) {
+      for (let i = 0; i < count; i++) {
+        if (player.deck.length === 0) {
+          if (player.discard.length === 0) break;
+          player.deck = shuffle([...player.discard]);
+          player.discard = [];
+          logMessage('山札を再構築しました', 'log-system');
+        }
+        player.hand.push(player.deck.pop());
+      }
+    }
+
+    function startTurn() {
+      isPlayerTurn = true;
+      player.actions = (player.class === 'butouka' ? 2 : 1);
+      if (player.relics.includes('shoes_sneaker')) player.actions += 1;
+
+      if (player.paralyze > 0) {
+        player.paralyze -= 1;
+        logMessage('あなたは麻痺で動けない！ターンが強制終了します。', 'log-poison');
+        setTimeout(() => { if (!isGameOver) endTurn(); }, 1000);
         return;
       }
 
-      // ② 敵の行動（反撃）
-      // ちょっと間を空けて敵が攻撃してくるようにする（setTimeout）
-      setTimeout(() => {
-        if (isGameOver) return;
+      if (player.class === 'kenshi') {
+        player.hp = Math.min(player.maxHp, player.hp + 1);
+        logMessage('戦士のパッシブ効果でHPが 1 回復した。', 'log-heal');
+      }
+      if (player.class === 'mahoutsukai') {
+        player.mp = Math.min(player.maxMp, player.mp + 1);
+        logMessage('魔法使いのパッシブ効果でMPが 1 回復した。', 'log-heal');
+      }
+      if (player.relics.includes('mermaid_necklace')) {
+        player.mp = Math.min(player.maxMp, player.mp + 1);
+        logMessage('人魚のネックレス：ターン開始時にMPが 1 回復した。', 'log-heal');
+      }
 
-        const damage = calculateDamage(enemy.attack, player.defense);
-        player.hp = Math.max(0, player.hp - damage);
-        logMessage(enemy.name + 'の攻撃！ プレイヤーに <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
+      if (player.poison > 0) {
+        player.hp = Math.max(0, player.hp - player.poison);
+        logMessage('プレイヤーが毒で ' + player.poison + ' ダメージ！', 'log-poison');
+        player.poison = Math.max(0, player.poison - 1);
+        if (player.hp <= 0) { handleGameOver(); return; }
+      }
 
-        updateUI();
+      if (player.buffUp > 0) player.buffUp -= 1;
+      if (player.buffDown > 0) player.buffDown -= 1;
 
-        // ゲームオーバー判定
-        if (player.hp <= 0) {
-          logMessage('<' + 'span class="log-damage">プレイヤーは力尽きた...<' + '/span>');
-          isGameOver = true;
-          setTimeout(() => {
-            resultTitle.textContent = "ゲームオーバー";
-            btnNext.textContent = "最初からやり直す";
-            overlay.style.display = 'flex';
-          }, 1000);
-        }
-      }, 500); // 0.5秒後に敵のターン
+      const drawCount = player.relics.includes('book_madousyo') ? 5 : 4;
+      drawCards(drawCount);
+      updateUI();
+      logMessage('【あなたのターン】', 'log-system');
+      if (btnEndTurn) btnEndTurn.disabled = false;
     }
 
-    // --- 5. イベントリスナー（ボタン押下時の処理） ---
+    function endTurn() {
+      if (!isPlayerTurn || isGameOver) return;
+      isPlayerTurn = false;
+      if (btnEndTurn) btnEndTurn.disabled = true;
 
-    // たたかうボタン
-    btnAttack.addEventListener('click', () => {
-      processTurn(() => {
-        const damage = calculateDamage(player.attack, enemy.defense);
-        enemy.hp -= damage;
-        logMessage('プレイヤーの攻撃！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
+      if (player.actions > 0) {
+        player.mp = Math.min(player.maxMp, player.mp + player.actions);
+        logMessage('様子見を行い、MPが ' + player.actions + ' 回復した！', 'log-heal');
+      }
+
+      player.discard.push(...player.hand);
+      player.hand = [];
+      updateUI();
+      setTimeout(() => enemyTurn(), 400);
+    }
+
+    function enemyTurn() {
+      if (isGameOver || !enemy || enemy.hp <= 0) return;
+      logMessage('【敵のターン】');
+
+      if (enemy.paralyze > 0) {
+        enemy.paralyze -= 1;
+        logMessage(`${enemy.name} は麻痺して動けない！`, 'log-system');
+        setTimeout(() => { if (!isGameOver) { setEnemyIntent(); startTurn(); } }, 800);
+        return;
+      }
+
+      if (enemy.poison && enemy.poison > 0) {
+        enemy.hp = Math.max(0, enemy.hp - enemy.poison);
+        logMessage(enemy.name + 'が毒で ' + enemy.poison + ' ダメージ！', 'log-poison');
+        enemy.poison = Math.max(0, enemy.poison - 1);
+        if (enemy.hp <= 0) { enemy.hp = 0; updateUI(); handleVictory(); return; }
+      }
+
+      if (enemy.buffUp > 0) enemy.buffUp -= 1;
+      if (enemy.buffDown > 0) enemy.buffDown -= 1;
+
+      if (enemy.intent) {
+        let dmg = enemy.intent.damage;
+        logMessage(`${enemy.name} の「${enemy.intent.desc}」！`);
+        if (enemyImageEl) enemyImageEl.classList.add('shake');
+
+        setTimeout(() => {
+          if (enemyImageEl) enemyImageEl.classList.remove('shake');
+          if (enemy.intent.type === 'heal') {
+            enemy.hp = Math.min(enemy.maxHp, enemy.hp + 5);
+            logMessage(`${enemy.name} はHPを 5 回復した！`, 'log-heal');
+          } else if (enemy.intent.type === 'paralyze') {
+            player.paralyze = 1;
+            logMessage('プレイヤーは麻痺状態になった！', 'log-poison');
+          } else if (enemy.intent.type === 'poison') {
+            player.poison = (player.poison || 0) + 2;
+            logMessage('プレイヤーは毒2を付与された！', 'log-poison');
+          } else if (enemy.intent.type === 'buff_up') {
+            enemy.buffUp = 3;
+            logMessage(`${enemy.name} は能昇状態になった！`, 'log-heal');
+          } else if (enemy.intent.type === 'buff_down') {
+            player.buffDown = 3;
+            logMessage('プレイヤーは能降状態になった！', 'log-poison');
+          } else {
+            const element = (enemy.intent.type === 'fire_attack') ? 'fire' : ((enemy.intent.type === 'ice_attack') ? 'ice' : 'none');
+            const calculatedDmg = calculateDamage(dmg, element, false);
+            if (calculatedDmg > 0) {
+              player.hp = Math.max(0, player.hp - calculatedDmg);
+              logMessage('プレイヤーに ' + calculatedDmg + ' のダメージ！', 'log-damage');
+            }
+          }
+          if (player.hp <= 0) { handleGameOver(); }
+          else { setEnemyIntent(); setTimeout(startTurn, 600); }
+          updateUI();
+        }, 500);
+      }
+    }
+
+    function playCard(index) {
+      if (!isPlayerTurn || isGameOver) return;
+      const card = player.hand[index];
+      const cardCost = getCardCost(card);
+      if (player.mp < cardCost) { logMessage('MPが足りません！', 'log-system'); return; }
+      if (player.actions <= 0) { logMessage('行動回数が残っていません！', 'log-system'); return; }
+
+      player.mp -= cardCost;
+      player.actions -= 1;
+      player.hand.splice(index, 1);
+      if (!card.oncePerBattle) {
+        player.discard.push(card);
+      }
+
+      if (card.type === 'attack') {
+        const hits = card.hits || 1;
+        let total = 0;
+        for (let i = 0; i < hits; i++) {
+          const d = calculateDamage(card.value, card.element, true);
+          enemy.hp = Math.max(0, enemy.hp - d);
+          total += d;
+        }
+        logMessage(card.name + '！ ' + enemy.name + ' に ' + (hits > 1 ? total + '(' + (total / hits) + '×' + hits + '）' : '' + total) + ' ダメージ！', 'log-damage');
+        if (card.poison && card.poison > 0) {
+          if (enemy.isGolem || enemy.isVampire) {
+            logMessage(`${enemy.name} は毒を無効化した。`, 'log-system');
+          } else if (enemy.isMaou && Math.random() < 0.5) {
+            logMessage('魔王は状態異常を防いだ。', 'log-system');
+          } else {
+            enemy.poison = (enemy.poison || 0) + card.poison;
+            logMessage(enemy.name + 'に毒' + card.poison + 'を付与！', 'log-poison');
+          }
+        }
+      } else if (card.type === 'skill') {
+        if (card.draw) { drawCards(card.draw); player.actions++; logMessage(card.name + '！ カードを' + card.draw + '枚引き、行動回数+1！'); }
+        if (card.healSelf) { player.hp = Math.min(player.maxHp, player.hp + card.healSelf); logMessage(card.name + '！ HP +' + card.healSelf, 'log-heal'); }
+        if (card.buffUp) { player.buffUp = card.buffUp; logMessage('能昇！能昇（与ダメ+1/被ダメ-1）を3ターン得た！', 'log-heal'); }
+        if (card.buffDown) { enemy.buffDown = card.buffDown; logMessage('能降！敵に能降（与ダメ-1/被ダメ+1）を3ターン付与！', 'log-poison'); }
+      }
+      updateUI();
+      if (enemy.hp <= 0) {
+        enemy.hp = 0;
+        updateUI();
+        handleVictory();
+      } else {
+        if (player.actions <= 0) {
+          logMessage('行動回数がなくなったため、自動的にターンを終了します。', 'log-system');
+          setTimeout(() => { if (!isGameOver) endTurn(); }, 800);
+        }
+      }
+    }
+
+    // --- 16. 勝敗・報酬 ---
+    /** 固定レリックをカットシーン後に付与するユーティリティ */
+    function giveFixedRelic(relicId, cutsceneScenes, onDone) {
+      const relic = RELIC_DB[relicId];
+      if (!relic) { onDone?.(); return; }
+      showCutscene(cutsceneScenes, () => {
+        if (!player.relics.includes(relicId)) player.relics.push(relicId);
+        logMessage(`「${relic.name}」を手に入れた！`, 'log-system');
+        // レリック即時効果の適用
+        if (relicId === 'yubiwa_gold') { player.maxHp += 1; player.hp = Math.min(player.hp, player.maxHp); }
+        if (relicId === 'yubiwa_silver') { player.maxMp += 1; }
+        showGameAlert('レリック入手', `「${relic.name}」を入手しました！<br><span style="font-size:0.7rem; color:var(--text-muted);">${relic.desc}</span>`, () => {
+          onDone?.();
+        });
       });
-    });
+    }
 
-    // 回復魔法ボタン
-    btnHeal.addEventListener('click', () => {
-      processTurn(() => {
-        player.mp -= 10;
-        const healAmount = 30 + Math.floor(Math.random() * 10); // 30〜39回復
-        player.hp = Math.min(player.maxHp, player.hp + healAmount);
-        logMessage('プレイヤーは回復魔法を唱えた！ HPが <' + 'span class="log-heal">' + healAmount + '回復<' + '/span>した！');
+    function handleVictory() {
+      isGameOver = true;
+      if (btnEndTurn) btnEndTurn.disabled = true;
+      logMessage(enemy.name + ' を倒した！', 'log-system');
+
+      let goldReward = 10 + Math.floor(Math.random() * 6);
+      if (currentPathType === 'elite' || currentPathType === 'mimic') {
+        goldReward = 20 + Math.floor(Math.random() * 11);
+      }
+      player.gold += goldReward;
+      logMessage(`報酬として 💰${goldReward} ゴールドを獲得！`, 'log-system');
+
+
+      if (currentPathType === 'mimic') {
+        const unownedRelics = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
+        if (unownedRelics.length > 0) {
+          shuffle(unownedRelics);
+          player.relics.push(unownedRelics[0]);
+          logMessage(`ミミックからレリック「${RELIC_DB[unownedRelics[0]].name}」を手に入れた！`, 'log-system');
+        }
+        const unupgraded = player.deck.filter(c => !c.upgraded);
+        if (unupgraded.length > 0) {
+          shuffle(unupgraded);
+          const target = unupgraded[0];
+          const index = player.deck.findIndex(c => c === target);
+          if (index !== -1) {
+            player.deck[index] = upgradeCard(player.deck[index]);
+            logMessage(`ミミックの宝の力で、カード「${target.name}」が「${target.name}+」に強化された！`, 'log-heal');
+          }
+        }
+      }
+
+      // ===== 中ボス撃破後 =====
+      if (currentPathType === 'midboss') {
+        setTimeout(() => {
+          showMapScreen();
+          // エリア2中ボス（ゴーレム）
+          if (currentArea === 2) {
+            const postScenes = [{
+              bg: BASE_MAP + 'mon_gate_western_close.png',
+              portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
+              speaker: '見回りの兵士',
+              lines: [
+                'ありがとう！町を守るゴーレムが故障で暴走してしまい、誰も近づけなくなっていたんだ。',
+                'おかげで出入りができるようになった。あとで修理してやらないとな。これはお礼だ。'
+              ]
+            }];
+            const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
+            const pick = unownedNonFixed.length > 0 ? unownedNonFixed[Math.floor(Math.random() * unownedNonFixed.length)] : null;
+            if (pick) {
+              giveFixedRelic(pick, postScenes, () => triggerMidbossFairyUpgrade());
+            } else {
+              showCutscene(postScenes, () => triggerMidbossFairyUpgrade());
+            }
+          }
+          // エリア3中ボス（リヴァイアサン）
+          else if (currentArea === 3) {
+            const postScenes = [
+              {
+                bg: BASE_MAP + 'arashi.png',
+                portraits: [],
+                speaker: '─── 状況 ───',
+                lines: ['ふと、嵐が止んだ。\nリヴァイアサンはあなたの実力を認めてくれたようだ。']
+              },
+              {
+                bg: BASE_MAP + 'arashi.png',
+                portraits: [{ src: BASE_CH + 'ningyohime.png', size: '130px' }],
+                speaker: '人魚',
+                lines: [
+                  '海神様に認められるなんて、本当に勇敢な人間ね！',
+                  '魔王と戦うなら、これを持っていって。\nこの海に伝わる力が、きっとあなたを守ってくれるはずよ。'
+                ]
+              }
+            ];
+            giveFixedRelic('mermaid_necklace', postScenes, () => triggerMidbossFairyUpgrade());
+          }
+          // エリア1中ボス（バンディットリーダー）
+          else {
+            const postScenes = [{
+              bg: BASE_MAP + 'doukutsu.png',
+              portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
+              speaker: '城の兵士',
+              lines: [
+                'ご助力感謝します。この山賊は我々が連行します。',
+                '山賊が持っていたものです。あなたにお役立ていただければ幸いです。'
+              ]
+            }];
+            const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
+            const pick = unownedNonFixed.length > 0 ? unownedNonFixed[Math.floor(Math.random() * unownedNonFixed.length)] : null;
+            if (pick) {
+              giveFixedRelic(pick, postScenes, () => triggerMidbossFairyUpgrade());
+            } else {
+              showCutscene(postScenes, () => triggerMidbossFairyUpgrade());
+            }
+          }
+        }, 800);
+        return;
+      }
+
+      // ===== ボス撃破後 =====
+      if (currentPathType === 'boss') {
+        setTimeout(() => {
+          // エリア1ボス（ダークエルフ）
+          if (currentArea === 1) {
+            const postScenes = [
+              {
+                bg: BASE_MAP + 'mori.png',
+                portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '120px' }],
+                speaker: 'ダークエルフ',
+                lines: ['きゅ～……']
+              },
+              {
+                bg: BASE_MAP + 'mori.png',
+                portraits: [{ src: BASE_CH + 'fantasy_elf2.png', size: '130px' }],
+                speaker: 'エルフ',
+                lines: [
+                  '闇に囚われた仲間を正気に戻してくれて、ありがとうございます。',
+                  'あなたの勇気に感謝を込めて、この森に古くから伝わる妖精の剣を授けましょう。\n大切にしてください。'
+                ]
+              }
+            ];
+            showMapScreen();
+            giveFixedRelic('game_ken_seiken', postScenes, () => progressArea());
+          }
+          // エリア2ボス（ヴァンパイア）
+          else if (currentArea === 2) {
+            const postScenes = [{
+              bg: BASE_MAP + 'building_europe_kojou.png',
+              portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
+              speaker: '姫',
+              lines: [
+                '助けてくださいまして、誠にありがとうございます。\nあなたのような勇敢な方が来てくださるとは夢にも思いませんでした。',
+                'これはわたくしの形見の品でございます。\nどうかお力になれますように。'
+              ]
+            }];
+            showMapScreen();
+            giveFixedRelic('yubiwa_diamond', postScenes, () => progressArea());
+          }
+          else {
+            showBossRelicReward();
+          }
+        }, 800);
+        return;
+      }
+
+      if (currentPathType === 'lastboss') {
+        setTimeout(() => showGameClearScreen(), 800);
+        return;
+      }
+      setTimeout(() => showReward(), 800);
+    }
+
+
+    function showReward() {
+      if (rewardCards) rewardCards.innerHTML = '';
+      if (rewardSubtitleText) rewardSubtitleText.textContent = '1枚カードを選んでデッキに追加';
+      const pool = [...REWARD_POOL];
+      shuffle(pool);
+      const picks = pool.slice(0, 3);
+      picks.forEach(id => {
+        const card = CARD_DB[id];
+        const el = makeCardEl(card, () => {
+          player.discard.push({ ...CARD_DB[id] });
+          logMessage(CARD_DB[id].name + ' をデッキに追加！', 'log-system');
+          if (rewardOverlay) rewardOverlay.style.display = 'none';
+          proceedNextFloor();
+        });
+        if (rewardCards) rewardCards.appendChild(el);
       });
-    });
+      if (rewardOverlay) rewardOverlay.style.display = 'flex';
+    }
 
-    // 炎の魔法ボタン
-    btnFire.addEventListener('click', () => {
-      processTurn(() => {
-        player.mp -= 15;
-        // 炎の魔法は相手の防御力を無視して大ダメージを与える固定式
-        const damage = 25 + Math.floor(Math.random() * 10); // 25〜34ダメージ
-        enemy.hp -= damage;
-        logMessage('プレイヤーの炎の魔法！ ' + enemy.name + 'に <' + 'span class="log-damage">' + damage + 'のダメージ<' + '/span>！');
+    function triggerMidbossFairyUpgrade() {
+      showScreen(fairyScreen);
+      const desc = document.getElementById('fairy-desc');
+      if (desc) desc.textContent = '中ボス撃破ボーナス！カードを1枚選んで「強化（+）」します。(無料)';
+
+      if (fairyCardList) {
+        fairyCardList.innerHTML = '';
+        const targets = [...player.deck, ...player.discard, ...player.hand];
+        const upgradableCards = targets.filter(c => !c.upgraded);
+        if (upgradableCards.length === 0) {
+          fairyCardList.innerHTML = '<div style="grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem;">強化可能なカードがありません</div>';
+        } else {
+          const uniqueIds = Array.from(new Set(upgradableCards.map(c => c.id)));
+          uniqueIds.forEach(id => {
+            const card = CARD_DB[id];
+            const btn = document.createElement('div');
+            btn.className = `battle-card color-${card.color}`;
+            btn.style.cssText = 'width: 100%; height: 110px; cursor: pointer; position: relative; margin: 0; border-width:2px;';
+            btn.innerHTML = `
+              <div class="card-cost">${card.cost}</div>
+              <div class="card-name" style="font-size:0.7rem; margin-top:0.6rem;">${card.name}</div>
+              <div class="card-desc" style="font-size:0.55rem; line-height:1.2;">${card.desc}</div>
+            `;
+            btn.addEventListener('click', () => {
+              let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
+              if (index !== -1) {
+                player.deck[index] = upgradeCard(player.deck[index]);
+              } else {
+                index = player.discard.findIndex(c => c.id === id && !c.upgraded);
+                if (index !== -1) {
+                  player.discard[index] = upgradeCard(player.discard[index]);
+                }
+              }
+              showGameAlert('強化成功', `「${card.name}」が強化され「${card.name}+」になりました！`, () => {
+                proceedNextFloor();
+              });
+            });
+            fairyCardList.appendChild(btn);
+          });
+        }
+      }
+    }
+
+    function showBossRelicReward() {
+      if (rewardCards) rewardCards.innerHTML = '';
+      if (rewardSubtitleText) rewardSubtitleText.textContent = 'エリアボス撃破！レリックを1つ選択してください';
+      const unownedRelics = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
+      shuffle(unownedRelics);
+      const picks = unownedRelics.slice(0, 3);
+      picks.forEach(relicId => {
+        const relic = RELIC_DB[relicId];
+        const el = document.createElement('div');
+        el.className = 'battle-card reward-card';
+        el.style.borderColor = '#ffd700';
+        el.style.borderWidth = '2px';
+        el.innerHTML = `
+          <div class="card-cost" style="background:#ffd700; color:#1a1a2e; font-size:0.65rem;">宝</div>
+          <div class="card-name" style="color:#ffd700; font-size:0.55rem; line-height:1.2; margin-top:0.6rem; padding:0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box; width:100%; text-align:center;">${relic.name}</div>
+          <div class="card-desc" style="font-size:0.55rem; line-height:1.2; padding:2px;">${relic.desc}</div>
+        `;
+        el.addEventListener('click', () => {
+          player.relics.push(relicId);
+          logMessage(`ボス報酬：レリック「${relic.name}」を獲得！`, 'log-system');
+          if (rewardOverlay) rewardOverlay.style.display = 'none';
+          proceedNextFloor();
+        });
+        if (rewardCards) rewardCards.appendChild(el);
       });
-    });
+      if (rewardOverlay) rewardOverlay.style.display = 'flex';
+    }
 
-    // 次の戦闘へ・またはリトライボタン
-    if (btnTitle) btnTitle.addEventListener('click', () => {
-      overlay.style.display = 'none';
-      startScreen.style.display = 'flex';
-    });
+    function showResultOverlay(isWin) {
+      if (resultTitle) {
+        resultTitle.textContent = isWin ? '戦闘勝利！' : 'ゲームオーバー';
+        resultTitle.style.color = isWin ? '#28a745' : '#dc3545';
+      }
+      if (resultDetails) {
+        resultDetails.textContent = isWin
+          ? `第${battleCount}戦を見事に勝ち抜きました！引き続き次の階層を選択してください。`
+          : `魔王の軍勢に倒れました（到達階層: エリア ${currentArea} - ${currentFloor}層）。もう一度挑戦しますか？`;
+      }
+      if (btnNext) btnNext.textContent = isWin ? 'マップへ戻る' : 'リトライ';
+      if (overlay) overlay.style.display = 'flex';
+    }
 
-    if (btnShare) btnShare.addEventListener('click', () => {
-      const text = encodeURIComponent('ローグライクRPGで戦闘を完了しました！\n#ミニゲーム #ポートフォリオ');
-      const url = encodeURIComponent(window.location.href);
-      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
-    });
+    function showGameClearScreen() {
+      isGameOver = true;
+      if (resultTitle) {
+        resultTitle.textContent = '🎉 全面クリア！';
+        resultTitle.style.color = '#ffd700';
+      }
+      if (resultDetails) {
+        const clsName = player.class === 'yuusya' ? '勇者' : (player.class === 'kenshi' ? '戦士' : (player.class === 'mahoutsukai' ? '魔法使い' : '格闘家'));
+        resultDetails.innerHTML = `
+          <strong>おめでとうございます！</strong><br>
+          あなたは魔王を撃破し、世界に平和を取り戻しました！<br><br>
+          【冒険の記録】<br>
+          選択した職業: ${clsName}<br>
+          最終所持金: 💰${player.gold} / 獲得レリック: ${player.relics.length}個
+        `;
+      }
+      if (btnNext) btnNext.style.display = 'none';
+      if (overlay) overlay.style.display = 'flex';
+    }
 
-    btnNext.addEventListener('click', () => {
-      if (player.hp <= 0) {
-        // ゲームオーバーからのリトライ時はステータスを全回復
+    function handleGameOver() {
+      isGameOver = true;
+      if (btnEndTurn) btnEndTurn.disabled = true;
+      logMessage('プレイヤーは倒れた...', 'log-system');
+      setTimeout(() => showResultOverlay(false), 800);
+    }
+
+    // --- 17. 戦闘開始・ループ ---
+    let battleCount = 1;
+
+    function startBattle() {
+      isGameOver = false;
+      isPlayerTurn = true;
+      if (overlay) overlay.style.display = 'none';
+      if (rewardOverlay) rewardOverlay.style.display = 'none';
+      if (deckViewerOverlay) deckViewerOverlay.style.display = 'none';
+      if (battleMapOverlay) battleMapOverlay.style.display = 'none';
+
+      const tpl = getEnemyTemplate(currentArea, currentFloor, currentPathType);
+      enemy = { ...tpl, hp: tpl.hp, maxHp: tpl.maxHp, poison: 0, paralyze: 0, buffUp: 0, buffDown: 0 };
+      if (enemyNameEl) enemyNameEl.textContent = enemy.name;
+      if (enemyImageEl) enemyImageEl.src = enemy.image;
+      player.maxMp = player.relics.includes('ruby_ring') ? 6 : 5;
+      player.items.forEach(i => i.used = false);
+
+      // 戦闘開始前に手札・捨て札を山札にまとめてシャッフル（初回以外）
+      if (!(currentFloor === 1 && currentArea === 1)) {
+        player.deck = shuffle([...player.deck, ...player.discard, ...player.hand]);
+        player.discard = [];
+        player.hand = [];
+      }
+
+      if (currentFloor === 1 && currentArea === 1) {
+        // ゲーム最初期化
         player.hp = player.maxHp;
         player.mp = player.maxMp;
+        player.deck = shuffle(INITIAL_DECKS[player.class].map(id => ({ ...CARD_DB[id] })));
+        player.discard = [];
+        player.poison = 0;
+        player.paralyze = 0;
+        player.buffUp = 0;
+        player.buffDown = 0;
+      } else {
+        // 通常の戦闘開始：前の戦闘のデッキを引き継ぎ、シャッフル
+        player.deck = shuffle([...player.deck, ...player.discard, ...player.hand]);
+        player.discard = [];
+        player.poison = 0;
+        player.paralyze = 0;
+        player.buffUp = 0;
+        player.buffDown = 0;
+        player.mp = Math.min(player.maxMp, player.mp);
       }
-      startBattle();
+      player.hand = [];
+
+      showScreen(document.querySelector('.battle-layout'));
+
+      if (battleLog) battleLog.innerHTML = '';
+      logMessage(`第${currentFloor}層：${enemy.name}が現れた！`, 'log-system');
+
+      setEnemyIntent();
+      startTurn();
+    }
+
+    function updateUI() {
+      // プレイヤーHP
+      if (playerHpText) playerHpText.textContent = player.hp + '/' + player.maxHp;
+      if (playerHpBar) playerHpBar.style.width = (player.hp / player.maxHp * 100) + '%';
+
+      // MP
+      if (playerMpText) playerMpText.textContent = player.mp + '/' + player.maxMp;
+      if (playerMpOrbs) {
+        playerMpOrbs.innerHTML = '';
+        for (let i = 0; i < player.maxMp; i++) {
+          const o = document.createElement('div');
+          o.className = 'ap-orb' + (i < player.mp ? ' active' : '');
+          playerMpOrbs.appendChild(o);
+        }
+      }
+
+      // 行動回数
+      if (playerActionsText) playerActionsText.textContent = player.actions;
+
+      // 毒・麻痺・能昇・能降バッジ (プレイヤー)
+      if (playerPoisonEl) {
+        let text = '';
+        if (player.poison > 0) text += ` 🟢×${player.poison}`;
+        if (player.paralyze > 0) text += ` ⚡×${player.paralyze}`;
+        if (player.buffUp > 0) text += ` 📈×${player.buffUp}`;
+        if (player.buffDown > 0) text += ` 📉×${player.buffDown}`;
+
+        playerPoisonEl.style.display = text ? 'inline' : 'none';
+        playerPoisonEl.textContent = text;
+      }
+
+      // 山札
+      if (deckCountEl) deckCountEl.textContent = player.deck.length;
+
+      // 手札
+      renderHand();
+
+      // レリックとアイテム
+      renderRelicsAndItems();
+
+      // 敵ステータス
+      if (enemy) {
+        if (enemyHpText) enemyHpText.textContent = enemy.hp + '/' + enemy.maxHp;
+        if (enemyHpBar) enemyHpBar.style.width = Math.max(0, enemy.hp / enemy.maxHp * 100) + '%';
+        if (enemyIntentEl) {
+          if (enemy.intent) {
+            enemyIntentEl.style.display = 'block';
+            enemyIntentEl.textContent = `${enemy.intent.desc} ` + (enemy.intent.damage > 0 ? `⚔️${enemy.intent.damage}` : '');
+          } else {
+            enemyIntentEl.style.display = 'none';
+          }
+        }
+
+        // 毒・麻痺・能昇・能降バッジ (敵)
+        if (enemyPoisonEl) {
+          let text = '';
+          if (enemy.poison > 0) text += ` 🟢×${enemy.poison}`;
+          if (enemy.paralyze > 0) text += ` ⚡×${enemy.paralyze}`;
+          if (enemy.buffUp > 0) text += ` 📈×${enemy.buffUp}`;
+          if (enemy.buffDown > 0) text += ` 📉×${enemy.buffDown}`;
+
+          enemyPoisonEl.style.display = text ? 'inline' : 'none';
+          enemyPoisonEl.textContent = text;
+        }
+      }
+
+      updateHeaderBar();
+    }
+
+    function renderHand() {
+      if (!handArea) return;
+      handArea.innerHTML = '';
+      player.hand.forEach((card, index) => {
+        const playable = player.actions > 0 && player.mp >= getCardCost(card);
+        const cardEl = makeCardEl(card, playable ? () => playCard(index) : null);
+        if (!playable) cardEl.classList.add('disabled');
+        handArea.appendChild(cardEl);
+      });
+    }
+
+    // --- 18. デッキ閲覧 ---
+    function openDeckViewer() {
+      if (!deckViewerOverlay) return;
+
+      document.getElementById('dv-deck-count').textContent = player.deck.length;
+      document.getElementById('dv-discard-count').textContent = player.discard.length;
+      document.getElementById('dv-hand-count').textContent = player.hand.length;
+
+      function fillList(elId, cards) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.innerHTML = '';
+        if (cards.length === 0) {
+          el.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">カードなし</p>';
+          return;
+        }
+        cards.forEach(c => {
+          const cardEl = makeCardEl(c, null);
+          cardEl.style.cursor = 'default';
+          el.appendChild(cardEl);
+        });
+      }
+
+      fillList('deck-list', [...player.deck]);
+      fillList('discard-list', [...player.discard]);
+      fillList('hand-list', [...player.hand]);
+
+      deckViewerOverlay.style.display = 'flex';
+    }
+
+    // --- 19. イベントリスナー ---
+    if (btnEndTurn) btnEndTurn.addEventListener('click', endTurn);
+
+    if (btnNext) {
+      btnNext.addEventListener('click', () => {
+        if (player.hp <= 0) {
+          if (overlay) overlay.style.display = 'none';
+          if (startScreen) startScreen.style.display = 'flex';
+          return;
+        }
+        proceedNextFloor();
+      });
+    }
+
+    if (btnTitle) {
+      btnTitle.addEventListener('click', () => {
+        if (overlay) overlay.style.display = 'none';
+        if (startScreen) startScreen.style.display = 'flex';
+      });
+    }
+
+    if (btnSkipReward) {
+      btnSkipReward.addEventListener('click', () => {
+        if (rewardOverlay) rewardOverlay.style.display = 'none';
+        proceedNextFloor();
+      });
+    }
+
+    if (btnViewDeck) {
+      btnViewDeck.addEventListener('click', () => {
+        if (!isGameOver) openDeckViewer();
+      });
+    }
+    if (btnMapViewDeck) {
+      btnMapViewDeck.addEventListener('click', () => {
+        openDeckViewer();
+      });
+    }
+    if (closeDeckViewer) {
+      closeDeckViewer.addEventListener('click', () => {
+        if (deckViewerOverlay) deckViewerOverlay.style.display = 'none';
+      });
+    }
+
+    // 戦闘中マップ確認
+    if (btnBattleViewMap) {
+      btnBattleViewMap.addEventListener('click', () => {
+        if (battleMapOverlay) {
+          battleMapOverlay.style.display = 'flex';
+          renderBoardMap(battleMapBoard, true);
+
+          if (battleMapBoard) {
+            setTimeout(() => {
+              const wrapper = document.getElementById('battle-map-scroll-wrapper');
+              if (wrapper) wrapper.scrollLeft = currentFloor * 70;
+            }, 100);
+          }
+        }
+      });
+    }
+    if (btnCloseBattleMap) {
+      btnCloseBattleMap.addEventListener('click', () => {
+        if (battleMapOverlay) battleMapOverlay.style.display = 'none';
+      });
+    }
+
+    // デッキビュアーのタブ
+    document.querySelectorAll('.deck-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.deck-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.dv-card-list').forEach(l => l.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.target);
+        if (target) target.classList.add('active');
+      });
     });
 
-    // タイトル画面とコンフィグの制御
-    const startScreen = document.getElementById('start-screen');
+    // スタート画面遷移
     const startBtn = document.getElementById('start-btn');
+    if (startBtn) {
+      startBtn.addEventListener('click', () => {
+        if (startScreen) startScreen.style.display = 'none';
+        showScreen(classSelectScreen);
+        setupClassSelection();
+      });
+    }
+
+    const btnGameStart = document.getElementById('btn-game-start');
+    if (btnGameStart) {
+      btnGameStart.addEventListener('click', () => {
+        initGame();
+      });
+    }
+
+    // 各種ポップアップモーダル
     const howtoBtn = document.getElementById('howto-btn');
     const closeHowtoBtn = document.getElementById('close-howto-btn');
     const howtoModal = document.getElementById('howto-modal');
     const configBtn = document.getElementById('config-btn');
     const closeConfigBtn = document.getElementById('close-config-btn');
     const configModal = document.getElementById('config-modal');
-      const creditsBtn = document.getElementById('credits-btn');
-      const closeCreditsBtn = document.getElementById('close-credits-btn');
-      const creditsModal = document.getElementById('credits-modal');
+    const creditsBtn = document.getElementById('credits-btn');
+    const closeCreditsBtn = document.getElementById('close-credits-btn');
+    const creditsModal = document.getElementById('credits-modal');
     const modalOverlay = document.getElementById('modal-overlay');
 
-    if (startBtn) startBtn.addEventListener('click', () => {
-      startScreen.style.display = 'none';
-      startBattle();
-    });
-    if (howtoBtn) howtoBtn.addEventListener('click', () => {
-      howtoModal.classList.add('active');
-      modalOverlay.classList.add('active');
-    });
-    if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
-      howtoModal.classList.remove('active');
-      modalOverlay.classList.remove('active');
-    });
-
-    const _cfgBtn = document.getElementById('config-btn');
-    if (_cfgBtn) {
-      _cfgBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.getElementById('config-modal')?.classList.add('active');
-        document.getElementById('modal-overlay')?.classList.add('active');
+    if (howtoBtn) {
+      howtoBtn.addEventListener('click', () => {
+        if (howtoModal) howtoModal.classList.add('active');
+        if (modalOverlay) modalOverlay.classList.add('active');
       });
-      _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
     }
-    const _closeCfgBtn = document.getElementById('close-config-btn');
-    if (_closeCfgBtn) {
-      _closeCfgBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        document.getElementById('config-modal')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
+    if (closeHowtoBtn) {
+      closeHowtoBtn.addEventListener('click', () => {
+        if (howtoModal) howtoModal.classList.remove('active');
+        if (modalOverlay) modalOverlay.classList.remove('active');
       });
-      _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
     }
 
-    const _credBtn = document.getElementById('credits-btn');
-    if (_credBtn) {
-      _credBtn.addEventListener('click', (e) => {
+    if (configBtn) {
+      configBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('config-modal')?.classList.remove('active');
-              document.getElementById('credits-modal')?.classList.add('active');
-        document.getElementById('modal-overlay')?.classList.add('active');
+        if (configModal) configModal.classList.add('active');
+        if (modalOverlay) modalOverlay.classList.add('active');
       });
-      _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+      configBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     }
-    const _closeCredBtn = document.getElementById('close-credits-btn');
-    if (_closeCredBtn) {
-      _closeCredBtn.addEventListener('click', (e) => {
+    if (closeConfigBtn) {
+      closeConfigBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('credits-modal')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
+        if (configModal) configModal.classList.remove('active');
+        if (modalOverlay) modalOverlay.classList.remove('active');
       });
-      _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
     }
-  </script>
-
-
+    if (creditsBtn) {
+      creditsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (configModal) configModal.classList.remove('active');
+        if (creditsModal) creditsModal.classList.add('active');
+        if (modalOverlay) modalOverlay.classList.add('active');
+      });
+    }
+    if (closeCreditsBtn) {
+      closeCreditsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (creditsModal) creditsModal.classList.remove('active');
+        if (modalOverlay) modalOverlay.classList.remove('active');
+      });
+    }
