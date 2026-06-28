@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -16,9 +16,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
 const learningThemes = ["ゲームエンジン(Phaser 3)基礎", "Arcade Physicsによる衝突判定"];
 
-const materials = [
-  { name: "Google Fonts", url: "https://fonts.google.com/" },
-  { name: "Simple Icons", url: "https://simpleicons.org/" }
+const materialCategories = [
+  { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+  { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] },
+  { category: "音楽・効果音", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }] }
 ];
 ---
 
@@ -91,8 +92,14 @@ const materials = [
             <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
               <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
               <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google Fonts</a></li>
-                <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple Icons</a></li>
+                {materialCategories.map((mat) => (
+                  <li>{mat.category}: {mat.items.map((item, index) => (
+                    <span key={item.name}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                      {index < mat.items.length - 1 ? " / " : ""}
+                    </span>
+                  ))}</li>
+                ))}
               </ul>
             </div>
             <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
@@ -132,14 +139,23 @@ const materials = [
         </div>
 
           <h2>使用素材</h2>
-          <div class="materials-list">
-            <ul>
-              {materials.map((material) => (
-              <li>
-                <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
-              </li>
-              ))}
-            </ul>
+          <div class="table-responsive">
+            <table class="tech-table">
+              <tbody>
+                {materialCategories.map((mat) => (
+                <tr>
+                  <th>{mat.category}</th>
+                  <td>
+                    {mat.items.map((item, index) => (
+                    <span key={item.name}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                      {index < mat.items.length - 1 ? " / " : "" } </span>
+                        ))}
+                  </td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </article>
@@ -202,31 +218,42 @@ const materials = [
       color: #fff;
     }
 
-    /* --- 追加：プロジェクト概要セクションのスタイル --- */
+    /* =============================
+       プロジェクト概要・使用技術
+       ============================= */
     .project-details {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-  }
-  .project-details h2 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  .project-details h2:first-of-type {
-    margin-top: 0;
-  }
-  .description {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .project-details h2 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .project-details h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .description {
       line-height: 1.8;
       color: var(--text-muted);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
     }
 
     .tech-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 1rem;
+      font-size: 0.95rem;
     }
 
     .tech-table th,
@@ -240,6 +267,14 @@ const materials = [
       background-color: var(--bg-secondary);
       width: 30%;
       font-weight: bold;
+    }
+
+    .materials-list ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
     }
   </style>
 
@@ -258,6 +293,22 @@ const materials = [
     let mana = 0;
     const manaDisplay = document.getElementById('mana-display');
     const btnSpawn = document.getElementById('btn-spawn');
+
+    let configBgmVolume = 0.5;
+    let configSeVolume = 0.5;
+    
+    const SE_DB = {
+      'cursor': '/portfolio/common/assets/audio/se/カーソル移動7.mp3',
+      'confirm': '/portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
+      'cancel': '/portfolio/common/assets/audio/se/キャンセル1.mp3'
+    };
+
+    function playSE(seId) {
+      if (!SE_DB[seId]) return;
+      const se = new Audio(SE_DB[seId]);
+      se.volume = configSeVolume;
+      se.play().catch(e => console.log('SE play failed:', e));
+    }
 
     // --- Phaser メインシーンの定義 ---
     class MainScene extends Phaser.Scene {
@@ -475,22 +526,8 @@ const materials = [
     
     
 
-    if (howtoBtn) howtoBtn.addEventListener('click', () => {
-      howtoModal.classList.add('active');
-      modalOverlay.classList.add('active');
-    });
-    if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', () => {
-      howtoModal.classList.remove('active');
-      modalOverlay.classList.remove('active');
-    });
-    
-        
-    
-
-        
-        
-
     if (btnRetry) btnRetry.addEventListener('click', () => {
+      playSE('confirm');
       resultScreen.style.display = 'none';
       game.scene.stop('MainScene');
       game.scene.start('MainScene');
@@ -498,6 +535,7 @@ const materials = [
     });
 
     if (btnTitle) btnTitle.addEventListener('click', () => {
+      playSE('cancel');
       resultScreen.style.display = 'none';
       startScreen.style.display = 'flex';
       game.scene.stop('MainScene');
@@ -512,6 +550,7 @@ const materials = [
     });
 
     if (startBtn) startBtn.addEventListener('click', () => {
+      playSE('confirm');
       startScreen.style.display = 'none';
       game.scene.resume('MainScene');
     });
@@ -520,6 +559,7 @@ const materials = [
     if (_cfgBtn) {
       _cfgBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         document.getElementById('config-modal')?.classList.add('active');
         document.getElementById('modal-overlay')?.classList.add('active');
       });
@@ -530,6 +570,7 @@ const materials = [
     if (_closeCfgBtn) {
       _closeCfgBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         document.getElementById('config-modal')?.classList.remove('active');
         document.getElementById('modal-overlay')?.classList.remove('active');
       });
@@ -541,8 +582,9 @@ const materials = [
     if (_credBtn) {
       _credBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         document.getElementById('config-modal')?.classList.remove('active');
-              document.getElementById('credits-modal')?.classList.add('active');
+        document.getElementById('credits-modal')?.classList.add('active');
         document.getElementById('modal-overlay')?.classList.add('active');
       });
       _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -552,11 +594,54 @@ const materials = [
     if (_closeCredBtn) {
       _closeCredBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         document.getElementById('credits-modal')?.classList.remove('active');
         document.getElementById('modal-overlay')?.classList.remove('active');
       });
       _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
       _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+
+    if (howtoBtn) {
+      howtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('howto-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+    }
+
+    if (closeHowtoBtn) {
+      closeHowtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('howto-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+    }
+
+    // グローバルなボタンクリック音
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn, .icon-config');
+      if (btn) {
+        const id = btn.id;
+        if (id !== 'start-btn' && id !== 'btn-retry' && id !== 'btn-title') {
+          playSE('cursor');
+        }
+      }
+    });
+
+    const seVolumeInput = document.getElementById('se-volume');
+    if (seVolumeInput) {
+      seVolumeInput.addEventListener('input', (e) => {
+        configSeVolume = parseFloat(e.target.value) / 100;
+      });
+    }
+    const bgmVolumeInput = document.getElementById('bgm-volume');
+    if (bgmVolumeInput) {
+      bgmVolumeInput.addEventListener('input', (e) => {
+        configBgmVolume = parseFloat(e.target.value) / 100;
+      });
     }
   </script>
 

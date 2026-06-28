@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -16,9 +16,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
 
-  const materials = [
-  { name: "Google Fonts", url: "https://fonts.google.com/" },
-  { name: "Simple Icons", url: "https://simpleicons.org/" }
+  const materialCategories = [
+    { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+    { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] },
+    { category: "音楽・効果音", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }] }
   ];
   ---
 
@@ -44,7 +45,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             <!-- Screens -->
             <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10;">
               <h2>エンドレス・ラン！
-                <p>スタートで走り出します</p>
+                <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">スタートで走り出します</p>
                 <button id="start-btn" class="btn btn-full">スタート</button>
                 <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
                 <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
@@ -99,10 +100,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
                 <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
                 <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                  <li>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer">Google
-                      Fonts</a></li>
-                  <li>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer">Simple
-                      Icons</a></li>
+                  {materialCategories.map((mat) => (
+                    <li>{mat.category}: {mat.items.map((item, index) => (
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                    ))}</li>
+                  ))}
                 </ul>
               </div>
               <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
@@ -143,14 +145,23 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           </div>
 
           <h2>使用素材</h2>
-          <div class="materials-list">
-            <ul>
-              {materials.map((material) => (
-              <li>
-                <a href={material.url} target="_blank" rel="noopener noreferrer">{material.name}</a>
-              </li>
-              ))}
-            </ul>
+          <div class="table-responsive">
+            <table class="tech-table">
+              <tbody>
+                {materialCategories.map((mat) => (
+                <tr>
+                  <th>{mat.category}</th>
+                  <td>
+                    {mat.items.map((item, index) => (
+                    <span key={item.name}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                      {index < mat.items.length - 1 ? " / " : "" } </span>
+                        ))}
+                  </td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </article>
@@ -185,16 +196,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      /* アスペクト比を固定しつつレスポンシブにするためのハック、今回は固定高さにする */
       height: 450px;
       background: #87CEEB;
-      /* 空の色のモック */
       border: 4px solid var(--border-color);
       border-radius: 8px;
       overflow: hidden;
     }
 
-    /* ダークモード時の空の色調整 */
     :global([data-theme="dark"]) .canvas-wrapper {
       background: #1a2a40;
     }
@@ -204,7 +212,6 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       width: 100%;
       height: 100%;
       touch-action: none;
-      /* スマホでのスワイプによるスクロールを無効化 */
     }
 
     .overlay {
@@ -292,6 +299,24 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   <script is:inline>
     (function () {
+      let configBgmVolume = 0.5;
+      let configSeVolume = 0.5;
+
+      const SE_DB = {
+        'jump': '/portfolio/run-action/assets/audio/se/パパッ.mp3',
+        'collision': '/portfolio/run-action/assets/audio/se/クイズ不正解2.mp3',
+        'cursor': '/portfolio/common/assets/audio/se/カーソル移動7.mp3',
+        'confirm': '/portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
+        'cancel': '/portfolio/common/assets/audio/se/キャンセル1.mp3'
+      };
+
+      function playSE(seId) {
+        if (!SE_DB[seId]) return;
+        const se = new Audio(SE_DB[seId]);
+        se.volume = configSeVolume;
+        se.play().catch(e => console.log('SE play failed:', e));
+      }
+
       const canvas = document.getElementById('game-canvas');
       const ctx = canvas.getContext('2d');
       const wrapper = document.getElementById('canvas-wrapper');
@@ -426,6 +451,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               onGround = true;
             } else {
               // 横からぶつかった場合（壁としてゲームオーバー）
+              playSE('collision');
               gameOver();
               return;
             }
@@ -435,6 +461,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         // --- 当たり判定（障害物） ---
         for (const obs of obstacles) {
           if (checkCollision(player, obs)) {
+            playSE('collision');
             gameOver();
             return;
           }
@@ -442,6 +469,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
         // --- 落下判定 ---
         if (player.y > canvas.height) {
+          playSE('collision');
           gameOver();
           return;
         }
@@ -531,11 +559,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         if (gameState === 'playing') {
           // Jump Logic (2段ジャンプ)
           if (player.jumpCount < player.maxJumps) {
+            playSE('jump');
             player.vy = jumpPower;
             player.jumpCount++;
           }
-        } else if (gameState === 'start') {
-          startGame();
         }
       }
 
@@ -612,21 +639,24 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         });
       }
 
-      startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
-      retryBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+      startBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
+      retryBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
       if (titleBtn) titleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cancel');
         resultScreen.style.display = 'none';
         startScreen.style.display = 'flex';
       });
       if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
       if (howtoBtn) howtoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         howtoModal.classList.add('active');
         modalOverlay.classList.add('active');
       });
       if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         howtoModal.classList.remove('active');
         modalOverlay.classList.remove('active');
       });
@@ -641,6 +671,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (_cfgBtn) {
         _cfgBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.add('active');
           document.getElementById('modal-overlay')?.classList.add('active');
         });
@@ -651,6 +682,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (_closeCfgBtn) {
         _closeCfgBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.remove('active');
           document.getElementById('modal-overlay')?.classList.remove('active');
         });
@@ -662,6 +694,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (_credBtn) {
         _credBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.remove('active');
           document.getElementById('credits-modal')?.classList.add('active');
           document.getElementById('modal-overlay')?.classList.add('active');
@@ -673,11 +706,37 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (_closeCredBtn) {
         _closeCredBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('credits-modal')?.classList.remove('active');
           document.getElementById('modal-overlay')?.classList.remove('active');
         });
         _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
       }
+
+      // グローバルなボタンクリック音
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn, .icon-config');
+        if (btn) {
+          const id = btn.id;
+          if (id !== 'start-btn' && id !== 'retry-btn' && id !== 'title-btn') {
+            playSE('cursor');
+          }
+        }
+      });
+
+      const seVolumeInput = document.getElementById('se-volume');
+      if (seVolumeInput) {
+        seVolumeInput.addEventListener('input', (e) => {
+          configSeVolume = parseFloat(e.target.value) / 100;
+        });
+      }
+      const bgmVolumeInput = document.getElementById('bgm-volume');
+      if (bgmVolumeInput) {
+        bgmVolumeInput.addEventListener('input', (e) => {
+          configBgmVolume = parseFloat(e.target.value) / 100;
+        });
+      }
+
     })();
   </script>

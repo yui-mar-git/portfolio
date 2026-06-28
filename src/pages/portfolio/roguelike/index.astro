@@ -18,6 +18,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   const materialCategories = [
   { category: "画像素材", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
+  { category: "音楽・効果音", items: [
+    { name: "魔王魂", url: "https://maou.audio/" },
+    { name: "効果音ラボ", url: "https://soundeffect-lab.info/" }
+  ] },
   { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
   { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] }
   ];
@@ -27,21 +31,22 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     <Header activeId="portfolio" />
 
     <main class="container">
-      <div class="game-container" style="position: relative; height: 580px; overflow: hidden;">
+      <div class="game-container" style="position: relative; height: 580px; overflow: hidden;" id="game-container">
+        <span id="config-btn" class="icon-config" title="コンフィグ" style="position:absolute; top:0.5rem; right:0.5rem; z-index: 999;">⚙️</span>
 
         <!-- ゲームヘッダーバー（ステータス常時表示） -->
         <div id="game-header" class="game-header-bar"
-          style="display: none; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.95); border-bottom: 1px solid #333; padding: 0.4rem 0.8rem; font-size: 0.78rem; z-index: 100;">
+          style="display: none; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.95); border-bottom: 1px solid #333; padding: 0.4rem 2.5rem 0.4rem 0.8rem; font-size: 0.78rem; z-index: 100;">
           <div class="header-status" style="display: flex; gap: 0.8rem; align-items: center;">
             <span id="header-floor" style="font-weight: bold; color: #ffb84d;">エリア 1 - 0層</span>
             <span class="gold-badge" style="color: #ffd700; font-weight: bold;">💰<span
                 id="header-gold">50</span></span>
             <span class="hp-badge" style="color: #ff6b6b; font-weight: bold;">❤️<span id="header-hp">10/10</span></span>
             <span class="mp-badge" style="color: #7cc5ff; font-weight: bold;">💧<span id="header-mp">5/5</span></span>
-          </div>
-          <div class="header-relics" style="display: flex; gap: 4px; align-items: center;">
-            <span style="font-size: 0.7rem; color: var(--text-muted);">レリック:</span>
-            <div id="header-relics-list" style="display: flex; gap: 4px;"></div>
+            <div class="header-relics" style="display: flex; gap: 4px; align-items: center; margin-left: 0.5rem;">
+              <span style="font-size: 0.7rem; color: var(--text-muted);">レリック:</span>
+              <div id="header-relics-list" style="display: flex; gap: 4px;"></div>
+            </div>
           </div>
         </div>
 
@@ -87,10 +92,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <!-- スタート画面 -->
         <div id="start-screen"
           style="position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
-          <span id="config-btn" class="icon-config" title="コンフィグ"
-            style="position:absolute; top:0.5rem; right:0.5rem;">⚙️</span>
           <h2 style="font-size: 1.8rem; margin-bottom: 0.3rem;">ローグライクカードゲーム</h2>
-          <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">職業・属性・状態異常・ゴールドを駆使する本格ローグライク</p>
+          <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
           <button id="start-btn" class="btn btn-full">冒険を始める</button>
           <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
         </div>
@@ -193,7 +196,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
           <!-- 強化対象カード選択リスト -->
           <div id="fairy-card-list"
-            style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
+            style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
             <!-- 所持カードがボタンとして並びます -->
           </div>
 
@@ -494,7 +497,6 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
             <ul style="padding-left: 1.2rem; margin-top: 0.5rem;">
               <li><strong>画像素材:</strong> いらすとや 様</li>
-              <li><strong>背景素材:</strong> みんちりえ 様</li>
               <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
               <li><strong>フォント:</strong> Google Fonts</li>
             </ul>
@@ -1465,6 +1467,136 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     import { ITEM_DB } from '../../../data/roguelike/items';
     import { enemyTemplates, getEnemyTemplate } from '../../../data/roguelike/enemies';
 
+    // ===================================================
+    // Audio Manager
+    // ===================================================
+    const BGM_PATH = '/portfolio/roguelike/assets/audio/bgm/';
+    const SE_PATH = '/portfolio/roguelike/assets/audio/se/';
+
+    const BGM_DB = {
+      'start': 'maou_game_theme14.mp3',
+      'reward': 'maou_game_event04.mp3',
+      'castle': 'maou_game_castle01.mp3',
+      'inn': 'maou_game_village01.mp3',
+      'town': 'maou_game_town01.mp3',
+      'forest': 'maou_game_dangeon13.mp3',
+      'area1': 'maou_game_field05.mp3',
+      'area2': 'maou_game_field11.mp3',
+      'area3': 'maou_game_field07.mp3',
+      'battle': 'maou_game_battle07.mp3',
+      'boss': 'maou_game_boss02.mp3',
+      'lastboss': 'maou_game_boss06.mp3',
+      'bandit_pre': 'maou_game_dangeon07.mp3',
+      'darkelf_pre': 'maou_game_dangeon22.mp3',
+      'golem_pre': 'maou_game_dangeon01.mp3',
+      'vampire_pre': 'maou_game_dangeon17.mp3',
+      'leviathan_pre': 'maou_game_dangeon15.mp3',
+      'maou_pre': 'maou_game_dangeon04b.mp3'
+    };
+
+    const SE_DB = {
+      'relic': 'maou_game_jingle09.mp3',
+      'inn': 'maou_game_jingle07.mp3',
+      'victory': 'maou_game_jingle01.mp3',
+      'defeat': 'maou_game_jingle08.mp3',
+      'strike': '剣で斬る2.mp3',
+      'smite': '剣で斬る3.mp3',
+      'rush': '剣で斬る4.mp3',
+      'stone': '岩が真っ二つに割れる.mp3',
+      'buff_up': 'ステータス上昇魔法2.mp3',
+      'buff_down': 'HP吸収魔法2.mp3',
+      'enemy_attack': '小パンチ.mp3',
+      'boss_attack': '打撃6.mp3',
+      'reward_select': '決定ボタンを押す4.mp3',
+      'invalid': 'ビープ音4.mp3',
+      'harpy': 'ヒヨドリの鳴き声1.mp3',
+      'fire': '火炎魔法1.mp3',
+      'ice': '氷魔法1.mp3',
+      'thunder': '雷魔法1.mp3',
+      'wind': '風魔法1.mp3',
+      'poison': '毒魔法1.mp3',
+      'heal': '回復魔法1.mp3',
+      'meteor': 'ドラゴンが火を吐く.mp3',
+      'confirm': '/portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
+      'cancel': '/portfolio/common/assets/audio/se/キャンセル1.mp3',
+      'cursor': '/portfolio/common/assets/audio/se/カーソル移動7.mp3',
+      'draw': 'カードをめくる.mp3',
+      'play': 'カードを台の上に出す.mp3'
+    };
+
+    let currentBgmAudio = null;
+    let configBgmVolume = 0.2;
+    let configSeVolume = 0.5;
+
+    let currentBgmFadeInterval = null;
+
+    function playBGM(bgmId, fadeOutMs = 1000) {
+      if (!BGM_DB[bgmId]) return;
+      const url = BGM_PATH + BGM_DB[bgmId];
+      if (currentBgmAudio && currentBgmAudio.src.endsWith(url)) return;
+
+      if (currentBgmFadeInterval) {
+        clearInterval(currentBgmFadeInterval);
+        currentBgmFadeInterval = null;
+      }
+
+      const playNext = () => {
+        currentBgmAudio = new Audio(url);
+        currentBgmAudio.loop = true;
+        currentBgmAudio.volume = configBgmVolume;
+        currentBgmAudio.play().catch(e => console.log('BGM Play blocked:', e));
+      };
+
+      if (currentBgmAudio && fadeOutMs > 0) {
+        const steps = 10;
+        const stepTime = fadeOutMs / steps;
+        const volStep = currentBgmAudio.volume / steps;
+        let stepCount = 0;
+        const oldAudio = currentBgmAudio;
+        currentBgmAudio = null;
+        currentBgmFadeInterval = setInterval(() => {
+          stepCount++;
+          if (oldAudio.volume > volStep) oldAudio.volume -= volStep;
+          if (stepCount >= steps) {
+            clearInterval(currentBgmFadeInterval);
+            currentBgmFadeInterval = null;
+            oldAudio.pause();
+            playNext();
+          }
+        }, stepTime);
+      } else {
+        if (currentBgmAudio) {
+          currentBgmAudio.pause();
+        }
+        playNext();
+      }
+    }
+
+    function stopBGM() {
+      if (currentBgmAudio) {
+        currentBgmAudio.pause();
+        currentBgmAudio = null;
+      }
+    }
+
+    function playSE(seId) {
+      if (!SE_DB[seId]) return;
+      const path = SE_DB[seId].startsWith('/') ? SE_DB[seId] : SE_PATH + SE_DB[seId];
+      const se = new Audio(path);
+      se.volume = configSeVolume;
+      se.play().catch(e => console.log('SE Play blocked:', e));
+    }
+
+    function setBgmVolume(vol) {
+      configBgmVolume = vol;
+      if (currentBgmAudio) currentBgmAudio.volume = vol;
+    }
+
+    function setSeVolume(vol) {
+      configSeVolume = vol;
+    }
+
+
     // --- 1. DOM要素の取得 ---
     const gameHeader = document.getElementById('game-header');
     const headerFloor = document.getElementById('header-floor');
@@ -1772,6 +1904,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     // --- 7. 王様遇遇レリックイベント (Floor 0) ---
     function showKingEvent() {
+      playBGM('castle');
       if (kingRelicChoices) kingRelicChoices.innerHTML = '';
 
       const allRelicKeys = Object.keys(RELIC_DB).filter(k => !RELIC_DB[k].isFixed);
@@ -1808,11 +1941,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             'レリック選択',
             `レリック「${relic.name}」を選択しますか？<br><br><span style="font-size:0.75rem; color:var(--text-muted);">${relic.desc}</span>`,
             () => {
-              // はい
+              playSE('relic');
               player.relics.push(relicId);
               if (player.class === 'yuusya') {
                 const remaining = allRelicKeys.filter(r => r !== relicId);
                 const extra = remaining[0];
+                playSE('relic');
                 player.relics.push(extra);
                 showGameAlert('王からの餞別 ', `さらに勇者の幸運により「${RELIC_DB[extra].name}」も追加で手に入りました！`, () => {
                   if (kingEventModal) kingEventModal.style.display = 'none';
@@ -2025,6 +2159,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
             btn.addEventListener('click', () => {
               if (!canMove) {
+                playSE('invalid');
                 showGameAlert('移動不可', '現在のルートから外れることはできません。<br>直進するマス（現在地と同じ行のマス）を選んでください。');
                 return;
               }
@@ -2039,6 +2174,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 },
                 null
               );
+            });
+          } else {
+            btn.addEventListener('click', () => {
+              playSE('invalid');
             });
           }
 
@@ -2118,6 +2257,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function showMapScreen() {
       showScreen(mapScreen);
       renderBoardMap(mapBoard, false);
+      if (currentArea === 1) playBGM('area1');
+      else if (currentArea === 2) playBGM('area2');
+      else playBGM('area3');
       if (mapScrollWrapper) {
         setTimeout(() => {
           mapScrollWrapper.scrollLeft = currentFloor * 70;
@@ -2225,9 +2367,15 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       } else if (currentPathType === 'event') {
         triggerEventNode();
       } else {
-        // 戦闘系：カットシーンがあれば先に表示
         const scenes = getPreBattleCutscene();
         if (scenes) {
+          if (currentPathType === 'midboss' && currentArea === 1) playBGM('bandit_pre');
+          else if (currentPathType === 'boss' && currentArea === 1) playBGM('darkelf_pre');
+          else if (currentPathType === 'midboss' && currentArea === 2) playBGM('golem_pre');
+          else if (currentPathType === 'boss' && currentArea === 2) playBGM('vampire_pre');
+          else if (currentPathType === 'midboss' && currentArea === 3) playBGM('leviathan_pre');
+          else if (currentPathType === 'lastboss') playBGM('maou_pre');
+
           showCutscene(scenes, () => startBattle());
         } else {
           startBattle();
@@ -2240,6 +2388,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     const btnInnLeave = document.getElementById('btn-inn-leave');
 
     function showInnScreen() {
+      playBGM('inn');
       showScreen(innScreen);
     }
 
@@ -2248,6 +2397,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         if (player.gold >= 15) {
           showGameConfirm('宿での休息', '15ゴールドを支払い休息しますか？<br>(HPが全回復し、状態異常が全解除されます)', () => {
             player.gold -= 15;
+            playSE('inn');
             player.hp = player.maxHp;
             player.poison = 0;
             player.paralyze = 0;
@@ -2272,6 +2422,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     const fairyCardList = document.getElementById('fairy-card-list');
 
     function showFairyScreen() {
+      playBGM('darkelf_pre');
       showScreen(fairyScreen);
       const desc = document.getElementById('fairy-desc');
       if (desc) desc.textContent = '20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。';
@@ -2339,6 +2490,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     let shopItemsPool = [];
 
     function showTownScreen() {
+      playBGM('town');
       showScreen(townScreen);
       const pool = [...REWARD_POOL];
       shuffle(pool);
@@ -2377,6 +2529,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               if (player.gold >= 15) {
                 showGameConfirm('商品の購入', `「${card.name}」を15ゴールドで購入しますか？`, () => {
                   player.gold -= 15;
+                  playSE('reward_select');
                   player.discard.push({ ...CARD_DB[item.id] });
                   item.bought = true;
                   showGameAlert('購入完了', `「${card.name}」を購入し、デッキに追加しました！`, () => {
@@ -2918,6 +3071,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     function addRelic(relicId) {
+      playSE('relic');
       player.relics.push(relicId);
       if (relicId === 'yubiwa_gold') {
         player.maxHp += 1;
@@ -2991,6 +3145,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           logMessage('山札を再構築しました', 'log-system');
         }
         player.hand.push(player.deck.pop());
+        playSE('draw');
       }
     }
 
@@ -3080,22 +3235,35 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
         setTimeout(() => {
           if (enemyImageEl) enemyImageEl.classList.remove('shake');
+          
           if (enemy.intent.type === 'heal') {
+            playSE('heal');
             enemy.hp = Math.min(enemy.maxHp, enemy.hp + 5);
             logMessage(`${enemy.name} はHPを 5 回復した！`, 'log-heal');
           } else if (enemy.intent.type === 'paralyze') {
+            playSE('thunder');
             player.paralyze = 1;
             logMessage('プレイヤーは麻痺状態になった！', 'log-poison');
           } else if (enemy.intent.type === 'poison') {
+            playSE('poison');
             player.poison = (player.poison || 0) + 2;
             logMessage('プレイヤーは毒2を付与された！', 'log-poison');
           } else if (enemy.intent.type === 'buff_up') {
+            playSE('buff_up');
             enemy.buffUp = 3;
             logMessage(`${enemy.name} は能昇状態になった！`, 'log-heal');
           } else if (enemy.intent.type === 'buff_down') {
+            playSE('buff_down');
             player.buffDown = 3;
             logMessage('プレイヤーは能降状態になった！', 'log-poison');
           } else {
+            const isBoss = (currentPathType === 'boss' || currentPathType === 'midboss' || currentPathType === 'lastboss');
+            if (enemy.intent.type === 'fire_attack') playSE('fire');
+            else if (enemy.intent.type === 'ice_attack') playSE('ice');
+            else if (enemy.name === 'ハーピー') playSE('harpy');
+            else if (isBoss) playSE('boss_attack');
+            else playSE('enemy_attack');
+
             const element = (enemy.intent.type === 'fire_attack') ? 'fire' : ((enemy.intent.type === 'ice_attack') ? 'ice' : 'none');
             const calculatedDmg = calculateDamage(dmg, element, false);
             if (calculatedDmg > 0) {
@@ -3120,9 +3288,25 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       player.mp -= cardCost;
       player.actions -= 1;
       player.hand.splice(index, 1);
+      playSE('play');
       if (!card.oncePerBattle) {
         player.discard.push(card);
       }
+
+      if (card.id === 'strike' || card.id === 'strike_plus') playSE('strike');
+      else if (card.id === 'smite' || card.id === 'smite_plus') playSE('smite');
+      else if (card.id === 'rush' || card.id === 'rush_plus') playSE('rush');
+      else if (card.id === 'stone' || card.id === 'stone_plus') playSE('stone');
+      else if (card.id === 'meteor' || card.id === 'meteor_plus') playSE('meteor');
+      else if (card.element === 'fire') playSE('fire');
+      else if (card.element === 'ice') playSE('ice');
+      else if (card.element === 'thunder') playSE('thunder');
+      else if (card.element === 'wind') playSE('wind');
+      else if (card.buffUp) playSE('buff_up');
+      else if (card.buffDown) playSE('buff_down');
+      else if (card.poison) playSE('poison');
+      else if (card.healSelf) playSE('heal');
+      else if (card.type === 'attack') playSE('strike');
 
       if (card.type === 'attack') {
         const hits = card.hits || 1;
@@ -3168,7 +3352,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const relic = RELIC_DB[relicId];
       if (!relic) { onDone?.(); return; }
       showCutscene(cutsceneScenes, () => {
-        if (!player.relics.includes(relicId)) player.relics.push(relicId);
+        if (!player.relics.includes(relicId)) {
+          playSE('relic');
+          player.relics.push(relicId);
+        }
         logMessage(`「${relic.name}」を手に入れた！`, 'log-system');
         // レリック即時効果の適用
         if (relicId === 'yubiwa_gold') { player.maxHp += 1; player.hp = Math.min(player.hp, player.maxHp); }
@@ -3182,6 +3369,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function handleVictory() {
       isGameOver = true;
       if (btnEndTurn) btnEndTurn.disabled = true;
+      playSE('victory');
       logMessage(enemy.name + ' を倒した！', 'log-system');
 
       let goldReward = 10 + Math.floor(Math.random() * 6);
@@ -3196,6 +3384,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         const unownedRelics = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
         if (unownedRelics.length > 0) {
           shuffle(unownedRelics);
+          playSE('relic');
           player.relics.push(unownedRelics[0]);
           logMessage(`ミミックからレリック「${RELIC_DB[unownedRelics[0]].name}」を手に入れた！`, 'log-system');
         }
@@ -3333,6 +3522,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
 
     function showReward() {
+      playBGM('reward');
       if (rewardCards) rewardCards.innerHTML = '';
       if (rewardSubtitleText) rewardSubtitleText.textContent = '1枚カードを選んでデッキに追加';
       const pool = [...REWARD_POOL];
@@ -3341,6 +3531,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       picks.forEach(id => {
         const card = CARD_DB[id];
         const el = makeCardEl(card, () => {
+          playSE('reward_select');
           player.discard.push({ ...CARD_DB[id] });
           logMessage(CARD_DB[id].name + ' をデッキに追加！', 'log-system');
           if (rewardOverlay) rewardOverlay.style.display = 'none';
@@ -3375,6 +3566,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               <div class="card-desc" style="font-size:0.55rem; line-height:1.2;">${card.desc}</div>
             `;
             btn.addEventListener('click', () => {
+              playSE('reward_select');
               let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
               if (index !== -1) {
                 player.deck[index] = upgradeCard(player.deck[index]);
@@ -3412,6 +3604,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           <div class="card-desc" style="font-size:0.55rem; line-height:1.2; padding:2px;">${relic.desc}</div>
         `;
         el.addEventListener('click', () => {
+          playSE('relic');
           player.relics.push(relicId);
           logMessage(`ボス報酬：レリック「${relic.name}」を獲得！`, 'log-system');
           if (rewardOverlay) rewardOverlay.style.display = 'none';
@@ -3423,6 +3616,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     function showResultOverlay(isWin) {
+      if (isWin) playSE('victory');
+      else playSE('defeat');
+
       if (resultTitle) {
         resultTitle.textContent = isWin ? '戦闘勝利！' : 'ゲームオーバー';
         resultTitle.style.color = isWin ? '#28a745' : '#dc3545';
@@ -3438,6 +3634,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function showGameClearScreen() {
       isGameOver = true;
+      stopBGM();
+      playSE('victory');
       if (resultTitle) {
         resultTitle.textContent = '🎉 全面クリア！';
         resultTitle.style.color = '#ffd700';
@@ -3475,6 +3673,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (battleMapOverlay) battleMapOverlay.style.display = 'none';
 
       const tpl = getEnemyTemplate(currentArea, currentFloor, currentPathType);
+
+      if (tpl.name === '魔王') playBGM('lastboss');
+      else if (currentPathType === 'boss' || currentPathType === 'midboss') playBGM('boss');
+      else playBGM('battle');
+
       enemy = { ...tpl, hp: tpl.hp, maxHp: tpl.maxHp, poison: 0, paralyze: 0, buffUp: 0, buffDown: 0 };
       if (enemyNameEl) enemyNameEl.textContent = enemy.name;
       if (enemyImageEl) enemyImageEl.src = enemy.image;
@@ -3637,6 +3840,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         if (player.hp <= 0) {
           if (overlay) overlay.style.display = 'none';
           if (startScreen) startScreen.style.display = 'flex';
+          playBGM('start');
           return;
         }
         proceedNextFloor();
@@ -3647,6 +3851,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       btnTitle.addEventListener('click', () => {
         if (overlay) overlay.style.display = 'none';
         if (startScreen) startScreen.style.display = 'flex';
+        playBGM('start');
       });
     }
 
@@ -3711,6 +3916,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (startBtn) {
       startBtn.addEventListener('click', () => {
         if (startScreen) startScreen.style.display = 'none';
+        playBGM('reward');
         showScreen(classSelectScreen);
         setupClassSelection();
       });
@@ -3737,12 +3943,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     if (howtoBtn) {
       howtoBtn.addEventListener('click', () => {
+        playSE('cursor');
         if (howtoModal) howtoModal.classList.add('active');
         if (modalOverlay) modalOverlay.classList.add('active');
       });
     }
     if (closeHowtoBtn) {
       closeHowtoBtn.addEventListener('click', () => {
+        playSE('cursor');
         if (howtoModal) howtoModal.classList.remove('active');
         if (modalOverlay) modalOverlay.classList.remove('active');
       });
@@ -3751,6 +3959,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (configBtn) {
       configBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         if (configModal) configModal.classList.add('active');
         if (modalOverlay) modalOverlay.classList.add('active');
       });
@@ -3759,6 +3968,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (closeConfigBtn) {
       closeConfigBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         if (configModal) configModal.classList.remove('active');
         if (modalOverlay) modalOverlay.classList.remove('active');
       });
@@ -3766,6 +3976,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (creditsBtn) {
       creditsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         if (configModal) configModal.classList.remove('active');
         if (creditsModal) creditsModal.classList.add('active');
         if (modalOverlay) modalOverlay.classList.add('active');
@@ -3774,7 +3985,33 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (closeCreditsBtn) {
       closeCreditsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         if (creditsModal) creditsModal.classList.remove('active');
         if (modalOverlay) modalOverlay.classList.remove('active');
+      });
+    }
+
+    // グローバルなボタンクリック音
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn, .icon-config, .deck-tab, .class-card');
+      if (btn) {
+        const id = btn.id;
+        if (id !== 'btn-dialog-yes' && id !== 'btn-dialog-no' && id !== 'btn-dialog-ok') {
+          playSE('cursor');
+        }
+      }
+    });
+
+    const bgmVolumeInput = document.getElementById('bgm-volume');
+    if (bgmVolumeInput) {
+      bgmVolumeInput.addEventListener('input', (e) => {
+        setBgmVolume(e.target.value / 100);
+      });
+    }
+
+    const seVolumeInput = document.getElementById('se-volume');
+    if (seVolumeInput) {
+      seVolumeInput.addEventListener('input', (e) => {
+        setSeVolume(e.target.value / 100);
       });
     }

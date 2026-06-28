@@ -17,10 +17,26 @@
   </script><link rel="stylesheet" href="/portfolio/_astro/index.vqFMR8av.css">
 <style>.game-container[data-astro-cid-ia44z2ko]{margin-top:2rem;background:var(--bg-secondary);border-radius:12px;padding:1.5rem;box-shadow:0 4px 6px #0000001a}.game-hud[data-astro-cid-ia44z2ko]{display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;margin-bottom:1rem;padding:0 1rem;color:var(--text-color)}.highscore-display[data-astro-cid-ia44z2ko]{color:var(--primary-color)}.canvas-wrapper[data-astro-cid-ia44z2ko]{position:relative;width:100%;height:450px;background:#87ceeb;border:4px solid var(--border-color);border-radius:8px;overflow:hidden}[data-theme=dark] .canvas-wrapper[data-astro-cid-ia44z2ko]{background:#1a2a40}canvas[data-astro-cid-ia44z2ko]{display:block;width:100%;height:100%;touch-action:none}.overlay[data-astro-cid-ia44z2ko]{position:absolute;top:0;left:0;width:100%;height:100%;background:#0009;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:10}.overlay[data-astro-cid-ia44z2ko] h2[data-astro-cid-ia44z2ko]{color:#fff;margin-bottom:1rem;font-size:2rem}.overlay[data-astro-cid-ia44z2ko] p[data-astro-cid-ia44z2ko]{color:#f8f9fa;margin-bottom:2rem;font-weight:700}.highlight[data-astro-cid-ia44z2ko]{font-size:2.5rem;color:#ffea00;margin:0 .5rem}.result-actions[data-astro-cid-ia44z2ko]{display:flex;gap:1rem;justify-content:center}.project-details[data-astro-cid-ia44z2ko]{margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border-color)}.project-details[data-astro-cid-ia44z2ko] h2[data-astro-cid-ia44z2ko]{font-size:1.25rem;margin-top:2rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border-color)}.project-details[data-astro-cid-ia44z2ko] h2[data-astro-cid-ia44z2ko]:first-of-type{margin-top:0}.description[data-astro-cid-ia44z2ko]{line-height:1.8;color:var(--text-muted)}.tech-table[data-astro-cid-ia44z2ko]{width:100%;border-collapse:collapse;margin-top:1rem}.tech-table[data-astro-cid-ia44z2ko] th[data-astro-cid-ia44z2ko],.tech-table[data-astro-cid-ia44z2ko] td[data-astro-cid-ia44z2ko]{padding:1rem;border:1px solid var(--border-color);text-align:left}.tech-table[data-astro-cid-ia44z2ko] th[data-astro-cid-ia44z2ko]{background-color:var(--bg-secondary);width:30%;font-weight:700}
 </style><script type="module" src="/portfolio/_astro/hoisted.CousFrzU.js"></script></head> <body id="run-action">  <header> <div class="container header-container"> <div class="logo"><a href="/portfolio/index.html">My Portfolio.</a></div> <button class="hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false"> <span class="hamburger-line"></span> <span class="hamburger-line"></span> <span class="hamburger-line"></span> </button> <button id="theme-toggle" class="theme-toggle" aria-label="テーマを切り替える"> <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <circle cx="12" cy="12" r="5"></circle> <line x1="12" y1="1" x2="12" y2="3"></line> <line x1="12" y1="21" x2="12" y2="23"></line> <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line> <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line> <line x1="1" y1="12" x2="3" y2="12"></line> <line x1="21" y1="12" x2="23" y2="12"></line> <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line> <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line> </svg> <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path> </svg> </button> <nav id="global-nav"> <ul> <li> <a href="/portfolio/profile/index.html" class=""> プロフィール </a> </li><li> <a href="/portfolio/portfolio/index.html" class="active"> 制作物 </a> </li><li> <a href="/portfolio/credits/index.html" class=""> 使用素材 </a> </li><li> <a href="/portfolio/contact/index.html" class=""> お問い合わせ </a> </li> </ul> </nav> </div> </header>  <main class="container" data-astro-cid-ia44z2ko> <article data-astro-cid-ia44z2ko> <span class="page-label" data-astro-cid-ia44z2ko>ACTION GAME</span> <h1 data-astro-cid-ia44z2ko>エンドレス・ラン！</h1> <div class="game-container" data-astro-cid-ia44z2ko> <!-- Game Area (Canvas) --> <div class="canvas-wrapper" id="canvas-wrapper" style="position: relative;" data-astro-cid-ia44z2ko> <!-- HUD (Score / Highscore) --> <div class="game-hud" id="game-hud" style="position: absolute; display: none; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between;" data-astro-cid-ia44z2ko> <div class="time-display" data-astro-cid-ia44z2ko>生存時間: <span id="survival-time" data-astro-cid-ia44z2ko>0.0</span>秒</div> <div class="highscore-display" data-astro-cid-ia44z2ko>ベスト: <span id="highscore" data-astro-cid-ia44z2ko>0.0</span>秒</div> </div> <canvas id="game-canvas" data-astro-cid-ia44z2ko></canvas> <!-- Screens --> <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10;" data-astro-cid-ia44z2ko> <h2 data-astro-cid-ia44z2ko>エンドレス・ラン！
-<p data-astro-cid-ia44z2ko>スタートで走り出します</p> <button id="start-btn" class="btn btn-full" data-astro-cid-ia44z2ko>スタート</button> <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;" data-astro-cid-ia44z2ko>遊び方</button> <span id="config-btn" class="icon-config" title="コンフィグ" data-astro-cid-ia44z2ko>⚙️</span> </h2></div> <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.6); z-index: 10; flex-direction: column; align-items: center; justify-content: center;" data-astro-cid-ia44z2ko> <h2 data-astro-cid-ia44z2ko>ゲームオーバー</h2> <p data-astro-cid-ia44z2ko>記録: <span id="final-time" class="highlight" data-astro-cid-ia44z2ko>0.0</span> 秒</p> <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;" data-astro-cid-ia44z2ko> <button id="retry-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>リトライ</button> <button id="title-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>タイトルへ</button> <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;" data-astro-cid-ia44z2ko>Xでシェア</button> </div> </div> <!-- 遊び方モーダル --> <div id="howto-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>遊び方</h3> <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;" data-astro-cid-ia44z2ko> <p data-astro-cid-ia44z2ko>画面をタップするとキャラクターがジャンプします。</p> <p data-astro-cid-ia44z2ko>空中でもう一度タップすると2段ジャンプが可能です。</p> <p data-astro-cid-ia44z2ko>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p> </div> <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> <!-- コンフィグモーダル（ダミー） --> <div id="modal-overlay" class="modal-overlay" data-astro-cid-ia44z2ko></div> <div id="config-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>設定（コンフィグ）</h3> <div class="config-item" data-astro-cid-ia44z2ko> <label for="bgm-volume" data-astro-cid-ia44z2ko>BGM音量</label> <input type="range" id="bgm-volume" min="0" max="100" value="50" data-astro-cid-ia44z2ko> </div> <div class="config-item" data-astro-cid-ia44z2ko> <label for="se-volume" data-astro-cid-ia44z2ko>SE音量</label> <input type="range" id="se-volume" min="0" max="100" value="50" data-astro-cid-ia44z2ko> </div> <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" data-astro-cid-ia44z2ko>クレジット・使用素材</button> <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> <!-- クレジットモーダル --> <div id="credits-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>クレジット・使用素材</h3> <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;" data-astro-cid-ia44z2ko> <p data-astro-cid-ia44z2ko>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p> <ul style="margin-top: 1rem; padding-left: 1.5rem;" data-astro-cid-ia44z2ko> <li data-astro-cid-ia44z2ko>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Google
-                      Fonts</a></li> <li data-astro-cid-ia44z2ko>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Simple
-                      Icons</a></li> </ul> </div> <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> </div> </div> <!-- ゲーム概要・使用技術セクション --> <section class="project-details" data-astro-cid-ia44z2ko> <h2 data-astro-cid-ia44z2ko>概要</h2> <p class="description" data-astro-cid-ia44z2ko>画面をタップしてジャンプ！障害物を避け、穴を飛び越え、どこまで走り続けられるか挑戦だ！</p> <h2 data-astro-cid-ia44z2ko>学習テーマ</h2> <div class="materials-list" data-astro-cid-ia44z2ko> <ul data-astro-cid-ia44z2ko> <li data-astro-cid-ia44z2ko>requestAnimationFrameによるメインループ</li><li data-astro-cid-ia44z2ko>物理演算（重力・ジャンプ）の基礎</li> </ul> </div> <h2 data-astro-cid-ia44z2ko>使用技術・ツール</h2> <div class="table-responsive" data-astro-cid-ia44z2ko> <table class="tech-table" data-astro-cid-ia44z2ko> <tbody data-astro-cid-ia44z2ko> <tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>開発言語</th> <td data-astro-cid-ia44z2ko>HTML, CSS, JavaScript</td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>フレームワーク</th> <td data-astro-cid-ia44z2ko>Astro</td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>その他ツール</th> <td data-astro-cid-ia44z2ko>Claude, Gemini</td> </tr> </tbody> </table> </div> <h2 data-astro-cid-ia44z2ko>使用素材</h2> <div class="materials-list" data-astro-cid-ia44z2ko> <ul data-astro-cid-ia44z2ko> <li data-astro-cid-ia44z2ko> <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Google Fonts</a> </li><li data-astro-cid-ia44z2ko> <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Simple Icons</a> </li> </ul> </div> </section> </article> </main> <footer class="container"> <div class="footer-sns"> <a href="#" class="sns-icon" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="https://github.com/yui-mar-git" class="sns-icon linked" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a href="#" class="sns-icon" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a><a href="#" class="sns-icon" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" class="sns-icon" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a> </div> <p>&copy; 2026 Yui. All rights reserved.</p> </footer>  <script src="/portfolio/script.js"></script> </body> </html>   <script>
+<p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;" data-astro-cid-ia44z2ko>スタートで走り出します</p> <button id="start-btn" class="btn btn-full" data-astro-cid-ia44z2ko>スタート</button> <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;" data-astro-cid-ia44z2ko>遊び方</button> <span id="config-btn" class="icon-config" title="コンフィグ" data-astro-cid-ia44z2ko>⚙️</span> </h2></div> <div class="overlay" id="result-screen" style="display: none; background-color: rgba(0,0,0,0.6); z-index: 10; flex-direction: column; align-items: center; justify-content: center;" data-astro-cid-ia44z2ko> <h2 data-astro-cid-ia44z2ko>ゲームオーバー</h2> <p data-astro-cid-ia44z2ko>記録: <span id="final-time" class="highlight" data-astro-cid-ia44z2ko>0.0</span> 秒</p> <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;" data-astro-cid-ia44z2ko> <button id="retry-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>リトライ</button> <button id="title-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>タイトルへ</button> <button id="share-btn" class="btn btn-primary" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;" data-astro-cid-ia44z2ko>Xでシェア</button> </div> </div> <!-- 遊び方モーダル --> <div id="howto-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>遊び方</h3> <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;" data-astro-cid-ia44z2ko> <p data-astro-cid-ia44z2ko>画面をタップするとキャラクターがジャンプします。</p> <p data-astro-cid-ia44z2ko>空中でもう一度タップすると2段ジャンプが可能です。</p> <p data-astro-cid-ia44z2ko>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p> </div> <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> <!-- コンフィグモーダル（ダミー） --> <div id="modal-overlay" class="modal-overlay" data-astro-cid-ia44z2ko></div> <div id="config-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>設定（コンフィグ）</h3> <div class="config-item" data-astro-cid-ia44z2ko> <label for="bgm-volume" data-astro-cid-ia44z2ko>BGM音量</label> <input type="range" id="bgm-volume" min="0" max="100" value="50" data-astro-cid-ia44z2ko> </div> <div class="config-item" data-astro-cid-ia44z2ko> <label for="se-volume" data-astro-cid-ia44z2ko>SE音量</label> <input type="range" id="se-volume" min="0" max="100" value="50" data-astro-cid-ia44z2ko> </div> <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;" data-astro-cid-ia44z2ko>クレジット・使用素材</button> <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> <!-- クレジットモーダル --> <div id="credits-modal" class="config-modal" data-astro-cid-ia44z2ko> <h3 data-astro-cid-ia44z2ko>クレジット・使用素材</h3> <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;" data-astro-cid-ia44z2ko> <p data-astro-cid-ia44z2ko>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p> <ul style="margin-top: 1rem; padding-left: 1.5rem;" data-astro-cid-ia44z2ko> <li data-astro-cid-ia44z2ko>フォント: <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Google Fonts</a></li><li data-astro-cid-ia44z2ko>アイコン: <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Simple Icons</a></li><li data-astro-cid-ia44z2ko>音楽・効果音: <a href="https://soundeffect-lab.info/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>効果音ラボ</a></li> </ul> </div> <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;" data-astro-cid-ia44z2ko>閉じる</button> </div> </div> </div> <!-- ゲーム概要・使用技術セクション --> <section class="project-details" data-astro-cid-ia44z2ko> <h2 data-astro-cid-ia44z2ko>概要</h2> <p class="description" data-astro-cid-ia44z2ko>画面をタップしてジャンプ！障害物を避け、穴を飛び越え、どこまで走り続けられるか挑戦だ！</p> <h2 data-astro-cid-ia44z2ko>学習テーマ</h2> <div class="materials-list" data-astro-cid-ia44z2ko> <ul data-astro-cid-ia44z2ko> <li data-astro-cid-ia44z2ko>requestAnimationFrameによるメインループ</li><li data-astro-cid-ia44z2ko>物理演算（重力・ジャンプ）の基礎</li> </ul> </div> <h2 data-astro-cid-ia44z2ko>使用技術・ツール</h2> <div class="table-responsive" data-astro-cid-ia44z2ko> <table class="tech-table" data-astro-cid-ia44z2ko> <tbody data-astro-cid-ia44z2ko> <tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>開発言語</th> <td data-astro-cid-ia44z2ko>HTML, CSS, JavaScript</td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>フレームワーク</th> <td data-astro-cid-ia44z2ko>Astro</td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>その他ツール</th> <td data-astro-cid-ia44z2ko>Claude, Gemini</td> </tr> </tbody> </table> </div> <h2 data-astro-cid-ia44z2ko>使用素材</h2> <div class="table-responsive" data-astro-cid-ia44z2ko> <table class="tech-table" data-astro-cid-ia44z2ko> <tbody data-astro-cid-ia44z2ko> <tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>フォント</th> <td data-astro-cid-ia44z2ko> <span key="Google Fonts" data-astro-cid-ia44z2ko> <a href="https://fonts.google.com/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Google Fonts</a>  </span> </td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>アイコン</th> <td data-astro-cid-ia44z2ko> <span key="Simple Icons" data-astro-cid-ia44z2ko> <a href="https://simpleicons.org/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>Simple Icons</a>  </span> </td> </tr><tr data-astro-cid-ia44z2ko> <th data-astro-cid-ia44z2ko>音楽・効果音</th> <td data-astro-cid-ia44z2ko> <span key="効果音ラボ" data-astro-cid-ia44z2ko> <a href="https://soundeffect-lab.info/" target="_blank" rel="noopener noreferrer" data-astro-cid-ia44z2ko>効果音ラボ</a>  </span> </td> </tr> </tbody> </table> </div> </section> </article> </main> <footer class="container"> <div class="footer-sns"> <a href="#" class="sns-icon" aria-label="X (Twitter)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a href="https://github.com/yui-mar-git" class="sns-icon linked" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a><a href="#" class="sns-icon" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a><a href="#" class="sns-icon" aria-label="LinkedIn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="#" class="sns-icon" aria-label="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a> </div> <p>&copy; 2026 Yui. All rights reserved.</p> </footer>  <script src="/portfolio/script.js"></script> </body> </html>   <script>
     (function () {
+      let configBgmVolume = 0.5;
+      let configSeVolume = 0.5;
+
+      const SE_DB = {
+        'jump': '/portfolio/run-action/assets/audio/se/パパッ.mp3',
+        'collision': '/portfolio/run-action/assets/audio/se/クイズ不正解2.mp3',
+        'cursor': '/portfolio/common/assets/audio/se/カーソル移動7.mp3',
+        'confirm': '/portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
+        'cancel': '/portfolio/common/assets/audio/se/キャンセル1.mp3'
+      };
+
+      function playSE(seId) {
+        if (!SE_DB[seId]) return;
+        const se = new Audio(SE_DB[seId]);
+        se.volume = configSeVolume;
+        se.play().catch(e => console.log('SE play failed:', e));
+      }
+
       const canvas = document.getElementById('game-canvas');
       const ctx = canvas.getContext('2d');
       const wrapper = document.getElementById('canvas-wrapper');
@@ -155,6 +171,7 @@
               onGround = true;
             } else {
               // 横からぶつかった場合（壁としてゲームオーバー）
+              playSE('collision');
               gameOver();
               return;
             }
@@ -164,6 +181,7 @@
         // --- 当たり判定（障害物） ---
         for (const obs of obstacles) {
           if (checkCollision(player, obs)) {
+            playSE('collision');
             gameOver();
             return;
           }
@@ -171,6 +189,7 @@
 
         // --- 落下判定 ---
         if (player.y > canvas.height) {
+          playSE('collision');
           gameOver();
           return;
         }
@@ -260,11 +279,10 @@
         if (gameState === 'playing') {
           // Jump Logic (2段ジャンプ)
           if (player.jumpCount < player.maxJumps) {
+            playSE('jump');
             player.vy = jumpPower;
             player.jumpCount++;
           }
-        } else if (gameState === 'start') {
-          startGame();
         }
       }
 
@@ -341,21 +359,24 @@
         });
       }
 
-      startBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
-      retryBtn.addEventListener('click', (e) => { e.stopPropagation(); startGame(); });
+      startBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
+      retryBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
       if (titleBtn) titleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cancel');
         resultScreen.style.display = 'none';
         startScreen.style.display = 'flex';
       });
       if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
       if (howtoBtn) howtoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         howtoModal.classList.add('active');
         modalOverlay.classList.add('active');
       });
       if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playSE('cursor');
         howtoModal.classList.remove('active');
         modalOverlay.classList.remove('active');
       });
@@ -370,6 +391,7 @@
       if (_cfgBtn) {
         _cfgBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.add('active');
           document.getElementById('modal-overlay')?.classList.add('active');
         });
@@ -380,6 +402,7 @@
       if (_closeCfgBtn) {
         _closeCfgBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.remove('active');
           document.getElementById('modal-overlay')?.classList.remove('active');
         });
@@ -391,6 +414,7 @@
       if (_credBtn) {
         _credBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('config-modal')?.classList.remove('active');
           document.getElementById('credits-modal')?.classList.add('active');
           document.getElementById('modal-overlay')?.classList.add('active');
@@ -402,11 +426,37 @@
       if (_closeCredBtn) {
         _closeCredBtn.addEventListener('click', (e) => {
           e.stopPropagation();
+          playSE('cursor');
           document.getElementById('credits-modal')?.classList.remove('active');
           document.getElementById('modal-overlay')?.classList.remove('active');
         });
         _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
         _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
       }
+
+      // グローバルなボタンクリック音
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn, .icon-config');
+        if (btn) {
+          const id = btn.id;
+          if (id !== 'start-btn' && id !== 'retry-btn' && id !== 'title-btn') {
+            playSE('cursor');
+          }
+        }
+      });
+
+      const seVolumeInput = document.getElementById('se-volume');
+      if (seVolumeInput) {
+        seVolumeInput.addEventListener('input', (e) => {
+          configSeVolume = parseFloat(e.target.value) / 100;
+        });
+      }
+      const bgmVolumeInput = document.getElementById('bgm-volume');
+      if (bgmVolumeInput) {
+        bgmVolumeInput.addEventListener('input', (e) => {
+          configBgmVolume = parseFloat(e.target.value) / 100;
+        });
+      }
+
     })();
   </script>
