@@ -18,7 +18,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
   early: [
     {
       name: 'スライム',
-      hp: 4, maxHp: 4, attackBase: 1,
+      hp: 6, maxHp: 6, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/fantasy_game_character_slime.png',
       weaknesses: [],
       resistances: ['fire'],
@@ -27,7 +27,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'ゴブリン',
-      hp: 6, maxHp: 6, attackBase: 1,
+      hp: 10, maxHp: 10, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/fantasy_goblin.png',
       weaknesses: [],
       resistances: [],
@@ -36,7 +36,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'カラス',
-      hp: 4, maxHp: 4, attackBase: 1,
+      hp: 6, maxHp: 6, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/bird_karasu_kowai.png',
       weaknesses: ['fire', 'ice'],
       resistances: [],
@@ -45,7 +45,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'オオカミ',
-      hp: 5, maxHp: 5, attackBase: 1,
+      hp: 8, maxHp: 8, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/animal_ookami.png',
       weaknesses: ['fire', 'ice'],
       resistances: [],
@@ -58,7 +58,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
   mid: [
     {
       name: 'ゴブリン',
-      hp: 8, maxHp: 8, attackBase: 1,
+      hp: 12, maxHp: 12, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/fantasy_goblin.png',
       weaknesses: [],
       resistances: [],
@@ -67,7 +67,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'オオカミ',
-      hp: 7, maxHp: 7, attackBase: 1,
+      hp: 10, maxHp: 10, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/animal_ookami.png',
       weaknesses: ['fire', 'ice'],
       resistances: [],
@@ -76,7 +76,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'ベアー',
-      hp: 12, maxHp: 12, attackBase: 2,
+      hp: 18, maxHp: 18, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/animal_bear_higuma.png',
       weaknesses: ['fire', 'ice'],
       resistances: [],
@@ -85,7 +85,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'ハーピー',
-      hp: 10, maxHp: 10, attackBase: 1,
+      hp: 15, maxHp: 15, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/fantasy_harpy.png',
       weaknesses: ['stone'],
       resistances: ['wind'],
@@ -94,7 +94,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'オーク',
-      hp: 14, maxHp: 14, attackBase: 2,
+      hp: 20, maxHp: 20, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_orc.png',
       weaknesses: ['wind'],
       resistances: [],
@@ -107,7 +107,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
   late: [
     {
       name: 'ハーピー',
-      hp: 12, maxHp: 12, attackBase: 2,
+      hp: 18, maxHp: 18, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_harpy.png',
       weaknesses: ['stone'],
       resistances: ['wind'],
@@ -116,7 +116,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'オーク',
-      hp: 16, maxHp: 16, attackBase: 2,
+      hp: 24, maxHp: 24, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_orc.png',
       weaknesses: ['wind'],
       resistances: [],
@@ -125,7 +125,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     },
     {
       name: 'ドラゴン',
-      hp: 25, maxHp: 25, attackBase: 3,
+      hp: 35, maxHp: 35, attackBase: 3,
       image: '/portfolio/roguelike/assets/monsters/fantasy_dragon.png',
       weaknesses: ['ice'],
       resistances: ['fire'],
@@ -139,7 +139,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア1 中ボス (5層)
     {
       name: 'バンディット',
-      hp: 18, maxHp: 18, attackBase: 1,
+      hp: 30, maxHp: 30, attackBase: 1,
       image: '/portfolio/roguelike/assets/monsters/character_sanzoku.png',
       weaknesses: [],
       resistances: [],
@@ -149,7 +149,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア1 ボス (9層)
     {
       name: 'ダークエルフ',
-      hp: 30, maxHp: 30, attackBase: 2,
+      hp: 50, maxHp: 50, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png',
       weaknesses: [],
       resistances: [],
@@ -159,7 +159,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア2 中ボス (4層)
     {
       name: 'ゴーレム',
-      hp: 35, maxHp: 35, attackBase: 2,
+      hp: 60, maxHp: 60, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_golem.png',
       weaknesses: ['wind'],
       resistances: [],
@@ -170,7 +170,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア2 ボス (9層)
     {
       name: 'ヴァンパイア',
-      hp: 40, maxHp: 40, attackBase: 2,
+      hp: 75, maxHp: 75, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/fantasy_dracula2.png',
       weaknesses: ['fire'],
       resistances: [],
@@ -181,7 +181,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア3 中ボス (5層)
     {
       name: 'リヴァイアサン',
-      hp: 45, maxHp: 45, attackBase: 3,
+      hp: 85, maxHp: 85, attackBase: 3,
       image: '/portfolio/roguelike/assets/monsters/fantasy_leviathan.png',
       weaknesses: ['thunder'],
       resistances: ['fire'],
@@ -191,7 +191,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     // エリア3 ラスボス (9層)
     {
       name: '魔王',
-      hp: 60, maxHp: 60, attackBase: 3,
+      hp: 120, maxHp: 120, attackBase: 3,
       image: '/portfolio/roguelike/assets/monsters/fantasy_maou_devil.png',
       weaknesses: ['thunder'],
       resistances: ['stone'], // 土耐性
@@ -205,7 +205,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
   mimic: [
     {
       name: 'ミミック',
-      hp: 15, maxHp: 15, attackBase: 2,
+      hp: 25, maxHp: 25, attackBase: 2,
       image: '/portfolio/roguelike/assets/monsters/character_game_mimic.png',
       weaknesses: [],
       resistances: [],

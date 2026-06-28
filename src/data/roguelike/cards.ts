@@ -212,20 +212,22 @@ export function upgradeCard(card: Card): Card {
   // 各カードごとの強化仕様
   switch (card.id) {
     case 'strike':
-      upgradedCard.value = 3;
-      upgradedCard.desc = '敵に 3 ダメージ';
+      upgradedCard.value = 4;
+      upgradedCard.desc = '敵に 4 ダメージ';
       break;
     case 'heal':
       upgradedCard.healSelf = 5;
       upgradedCard.desc = 'HP +5 回復';
       break;
     case 'smite':
-      upgradedCard.value = 6;
-      upgradedCard.desc = '敵に 6 ダメージ';
+      upgradedCard.cost = 1;
+      upgradedCard.value = 5;
+      upgradedCard.desc = '敵に 5 ダメージ (コスト1)';
       break;
     case 'rush':
+      upgradedCard.cost = 1;
       upgradedCard.value = 2;
-      upgradedCard.desc = '敵に 2×2 ダメージ';
+      upgradedCard.desc = '敵に 2×2 ダメージ (コスト1)';
       break;
     case 'fire':
       upgradedCard.value = 5;
@@ -248,16 +250,18 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.desc = '敵に 3 ダメージ (雷) ＋ 30%で麻痺付与';
       break;
     case 'venom':
+      upgradedCard.value = 2;
       upgradedCard.poison = 2;
-      upgradedCard.desc = '敵に 1 ダメージ ＋ 毒2 を付与';
+      upgradedCard.desc = '敵に 2 ダメージ ＋ 毒2 を付与';
       break;
     case 'fortify':
-      upgradedCard.healSelf = 9;
-      upgradedCard.desc = 'HP +9 回復';
+      upgradedCard.cost = 1;
+      upgradedCard.healSelf = 8;
+      upgradedCard.desc = 'HP +8 回復 (コスト1)';
       break;
     case 'draw_card':
       upgradedCard.draw = 3;
-      upgradedCard.desc = 'カードを 3 枚引く';
+      upgradedCard.desc = 'カードを 3 枚引き、行動回数+1';
       break;
     case 'buff_up':
       upgradedCard.cost = 0; // コストが0に減少
@@ -268,8 +272,9 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.desc = '敵に「能降」を 3 ターン付与 (コスト0)';
       break;
     case 'meteor':
-      upgradedCard.value = 12;
-      upgradedCard.desc = '敵に 12 ダメージ (炎・氷・雷の全属性効果) (戦闘中1回のみ使用可能)';
+      upgradedCard.cost = 2;
+      upgradedCard.value = 10;
+      upgradedCard.desc = '敵に 10 ダメージ (炎・氷・雷の全属性効果) (戦闘中1回のみ使用可能) (コスト2)';
       break;
   }
   return upgradedCard;
