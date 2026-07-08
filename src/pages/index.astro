@@ -2,12 +2,6 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-import { fetchMicroCMS } from '@/lib/microcms';
-import type { MicroCMSSettings, MicroCMSPortfolio, MicroCMSListResponse } from '@/types/microcms';
-
-const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
-const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio', { limit: '3' });
-const projects = portfolioResponse.contents;
 ---
 
 <BaseLayout title="Home" pageId="home">
@@ -16,47 +10,9 @@ const projects = portfolioResponse.contents;
   <main class="container">
     <article>
       <span class="page-label">HOME</span>
-      <h1>こんにちは、{settings.name}です。</h1>
+      <h1>こんにちは。</h1>
       <section class="hero">
-        <p set:html={settings.bio.replace(/\n/g, '<br>')} />
-        <a href={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/portfolio/index.html`} class="btn">作品を見る</a>
-      </section>
-
-      <section>
-        <h2>制作実績</h2>
-        <div class="project-grid">
-          {projects.length > 0 ? (
-            projects.map((project) => (
-              <div class="project-card">
-                {project.thumbnail && (
-                  <img src={project.thumbnail.url} alt={project.title} class="project-thumbnail" />
-                )}
-                <h3>{project.title}</h3>
-                {project.tags && (
-                  <div class="project-tags">
-                    <span>{project.tags}</span>
-                  </div>
-                )}
-                <p>{project.description}</p>
-                {project.url && (
-                  project.url.startsWith('http') ? (
-                    <a href={project.url} target="_blank" rel="noopener noreferrer">
-                      詳細を見る →
-                    </a>
-                  ) : (
-                    <a href={project.url}>
-                      詳細を見る →
-                    </a>
-                  )
-                )}
-              </div>
-            ))
-          ) : (
-            <p class="empty-message">
-              鋭意制作中です。
-            </p>
-          )}
-        </div>
+        <p>ここは私のポートフォリオのページです。<br>コンテンツは随時追加していきます。</p>
       </section>
     </article>
   </main>
