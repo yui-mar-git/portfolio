@@ -24,7 +24,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   }
 
   const canvas = document.getElementById('game-canvas');
-  if(!canvas) return;
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const wrapper = document.getElementById('game-container');
 
@@ -58,9 +58,9 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   let isPaused = false;
   let pauseStartTime = 0;
   let highScore = parseFloat(localStorage.getItem('runaction_highscore')) || 0;
-  if(highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
+  if (highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
   const startHighscoreElement = document.getElementById('start-highscore-val');
-  if(startHighscoreElement) startHighscoreElement.textContent = highScore.toFixed(1);
+  if (startHighscoreElement) startHighscoreElement.textContent = highScore.toFixed(1);
 
   function pauseGame() {
     if (gameState !== 'playing' || isPaused) return;
@@ -300,7 +300,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     if (gameHud) gameHud.style.display = 'flex';
     const bottomHud = document.getElementById('bottom-hud');
     if (bottomHud) bottomHud.style.display = 'block';
-    
+
     gameState = 'playing';
     isPaused = false;
     startScreen.style.display = 'none';
@@ -346,7 +346,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   function gameOver() {
     if (gameHud) gameHud.style.display = 'none';
     gameState = 'gameover';
-    if(resultScreen) resultScreen.style.display = 'flex';
+    if (resultScreen) resultScreen.style.display = 'flex';
     const bottomHud = document.getElementById('bottom-hud');
     if (bottomHud) bottomHud.style.display = 'none';
     finalTimeElement.textContent = survivalTime.toFixed(1);
@@ -354,11 +354,11 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     if (survivalTime > highScore) {
       highScore = survivalTime;
       localStorage.setItem('runaction_highscore', highScore.toString());
-      if(highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
+      if (highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
     }
 
     // Update Share Button
-    const shareText = `生存時間 ${survivalTime.toFixed(1)} 秒！(ベスト: ${highScore.toFixed(1)}秒) #MyPortfolioAction`;
+    const shareText = `記録 ${survivalTime.toFixed(1)} 秒！(ベスト: ${highScore.toFixed(1)}秒) #MyPortfolioAction`;
     const shareUrl = window.location.href;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
@@ -370,16 +370,16 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     });
   }
 
-  if(startBtn) startBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
-  if(retryBtn) retryBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
+  if (startBtn) startBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
+  if (retryBtn) retryBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
   if (titleBtn) {
     titleBtn.addEventListener('click', () => {
       playSE('cancel');
-      if(resultScreen) resultScreen.style.display = 'none';
-      if(startScreen) startScreen.style.display = 'flex';
-      if(gameHud) gameHud.style.display = 'none';
+      if (resultScreen) resultScreen.style.display = 'none';
+      if (startScreen) startScreen.style.display = 'flex';
+      if (gameHud) gameHud.style.display = 'none';
       const bottomHud = document.getElementById('bottom-hud');
-      if(bottomHud) bottomHud.style.display = 'none';
+      if (bottomHud) bottomHud.style.display = 'none';
     });
   }
   if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
@@ -402,10 +402,10 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     e.stopPropagation();
     playSE('cursor');
     if (gameState === 'playing' && !isPaused) pauseGame();
-    if(configModal) configModal.classList.add('active');
-    if(modalOverlay) modalOverlay.classList.add('active');
+    if (configModal) configModal.classList.add('active');
+    if (modalOverlay) modalOverlay.classList.add('active');
   };
-  
+
   if (_cfgBtn1) {
     _cfgBtn1.addEventListener('click', openConfig);
     _cfgBtn1.addEventListener('mousedown', (e) => e.stopPropagation());
@@ -421,8 +421,8 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     closeConfigBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      if(configModal) configModal.classList.remove('active');
-      if(modalOverlay) modalOverlay.classList.remove('active');
+      if (configModal) configModal.classList.remove('active');
+      if (modalOverlay) modalOverlay.classList.remove('active');
       if (gameState === 'playing' && isPaused && !document.getElementById('credits-modal')?.classList.contains('active') && !document.getElementById('retire-modal')?.classList.contains('active')) {
         resumeGame();
       }
@@ -480,11 +480,11 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       document.getElementById('modal-overlay')?.classList.remove('active');
       gameState = 'start';
       isPaused = false;
-      if(resultScreen) resultScreen.style.display = 'none';
-      if(startScreen) startScreen.style.display = 'flex';
-      if(gameHud) gameHud.style.display = 'none';
+      if (resultScreen) resultScreen.style.display = 'none';
+      if (startScreen) startScreen.style.display = 'flex';
+      if (gameHud) gameHud.style.display = 'none';
       const bottomHud = document.getElementById('bottom-hud');
-      if(bottomHud) bottomHud.style.display = 'none';
+      if (bottomHud) bottomHud.style.display = 'none';
     });
   }
 

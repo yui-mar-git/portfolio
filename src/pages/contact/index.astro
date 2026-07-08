@@ -5,6 +5,7 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
 let errorMsg = '';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
 if (Astro.request.method === 'POST') {
 try {
@@ -14,7 +15,9 @@ const token = data.get('cf-turnstile-response');
 if (!token) {
 errorMsg = 'Turnstileトークンが見つかりません。チェックボックスをオンにしてください。';
 } else {
-const secretKey = import.meta.env.TURNSTILE_SECRET_KEY;
+// 🌟【修正箇所】Cloudflare Pagesのランタイム変数と、ローカルの変数の両方に対応させる
+const secretKey = Astro.locals.runtime?.env?.TURNSTILE_SECRET_KEY || import.meta.env.TURNSTILE_SECRET_KEY;
+
 const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
 method: 'POST',
 headers: {
@@ -26,11 +29,13 @@ body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(tok
 const resultData = await result.json();
 
 if (resultData.success) {
-// トークン検証成功：本来はここでメール送信やDB保存の処理を行う
+// トークン検証成功：サンクスページへ
 const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
 return Astro.redirect(`${baseUrl}/contact/thanks/index.html`);
 } else {
-errorMsg = 'ボット判定されました。もう一度お試しください。';
+// エラー理由をより詳細に出力（デバッグ用）
+errorMsg = `ボット判定されました。理由: ${JSON.stringify(resultData['error-codes'] || resultData)} (Secret: ${secretKey ? '設定済' :
+'未設定'})`;
 console.error('Turnstile verification failed:', resultData);
 }
 }
@@ -39,6 +44,7 @@ console.error(err);
 errorMsg = '送信中にエラーが発生しました。';
 }
 }
+
 ---
 
 <BaseLayout title="Contact" pageId="contact">
@@ -75,7 +81,7 @@ errorMsg = '送信中にエラーが発生しました。';
 
           <button type="submit" class="btn btn-full" style="margin: 0 auto; margin-bottom: 1.5rem;">送信する</button>
 
-          <div class="cf-turnstile" data-sitekey="0x4AAAAAADyCTGLRYVvNAZlJ"
+          <div class="cf-turnstile" data-sitekey={siteKey}
             style="margin-bottom: 1.5rem; display: flex; justify-content: center;"></div>
 
           <p class="dummy-notice">
