@@ -42,7 +42,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     <Header activeId="portfolio" />
 
     <main class="container">
-      <div class="game-container" style="position: relative; height: 580px; overflow: hidden;" id="game-container">
+      <div id="global-game-scaler" style="width: 100%; overflow: hidden; position: relative; margin-top: 2rem;">
+        <div id="global-game-scaler-inner" style="transform-origin: top left; transition: transform 0.2s ease-out;">
+          <div class="game-container" style="position: relative; height: 580px; overflow: hidden; width: 800px; max-width: 800px; margin: 0 auto; border-radius: 8px;" id="game-container">
         <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
 
         <!-- ゲームヘッダーバー（ステータス常時表示） -->
@@ -511,6 +513,44 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         </div>
 
       </div><!-- /.game-container -->
+        </div><!-- /#global-game-scaler-inner -->
+      </div><!-- /#global-game-scaler -->
+
+      <script is:inline>
+        (function() {
+          function applyScale() {
+            const scaler = document.getElementById('global-game-scaler');
+            const inner = document.getElementById('global-game-scaler-inner');
+            if (!scaler || !inner) return;
+            
+            const container = inner.querySelector('.game-container') || inner.firstElementChild;
+            if (!container) return;
+            
+            const style = window.getComputedStyle(container);
+            const logicalWidth = parseInt(style.maxWidth) || parseInt(style.width) || 800;
+            const logicalHeight = container.offsetHeight || parseInt(style.height) || 580;
+            
+            const parentWidth = scaler.parentElement.clientWidth;
+            
+            if (parentWidth < logicalWidth) {
+              const scale = parentWidth / logicalWidth;
+              inner.style.width = `${logicalWidth}px`;
+              inner.style.transform = `scale(${scale})`;
+              scaler.style.height = `${logicalHeight * scale}px`;
+            } else {
+              inner.style.width = '100%';
+              inner.style.transform = 'none';
+              scaler.style.height = `${logicalHeight}px`;
+            }
+          }
+          
+          window.addEventListener('resize', applyScale);
+          document.addEventListener('DOMContentLoaded', applyScale);
+          setTimeout(applyScale, 100);
+          setTimeout(applyScale, 500);
+          window.addEventListener('load', applyScale);
+        })();
+      </script>
 
       <!-- ゲーム概要・使用技術セクション -->
       <section class="project-details">
@@ -883,7 +923,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     .game-container {
-      margin-top: 2rem;
+      margin-top: 0;
       background: var(--bg-secondary);
       border-radius: 12px;
       padding: 0;

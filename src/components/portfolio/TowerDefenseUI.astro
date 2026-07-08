@@ -283,8 +283,13 @@ import fighterImg from '../../assets/games/tower-defense/images/unit/figure_rpg_
 
   <style>
     /* タワーディフェンス個別のスタイル */
-    .game-container {
+    :global(.game-container) {
       height: 600px;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
     }
 
     /* overlay基底クラス: position:absolute で game-container を全面覆う。初期非表示。

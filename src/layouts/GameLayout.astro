@@ -49,7 +49,47 @@ const {
       <span class="page-label">{pageLabel}</span>
       <h1>{projectData ? projectData.title : title.split(' - ')[0]}</h1>
 
-      <slot />
+      <div id="global-game-scaler" style="width: 100%; overflow: hidden; position: relative;">
+        <div id="global-game-scaler-inner" style="transform-origin: top left; transition: transform 0.2s ease-out;">
+          <slot />
+        </div>
+      </div>
+
+      <script is:inline>
+        (function() {
+          function applyScale() {
+            const scaler = document.getElementById('global-game-scaler');
+            const inner = document.getElementById('global-game-scaler-inner');
+            if (!scaler || !inner) return;
+            
+            const container = inner.querySelector('.game-container') || inner.firstElementChild;
+            if (!container) return;
+            
+            const style = window.getComputedStyle(container);
+            const logicalWidth = parseInt(style.maxWidth) || parseInt(style.width) || 800;
+            const logicalHeight = container.offsetHeight || parseInt(style.height) || 600;
+            
+            const parentWidth = scaler.parentElement.clientWidth;
+            
+            if (parentWidth < logicalWidth) {
+              const scale = parentWidth / logicalWidth;
+              inner.style.width = `${logicalWidth}px`;
+              inner.style.transform = `scale(${scale})`;
+              scaler.style.height = `${logicalHeight * scale}px`;
+            } else {
+              inner.style.width = '100%';
+              inner.style.transform = 'none';
+              scaler.style.height = `${logicalHeight}px`;
+            }
+          }
+          
+          window.addEventListener('resize', applyScale);
+          document.addEventListener('DOMContentLoaded', applyScale);
+          setTimeout(applyScale, 100);
+          setTimeout(applyScale, 500);
+          window.addEventListener('load', applyScale);
+        })();
+      </script>
 
       <!-- プロジェクト概要・使用技術セクション -->
       <section class="project-details">

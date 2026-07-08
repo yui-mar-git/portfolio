@@ -10,15 +10,7 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
   const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
     const allProfileItems = profileResponse.contents;
 
-    // 資格以外のアイテムをカテゴリごとにグループ化
-    const groupedSkills = allProfileItems.reduce((acc, item) => {
-    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-    if (cat && !cat.includes('資格') && !cat.includes('検定')) {
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(item);
-    }
-    return acc;
-    }, {} as Record<string, MicroCMSProfile[]>);
+    // 資格以外のアイテムは静的にハードコードするため、ここではフェッチしたデータからフィルタリングしません。
 
       // 資格のグルーピング
       const certs = allProfileItems.filter(item => {
@@ -82,21 +74,50 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
                 <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>' )} />
               </section>
 
-              {Object.keys(groupedSkills).length > 0 && (
               <section>
                 <h2>使用技術・ツール</h2>
                 <div class="skill-grid">
-                  {Object.entries(groupedSkills).map(([category, items]) => (
-                  <div class="profile-card skill-card">
-                    <h3>{category}</h3>
+                  <div class="profile-card skill-card" style="width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+                    <h3>フロントエンド</h3>
                     <ul>
-                      {items.map(item => <li>{item.name}</li>)}
+                      <li><strong>HTML</strong></li>
+                      <li><strong>CSS</strong></li>
+                      <li><strong>JavaScript</strong></li>
+                      <li><strong>TypeScript</strong></li>
+                      <li><strong>Astro</strong></li>
+                      <li><strong>Phaser 3</strong></li>
                     </ul>
+                    
+                    <h3 style="margin-top: 1.5rem;">バックエンド・CMS</h3>
+                    <ul>
+                      <li><strong>Node.js</strong></li>
+                      <li style="opacity: 0.5;">PHP</li>
+                      <li><strong>microCMS</strong></li>
+                      <li style="opacity: 0.5;">WordPress</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 1.5rem;">インフラ・ホスティング</h3>
+                    <ul>
+                      <li><strong>Cloudflare (Pages / Turnstile)</strong></li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 1.5rem;">開発環境・ツール</h3>
+                    <ul>
+                      <li><strong>GitHub</strong></li>
+                      <li><strong>Google Antigravity</strong></li>
+                      <li style="opacity: 0.5;">Cursor</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 1.5rem;">デザイン</h3>
+                    <ul>
+                      <li style="opacity: 0.5;">Figma</li>
+                      <li style="opacity: 0.5;">Photoshop</li>
+                    </ul>
+                    
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2rem; text-align: right;">※本ページで使用していないものは薄文字</p>
                   </div>
-                  ))}
                 </div>
               </section>
-              )}
 
               <section>
                 <h2>保有資格・検定</h2>
