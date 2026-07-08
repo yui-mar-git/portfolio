@@ -1,11 +1,49 @@
 ---
+export const prerender = false;
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
+
+let errorMsg = '';
+
+if (Astro.request.method === 'POST') {
+try {
+const data = await Astro.request.formData();
+const token = data.get('cf-turnstile-response');
+
+if (!token) {
+errorMsg = 'Turnstileトークンが見つかりません。チェックボックスをオンにしてください。';
+} else {
+const secretKey = import.meta.env.TURNSTILE_SECRET_KEY;
+const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(token.toString())}`
+});
+
+const resultData = await result.json();
+
+if (resultData.success) {
+// トークン検証成功：本来はここでメール送信やDB保存の処理を行う
+const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
+return Astro.redirect(`${baseUrl}/contact/thanks/index.html`);
+} else {
+errorMsg = 'ボット判定されました。もう一度お試しください。';
+console.error('Turnstile verification failed:', resultData);
+}
+}
+} catch (err) {
+console.error(err);
+errorMsg = '送信中にエラーが発生しました。';
+}
+}
 ---
 
 <BaseLayout title="Contact" pageId="contact">
   <Header activeId="contact" />
+  <script slot="head" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
   <main class="container">
     <article>
@@ -14,26 +52,38 @@ import Footer from '@/components/Footer.astro';
       <section class="hero">
         <p>お仕事のご依頼やご相談は、こちらのフォームからお気軽にご連絡ください。</p>
 
-        <div class="contact-form-container">
+        {errorMsg && (
+        <div
+          style="background: #ffcccc; color: #cc0000; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; text-align: center;">
+          {errorMsg}
+        </div>
+        )}
+
+        <form method="POST" class="contact-form-container">
           <div class="form-group">
             <label class="form-label">お名前</label>
-            <input type="text" class="form-control" placeholder="山田 太郎">
+            <input type="text" class="form-control" name="name" placeholder="山田 太郎">
           </div>
           <div class="form-group">
             <label class="form-label">メールアドレス</label>
-            <input type="email" class="form-control" placeholder="example@email.com">
+            <input type="email" class="form-control" name="email" placeholder="example@email.com">
           </div>
           <div class="form-group-last">
             <label class="form-label">メッセージ</label>
-            <textarea rows="5" class="form-control" placeholder="ご用件をご記入ください"></textarea>
+            <textarea rows="5" class="form-control" name="message" placeholder="ご用件をご記入ください"></textarea>
           </div>
-          <a href={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/contact/thanks/index.html`} class="btn btn-full" style="margin: 0 auto;">送信する</a>
+
+          <button type="submit" class="btn btn-full" style="margin: 0 auto; margin-bottom: 1.5rem;">送信する</button>
+
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAADyCTGLRYVvNAZlJ"
+            style="margin-bottom: 1.5rem; display: flex; justify-content: center;"></div>
+
           <p class="dummy-notice">
             ※このフォームはポートフォリオ用のデモ（ダミー）です。<br>
             実際にはどこにもメールは送信されず、データが保存されることもありません。<br>
             送信ボタンを押すと、完了ページ（サンクスページ）のデザインサンプルに遷移します。
           </p>
-        </div>
+        </form>
       </section>
     </article>
   </main>
