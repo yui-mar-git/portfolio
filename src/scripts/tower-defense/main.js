@@ -1,836 +1,1115 @@
-    const STORAGE_KEY = 'td_save_data';
-    let saveData = {
-      gold: 0,
-      clearedStage: 0,
-      levels: { hero: 1, sword: 1, fighter: 1, mage: 1 },
-      unlocked: { hero: false, sword: true, fighter: false, mage: true }
-    };
+/**
+ * ==========================================
+ * タワーディフェンス・横スクロール・基礎ロジック
+ * ==========================================
+ */
 
-    function loadSaveData() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try { saveData = { ...saveData, ...JSON.parse(saved) }; } catch (e) { }
-      }
-      if (!saveData.levels) saveData.levels = { hero: 1, sword: 1, fighter: 1, mage: 1 };
-      if (!saveData.unlocked) saveData.unlocked = { hero: false, sword: true, fighter: false, mage: true };
-      updateMapUI();
-      updateUpgradeUI();
-      updateDeckUI();
-    }
+const STORAGE_KEY = 'td_save_data';
+let saveData = {
+  gold: 0,
+  clearedStage: 0,
+  levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 }
+};
 
-    function saveGame() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
-      updateMapUI();
-      updateUpgradeUI();
-      updateDeckUI();
-    }
+function loadSaveData() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try { saveData = { ...saveData, ...JSON.parse(saved) }; } catch (e) { }
+  }
+  if (!saveData.levels) saveData.levels = { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 };
+  const legacyBase = saveData.levels.base || 1;
+  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+    if (!saveData.levels[type]) saveData.levels[type] = 1;
+  });
+  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach(type => {
+    if (!saveData.levels[type]) saveData.levels[type] = legacyBase;
+  });
+  updateMapUI();
+  updateUpgradeUI();
+  updateDeckUI();
+}
 
-    const BASE_UNIT_DB = {
-      'sword': { cost: 40, hp: 150, attack: 15, cooldown: 1000, speed: 50, range: 60, width: 60, height: 60, attackSE: 'strike', image: 'img_sword', type: 'aoe' },
-      'mage': { cost: 120, hp: 40, attack: 25, cooldown: 2000, speed: 40, range: 400, width: 60, height: 60, attackSE: 'magic', image: 'img_mage', type: 'projectile' },
-      'fighter': { cost: 20, hp: 60, attack: 10, cooldown: 400, speed: 80, range: 40, width: 60, height: 60, attackSE: 'punch', image: 'img_fighter', type: 'single' },
-      'hero': { cost: 150, hp: 200, attack: 30, cooldown: 800, speed: 45, range: 80, width: 60, height: 60, attackSE: 'strike', image: 'img_hero', type: 'single' }
-    };
+function saveGame() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+  updateMapUI();
+  updateUpgradeUI();
+  updateDeckUI();
+}
 
-    function getUnitData(type) {
-      const base = BASE_UNIT_DB[type];
-      const lv = saveData.levels[type] || 1;
-      return {
-        ...base,
-        hp: Math.floor(base.hp * (1 + (lv - 1) * 0.2)),
-        attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2))
+const BASE_UNIT_DB = {
+  'sword': { cost: 130, hp: 100, attack: 20, cooldown: 666, speed: 50, range: 80, texture: 'unit_sword', height: 80, attackSE: 'strike' },
+  'shield': { cost: 50, hp: 200, attack: 20, cooldown: 1000, speed: 30, range: 60, texture: 'unit_shield', height: 90, attackSE: 'smite' },
+  'mage': { cost: 90, hp: 30, attack: 15, cooldown: 3000, speed: 25, range: 200, texture: 'unit_mage', height: 80, attackSE: 'energyball' },
+  'butouka': { cost: 20, hp: 50, attack: 15, cooldown: 333, speed: 80, range: 60, texture: 'unit_butouka', height: 70, attackSE: 'strike' }
+};
+
+function getUnitData(type) {
+  const base = BASE_UNIT_DB[type];
+  const lv = saveData.levels[type] || 1;
+  const baseStatsLv = saveData.levels['baseStats'] || 1;
+  const globalBuff = 1 + (baseStatsLv - 1) * 0.05;
+  return {
+    ...base,
+    originalType: type,
+    hp: Math.floor(base.hp * (1 + (lv - 1) * 0.2) * globalBuff),
+    attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2) * globalBuff)
+  };
+}
+
+let コスト = 0;
+const コストDisplay = document.getElementById('コスト-display');
+const waveDisplay = document.getElementById('wave-display');
+const goldDisplay = document.getElementById('gold-display');
+const btnSpawnSword = document.getElementById('btn-spawn-sword');
+const btnSpawnShield = document.getElementById('btn-spawn-shield');
+const btnSpawnMage = document.getElementById('btn-spawn-mage');
+const btnSpawnButouka = document.getElementById('btn-spawn-butouka');
+
+function updateDeckUI() {
+  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+    const data = getUnitData(type);
+    const hpEl = document.getElementById(`stat-${type}-hp`);
+    const atkEl = document.getElementById(`stat-${type}-atk`);
+    if (hpEl) hpEl.textContent = data.hp;
+    if (atkEl) atkEl.textContent = data.attack;
+  });
+  if (goldDisplay) goldDisplay.textContent = saveData.gold;
+
+  const btnSword = document.getElementById('btn-spawn-sword');
+  const btnButouka = document.getElementById('btn-spawn-butouka');
+  if (btnButouka) btnButouka.style.display = saveData.clearedStage >= 1 ? '' : 'none';
+  if (btnSword) btnSword.style.display = saveData.clearedStage >= 2 ? '' : 'none';
+}
+
+function updateMapUI() {
+  const btnRetire = document.getElementById('btn-retire');
+  if (btnRetire) btnRetire.style.display = 'none';
+  const mapGold = document.getElementById('map-gold');
+  if (mapGold) mapGold.textContent = saveData.gold;
+
+  const btnStage1 = document.getElementById('btn-stage1');
+  const btnStage2 = document.getElementById('btn-stage2');
+  const btnStage3 = document.getElementById('btn-stage3');
+
+  if (btnStage1) {
+    btnStage1.className = saveData.clearedStage >= 1 ? 'btn btn-primary' : 'btn btn-stage';
+  }
+
+  if (btnStage2) {
+    const isUnlocked = saveData.clearedStage >= 1;
+    const isCleared = saveData.clearedStage >= 2;
+    if (isCleared) btnStage2.className = 'btn btn-primary';
+    else if (isUnlocked) btnStage2.className = 'btn btn-stage';
+    else btnStage2.className = 'btn btn-stage locked';
+    btnStage2.disabled = !isUnlocked;
+  }
+
+  if (btnStage3) {
+    const isUnlocked = saveData.clearedStage >= 2;
+    const isCleared = saveData.clearedStage >= 3;
+    if (isCleared) btnStage3.className = 'btn btn-primary';
+    else if (isUnlocked) btnStage3.className = 'btn btn-stage';
+    else btnStage3.className = 'btn btn-stage locked';
+    btnStage3.disabled = !isUnlocked;
+  }
+}
+
+function updateUpgradeUI() {
+  const upgGold = document.getElementById('upgrade-gold-display');
+  if (upgGold) upgGold.textContent = saveData.gold;
+
+  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+    const lv = saveData.levels[type];
+    const cost = lv * 100;
+    const data = getUnitData(type);
+
+    const lvEl = document.getElementById(`lv-${type}`);
+    const costEl = document.getElementById(`cost-${type}`);
+    const hpEl = document.getElementById(`upg-hp-${type}`);
+    const atkEl = document.getElementById(`upg-atk-${type}`);
+    const spdEl = document.getElementById(`upg-spd-${type}`);
+    const btnUpg = document.getElementById(`btn-upg-${type}`);
+
+    if (lvEl) lvEl.textContent = lv;
+    if (costEl) costEl.textContent = cost;
+    if (hpEl) hpEl.textContent = data.hp;
+    if (atkEl) atkEl.textContent = data.attack;
+    if (spdEl) spdEl.textContent = data.speed;
+    if (btnUpg) {
+      btnUpg.disabled = saveData.gold < cost;
+      btnUpg.onclick = () => {
+        if (saveData.gold >= cost) {
+          saveData.gold -= cost;
+          saveData.levels[type]++;
+          playSE('confirm');
+          saveGame();
+        }
       };
     }
+  });
 
-    let mana = 0;
-    const manaDisplay = document.getElementById('mana-display');
-    const waveDisplay = document.getElementById('wave-display');
-    const goldDisplay = document.getElementById('gold-display');
-    const btnSpawnHero = document.getElementById('btn-spawn-hero');
-    const btnSpawnSword = document.getElementById('btn-spawn-sword');
-    const btnSpawnFighter = document.getElementById('btn-spawn-fighter');
-    const btnSpawnMage = document.getElementById('btn-spawn-mage');
+  // Base Upgrade
+  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach(type => {
+    const baseLv = saveData.levels[type] || 1;
+    const baseCost = Math.floor(500 * Math.pow(1.05, baseLv - 1));
+    const kebab = type.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
+    const upgLv = document.getElementById(`upg-lv-${kebab}`);
+    const upgCost = document.getElementById(`cost-${kebab}`);
+    const btnUpg = document.getElementById(`btn-upg-${kebab}`);
 
-    function updateDeckUI() {
-      ['hero', 'sword', 'fighter', 'mage'].forEach(type => {
-        const data = getUnitData(type);
-        const hpEl = document.getElementById(`stat-${type}-hp`);
-        const atkEl = document.getElementById(`stat-${type}-atk`);
-        const costEl = document.getElementById(`stat-${type}-cost`);
-        if (hpEl) hpEl.textContent = data.hp;
-        if (atkEl) atkEl.textContent = data.attack;
-        if (costEl) costEl.textContent = data.cost;
-
-        const btn = document.getElementById(`btn-spawn-${type}`);
-        if (btn) {
-          btn.style.display = saveData.unlocked[type] ? 'block' : 'none';
+    if (upgLv) upgLv.textContent = baseLv;
+    if (upgCost) upgCost.textContent = baseCost;
+    if (btnUpg) {
+      btnUpg.disabled = saveData.gold < baseCost;
+      btnUpg.onclick = () => {
+        if (saveData.gold >= baseCost) {
+          saveData.gold -= baseCost;
+          saveData.levels[type]++;
+          playSE('confirm');
+          saveGame();
+          updateUpgradeUI();
         }
-      });
-      if (goldDisplay) goldDisplay.textContent = saveData.gold;
+      };
+    }
+  });
+
+  const upgButouka = document.getElementById('upg-container-butouka');
+  const upgSword = document.getElementById('upg-container-sword');
+  if (upgButouka) upgButouka.style.display = saveData.clearedStage >= 1 ? '' : 'none';
+  if (upgSword) upgSword.style.display = saveData.clearedStage >= 2 ? '' : 'none';
+}
+
+// Audio setup
+let configBgmVolume = 0.1;
+let configSeVolume = 0.5;
+let currentBgmAudio = null;
+let currentJingleAudio = null;
+
+import seCursor from '../../assets/games/tower-defense/audio/se/カーソル移動7.mp3';
+import seConfirm from '../../assets/games/tower-defense/audio/se/決定ボタンを押す2.mp3';
+import seCancel from '../../assets/games/tower-defense/audio/se/キャンセル1.mp3';
+import seInvalid from '../../assets/games/tower-defense/audio/se/ビープ音4.mp3';
+import seStrike from '../../assets/games/tower-defense/audio/se/剣で斬る2.mp3';
+import seSmite from '../../assets/games/tower-defense/audio/se/打撃6.mp3';
+import sePunch from '../../assets/games/tower-defense/audio/se/小パンチ.mp3';
+import seMagic from '../../assets/games/tower-defense/audio/se/風魔法1.mp3';
+import seEnergyBall from '../../assets/games/tower-defense/audio/se/気弾1.mp3';
+import seVictory from '../../assets/games/tower-defense/audio/se/maou_game_jingle01.mp3';
+import seDefeat from '../../assets/games/tower-defense/audio/se/maou_game_jingle08.mp3';
+import seWaveNext from '../../assets/games/tower-defense/audio/se/決定ボタンを押す33.mp3';
+
+import bgmWave1 from '../../assets/games/tower-defense/audio/bgm/maou_game_field05.mp3';
+import bgmWave2 from '../../assets/games/tower-defense/audio/bgm/maou_game_field11.mp3';
+import bgmWave3 from '../../assets/games/tower-defense/audio/bgm/maou_game_boss02.mp3';
+
+const SE_DB = {
+  'cursor': seCursor,
+  'confirm': seConfirm,
+  'cancel': seCancel,
+  'invalid': seInvalid,
+  'strike': seStrike,
+  'smite': seSmite,
+  'punch': sePunch,
+  'magic': seMagic,
+  'energyball': seEnergyBall,
+  'victory': seVictory,
+  'defeat': seDefeat,
+  'wave_next': seWaveNext
+};
+
+const BGM_DB = {
+  'wave1': bgmWave1,
+  'wave2': bgmWave2,
+  'wave3': bgmWave3
+};
+
+function playSE(key) {
+  if (!SE_DB[key]) return;
+  const audio = new Audio(SE_DB[key]);
+  audio.volume = configSeVolume;
+  if (key === 'victory' || key === 'defeat') {
+    if (currentJingleAudio) {
+      currentJingleAudio.pause();
+      currentJingleAudio.currentTime = 0;
+    }
+    currentJingleAudio = audio;
+  }
+  audio.play().catch(e => console.log('SE play failed:', e));
+  return audio;
+}
+
+function playBGM(bgmId) {
+  if (currentBgmAudio) currentBgmAudio.pause();
+  if (!bgmId || !BGM_DB[bgmId]) return;
+  currentBgmAudio = new Audio(BGM_DB[bgmId]);
+  currentBgmAudio.volume = configBgmVolume;
+  currentBgmAudio.loop = true;
+  currentBgmAudio.play().catch(e => console.log('BGM Play blocked:', e));
+}
+
+function stopBGM() {
+  if (currentBgmAudio) currentBgmAudio.pause();
+}
+
+let activeStage = 1;
+
+import imgUnitSword from '../../assets/games/tower-defense/images/unit/figure_rpg_character_yuusya.png';
+import imgUnitShield from '../../assets/games/tower-defense/images/unit/figure_rpg_character_kenshi.png';
+import imgUnitMage from '../../assets/games/tower-defense/images/unit/figure_rpg_character_mahoutsukai.png';
+import imgUnitButouka from '../../assets/games/tower-defense/images/unit/figure_rpg_character_butouka.png';
+import imgEnemySlime from '../../assets/games/tower-defense/images/enemy/fantasy_game_character_slime.png';
+import imgEnemyGoblin from '../../assets/games/tower-defense/images/enemy/fantasy_goblin.png';
+import imgEnemyOgre from '../../assets/games/tower-defense/images/enemy/fantasy_ogre.png';
+import imgEnemyOrc from '../../assets/games/tower-defense/images/enemy/fantasy_orc.png';
+
+class BootScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'BootScene' });
+  }
+  create() {
+    // マップ画面など、ゲーム外の時はこの空のシーンを回しておく
+    this.cameras.main.setBackgroundColor('#1a1a2e');
+  }
+}
+
+class MainScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'MainScene' });
+  }
+
+  preload() {
+    this.load.image('unit_sword', imgUnitSword.src);
+    this.load.image('unit_shield', imgUnitShield.src);
+    this.load.image('unit_mage', imgUnitMage.src);
+    this.load.image('unit_butouka', imgUnitButouka.src);
+
+    this.load.image('enemy_slime', imgEnemySlime.src);
+    this.load.image('enemy_goblin', imgEnemyGoblin.src);
+    this.load.image('enemy_ogre', imgEnemyOgre.src);
+    this.load.image('enemy_orc', imgEnemyOrc.src);
+  }
+
+  create() {
+    let skyColor = '#87CEEB';
+    let groundColor = 0x228B22;
+
+    if (activeStage === 2) {
+      skyColor = '#FF7F50'; // 夕方（コーラル）
+      groundColor = 0x6B5E2F; // 夕日に照らされた地面
+    } else if (activeStage === 3) {
+      skyColor = '#191970'; // 夜（ミッドナイトブルー）
+      groundColor = 0x1A2A1A; // 暗い地面
     }
 
-    function updateMapUI() {
-      document.getElementById('btn-retire').style.display = 'none';
+    this.cameras.main.setBackgroundColor(skyColor);
+    const ground = this.add.rectangle(400, 515, 800, 170, groundColor);
 
-      const mapGold = document.getElementById('map-gold');
-      if (mapGold) mapGold.textContent = saveData.gold;
+    // 簡易的な拠点のグラフィック（塔と入り口）
+    const towerColor = 0x8B4513; // 茶色
+    const towerLineColor = 0x4A2511;
 
-      const btnStage1 = document.getElementById('btn-stage1');
-      const btnStage2 = document.getElementById('btn-stage2');
-      const btnStage3 = document.getElementById('btn-stage3');
+    // 塔本体
+    const baseTower = this.add.rectangle(0, 430, 90, 240, towerColor);
+    baseTower.setOrigin(0, 1);
+    baseTower.setStrokeStyle(2, towerLineColor);
 
-      if (btnStage1) {
-        if (saveData.clearedStage >= 1) {
-          btnStage1.className = 'btn btn-primary';
-          btnStage1.innerHTML = '繧ｹ繝・・繧ｸ1 (蟷ｳ蜴・ <span style="color:#ffd700">笘・/span>';
-          btnStage1.style.backgroundColor = '#28a745';
-          btnStage1.style.borderColor = '#28a745';
-        } else {
-          btnStage1.className = 'btn btn-primary';
-          btnStage1.innerHTML = '繧ｹ繝・・繧ｸ1 (蟷ｳ蜴・';
-          btnStage1.style.backgroundColor = '';
-          btnStage1.style.borderColor = '';
-        }
-      }
+    // せり出し部分（バルコニー状）
+    const baseOverhang = this.add.rectangle(0, 190, 110, 20, towerColor);
+    baseOverhang.setOrigin(0, 1);
+    baseOverhang.setStrokeStyle(2, towerLineColor);
 
-      if (btnStage2) {
-        if (saveData.clearedStage >= 2) {
-          btnStage2.disabled = false;
-          btnStage2.className = 'btn btn-primary';
-          btnStage2.innerHTML = '繧ｹ繝・・繧ｸ2 (譽ｮ) <span style="color:#ffd700">笘・/span>';
-          btnStage2.style.backgroundColor = '#28a745';
-          btnStage2.style.borderColor = '#28a745';
-        } else if (saveData.clearedStage >= 1) {
-          btnStage2.disabled = false;
-          btnStage2.className = 'btn btn-primary';
-          btnStage2.innerHTML = '繧ｹ繝・・繧ｸ2 (譽ｮ)';
-          btnStage2.style.backgroundColor = '';
-          btnStage2.style.borderColor = '';
-        } else {
-          btnStage2.disabled = true;
-          btnStage2.className = 'btn btn-secondary';
-          btnStage2.innerHTML = '繧ｹ繝・・繧ｸ2 (譽ｮ)';
-          btnStage2.style.backgroundColor = '';
-          btnStage2.style.borderColor = '';
-        }
-      }
+    // 塔頭（塔本体と同じ幅）
+    const baseTop = this.add.rectangle(0, 170, 90, 40, towerColor);
+    baseTop.setOrigin(0, 1);
+    baseTop.setStrokeStyle(2, towerLineColor);
 
-      if (btnStage3) {
-        if (saveData.clearedStage >= 3) {
-          btnStage3.disabled = false;
-          btnStage3.className = 'btn btn-primary';
-          btnStage3.innerHTML = '繧ｹ繝・・繧ｸ3 (螻ｱ) <span style="color:#ffd700">笘・/span>';
-          btnStage3.style.backgroundColor = '#28a745';
-          btnStage3.style.borderColor = '#28a745';
-        } else if (saveData.clearedStage >= 2) {
-          btnStage3.disabled = false;
-          btnStage3.className = 'btn btn-primary';
-          btnStage3.innerHTML = '繧ｹ繝・・繧ｸ3 (螻ｱ)';
-          btnStage3.style.backgroundColor = '';
-          btnStage3.style.borderColor = '';
-        } else {
-          btnStage3.disabled = true;
-          btnStage3.className = 'btn btn-secondary';
-          btnStage3.innerHTML = '繧ｹ繝・・繧ｸ3 (螻ｱ)';
-          btnStage3.style.backgroundColor = '';
-          btnStage3.style.borderColor = '';
-        }
-      }
+    // 入り口
+    const baseEntrance = this.add.rectangle(50, 430, 50, 70, 0x111111);
+    baseEntrance.setOrigin(0.5, 1);
+
+    // Generate projectile texture if not exists
+    if (!this.textures.exists('magic_orb')) {
+      const g = this.make.graphics({ x: 0, y: 0, add: false });
+      g.fillStyle(0x88ccff, 1); g.fillCircle(10, 10, 10);
+      g.fillStyle(0xffffff, 0.8); g.fillCircle(10, 10, 5);
+      g.generateTexture('magic_orb', 20, 20);
+      
+      const gSlashD = this.make.graphics({ x: 0, y: 0, add: false });
+      gSlashD.lineStyle(4, 0xffffff, 1);
+      gSlashD.beginPath(); gSlashD.moveTo(0,0); gSlashD.lineTo(30,30); gSlashD.strokePath();
+      gSlashD.generateTexture('fx_slash', 30, 30);
+      
+      const gBurst = this.make.graphics({ x: 0, y: 0, add: false });
+      gBurst.fillStyle(0xffaa00, 1); gBurst.fillCircle(10, 10, 10);
+      gBurst.fillStyle(0xffffff, 0.9); gBurst.fillCircle(10, 10, 5);
+      gBurst.generateTexture('fx_burst', 20, 20);
+      
+      const gSlashL = this.make.graphics({ x: 0, y: 0, add: false });
+      gSlashL.lineStyle(8, 0x00ffff, 1);
+      gSlashL.beginPath(); gSlashL.moveTo(0, 10); gSlashL.lineTo(100, 10); gSlashL.strokePath();
+      gSlashL.generateTexture('fx_slash_long', 100, 20);
     }
 
-    function updateUpgradeUI() {
-      const upgGold = document.getElementById('upg-gold');
-      if (upgGold) upgGold.textContent = saveData.gold;
+    this.allies = this.physics.add.group();
+    this.enemies = this.physics.add.group();
+    this.projectiles = this.physics.add.group();
 
-      ['hero', 'sword', 'fighter', 'mage'].forEach(type => {
-        const lv = saveData.levels[type] || 1;
-        const isUnlocked = saveData.unlocked[type];
+    this.physics.add.overlap(this.projectiles, this.enemies, this.handleProjectileHit, null, this);
 
-        const lvEl = document.getElementById(`lv-${type}`);
-        const costEl = document.getElementById(`cost-${type}`);
-        const btnUpg = document.getElementById(`btn-upg-${type}`);
-        const itemContainer = document.getElementById(`upg-item-${type}`);
-        const lvLabel = document.getElementById(`upg-lv-label-${type}`);
+    const baseCostLv = saveData.levels?.baseCost || 1;
+    const costBuff = 1 + (baseCostLv - 1) * 0.05;
+    const baseHpLv = saveData.levels?.baseHp || 1;
 
-        // Update stats on card
-        const data = getUnitData(type);
-        const hpEl = document.getElementById(`upg-stat-${type}-hp`);
-        const atkEl = document.getElementById(`upg-stat-${type}-atk`);
-        const uCostEl = document.getElementById(`upg-stat-${type}-cost`);
-        if (hpEl) hpEl.textContent = data.hp;
-        if (atkEl) atkEl.textContent = data.attack;
-        if (uCostEl) uCostEl.textContent = data.cost;
+    this.currentWave = 1;
+    this.maxWaves = activeStage === 3 ? 3 : (activeStage === 2 ? 2 : 1);
+    this.enemiesSpawned = 0;
+    this.enemiesToSpawn = 10;
+    コスト = Math.floor(100 * costBuff);
+    this.isGameOver = false;
 
-        if (lvEl) lvEl.textContent = lv;
+    this.maxBaseHp = 3 + (baseHpLv - 1);
+    this.currentBaseHp = this.maxBaseHp;
 
-        if (btnUpg && itemContainer) {
-          if (!isUnlocked) {
-            // 未解禁ゞI
-            if (saveData.clearedStage >= 1) {
-              itemContainer.style.display = 'flex';
-              itemContainer.style.filter = 'grayscale(100%)';
-              itemContainer.style.opacity = '0.7';
-              if (lvLabel) lvLabel.textContent = '未解禁・;
-              if (lvEl) lvEl.textContent = '';
-
-              const unlockCost = type === 'hero' ? 500 : 200;
-              if (costEl) costEl.textContent = unlockCost;
-              btnUpg.innerHTML = `解禁・(<span id="cost-${type}">${unlockCost}</span>G)`;
-              btnUpg.disabled = saveData.gold < unlockCost;
-              btnUpg.onclick = () => {
-                if (saveData.gold >= unlockCost) {
-                  saveData.gold -= unlockCost;
-                  saveData.unlocked[type] = true;
-                  playSE('confirm');
-                  saveGame(); // this will call updateUpgradeUI again
-                }
-              };
-            } else {
-              itemContainer.style.display = 'none'; // ステージ1クリア前は見せない
-            }
-          } else {
-            // 強化剖I
-            itemContainer.style.display = 'flex';
-            const cost = lv * 100;
-            if (costEl) costEl.textContent = cost;
-            btnUpg.innerHTML = `強化・(<span id="cost-${type}">${cost}</span>G)`;
-            btnUpg.disabled = saveData.gold < cost;
-            btnUpg.onclick = () => {
-              if (saveData.gold >= cost) {
-                saveData.gold -= cost;
-                saveData.levels[type]++;
-                playSE('confirm');
-                saveGame();
-              }
-            };
-          }
-        }
-      });
-    }
-
-    // Audio setup
-    let configBgmVolume = 0.1;
-    let configSeVolume = 0.5;
-    let currentBgmAudio = null;
-
-    const BGM_PATH = '/portfolio/common/assets/audio/bgm/';
-    const SE_PATH = '/portfolio/common/assets/audio/se/';
-
-    const SE_DB = {
-      'cursor': '繧ｫ繝ｼ繧ｽ繝ｫ遘ｻ蜍・.mp3',
-      'confirm': '豎ｺ螳壹・繧ｿ繝ｳ繧呈款縺・.mp3',
-      'cancel': '繧ｭ繝｣繝ｳ繧ｻ繝ｫ1.mp3',
-      'invalid': '繝薙・繝鈴浹4.mp3',
-      'strike': '蜑｣縺ｧ譁ｬ繧・.mp3',
-      'smite': '謇捺茶6.mp3',
-      'punch': '蟆上ヱ繝ｳ繝・mp3',
-      'magic': '鬚ｨ鬲疲ｳ・.mp3',
-      'victory': 'maou_game_jingle01.mp3',
-      'defeat': 'maou_game_jingle08.mp3'
-    };
-
-    const BGM_DB = {
-      'wave1': 'maou_game_field05.mp3',
-      'wave2': 'maou_game_field11.mp3',
-      'wave3': 'maou_game_boss02.mp3'
-    };
-
-    function playSE(seId) {
-      if (!SE_DB[seId]) return;
-      const se = new Audio(SE_PATH + SE_DB[seId]);
-      se.volume = configSeVolume;
-      se.play().catch(e => console.log('SE play failed:', e));
-    }
-
-    function playBGM(bgmId) {
-      if (currentBgmAudio) currentBgmAudio.pause();
-      if (!bgmId || !BGM_DB[bgmId]) return;
-      currentBgmAudio = new Audio(BGM_PATH + BGM_DB[bgmId]);
-      currentBgmAudio.volume = configBgmVolume;
-      currentBgmAudio.loop = true;
-      currentBgmAudio.play().catch(e => console.log('BGM Play blocked:', e));
-    }
-
-    function stopBGM() {
-      if (currentBgmAudio) currentBgmAudio.pause();
-    }
-
-    let activeStage = 1;
-
-    class MainScene extends Phaser.Scene {
-      constructor() {
-        super({ key: 'MainScene' });
-      }
-
-      preload() {
-        // 繧ｭ繝｣繝ｩ繧ｯ繧ｿ繝ｼ逕ｻ蜒剰ｪｭ縺ｿ霎ｼ縺ｿ
-        this.load.image('img_hero', '/portfolio/roguelike/assets/characters/figure_rpg_character_yuusya.png');
-        this.load.image('img_sword', '/portfolio/roguelike/assets/characters/figure_rpg_character_kenshi.png');
-        this.load.image('img_fighter', '/portfolio/roguelike/assets/characters/figure_rpg_character_butouka.png');
-        this.load.image('img_mage', '/portfolio/roguelike/assets/characters/figure_rpg_character_mahoutsukai.png');
-
-        // 繝｢繝ｳ繧ｹ繧ｿ繝ｼ逕ｻ蜒剰ｪｭ縺ｿ霎ｼ縺ｿ
-        this.load.image('img_slime', '/portfolio/roguelike/assets/monsters/fantasy_game_character_slime.png');
-        this.load.image('img_goblin', '/portfolio/roguelike/assets/monsters/fantasy_goblin.png');
-        this.load.image('img_ogre', '/portfolio/roguelike/assets/monsters/fantasy_ogre.png');
-      }
-
-      create() {
-        // 繝舌ャ繧ｯ繧ｰ繝ｩ繧ｦ繝ｳ繝峨〒荳譎ょ●豁｢縺励↑縺・ｈ縺・↓險ｭ螳・
-        this.game.events.off('hidden');
-        this.game.events.off('blur');
-
-        this.cameras.main.setBackgroundColor('#87CEEB');
-        // Clouds
-        this.clouds = [];
-        for (let i = 0; i < 5; i++) {
-          const cloud = this.add.ellipse(Phaser.Math.Between(0, 800), Phaser.Math.Between(50, 200), Phaser.Math.Between(80, 150), Phaser.Math.Between(40, 60), 0xffffff);
-          cloud.setAlpha(0.8);
-          cloud.speed = Phaser.Math.FloatBetween(0.2, 0.8);
-          this.clouds.push(cloud);
-        }
-
-        // Ground
-        const ground = this.add.rectangle(400, 500, 800, 200, 0x228B22);
-
-        // Base / Castle
-        this.add.rectangle(40, 320, 80, 160, 0x888888); // Tower body
-        this.add.triangle(40, 220, 0, 40, 40, 0, 80, 40, 0xaa0000); // Tower roof
-
-        this.allies = this.physics.add.group();
-        this.enemies = this.physics.add.group();
-        this.projectiles = this.physics.add.group();
-
-        this.physics.add.overlap(this.projectiles, this.enemies, (proj, enemy) => {
-          if (!proj.hitEnemies.has(enemy)) {
-            proj.hitEnemies.add(enemy);
-            this.damageEnemy(enemy, proj.attack);
-          }
-        });
-
-        this.currentWave = 1;
-        this.maxWaves = activeStage === 3 ? 3 : (activeStage === 2 ? 2 : 1);
-        this.enemiesSpawned = 0;
-        this.enemiesToSpawn = 10;
-        mana = 50;
-        this.isGameOver = false;
-
-        this.time.addEvent({
-          delay: 1000,
-          callback: () => {
-            if (this.isGameOver) return;
-            mana += 10;
-            this.updateUI();
-          },
-          loop: true
-        });
-
-        this.spawnTimer = this.time.addEvent({
-          delay: 3000,
-          callback: this.spawnEnemy,
-          callbackScope: this,
-          loop: true
-        });
-
-        const spawnAlly = (type) => {
-          if (this.isGameOver) return;
-          const unit = getUnitData(type);
-          if (mana >= unit.cost) {
-            mana -= unit.cost;
-            this.updateUI();
-            this.createAlly(unit);
-            playSE('confirm');
-          } else {
-            playSE('invalid');
-          }
-        };
-
-        if (btnSpawnHero) btnSpawnHero.onclick = () => spawnAlly('hero');
-        if (btnSpawnSword) btnSpawnSword.onclick = () => spawnAlly('sword');
-        if (btnSpawnFighter) btnSpawnFighter.onclick = () => spawnAlly('fighter');
-        if (btnSpawnMage) btnSpawnMage.onclick = () => spawnAlly('mage');
-
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        if (this.isGameOver) return;
+        コスト += Math.floor(10 * costBuff);
         this.updateUI();
-        this.startWave(1, false);
-        this.scene.pause();
+      },
+      loop: true
+    });
+
+    this.spawnTimer = this.time.addEvent({
+      delay: 3000,
+      callback: this.spawnEnemy,
+      callbackScope: this,
+      loop: true
+    });
+
+    const spawnAlly = (type) => {
+      if (this.isGameOver) return;
+      const unit = getUnitData(type);
+      const currentCost = this.getCurrentUnitCost(type);
+      if (コスト >= currentCost) {
+        コスト -= currentCost;
+        this.createAlly(unit);
+        playSE('confirm');
+        this.updateUI();
+      } else {
+        playSE('invalid');
       }
+    };
 
-      startWave(wave, playMusic = true) {
-        this.currentWave = wave;
-        this.enemiesSpawned = 0;
+    if (btnSpawnSword) btnSpawnSword.onclick = () => spawnAlly('sword');
+    if (btnSpawnShield) btnSpawnShield.onclick = () => spawnAlly('shield');
+    if (btnSpawnMage) btnSpawnMage.onclick = () => spawnAlly('mage');
+    if (btnSpawnButouka) btnSpawnButouka.onclick = () => spawnAlly('butouka');
 
-        let bgm = 'wave1';
-        if (activeStage === 2) {
-          bgm = wave === 1 ? 'wave1' : 'wave2';
-        } else if (activeStage === 3) {
-          bgm = wave === 1 ? 'wave1' : (wave === 2 ? 'wave2' : 'wave3');
-        }
+    this.updateUI();
+    this.startWave(1, false);
+    this.scene.pause();
+  }
 
-        if (activeStage === 1) {
-          this.enemiesToSpawn = 8;
-          this.spawnTimer.delay = 3000;
-        } else if (activeStage === 2) {
-          this.enemiesToSpawn = wave === 1 ? 10 : 15;
-          this.spawnTimer.delay = wave === 1 ? 3000 : 2000;
-        } else if (activeStage === 3) {
-          if (wave === 1) { this.enemiesToSpawn = 10; this.spawnTimer.delay = 3000; }
-          else if (wave === 2) { this.enemiesToSpawn = 15; this.spawnTimer.delay = 2000; }
-          else { this.enemiesToSpawn = 1; this.spawnTimer.delay = 5000; } // Boss
-        }
+  startWave(wave, showCutin = true) {
+    this.currentWave = wave;
+    this.enemiesSpawned = 0;
+    this.isWaveTransitioning = false;
 
-        if (playMusic) playBGM(bgm);
-        if (waveDisplay) waveDisplay.textContent = `${this.currentWave} / ${this.maxWaves}`;
+    let bgm = 'wave1';
+    if (activeStage === 2) {
+      bgm = wave === 1 ? 'wave1' : 'wave2';
+    } else if (activeStage === 3) {
+      bgm = wave === 1 ? 'wave1' : (wave === 2 ? 'wave2' : 'wave3');
+    }
+
+    if (activeStage === 1) {
+      this.enemiesToSpawn = 15;
+      this.spawnTimer.delay = 2000;
+    } else if (activeStage === 2) {
+      this.enemiesToSpawn = wave === 1 ? 15 : 25;
+      this.spawnTimer.delay = wave === 1 ? 2000 : 1500;
+    } else if (activeStage === 3) {
+      if (wave === 1) { this.enemiesToSpawn = 15; this.spawnTimer.delay = 2000; }
+      else if (wave === 2) { this.enemiesToSpawn = 25; this.spawnTimer.delay = 1500; }
+      else { this.enemiesToSpawn = 1; this.spawnTimer.delay = 5000; } // Boss
+    }
+
+    if (waveDisplay) waveDisplay.textContent = `${this.currentWave} / ${this.maxWaves}`;
+
+    if (showCutin) {
+      playSE('wave_next');
+      this.scene.pause();
+      const cutinContainer = document.getElementById('wave-cutin');
+      const cutinText = document.getElementById('wave-cutin-text');
+      if (cutinContainer && cutinText) {
+        cutinContainer.classList.remove('slide-out');
+        cutinContainer.style.display = 'flex';
+        void cutinContainer.offsetWidth; // Force reflow
+        cutinContainer.classList.add('active');
+        cutinText.textContent = `WAVE ${wave}`;
+        this.nextBgm = bgm;
+      } else {
+        playBGM(bgm);
+        this.scene.resume();
       }
+    }
+  }
 
-      update(time, delta) {
-        if (this.isGameOver) return;
+  update(time, delta) {
+    if (this.isGameOver) return;
 
-        // Clouds movement
-        this.clouds.forEach(cloud => {
-          cloud.x -= cloud.speed;
-          if (cloud.x < -100) cloud.x = 900;
-        });
-
-        this.allies.getChildren().forEach(ally => {
-          let target = null;
-          let minDistance = Infinity;
-
-          this.enemies.getChildren().forEach(enemy => {
-            const dist = enemy.x - ally.x;
-            if (dist > 0 && dist <= ally.unitData.range + (enemy.displayWidth / 2)) {
-              if (dist < minDistance) {
-                minDistance = dist;
-                target = enemy;
-              }
-            }
-          });
-
-          if (target) {
-            ally.state = 'attack';
-            ally.body.setVelocityX(0);
-            this.handleAllyAttack(ally, target);
-          } else {
-            ally.state = 'walk';
-            ally.body.setVelocityX(ally.unitData.speed);
-          }
-        });
-
-        this.enemies.getChildren().forEach(enemy => {
-          let target = null;
-          let minDistance = Infinity;
-
-          this.allies.getChildren().forEach(ally => {
-            const dist = enemy.x - ally.x;
-            if (dist > 0 && dist <= 40 + (ally.displayWidth / 2)) {
-              if (dist < minDistance) {
-                minDistance = dist;
-                target = ally;
-              }
-            }
-          });
-
-          if (enemy.x <= 80) { // Attacking the base/castle
-            enemy.state = 'attack';
-            enemy.body.setVelocityX(0);
-            const currentTime = this.time.now;
-            if (currentTime - enemy.lastAttackTime > 1500) {
-              enemy.lastAttackTime = currentTime;
-              playSE(enemy.attackSE);
-              // Base taking damage triggers game over in our simple mechanics
-              this.triggerGameOver(false);
-            }
-          } else if (target) {
-            enemy.state = 'attack';
-            enemy.body.setVelocityX(0);
-            this.handleEnemyAttack(enemy, target);
-          } else {
-            enemy.state = 'walk';
-            enemy.body.setVelocityX(-enemy.speed);
-          }
-        });
-
-        this.allies.getChildren().forEach(ally => {
-          if (ally.x > 850) ally.destroy();
-        });
-
-        this.projectiles.getChildren().forEach(p => {
-          if (p.x > 850) p.destroy();
-        });
-      }
-
-      updateUI() {
-        if (manaDisplay) manaDisplay.textContent = mana;
-        if (btnSpawnHero) btnSpawnHero.disabled = (mana < BASE_UNIT_DB['hero'].cost);
-        if (btnSpawnSword) btnSpawnSword.disabled = (mana < BASE_UNIT_DB['sword'].cost);
-        if (btnSpawnFighter) btnSpawnFighter.disabled = (mana < BASE_UNIT_DB['fighter'].cost);
-        if (btnSpawnMage) btnSpawnMage.disabled = (mana < BASE_UNIT_DB['mage'].cost);
-      }
-
-      createAlly(unitData) {
-        const ally = this.physics.add.image(50, 400 - (unitData.height / 2), unitData.image);
-        ally.setDisplaySize(unitData.width, unitData.height);
-        ally.unitData = unitData;
-        ally.hp = unitData.hp;
-        ally.lastAttackTime = 0;
-        ally.state = 'walk';
-        this.allies.add(ally);
-      }
-
-      spawnEnemy() {
-        if (this.isGameOver) return;
-        if (this.enemiesSpawned >= this.enemiesToSpawn) return;
-
-        let hp = 80;
-        let attack = 10;
-        let speed = 40;
-        let size = 60;
-        let attackSE = 'punch';
-        let imgKey = 'img_slime';
-
-        if (activeStage === 2) {
-          hp = this.currentWave === 2 ? 120 : 90;
-          attack = this.currentWave === 2 ? 15 : 12;
-          imgKey = this.currentWave === 2 ? 'img_goblin' : 'img_slime';
-          size = this.currentWave === 2 ? 75 : 60;
-        } else if (activeStage === 3) {
-          if (this.currentWave === 2) {
-            hp = 150; attack = 20; imgKey = 'img_goblin'; speed = 45; size = 75;
-          } else if (this.currentWave === 3) {
-            hp = 1200; attack = 40; speed = 25; size = 120; imgKey = 'img_ogre'; attackSE = 'smite';
+    this.allies.getChildren().forEach(ally => {
+      let targets = [];
+      let minDistance = Infinity;
+      let targetEnemy = null;
+      
+      this.enemies.getChildren().forEach(enemy => {
+        if (!enemy.active) return;
+        const dist = enemy.x - ally.x;
+        if (dist > 0 && dist <= ally.unitData.range) {
+          targets.push(enemy);
+          if (dist < minDistance) {
+            minDistance = dist;
+            targetEnemy = enemy;
           }
         }
+      });
 
-        const enemy = this.physics.add.image(850, 400 - (size / 2), imgKey);
-        enemy.setDisplaySize(size, size);
-        enemy.hp = hp;
-        enemy.attackPower = attack;
-        enemy.speed = speed;
-        enemy.lastAttackTime = 0;
+      if (targetEnemy) {
+        ally.state = 'attack';
+        ally.body.setVelocityX(0);
+        if (ally.unitData.texture === 'unit_sword') {
+          this.performAttack(ally, targets, time, 'ally');
+        } else {
+          this.performAttack(ally, targetEnemy, time, 'ally');
+        }
+      } else {
+        const stopX = (ally.unitData.texture === 'unit_mage') ? 450 : 600;
+        if (ally.x >= stopX) {
+          ally.state = 'idle';
+          ally.body.setVelocityX(0);
+        } else {
+          ally.state = 'walk';
+          ally.body.setVelocityX(ally.unitData.speed);
+        }
+      }
+    });
+
+    this.enemies.getChildren().forEach(enemy => {
+      let targetAlly = null;
+      let minDistance = Infinity;
+      let targets = [];
+      this.allies.getChildren().forEach(ally => {
+        if (!ally.active) return;
+        const dist = enemy.x - ally.x;
+        if (dist > 0 && dist <= 60) {
+          targets.push(ally);
+          if (dist < minDistance) {
+            minDistance = dist;
+            targetAlly = ally;
+          }
+        }
+      });
+
+      if (targetAlly) {
+        enemy.state = 'attack';
+        enemy.body.setVelocityX(0);
+        if (enemy.texture.key === 'enemy_ogre' || enemy.texture.key === 'enemy_orc') {
+          this.performAttack(enemy, targets, time, 'enemy');
+        } else {
+          this.performAttack(enemy, targetAlly, time, 'enemy');
+        }
+      } else {
         enemy.state = 'walk';
-        enemy.attackSE = attackSE;
-
-        this.enemies.add(enemy);
-        this.enemiesSpawned++;
+        enemy.body.setVelocityX(-enemy.speed);
       }
+    });
 
-      handleAllyAttack(ally, primaryTarget) {
-        const currentTime = this.time.now;
-        if (currentTime - ally.lastAttackTime > ally.unitData.cooldown) {
-          ally.lastAttackTime = currentTime;
-          playSE(ally.unitData.attackSE);
+    this.allies.getChildren().forEach(ally => {
+      if (ally.x > 850) ally.destroy();
+    });
 
-          if (ally.unitData.type === 'aoe') {
-            this.enemies.getChildren().forEach(enemy => {
-              const dist = enemy.x - ally.x;
-              if (dist > 0 && dist <= ally.unitData.range + (enemy.displayWidth / 2)) {
-                this.damageEnemy(enemy, ally.unitData.attack);
-              }
-            });
-          } else if (ally.unitData.type === 'projectile') {
-            const proj = this.add.circle(ally.x + 20, ally.y, 15, 0x00ffff);
-            this.physics.add.existing(proj);
-            this.projectiles.add(proj);
-            proj.body.setVelocityX(300);
-            proj.body.allowGravity = false;
-            proj.attack = ally.unitData.attack;
-            proj.hitEnemies = new Set();
-          } else {
-            this.damageEnemy(primaryTarget, ally.unitData.attack);
-          }
-        }
-      }
+    this.projectiles.getChildren().forEach(proj => {
+      if (proj.x > 850) proj.destroy();
+    });
 
-      handleEnemyAttack(enemy, targetAlly) {
-        const currentTime = this.time.now;
-        if (currentTime - enemy.lastAttackTime > 1500) {
-          enemy.lastAttackTime = currentTime;
-          playSE(enemy.attackSE);
-
-          targetAlly.hp -= enemy.attackPower;
-          targetAlly.setTint(0xff0000);
-          this.time.delayedCall(100, () => { if (targetAlly.active) targetAlly.clearTint(); });
-
-          if (targetAlly.hp <= 0 && targetAlly.active) {
-            targetAlly.destroy();
-          }
-        }
-      }
-
-      damageEnemy(enemy, amount) {
-        enemy.hp -= amount;
-        enemy.setTint(0xff0000);
-        this.time.delayedCall(100, () => { if (enemy.active) enemy.clearTint(); });
-
-        if (enemy.hp <= 0 && enemy.active) {
-          enemy.destroy();
-          mana += 20;
-          this.updateUI();
+    this.enemies.getChildren().forEach(enemy => {
+      if (enemy.x < 0) {
+        enemy.destroy();
+        this.currentBaseHp -= 1;
+        playSE('smite');
+        this.updateUI();
+        if (this.currentBaseHp <= 0) {
+          this.triggerGameOver(false);
+        } else {
           this.checkWaveProgress();
         }
       }
+    });
+  }
 
-      checkWaveProgress() {
-        if (this.enemiesSpawned >= this.enemiesToSpawn && this.enemies.countActive() === 0) {
-          if (this.currentWave < this.maxWaves) {
-            playSE('victory');
-            this.startWave(this.currentWave + 1);
-          } else {
-            this.triggerGameOver(true);
+  updateUI() {
+    if (コストDisplay) コストDisplay.textContent = Math.floor(コスト);
+    const baseHpDisplay = document.getElementById('base-hp-display');
+    if (baseHpDisplay) baseHpDisplay.textContent = `${this.currentBaseHp} / ${this.maxBaseHp}`;
+    if (goldDisplay) goldDisplay.textContent = saveData.gold;
+    
+    ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+      const btnEl = document.getElementById(`btn-spawn-${type}`);
+      const costEl = document.getElementById(`deck-cost-${type}`);
+      const currentCost = this.getCurrentUnitCost(type);
+      if (costEl) costEl.textContent = currentCost;
+      if (btnEl) btnEl.disabled = (コスト < currentCost);
+    });
+  }
+
+  getCurrentUnitCost(type) {
+    const baseUnit = getUnitData(type);
+    let activeCount = 0;
+    if (this.allies) {
+      this.allies.getChildren().forEach(ally => {
+        if (ally.active && ally.unitData && ally.unitData.originalType === type) {
+          activeCount++;
+        }
+      });
+    }
+    const multiplier = 1 + (activeCount * 0.2); // +20% cost per active unit
+    return Math.floor(baseUnit.cost * multiplier);
+  }
+
+  createAlly(unitData) {
+    const ally = this.add.image(50, 430, unitData.texture);
+    ally.setOrigin(0.5, 1);
+    ally.displayHeight = unitData.height || 80;
+    ally.scaleX = ally.scaleY;
+    this.physics.add.existing(ally);
+    ally.unitData = unitData;
+    ally.hp = unitData.hp;
+    ally.lastAttackTime = 0;
+    ally.state = 'walk';
+    this.allies.add(ally);
+  }
+
+  spawnEnemy() {
+    if (this.isGameOver) return;
+    if (this.enemiesSpawned >= this.enemiesToSpawn) return;
+
+    let hp = 30;
+    let attack = 10;
+    let speed = 20;
+    let height = 80;
+    let cooldown = 1500;
+    let textureKey = 'enemy_slime';
+    let attackSE = 'punch';
+    let isBoss = false;
+
+    const isFinalWave = (this.currentWave === this.maxWaves);
+    const spawnBossNow = (isFinalWave && this.enemiesSpawned === this.enemiesToSpawn - 1);
+
+    if (activeStage === 2) {
+      if (spawnBossNow) {
+        hp = 1000; attack = 40; speed = 20; height = 160; textureKey = 'enemy_ogre'; attackSE = 'smite'; cooldown = 2000;
+        isBoss = true;
+      } else {
+        if (Math.random() < 0.5) {
+          hp = 40; attack = 15; textureKey = 'enemy_goblin'; speed = 40; cooldown = 1000; height = 80;
+        }
+      }
+    } else if (activeStage === 3) {
+      if (spawnBossNow) {
+        hp = 3500; attack = 60; speed = 20; height = 160; textureKey = 'enemy_orc'; attackSE = 'smite'; cooldown = 2000;
+        isBoss = true;
+      } else {
+        hp = 40; attack = 15; textureKey = 'enemy_goblin'; speed = 40; cooldown = 1000; height = 80;
+      }
+    }
+
+    if (!isBoss) {
+      const stageBuff = 1 + (activeStage - 1) * 0.5;
+      hp = Math.floor(hp * stageBuff);
+      attack = Math.floor(attack * stageBuff);
+    }
+
+    const enemy = this.add.image(850, 430, textureKey);
+    enemy.setOrigin(0.5, 1);
+    if (textureKey === 'enemy_slime') enemy.y += 10;
+    enemy.displayHeight = height;
+    enemy.scaleX = enemy.scaleY;
+    this.physics.add.existing(enemy);
+    enemy.hp = hp;
+    enemy.attackPower = attack;
+    enemy.speed = speed;
+    enemy.cooldown = cooldown;
+    enemy.lastAttackTime = 0;
+    enemy.state = 'walk';
+    enemy.attackSE = attackSE;
+
+    this.enemies.add(enemy);
+    this.enemiesSpawned++;
+  }
+
+  performAttack(attacker, defenderOrDefenders, time, type) {
+    const cooldown = type === 'ally' ? attacker.unitData.cooldown : (attacker.cooldown || 1500);
+    const attackPower = type === 'ally' ? attacker.unitData.attack : attacker.attackPower;
+    
+    if (time - attacker.lastAttackTime > cooldown) {
+      attacker.lastAttackTime = time;
+      playSE(attacker.attackSE || (attacker.unitData && attacker.unitData.attackSE) || 'punch');
+
+      let targets = Array.isArray(defenderOrDefenders) ? defenderOrDefenders : [defenderOrDefenders];
+
+      if (type === 'ally') {
+        const tex = attacker.unitData.texture;
+        if (tex === 'unit_mage') {
+          const proj = this.projectiles.create(attacker.x, attacker.y - 40, 'magic_orb');
+          proj.body.setVelocityX(600);
+          proj.body.setAllowGravity(false);
+          proj.attackPower = attackPower;
+          proj.hitEnemies = new Set();
+          return;
+        } else if (tex === 'unit_sword') {
+          const fx = this.add.image(attacker.x + 50, attacker.y - 40, 'fx_slash_long');
+          this.tweens.add({ targets: fx, alpha: 0, scaleX: 1.5, duration: 200, onComplete: () => fx.destroy() });
+        } else if (tex === 'unit_shield') {
+          const fx = this.add.image(attacker.x + 30, attacker.y - 40, 'fx_slash');
+          this.tweens.add({ targets: fx, alpha: 0, scale: 1.2, duration: 150, onComplete: () => fx.destroy() });
+        } else if (tex === 'unit_butouka') {
+          for(let i=0; i<3; i++) {
+            this.time.delayedCall(i * 50, () => {
+              if (!attacker.active) return;
+              const fx = this.add.image(attacker.x + 20 + Math.random()*20, attacker.y - 20 - Math.random()*30, 'fx_burst');
+              this.tweens.add({ targets: fx, alpha: 0, scale: 1.5, duration: 100, onComplete: () => fx.destroy() });
+            });
           }
         }
       }
 
-      triggerGameOver(isWin) {
-        if (this.isGameOver) return;
-        this.isGameOver = true;
-        this.scene.pause();
-        stopBGM();
+      targets.forEach(defender => {
+        if (!defender || !defender.active) return;
+        defender.hp -= attackPower;
 
-        const resultScreen = document.getElementById('result-screen');
-        const title = resultScreen.querySelector('h2');
-        const msg = document.getElementById('result-message');
-
-        if (isWin) {
-          title.textContent = 'STAGE CLEAR・・;
-          title.style.color = '#ffd700';
-          playSE('victory');
-
-          let reward = activeStage * 200;
-          saveData.gold += reward;
-          saveData.clearedStage = Math.max(saveData.clearedStage, activeStage);
-          saveGame();
-          msg.textContent = `${reward} G 迯ｲ蠕暦ｼ～;
+        if (type === 'ally') {
+          defender.setTintFill(0xFFFFFF); // Enemy flashes white
         } else {
-          title.textContent = '繧ｲ繝ｼ繝繧ｪ繝ｼ繝舌・';
-          title.style.color = '#dc3545';
-          playSE('defeat');
-          msg.textContent = `髦ｲ陦帙↓螟ｱ謨励＠縺ｾ縺励◆...`;
+          defender.setTintFill(0xFF0000); // Ally flashes red
         }
-        resultScreen.style.display = 'flex';
-      }
-    }
+        
+        this.time.delayedCall(100, () => { 
+          if (defender.active) defender.clearTint();
+        });
 
-    const config = {
-      type: Phaser.AUTO,
-      width: 800,
-      height: 600,
-      parent: 'game-container',
-      physics: { default: 'arcade', arcade: { debug: false } },
-      scene: [MainScene]
-    };
-
-    const game = new Phaser.Game(config);
-
-    function setGamePause(paused) {
-      const scene = game.scene.getScene('MainScene');
-      if (!scene) return;
-      if (paused) {
-        if (scene.scene.isActive()) scene.scene.pause();
-      } else {
-        const isStart = document.getElementById('start-screen').style.display !== 'none';
-        const isMap = document.getElementById('map-screen').style.display === 'flex';
-        const isUpg = document.getElementById('upgrade-screen').style.display === 'flex';
-        const isRes = document.getElementById('result-screen').style.display === 'flex';
-        if (!isStart && !isMap && !isUpg && !isRes) {
-          scene.scene.resume();
+        if (defender.hp <= 0) {
+          defender.destroy();
+          if (type === 'ally') {
+            const costBuff = 1 + ((saveData.levels?.baseCost || 1) - 1) * 0.05;
+            コスト += Math.floor(20 * costBuff);
+            const goldBuff = (saveData.levels?.baseGold || 1) - 1;
+            saveData.gold += 10 + goldBuff * 2;
+            saveGame();
+            this.updateUI();
+            this.checkWaveProgress();
+          } else {
+            // 味方が倒されたのでコストUIなどを更新する
+            this.updateUI();
+          }
         }
-      }
+      });
     }
+  }
 
-    // Initial Load
-    loadSaveData();
+  handleProjectileHit(projectile, enemy) {
+    if (!enemy.active) return;
+    if (projectile.hitEnemies.has(enemy)) return;
 
-    // DOM Elements
-    const startScreen = document.getElementById('start-screen');
-    const mapScreen = document.getElementById('map-screen');
-    const upgradeScreen = document.getElementById('upgrade-screen');
+    projectile.hitEnemies.add(enemy);
+    enemy.hp -= projectile.attackPower;
+    
+    enemy.setTintFill(0xFFFFFF);
+    this.time.delayedCall(100, () => { 
+       if (enemy.active) enemy.clearTint();
+    });
+
+    if (enemy.hp <= 0) {
+      enemy.destroy();
+      const costBuff = 1 + ((saveData.levels?.baseCost || 1) - 1) * 0.05;
+      コスト += Math.floor(20 * costBuff);
+      const goldBuff = (saveData.levels?.baseGold || 1) - 1;
+      saveData.gold += 10 + goldBuff * 2;
+      saveGame();
+      this.updateUI();
+      this.checkWaveProgress();
+    }
+  }
+
+  checkWaveProgress() {
+    if (this.isWaveTransitioning) return;
+    if (this.enemiesSpawned >= this.enemiesToSpawn && this.enemies.countActive() === 0) {
+      this.isWaveTransitioning = true;
+      this.time.delayedCall(3000, () => {
+        if (this.isGameOver) return;
+        this.isWaveTransitioning = false;
+        if (this.currentWave < this.maxWaves) {
+          this.startWave(this.currentWave + 1, true);
+        } else {
+          this.triggerGameOver(true);
+        }
+      });
+    }
+  }
+
+  triggerGameOver(isWin) {
+    if (this.isGameOver) return;
+    this.isGameOver = true;
+    this.scene.pause();
+    stopBGM();
+
     const resultScreen = document.getElementById('result-screen');
+    const title = resultScreen.querySelector('h2');
+    const msg = document.getElementById('result-message');
 
-    // Start -> Map
-    document.getElementById('start-btn').addEventListener('click', () => {
-      playSE('confirm');
-      startScreen.style.display = 'none';
-      mapScreen.style.display = 'flex';
-      updateMapUI();
-    });
+    if (isWin) {
+      title.textContent = 'STAGE CLEAR!!';
+      title.className = 'result-win';
+      playSE('victory');
 
-    // Map -> Upgrade
-    document.getElementById('btn-to-upgrade').addEventListener('click', () => {
-      playSE('confirm');
-      mapScreen.style.display = 'none';
-      upgradeScreen.style.display = 'flex';
-      updateUpgradeUI();
-    });
-
-    // Upgrade -> Map
-    document.getElementById('btn-back-map').addEventListener('click', () => {
-      playSE('cancel');
-      upgradeScreen.style.display = 'none';
-      mapScreen.style.display = 'flex';
-      updateMapUI();
-    });
-
-    // Start Stage
-    function startGame(stageNumber) {
-      playSE('confirm');
-      activeStage = stageNumber;
-      mapScreen.style.display = 'none';
-      document.getElementById('btn-retire').style.display = 'block';
-      const scene = game.scene.getScene('MainScene');
-      if (scene) {
-        scene.scene.restart();
-        setTimeout(() => {
-          scene.scene.resume();
-          scene.startWave(1, true);
-        }, 100);
-      }
+      let reward = activeStage * 200;
+      saveData.gold += reward;
+      saveData.clearedStage = Math.max(saveData.clearedStage, activeStage);
+      saveGame();
+      msg.textContent = `${reward} G 獲得！`;
+    } else {
+      title.textContent = 'ゲームオーバー';
+      title.className = 'result-lose';
+      playSE('defeat');
+      msg.textContent = `防衛に失敗しました...`;
     }
-    document.getElementById('btn-stage1').addEventListener('click', () => startGame(1));
-    document.getElementById('btn-stage2').addEventListener('click', () => startGame(2));
-    document.getElementById('btn-stage3').addEventListener('click', () => startGame(3));
+    resultScreen.style.display = 'flex';
+  }
+}
 
-    // Result screen buttons
-    document.getElementById('btn-retry').addEventListener('click', () => {
-      playSE('confirm');
-      resultScreen.style.display = 'none';
-      startGame(activeStage);
-    });
+const config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  parent: 'game-container',
+  physics: { default: 'arcade', arcade: { debug: false } },
+  scene: [BootScene, MainScene]
+};
 
-    document.getElementById('btn-title').addEventListener('click', () => {
-      playSE('cancel');
-      resultScreen.style.display = 'none';
-      mapScreen.style.display = 'flex';
-      stopBGM();
-      game.scene.stop('MainScene');
-      game.scene.start('MainScene');
-      updateMapUI();
-    });
+if (window.tdGameInstance) {
+  window.tdGameInstance.destroy(true);
+}
+window.tdGameInstance = new Phaser.Game(config);
+const game = window.tdGameInstance;
 
-    window.handleRetire = function () {
-      const scene = game.scene.getScene('MainScene');
-      if (scene) {
-        playSE('cursor');
-        setGamePause(true);
-        document.getElementById('retire-confirm-modal').style.display = 'flex';
-      }
-    };
 
-    window.cancelRetire = function () {
-      playSE('cancel');
-      document.getElementById('retire-confirm-modal').style.display = 'none';
-      setGamePause(false);
-    };
+// Initial Load
+loadSaveData();
 
-    window.executeRetire = function () {
-      playSE('cancel');
-      document.getElementById('retire-confirm-modal').style.display = 'none';
-      stopBGM();
-      game.scene.stop('MainScene');
-      document.getElementById('btn-retire').style.display = 'none';
-      mapScreen.style.display = 'flex';
-      updateMapUI();
-    };
+// Screen State
+let currentScreen = 'start'; // 'start', 'map', 'upgrade', 'game'
+function updateGlobalBackButton() {
+  const backBtn = document.getElementById('global-back-btn');
+  if (!backBtn) return;
+  if (currentScreen === 'start') {
+    backBtn.style.display = 'none';
+  } else {
+    backBtn.style.display = 'flex';
+  }
+}
 
-    document.getElementById('btn-share').addEventListener('click', () => {
-      const text = encodeURIComponent('繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ縺ｧ驕翫・縺ｾ縺励◆・―n#繝溘ル繧ｲ繝ｼ繝 #繝昴・繝医ヵ繧ｩ繝ｪ繧ｪ');
-      const url = encodeURIComponent(window.location.href);
-      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
-    });
+// DOM Elements
+const startScreen = document.getElementById('start-screen');
+const mapScreen = document.getElementById('map-screen');
+const upgradeScreen = document.getElementById('upgrade-screen');
+const resultScreen = document.getElementById('result-screen');
 
-    // Modals config
-    const _cfgBtn = document.getElementById('config-btn');
-    if (_cfgBtn) {
-      _cfgBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        setGamePause(true);
-        document.getElementById('config-modal')?.classList.add('active');
-        document.getElementById('modal-overlay')?.classList.add('active');
-      });
-      _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-    }
-    const _closeCfgBtn = document.getElementById('close-config-btn');
-    if (_closeCfgBtn) {
-      _closeCfgBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        setGamePause(false);
-        document.getElementById('config-modal')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
-      });
-      _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-    }
+// Global Back Button
+document.getElementById('global-back-btn').addEventListener('click', () => {
+  playSE('cancel');
+  if (currentScreen === 'map') {
+    mapScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+    currentScreen = 'start';
+    updateGlobalBackButton();
+  } else if (currentScreen === 'upgrade') {
+    upgradeScreen.style.display = 'none';
+    mapScreen.style.display = 'flex';
+    currentScreen = 'map';
+    updateMapUI();
+    updateGlobalBackButton();
+  } else if (currentScreen === 'game') {
+    const scene = game.scene.getScene('MainScene');
+    if (scene) scene.scene.pause();
+    document.getElementById('retire-modal').style.display = 'flex';
+  }
+});
 
-    const _credBtn = document.getElementById('credits-btn');
-    if (_credBtn) {
-      _credBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        document.getElementById('config-modal')?.classList.remove('active');
-        document.getElementById('credits-modal')?.classList.add('active');
-        document.getElementById('modal-overlay')?.classList.add('active');
-      });
-      _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-    }
-    const _closeCredBtn = document.getElementById('close-credits-btn');
-    if (_closeCredBtn) {
-      _closeCredBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        document.getElementById('credits-modal')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
-        setGamePause(false); // credits can be opened directly or from config, so resume when closed
-      });
-      _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-      _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-    }
+// Start -> Map
+document.getElementById('start-btn').addEventListener('click', () => {
+  playSE('confirm');
+  startScreen.style.display = 'none';
+  mapScreen.style.display = 'flex';
+  currentScreen = 'map';
+  updateGlobalBackButton();
+  updateMapUI();
+});
 
-    const howtoBtn = document.getElementById('howto-btn');
-    const closeHowtoBtn = document.getElementById('close-howto-btn');
-    if (howtoBtn) {
-      howtoBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        setGamePause(true);
-        document.getElementById('howto-modal')?.classList.add('active');
-        document.getElementById('modal-overlay')?.classList.add('active');
-      });
-    }
+// Reset Save Data
+const resetConfirmModal = document.getElementById('reset-confirm-modal');
+document.getElementById('reset-save-btn').addEventListener('click', () => {
+  playSE('cursor');
+  if (resetConfirmModal) resetConfirmModal.classList.add('active');
+});
 
-    if (closeHowtoBtn) {
-      closeHowtoBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playSE('cursor');
-        setGamePause(false);
-        document.getElementById('howto-modal')?.classList.remove('active');
-        document.getElementById('modal-overlay')?.classList.remove('active');
-      });
-    }
+document.getElementById('btn-reset-cancel').addEventListener('click', () => {
+  playSE('cancel');
+  if (resetConfirmModal) resetConfirmModal.classList.remove('active');
+});
 
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn, .icon-config, .unit-card');
-      if (btn) {
-        const id = btn.id;
-        if (id && id !== 'start-btn' && id !== 'btn-retry' && id !== 'btn-title' && id !== 'btn-back-map' && !id.startsWith('btn-stage') && !id.startsWith('btn-to-upgrade')) {
-          playSE('cursor');
-        }
-      }
-    });
+document.getElementById('btn-reset-execute').addEventListener('click', () => {
+  playSE('confirm');
+  localStorage.removeItem(STORAGE_KEY);
+  saveData = {
+    gold: 0,
+    clearedStage: 0,
+    levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 }
+  };
+  location.reload();
+});
 
-    const seVolumeInput = document.getElementById('se-volume');
-    if (seVolumeInput) {
-      seVolumeInput.addEventListener('input', (e) => {
-        configSeVolume = parseFloat(e.target.value) / 100;
-      });
-    }
-    const bgmVolumeInput = document.getElementById('bgm-volume');
-    if (bgmVolumeInput) {
-      bgmVolumeInput.addEventListener('input', (e) => {
-        configBgmVolume = parseFloat(e.target.value) / 100;
-        if (currentBgmAudio) currentBgmAudio.volume = configBgmVolume;
-      });
-    }
+// Map -> Upgrade
+document.getElementById('btn-to-upgrade').addEventListener('click', () => {
+  playSE('confirm');
+  mapScreen.style.display = 'none';
+  upgradeScreen.style.display = 'flex';
+  currentScreen = 'upgrade';
+  updateGlobalBackButton();
+  updateUpgradeUI();
+});
+
+// Start Stage
+function startGame(stageNumber) {
+  playSE('confirm');
+  activeStage = stageNumber;
+  currentScreen = 'game';
+  updateGlobalBackButton();
+  mapScreen.style.display = 'none';
   
+  game.scene.start('MainScene');
+  setTimeout(() => {
+    const scene = game.scene.getScene('MainScene');
+    if (scene) {
+      scene.startWave(1, true);
+    }
+  }, 100);
+}
+document.getElementById('btn-stage1').addEventListener('click', () => startGame(1));
+document.getElementById('btn-stage2').addEventListener('click', () => startGame(2));
+document.getElementById('btn-stage3').addEventListener('click', () => startGame(3));
+
+const bry = document.getElementById('btn-retire-yes');
+if (bry) bry.addEventListener('click', () => {
+  playSE('confirm');
+  document.getElementById('retire-modal').style.display = 'none';
+  document.getElementById('modal-overlay')?.classList.remove('active');
+  returnToMapFromGame();
+});
+
+const brn = document.getElementById('btn-retire-no');
+if (brn) brn.addEventListener('click', () => {
+  playSE('cursor');
+  document.getElementById('retire-modal').style.display = 'none';
+  document.getElementById('modal-overlay')?.classList.remove('active');
+  const scene = game.scene.getScene('MainScene');
+  if (scene) scene.scene.resume();
+});
+
+    const btnWaveOk = document.getElementById('btn-wave-ok');
+    if (btnWaveOk) {
+      btnWaveOk.addEventListener('click', () => {
+        playSE('confirm');
+        const cutinContainer = document.getElementById('wave-cutin');
+        if (cutinContainer) {
+          cutinContainer.classList.add('slide-out');
+          setTimeout(() => {
+            cutinContainer.classList.remove('active');
+            cutinContainer.classList.remove('slide-out');
+            cutinContainer.style.display = 'none';
+
+            const scene = game.scene.getScene('MainScene');
+            if (scene) {
+              if (scene.nextBgm) playBGM(scene.nextBgm);
+              scene.scene.resume();
+            }
+          }, 400); // Wait for transition
+        }
+      });
+    }
+
+function returnToMapFromGame() {
+  document.getElementById('result-screen').style.display = 'none';
+  mapScreen.style.display = 'flex';
+  currentScreen = 'map';
+  updateGlobalBackButton();
+  stopBGM();
+  if (typeof game !== 'undefined') {
+    game.scene.stop('MainScene');
+    game.scene.start('BootScene');
+  }
+  updateMapUI();
+}
+
+// Result screen buttons
+document.getElementById('btn-retry').addEventListener('click', () => {
+  playSE('confirm');
+  if (currentJingleAudio) {
+    currentJingleAudio.pause();
+    currentJingleAudio.currentTime = 0;
+  }
+  resultScreen.style.display = 'none';
+  startGame(activeStage);
+});
+
+document.getElementById('btn-title').addEventListener('click', () => {
+  playSE('cancel');
+  if (currentJingleAudio) {
+    currentJingleAudio.pause();
+    currentJingleAudio.currentTime = 0;
+  }
+  returnToMapFromGame();
+});
+
+document.getElementById('btn-share').addEventListener('click', () => {
+  const text = encodeURIComponent('タワーディフェンスで遊びました！\n#ミニゲーム #ポートフォリオ');
+  const url = encodeURIComponent(window.location.href);
+  window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+});
+
+// Modals config
+const _cfgBtns = document.querySelectorAll('.icon-config');
+_cfgBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('config-modal')?.classList.add('active');
+    document.getElementById('modal-overlay')?.classList.add('active');
+    if (typeof game !== 'undefined') {
+      const scene = game.scene.getScene('MainScene');
+      if (scene && scene.scene.isActive()) scene.scene.pause();
+    }
+  });
+  btn.addEventListener('mousedown', (e) => e.stopPropagation());
+  btn.addEventListener('touchstart', (e) => e.stopPropagation());
+});
+const _closeCfgBtn = document.getElementById('close-config-btn');
+if (_closeCfgBtn) {
+  _closeCfgBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('config-modal')?.classList.remove('active');
+    document.getElementById('modal-overlay')?.classList.remove('active');
+    if (typeof game !== 'undefined') {
+      const scene = game.scene.getScene('MainScene');
+      if (scene && scene.scene.isPaused()) scene.scene.resume();
+    }
+  });
+  _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+  _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+}
+
+const _credBtn = document.getElementById('credits-btn');
+if (_credBtn) {
+  _credBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('config-modal')?.classList.remove('active');
+    document.getElementById('credits-modal')?.classList.add('active');
+    document.getElementById('modal-overlay')?.classList.add('active');
+  });
+  _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+  _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+}
+const _closeCredBtn = document.getElementById('close-credits-btn');
+if (_closeCredBtn) {
+  _closeCredBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('credits-modal')?.classList.remove('active');
+    document.getElementById('modal-overlay')?.classList.remove('active');
+  });
+  _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+  _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+}
+
+const howtoBtn = document.getElementById('howto-btn');
+const closeHowtoBtn = document.getElementById('close-howto-btn');
+if (howtoBtn) {
+  howtoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('howto-modal')?.classList.add('active');
+    document.getElementById('modal-overlay')?.classList.add('active');
+    if (typeof game !== 'undefined') {
+      const scene = game.scene.getScene('MainScene');
+      if (scene && scene.scene.isActive()) scene.scene.pause();
+    }
+  });
+}
+
+if (closeHowtoBtn) {
+  closeHowtoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    playSE('cursor');
+    document.getElementById('howto-modal')?.classList.remove('active');
+    document.getElementById('modal-overlay')?.classList.remove('active');
+    if (typeof game !== 'undefined') {
+      const scene = game.scene.getScene('MainScene');
+      if (scene && scene.scene.isPaused()) scene.scene.resume();
+    }
+  });
+}
+
+document.addEventListener('click', (e) => {
+  const tabBtnUnit = e.target.closest('#tab-btn-unit');
+  const tabBtnBase = e.target.closest('#tab-btn-base');
+  
+  if (tabBtnUnit) {
+    playSE('cursor');
+    tabBtnUnit.className = 'btn btn-primary';
+    document.getElementById('tab-btn-base').className = 'btn btn-secondary';
+    document.getElementById('tab-content-unit').style.display = '';
+    document.getElementById('tab-content-base').style.display = 'none';
+    return;
+  } else if (tabBtnBase) {
+    playSE('cursor');
+    tabBtnBase.className = 'btn btn-primary';
+    document.getElementById('tab-btn-unit').className = 'btn btn-secondary';
+    document.getElementById('tab-content-base').style.display = '';
+    document.getElementById('tab-content-unit').style.display = 'none';
+    return;
+  }
+
+  const btn = e.target.closest('.btn, .icon-config, .unit-card');
+  if (btn) {
+    const id = btn.id;
+    if (id && id !== 'start-btn' && id !== 'btn-retry' && id !== 'btn-title' && id !== 'btn-back-map' && !id.startsWith('btn-stage') && !id.startsWith('btn-to-upgrade')) {
+      playSE('cursor');
+    }
+  }
+});
+
+const seVolumeInput = document.getElementById('se-volume');
+if (seVolumeInput) {
+  seVolumeInput.addEventListener('input', (e) => {
+    configSeVolume = parseFloat(e.target.value) / 100;
+  });
+}
+const bgmVolumeInput = document.getElementById('bgm-volume');
+if (bgmVolumeInput) {
+  bgmVolumeInput.addEventListener('input', (e) => {
+    configBgmVolume = parseFloat(e.target.value) / 100;
+    if (currentBgmAudio) currentBgmAudio.volume = configBgmVolume;
+  });
+}

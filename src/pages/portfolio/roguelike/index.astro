@@ -1,4 +1,15 @@
 ---
+
+import yuusyaImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
+import kenshiImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
+import mahoutsukaiImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png';
+import butoukaImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_butouka.png';
+import hotelImg from '../../../assets/games/roguelike/images/map/building_hotel_pet.png';
+import pixyImg from '../../../assets/games/roguelike/images/characters/fantasy_pixy2.png';
+import shopImg from '../../../assets/games/roguelike/images/map/omise_shop_tatemono.png';
+import noImageImg from '../../../assets/games/roguelike/images/icons/no_image_square.jpg';
+import kingImg from '../../../assets/games/roguelike/images/characters/royal_king.png';
+
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/Header.astro';
 import Footer from '../../../components/Footer.astro';
@@ -11,18 +22,18 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   const techStack = [
   { category: "開発言語", items: "HTML, CSS, JavaScript" },
   { category: "フレームワーク", items: "Astro" },
-  { category: "その他ツール", items: "Claude, Gemini" }
+  { category: "その他ツール", items: "Google Antigravity, Gemini, Claude" }
   ];
 
   const learningThemes = ["状態管理", "ダメージ計算", "ターン制ロジック", "デッキ構築", "ローグライク設計"];
 
   const materialCategories = [
   { category: "画像素材", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
-  { category: "音楽・効果音", items: [
-    { name: "魔王魂", url: "https://maou.audio/" },
-    { name: "効果音ラボ", url: "https://soundeffect-lab.info/" }
-  ] },
   { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+  { category: "音楽・効果音", items: [
+  { name: "魔王魂", url: "https://maou.audio/" },
+  { name: "効果音ラボ", url: "https://soundeffect-lab.info/" }
+  ] },
   { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] }
   ];
   ---
@@ -32,24 +43,34 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     <main class="container">
       <div class="game-container" style="position: relative; height: 580px; overflow: hidden;" id="game-container">
-        <span id="config-btn" class="icon-config" title="コンフィグ" style="position:absolute; top:0.5rem; right:0.5rem; z-index: 999;">⚙️</span>
+        <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
 
         <!-- ゲームヘッダーバー（ステータス常時表示） -->
-        <div id="game-header" class="game-header-bar"
-          style="display: none; justify-content: space-between; align-items: center; background: rgba(15,15,26,0.95); border-bottom: 1px solid #333; padding: 0.4rem 2.5rem 0.4rem 0.8rem; font-size: 0.78rem; z-index: 100;">
-          <div class="header-status" style="display: flex; gap: 0.8rem; align-items: center;">
-            <span id="header-floor" style="font-weight: bold; color: #ffb84d;">エリア 1 - 0層</span>
-            <span class="gold-badge" style="color: #ffd700; font-weight: bold;">💰<span
-                id="header-gold">50</span></span>
-            <span class="hp-badge" style="color: #ff6b6b; font-weight: bold;">❤️<span id="header-hp">10/10</span></span>
-            <span class="mp-badge" style="color: #7cc5ff; font-weight: bold;">💧<span id="header-mp">5/5</span></span>
-            <div class="header-relics" style="display: flex; gap: 4px; align-items: center; margin-left: 0.5rem;">
-              <span style="font-size: 0.7rem; color: var(--text-muted);">レリック:</span>
-              <div id="header-relics-list" style="display: flex; gap: 4px;"></div>
+        <div id="game-header" class="game-header-bar" style="display: none;">
+          <div class="header-status">
+            <span id="header-floor" class="header-floor-text">エリア 1 - 0層</span>
+            <span class="gold-badge"><span id="header-gold">50</span> G</span>
+            <span class="hp-badge">HP: <span id="header-hp">10/10</span></span>
+            <span class="mp-badge">MP: <span id="header-mp">5/5</span></span>
+            <div class="header-relics">
+              <span class="header-relics-label">レリック:</span>
+              <div id="header-relics-list" class="header-relics-list-container"></div>
             </div>
           </div>
         </div>
 
+        <!-- ゲームフッターバー（アイテム・デッキ常時表示） -->
+        <div id="game-footer" class="game-footer-bar" style="display: none;">
+          <div
+            style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden; background: rgba(0,0,0,0.3); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box;">
+            <span
+              style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
+            <div id="footer-player-items" style="display: flex; gap: 4px; overflow-x: auto;"></div>
+          </div>
+          <button class="btn btn-secondary" id="btn-footer-view-deck"
+            style="font-size: 0.72rem; padding: 0.3rem 0.8rem; flex-shrink: 0; margin-left: 0.5rem; white-space: nowrap; border-color: #ffb84d; color: #ffb84d;">デッキ確認
+            (<span id="footer-deck-count">0</span>)</button>
+        </div>
         <!-- ゲームオーバー/クリア画面 -->
         <div class="overlay" id="result-overlay"
           style="display: none; background-color: rgba(0,0,0,0.95); z-index: 200;">
@@ -93,9 +114,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <div id="start-screen"
           style="position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
           <h2 style="font-size: 1.8rem; margin-bottom: 0.3rem;">ローグライクカードゲーム</h2>
-          <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
+          <p style="color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem;">
+            職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
           <button id="start-btn" class="btn btn-full">冒険を始める</button>
-          <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
+          <button id="howto-btn" class="btn btn-secondary btn-full" style="margin-top: 1rem;">遊び方</button>
         </div>
 
         <!-- 職業選択画面 -->
@@ -107,28 +129,28 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           <div style="flex: 1;">
             <div class="class-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
               <div class="class-card" data-class="yuusya">
-                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_yuusya.png"
+                <img src={yuusyaImg.src}
                   style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
                 <div style="font-size: 0.85rem; font-weight: bold;">勇者</div>
                 <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP10 /
                   MP5<br>初期レリックが+1個</div>
               </div>
               <div class="class-card" data-class="kenshi">
-                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_kenshi.png"
+                <img src={kenshiImg.src}
                   style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
                 <div style="font-size: 0.85rem; font-weight: bold;">戦士</div>
                 <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP15 /
                   MP4<br>毎ターンHP+1回復</div>
               </div>
               <div class="class-card" data-class="mahoutsukai">
-                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_mahoutsukai.png"
+                <img src={mahoutsukaiImg.src}
                   style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
                 <div style="font-size: 0.85rem; font-weight: bold;">魔法使い</div>
                 <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP7 /
                   MP7<br>毎ターンMP+1回復</div>
               </div>
               <div class="class-card" data-class="butouka">
-                <img src="/portfolio/roguelike/assets/characters/figure_rpg_character_butouka.png"
+                <img src={butoukaImg.src}
                   style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
                 <div style="font-size: 0.85rem; font-weight: bold;">格闘家</div>
                 <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP8 /
@@ -140,15 +162,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               勇者が選択されています</p>
           </div>
 
-          <button id="btn-game-start" class="btn btn-full" style="margin-top: 0.5rem;">冒険の旅へ出る</button>
+          <button id="btn-back-to-title" class="btn btn-secondary btn-full" style="margin-top: 0.5rem;">戻る</button>
         </div>
 
         <!-- マップ進行画面（横スクロール双六マップ） -->
         <div id="map-screen"
-          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#0f0f1a; z-index:80; display:none; flex-direction:column; padding:1rem; box-sizing:border-box; justify-content: space-between;">
-          <div style="text-align: center; margin-bottom: 0.3rem;">
-            <h3 style="font-size: 1.1rem; color: #ffb84d; margin-bottom: 0.1rem;">マップ</h3>
-          </div>
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#0f0f1a; z-index:80; display:none; flex-direction:column; padding:1rem; box-sizing:border-box; justify-content: space-between;">
+          <button id="btn-retire-map" class="btn btn-secondary"
+            style="position: absolute; top: 10px; right: 10px; z-index: 100; font-size: 0.75rem; padding: 0.3rem 0.6rem;">リタイア</button>
 
           <!-- 横スクロールすごろく本体 -->
           <div id="map-scroll-wrapper"
@@ -159,86 +180,93 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             </div>
           </div>
 
-          <div
-            style="border-top: 1px solid #333; padding-top: 0.4rem; display: flex; justify-content: space-between; align-items: center;">
-            <button class="btn btn-secondary" id="btn-map-view-deck"
-              style="font-size: 0.72rem; padding: 0.3rem 0.8rem;">デッキ確認</button>
-            <span style="font-size: 0.65rem; color: var(--text-muted);">接続された次のマスへ進めます</span>
-          </div>
+
         </div>
 
         <!-- 宿（回復）画面 -->
         <div id="inn-screen"
-          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#0c1513; z-index:81; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; text-align:center;">
-          <img src="/portfolio/roguelike/assets/map/building_hotel_pet.png"
-            style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 1rem;" />
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#0c1513; z-index:81; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; text-align:center;">
+          <img src={hotelImg.src} style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 1rem;" />
           <h3 style="color: #51cf66; font-size: 1.2rem; margin-bottom: 0.5rem;">旅人の宿</h3>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%;">
-            15ゴールドを支払って、宿屋でぐっすり休むことができます。<br>
-            <strong>効果: HP全回復 ＋ 毒/麻痺の全治</strong>
+            お金を払って、宿屋で休むことができます。
           </p>
           <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-            <button id="btn-inn-rest" class="btn btn-primary" style="width: 100%;">休む (💰15)</button>
+            <button id="btn-inn-rest-half" class="btn btn-primary" style="width: 100%;">小休憩 (💰15) <br><span
+                style="font-size:0.65rem;">HP/MP 50%回復</span></button>
+            <button id="btn-inn-rest-full" class="btn btn-primary" style="width: 100%;">宿泊 (💰30) <br><span
+                style="font-size:0.65rem;">HP/MP全快 ＋ 状態異常全治</span></button>
             <button id="btn-inn-leave" class="btn btn-secondary" style="width: 100%;">立ち去る</button>
           </div>
         </div>
 
-        <!-- 妖精（強化）画面 -->
-        <div id="fairy-screen"
-          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#150f1a; z-index:82; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
+        <!-- ショップサービス（強化・削除）画面 -->
+        <div id="shop-service-screen"
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#150f1a; z-index:85; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
           <div style="text-align: center;">
-            <img src="/portfolio/roguelike/assets/characters/fantasy_pixy2.png"
-              style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 0.5rem;" />
-            <h3 style="color: #cc5de8; font-size: 1.2rem; margin-bottom: 0.2rem;">祝福の妖精</h3>
-            <p id="fairy-desc" style="font-size: 0.75rem; color: var(--text-muted);">
-              20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。</p>
+            <h3 id="shop-service-title" style="color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.2rem;">ショップサービス</h3>
+            <p id="shop-service-desc" style="font-size: 0.75rem; color: var(--text-muted);"></p>
           </div>
 
-          <!-- 強化対象カード選択リスト -->
-          <div id="fairy-card-list"
-            style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
-            <!-- 所持カードがボタンとして並びます -->
+          <!-- 対象カード選択リスト -->
+          <div id="shop-service-card-list"
+            style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
           </div>
 
           <div style="display: flex; gap: 8px; width: 100%;">
-            <button id="btn-fairy-leave" class="btn btn-secondary" style="flex: 1;">立ち去る</button>
+            <button id="btn-shop-service-leave" class="btn btn-secondary" style="flex: 1;">キャンセル</button>
           </div>
         </div>
 
         <!-- 街（ショップ）画面 -->
         <div id="town-screen"
-          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#1a150f; z-index:83; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
-          <div style="text-align: center;">
-            <img src="/portfolio/roguelike/assets/map/omise_shop_tatemono.png"
-              style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 0.5rem;" />
-            <h3 style="color: #ff922b; font-size: 1.2rem; margin-bottom: 0.2rem;">よろず街の商い</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted);">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#1a150f; z-index:83; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+            <h3 style="color: #ff922b; font-size: 1.2rem; margin: 0;">よろず街の商い</h3>
+            <button id="btn-town-leave" class="btn btn-secondary"
+              style="font-size: 0.75rem; padding: 0.4rem 1rem; width: auto; font-weight: bold;">街を出る</button>
           </div>
 
           <div
-            style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px;">
+            style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0.5rem; overflow-y: auto;">
             <div>
               <p
                 style="font-size: 0.72rem; color: #ff922b; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
-                販売カード (各 💰15)</p>
-              <div id="town-cards" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+                販売カード</p>
+              <div id="town-cards"
+                style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; padding: 4px 0; overflow-y: auto; max-height: 260px;">
+              </div>
             </div>
             <div>
               <p
                 style="font-size: 0.72rem; color: #ffd8a8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
-                販売アイテム (各 💰20)</p>
+                販売アイテム</p>
               <div id="town-items" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
             </div>
-          </div>
+            <div style="margin-top: 4px;">
+              <p
+                style="font-size: 0.72rem; color: #cc5de8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+                特別サービス</p>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button id="btn-town-upgrade" class="btn btn-primary"
+                  style="flex: 1; font-size: 0.75rem; background-color: #1976d2; border-color: #1565c0;">カード強化 (20
+                  G)</button>
+                <button id="btn-town-remove" class="btn btn-primary"
+                  style="flex: 1; font-size: 0.75rem; background-color: #c0392b; border-color: #922b21;">カード削除 (20
+                  G)</button>
+              </div>
+            </div>
 
-          <button id="btn-town-leave" class="btn btn-secondary" style="width: 100%;">街を出る</button>
+
+          </div>
         </div>
 
         <!-- イベント画面 -->
         <div id="event-screen"
-          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 40px); background:#11111a; z-index:84; display:none; flex-direction:column; padding:1.5rem; box-sizing:border-box; justify-content: space-between; text-align: center;">
+          style="position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#11111a; z-index:84; display:none; flex-direction:column; padding:1.5rem; box-sizing:border-box; justify-content: space-between; text-align: center;">
           <div>
-            <img id="event-image" src="/portfolio/roguelike/assets/icons/no_image_square.jpg"
+            <img id="event-image" src={noImageImg.src}
               style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #444;" />
             <h3 id="event-title" style="color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.5rem;">未知のイベント</h3>
             <p id="event-text"
@@ -256,7 +284,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
           <div
             style="background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center;">
-            <h4 style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem;">アイテムの使用確認</h4>
+            <h4 id="item-confirm-title" style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem;">アイテムの使用確認</h4>
             <p id="item-confirm-text"
               style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem;"></p>
             <div style="display: flex; gap: 10px;">
@@ -270,7 +298,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <!-- 戦闘中マップ確認モーダル -->
         <div id="battle-map-overlay" class="overlay"
           style="display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column;">
-          <h3 style="color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">現在地確認 🗺️</h3>
+          <h3 style="color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">現在地確認</h3>
           <div id="battle-map-scroll-wrapper"
             style="flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem;">
             <div id="battle-map-board"
@@ -283,8 +311,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <!-- 王様遭遇イベントモーダル -->
         <div id="king-event-modal" class="overlay"
           style="display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center;">
-          <img src="/portfolio/roguelike/assets/characters/royal_king.png"
-            style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 1rem;" />
+          <img src={kingImg.src} style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 1rem;" />
           <h3 style="color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem;">謁見の間：王からの餞別</h3>
           <p
             style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%;">
@@ -324,7 +351,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <div id="game-dialog-modal" class="overlay"
           style="display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem;">
           <div
-            style="background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+            style="background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 460px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
             <h4 id="dialog-title" style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold;">通知
             </h4>
             <p id="dialog-message" style="font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem;">
@@ -336,79 +363,78 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               <button id="btn-dialog-no" class="btn btn-secondary"
                 style="display:none; flex:1; padding: 0.3rem 0;">いいえ</button>
             </div>
+            <div id="dialog-extra" style="display: none; width: 100%;"></div>
           </div>
         </div>
 
+        <!-- カード詳細モーダル -->
+        <div id="card-detail-modal" class="overlay card-detail-modal" style="display: none;">
+          <div class="card-detail-container">
+            <button id="btn-close-card-detail" class="btn-close-card-detail">&times;</button>
+            <div id="card-detail-content" class="card-detail-content">
+              <!-- カードが入る -->
+            </div>
+            <div id="card-detail-desc" class="card-detail-desc">
+            </div>
+          </div>
+        </div>
+
+
         <!-- バトル画面本体 -->
         <div class="battle-layout"
-          style="top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem;">
+          style="top: 40px; height:calc(100% - 84px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem;">
 
-          <!-- ポケモン式4象限バトルフィールド -->
-          <div class="battle-field"
-            style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+          <button class="btn btn-secondary" id="btn-battle-retire"
+            style="position: absolute; top: 12px; right: 0.5rem; z-index: 100; font-size: 0.7rem; width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; border-color: #ffb84d; color: #ffb84d; background: rgba(0,0,0,0.6);">リタイア</button>
+
+          <!--バトルフィールド -->
+          <div class="battle-field">
 
             <!-- ① 左上：敵ステータス -->
-            <div class="enemy-status-panel"
-              style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
-              <div
-                style="font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+            <div class="enemy-status-panel">
+              <div class="status-header enemy-header">
                 <span id="enemy-name">敵</span>
-                <span id="enemy-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+                <span id="enemy-poison-badge" class="poison-badge" style="display: none;"></span>
               </div>
-              <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
-                <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
-                <div
-                  style="flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
-                  <div id="enemy-hp-bar"
-                    style="height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s;">
-                  </div>
+              <div class="status-row">
+                <span class="status-label">HP</span>
+                <div class="hp-bar-bg enemy-hp-bg">
+                  <div id="enemy-hp-bar" class="hp-bar-fill enemy-hp-fill"></div>
                 </div>
-                <span id="enemy-hp-text"
-                  style="font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0;">40/40</span>
+                <span id="enemy-hp-text" class="status-text enemy-text">40/40</span>
               </div>
-              <div id="enemy-intent"
-                style="font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666;">
-                ⚔️ 5</div>
+              <div id="enemy-intent" class="enemy-intent-badge">⚔️ 5</div>
             </div>
 
             <!-- ② 右上：敵画像 -->
-            <div style="display: flex; align-items: center; justify-content: center; position: relative;">
-              <img id="enemy-image" src="" alt="敵"
-                style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));" />
+            <div class="battle-image-container">
+              <img id="enemy-image" src="" alt="敵" class="battle-image enemy-image" />
             </div>
 
             <!-- ③ 左下：自分画像 -->
-            <div
-              style="display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative;">
-              <img id="player-battle-image" src="" alt="自分"
-                style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8));" />
+            <div class="battle-image-container player-image-container">
+              <img id="player-battle-image" src="" alt="自分" class="battle-image player-image" />
             </div>
 
             <!-- ④ 右下：自分ステータス -->
-            <div class="player-status-panel"
-              style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6);">
-              <div
-                style="font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
-                <span id="player-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+            <div class="player-status-panel">
+              <div class="status-header player-header">
+                <span id="player-poison-badge" class="poison-badge" style="display: none;"></span>
                 <span id="player-class-name">あなた</span>
               </div>
-              <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
-                <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
-                <div
-                  style="flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
-                  <div id="player-hp-bar"
-                    style="height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s;">
-                  </div>
+              <div class="status-row">
+                <span class="status-label">HP</span>
+                <div class="hp-bar-bg player-hp-bg">
+                  <div id="player-hp-bar" class="hp-bar-fill player-hp-fill"></div>
                 </div>
-                <span id="player-hp-text"
-                  style="font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0;">10/10</span>
+                <span id="player-hp-text" class="status-text player-text">10/10</span>
               </div>
-              <div style="display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem;">
-                <span style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">MP</span>
-                <div id="player-mp-orbs" style="display: flex; gap: 2px; flex: 1;"></div>
-                <span id="player-mp-text" style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">5/5</span>
+              <div class="status-row player-mp-row">
+                <span class="status-label mp-label">MP</span>
+                <div id="player-mp-orbs" class="player-mp-orbs"></div>
+                <span id="player-mp-text" class="status-text mp-text">5/5</span>
               </div>
-              <div style="font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem;">
+              <div class="player-actions-text">
                 行動: <span id="player-actions">1</span>回
               </div>
             </div>
@@ -417,45 +443,25 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
           <!-- バトルログ (コンパクト) -->
           <div class="battle-log-panel" id="battle-log"
-            style="height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box;">
+            style="height: 80px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box;">
             <p class="log-system">戦闘開始！</p>
-          </div>
-
-          <!-- レリック・アイテムエリア -->
-          <div
-            style="display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%;">
-            <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
-              <span
-                style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">レリック:</span>
-              <div id="player-relics" style="display: flex; gap: 4px; overflow-x: auto;"></div>
-            </div>
-            <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
-              <span
-                style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
-              <div id="player-items" style="display: flex; gap: 4px;"></div>
-            </div>
           </div>
 
           <!-- 手札エリア -->
           <div style="display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-              <button class="btn btn-secondary" id="btn-view-deck"
-                style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem;">
-                山札 (<span id="deck-count">0</span>)
-              </button>
               <button class="btn btn-secondary" id="btn-battle-view-map"
-                style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d;">
-                マップ 🗺️
-              </button>
+                style="width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d; flex-shrink: 0;">マップ</button>
+              <button class="btn btn-end-turn" id="btn-end-turn"
+                style="width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; font-size: 0.7rem;">様子見</button>
             </div>
             <div id="hand-area" class="hand-area"
               style="height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start;">
               <!-- カードがJSで挿入されます -->
             </div>
-            <div style="margin-top: 0.1rem; width: 100%;">
-              <button class="btn btn-end-turn" id="btn-end-turn" style="width: 100%; padding: 0.4rem;">様子見</button>
-            </div>
           </div>
+
+
 
         </div><!-- /.battle-layout -->
 
@@ -475,7 +481,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         <!-- コンフィグモーダル -->
         <div id="modal-overlay" class="modal-overlay"></div>
         <div id="config-modal" class="config-modal">
-          <h3>設定（コンフィグ）</h3>
+          <h3>コンフィグ</h3>
           <div class="config-item">
             <label for="bgm-volume">BGM音量</label>
             <input type="range" id="bgm-volume" min="0" max="100" value="50">
@@ -565,9 +571,317 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   </BaseLayout>
 
   <style>
+    @keyframes slow-pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        opacity: 1;
+      }
+
+      50% {
+        box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.2);
+        opacity: 0.7;
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        opacity: 1;
+      }
+    }
+
+    .btn-pulse {
+      animation: slow-pulse 2s infinite ease-in-out;
+      border-color: #fff !important;
+      color: #fff !important;
+    }
+
+    /* =============================
+       バトルフィールド
+       ============================= */
+    .battle-field {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      /* 1fr 1fr instead of 85px auto avoids cutoff */
+      gap: 12px;
+      padding: 10px;
+      margin-bottom: 0.3rem;
+      position: relative;
+      background: linear-gradient(180deg, rgba(30, 15, 5, 0.6) 0%, rgba(5, 15, 30, 0.6) 100%);
+      border-radius: 8px;
+      border: 1px solid #333;
+      flex-shrink: 0;
+      min-height: 180px;
+    }
+
+    .enemy-status-panel,
+    .player-status-panel {
+      padding: 0.4rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 8px;
+      z-index: 2;
+      align-self: center;
+    }
+
+    .enemy-status-panel {
+      align-items: flex-start;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid #666;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+      transform: translateX(10px);
+      /* Adjust inward slightly */
+    }
+
+    .player-status-panel {
+      /*align-items: flex-end;*/
+      background: rgba(0, 0, 50, 0.75);
+      border: 1px solid #007bff;
+      box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.6);
+      transform: translateX(-10px);
+      /* Adjust inward slightly */
+    }
+
+    .status-header {
+      font-size: 0.78rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 0.15rem;
+    }
+
+    .enemy-header {
+      color: #e8d5b7;
+    }
+
+    .player-header {
+      color: #b7d5e8;
+    }
+
+    .poison-badge {
+      font-size: 0.65rem;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .status-label {
+      font-size: 0.62rem;
+      color: #ccc;
+      flex-shrink: 0;
+    }
+
+    .hp-bar-bg {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #555;
+    }
+
+    .enemy-hp-bg {
+      background: #2a1a1a;
+    }
+
+    .player-hp-bg {
+      background: #1a1a2a;
+    }
+
+    .hp-bar-fill {
+      height: 100%;
+      width: 100%;
+      transition: width 0.3s;
+    }
+
+    .enemy-hp-fill {
+      background: linear-gradient(90deg, #e74c3c, #e67e22);
+    }
+
+    .player-hp-fill {
+      background: linear-gradient(90deg, #27ae60, #2ecc71);
+    }
+
+    .status-text {
+      font-size: 0.62rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .enemy-text {
+      color: #e8d5b7;
+    }
+
+    .player-text {
+      color: #b7d5e8;
+    }
+
+    .enemy-intent-badge {
+      font-size: 0.6rem;
+      color: #ffb84d;
+      margin-top: 0.15rem;
+      display: none;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 3px;
+      padding: 1px 4px;
+      border: 1px solid #666;
+    }
+
+    .player-mp-row {
+      margin-top: 0.1rem;
+    }
+
+    .mp-label {
+      color: #7cc5ff;
+    }
+
+    .mp-text {
+      color: #7cc5ff;
+    }
+
+    .player-mp-orbs {
+      display: flex;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .player-actions-text {
+      font-size: 0.58rem;
+      color: #ffb84d;
+      margin-top: 0.1rem;
+    }
+
+    .battle-image-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .player-image-container {
+      /*justify-content: flex-start;*/
+      padding-left: 0.5rem;
+    }
+
+    .battle-image {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+
+    .enemy-image {
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+    }
+
+    .player-image {
+      filter: drop-shadow(-2px 2px 4px rgba(0, 0, 50, 0.8));
+    }
+
+    /* =============================
+       ゲームヘッダー
+       ============================= */
+    .game-header-bar {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 15, 26, 0.95);
+      border-bottom: 1px solid #333;
+      padding: 0.5rem 3rem 0.5rem 0.8rem;
+      font-size: 0.9rem;
+      z-index: 100;
+      min-height: 44px;
+    }
+
+    .game-footer-bar {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 15, 26, 0.95);
+      border-top: 1px solid #333;
+      padding: 0.4rem 0.8rem;
+      z-index: 100;
+      height: 44px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+
+    .header-status {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .header-floor-text {
+      font-weight: bold;
+      color: #ffb84d;
+    }
+
+    .gold-badge {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    .hp-badge {
+      color: #ff6b6b;
+      font-weight: bold;
+    }
+
+    .mp-badge {
+      color: #7cc5ff;
+      font-weight: bold;
+    }
+
+    .header-relics {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin-left: 0.5rem;
+    }
+
+    .header-relics-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-relics-list-container {
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-config {
+      position: absolute;
+      top: 22px;
+      transform: translateY(-50%);
+      right: 0.8rem;
+      z-index: 999;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .icon-config:hover {
+      transform: translateY(-50%) scale(1.1) rotate(15deg);
+      opacity: 0.8;
+    }
+
     /* =============================
        ゲームコンテナ
        ============================= */
+    .btn-full {
+      width: 100%;
+      margin: 0 auto;
+      display: block;
+      box-sizing: border-box;
+    }
+
     .game-container {
       margin-top: 2rem;
       background: var(--bg-secondary);
@@ -576,7 +890,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       position: relative;
       overflow: hidden;
-      max-width: 640px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
       height: 580px;
@@ -707,6 +1021,65 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
+    .card-detail-modal {
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 600;
+    }
+
+    .card-detail-container {
+      background: #151522;
+      border: 2px solid #555;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .btn-close-card-detail {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background: #fff;
+      border: 2px solid #555;
+      border-radius: 50%;
+      color: #333;
+      font-size: 1.5rem;
+      font-weight: bold;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-detail-content {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+      margin-bottom: 4rem;
+      min-height: 145px;
+    }
+
+    .card-detail-desc {
+      color: #eee;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.8rem;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
+    }
+
     .overlay h2 {
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
@@ -767,8 +1140,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     .dv-card-list {
       display: none;
-      flex-wrap: wrap;
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 6px;
       max-height: 320px;
       overflow-y: auto;
       justify-content: center;
@@ -777,7 +1150,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     .dv-card-list.active {
-      display: flex;
+      display: grid;
+    }
+
+    .dv-card-list :global(.battle-card),
+    #fairy-card-list :global(.battle-card) {
+      width: 100%;
+      min-width: 0;
+      height: 120px;
     }
 
     /* =============================
@@ -1468,60 +1848,60 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     import { enemyTemplates, getEnemyTemplate } from '../../../data/roguelike/enemies';
 
     // ===================================================
-    // Audio Manager
+    // Audio コストger
     // ===================================================
-    const BGM_PATH = '/portfolio/roguelike/assets/audio/bgm/';
-    const SE_PATH = '/portfolio/roguelike/assets/audio/se/';
+    const BGM_PATH = new URL('../../../assets/games/roguelike/audio/bgm/', import.meta.url).href;
+    const SE_PATH = new URL('../../../assets/games/roguelike/audio/se/', import.meta.url).href;
 
     const BGM_DB = {
-      'start': 'maou_game_theme14.mp3',
-      'reward': 'maou_game_event04.mp3',
-      'castle': 'maou_game_castle01.mp3',
-      'inn': 'maou_game_village01.mp3',
-      'town': 'maou_game_town01.mp3',
-      'forest': 'maou_game_dangeon13.mp3',
-      'area1': 'maou_game_field05.mp3',
-      'area2': 'maou_game_field11.mp3',
-      'area3': 'maou_game_field07.mp3',
-      'battle': 'maou_game_battle07.mp3',
-      'boss': 'maou_game_boss02.mp3',
-      'lastboss': 'maou_game_boss06.mp3',
-      'bandit_pre': 'maou_game_dangeon07.mp3',
-      'darkelf_pre': 'maou_game_dangeon22.mp3',
-      'golem_pre': 'maou_game_dangeon01.mp3',
-      'vampire_pre': 'maou_game_dangeon17.mp3',
-      'leviathan_pre': 'maou_game_dangeon15.mp3',
-      'maou_pre': 'maou_game_dangeon04b.mp3'
+      'start': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_theme14.mp3', import.meta.url).href,
+      'reward': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_event04.mp3', import.meta.url).href,
+      'castle': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_castle01.mp3', import.meta.url).href,
+      'inn': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_village01.mp3', import.meta.url).href,
+      'town': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_town01.mp3', import.meta.url).href,
+      'forest': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon13.mp3', import.meta.url).href,
+      'area1': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_field05.mp3', import.meta.url).href,
+      'area2': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_field11.mp3', import.meta.url).href,
+      'area3': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_field07.mp3', import.meta.url).href,
+      'battle': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_battle07.mp3', import.meta.url).href,
+      'boss': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_boss02.mp3', import.meta.url).href,
+      'lastboss': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_boss06.mp3', import.meta.url).href,
+      'bandit_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon07.mp3', import.meta.url).href,
+      'darkelf_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon22.mp3', import.meta.url).href,
+      'golem_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon01.mp3', import.meta.url).href,
+      'vampire_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon17.mp3', import.meta.url).href,
+      'leviathan_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon15.mp3', import.meta.url).href,
+      'maou_pre': new URL('../../../assets/games/roguelike/audio/bgm/maou_game_dangeon04b.mp3', import.meta.url).href
     };
 
     const SE_DB = {
-      'relic': 'maou_game_jingle09.mp3',
-      'inn': 'maou_game_jingle07.mp3',
-      'victory': 'maou_game_jingle01.mp3',
-      'defeat': 'maou_game_jingle08.mp3',
-      'strike': '剣で斬る2.mp3',
-      'smite': '剣で斬る3.mp3',
-      'rush': '剣で斬る4.mp3',
-      'stone': '岩が真っ二つに割れる.mp3',
-      'buff_up': 'ステータス上昇魔法2.mp3',
-      'buff_down': 'HP吸収魔法2.mp3',
-      'enemy_attack': '小パンチ.mp3',
-      'boss_attack': '打撃6.mp3',
-      'reward_select': '決定ボタンを押す4.mp3',
-      'invalid': 'ビープ音4.mp3',
-      'harpy': 'ヒヨドリの鳴き声1.mp3',
-      'fire': '火炎魔法1.mp3',
-      'ice': '氷魔法1.mp3',
-      'thunder': '雷魔法1.mp3',
-      'wind': '風魔法1.mp3',
-      'poison': '毒魔法1.mp3',
-      'heal': '回復魔法1.mp3',
-      'meteor': 'ドラゴンが火を吐く.mp3',
-      'confirm': '/portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
-      'cancel': '/portfolio/common/assets/audio/se/キャンセル1.mp3',
-      'cursor': '/portfolio/common/assets/audio/se/カーソル移動7.mp3',
-      'draw': 'カードをめくる.mp3',
-      'play': 'カードを台の上に出す.mp3'
+      'relic': new URL('../../../assets/games/roguelike/audio/se/maou_game_jingle09.mp3', import.meta.url).href,
+      'inn': new URL('../../../assets/games/roguelike/audio/se/maou_game_jingle07.mp3', import.meta.url).href,
+      'victory': new URL('../../../assets/games/roguelike/audio/se/maou_game_jingle01.mp3', import.meta.url).href,
+      'defeat': new URL('../../../assets/games/roguelike/audio/se/maou_game_jingle08.mp3', import.meta.url).href,
+      'strike': new URL('../../../assets/games/roguelike/audio/se/剣で斬る2.mp3', import.meta.url).href,
+      'smite': new URL('../../../assets/games/roguelike/audio/se/剣で斬る3.mp3', import.meta.url).href,
+      'rush': new URL('../../../assets/games/roguelike/audio/se/剣で斬る4.mp3', import.meta.url).href,
+      'stone': new URL('../../../assets/games/roguelike/audio/se/岩が真っ二つに割れる.mp3', import.meta.url).href,
+      'buff_up': new URL('../../../assets/games/roguelike/audio/se/ステータス上昇魔法2.mp3', import.meta.url).href,
+      'buff_down': new URL('../../../assets/games/roguelike/audio/se/HP吸収魔法2.mp3', import.meta.url).href,
+      'enemy_attack': new URL('../../../assets/games/roguelike/audio/se/小パンチ.mp3', import.meta.url).href,
+      'boss_attack': new URL('../../../assets/games/roguelike/audio/se/打撃6.mp3', import.meta.url).href,
+      'reward_select': new URL('../../../assets/games/roguelike/audio/se/決定ボタンを押す4.mp3', import.meta.url).href,
+      'invalid': new URL('../../../assets/games/roguelike/audio/se/ビープ音4.mp3', import.meta.url).href,
+      'harpy': new URL('../../../assets/games/roguelike/audio/se/ヒヨドリの鳴き声1.mp3', import.meta.url).href,
+      'fire': new URL('../../../assets/games/roguelike/audio/se/火炎魔法1.mp3', import.meta.url).href,
+      'ice': new URL('../../../assets/games/roguelike/audio/se/氷魔法1.mp3', import.meta.url).href,
+      'thunder': new URL('../../../assets/games/roguelike/audio/se/雷魔法1.mp3', import.meta.url).href,
+      'wind': new URL('../../../assets/games/roguelike/audio/se/風魔法1.mp3', import.meta.url).href,
+      'poison': new URL('../../../assets/games/roguelike/audio/se/毒魔法1.mp3', import.meta.url).href,
+      'heal': new URL('../../../assets/games/roguelike/audio/se/回復魔法1.mp3', import.meta.url).href,
+      'meteor': new URL('../../../assets/games/roguelike/audio/se/ドラゴンが火を吐く.mp3', import.meta.url).href,
+      'confirm': new URL('../../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/決定ボタンを押す2.mp3', import.meta.url).href,
+      'cancel': new URL('../../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/キャンセル1.mp3', import.meta.url).href,
+      'cursor': new URL('../../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/カーソル移動7.mp3', import.meta.url).href,
+      'draw': new URL('../../../assets/games/roguelike/audio/se/カードをめくる.mp3', import.meta.url).href,
+      'play': new URL('../../../assets/games/roguelike/audio/se/カードを台の上に出す.mp3', import.meta.url).href
     };
 
     let currentBgmAudio = null;
@@ -1532,7 +1912,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function playBGM(bgmId, fadeOutMs = 1000) {
       if (!BGM_DB[bgmId]) return;
-      const url = BGM_PATH + BGM_DB[bgmId];
+      const url = BGM_DB[bgmId];
       if (currentBgmAudio && currentBgmAudio.src.endsWith(url)) return;
 
       if (currentBgmFadeInterval) {
@@ -1579,12 +1959,28 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       }
     }
 
+    let currentLongSEs = [];
+
     function playSE(seId) {
       if (!SE_DB[seId]) return;
-      const path = SE_DB[seId].startsWith('/') ? SE_DB[seId] : SE_PATH + SE_DB[seId];
+      const path = SE_DB[seId];
       const se = new Audio(path);
       se.volume = configSeVolume;
       se.play().catch(e => console.log('SE Play blocked:', e));
+      if (seId === 'relic' || seId === 'level_up') {
+        currentLongSEs.push(se);
+        se.addEventListener('ended', () => {
+          currentLongSEs = currentLongSEs.filter(s => s !== se);
+        });
+      }
+    }
+
+    function stopLongSE() {
+      currentLongSEs.forEach(se => {
+        se.pause();
+        se.currentTime = 0;
+      });
+      currentLongSEs = [];
     }
 
     function setBgmVolume(vol) {
@@ -1599,6 +1995,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     // --- 1. DOM要素の取得 ---
     const gameHeader = document.getElementById('game-header');
+    const gameFooter = document.getElementById('game-footer');
     const headerFloor = document.getElementById('header-floor');
     const headerGold = document.getElementById('header-gold');
     const headerHp = document.getElementById('header-hp');
@@ -1646,8 +2043,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     const startScreen = document.getElementById('start-screen');
     const classSelectScreen = document.getElementById('class-select-screen');
     const mapScreen = document.getElementById('map-screen');
+    const btnRetireMap = document.getElementById('btn-retire-map');
     const innScreen = document.getElementById('inn-screen');
-    const fairyScreen = document.getElementById('fairy-screen');
+    const shopServiceScreen = document.getElementById('shop-service-screen');
     const townScreen = document.getElementById('town-screen');
     const eventScreen = document.getElementById('event-screen');
     const itemConfirmModal = document.getElementById('item-confirm-modal');
@@ -1668,9 +2066,15 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     const gameDialogModal = document.getElementById('game-dialog-modal');
     const dialogTitle = document.getElementById('dialog-title');
     const dialogMessage = document.getElementById('dialog-message');
+    const dialogExtra = document.getElementById('dialog-extra');
     const btnDialogOk = document.getElementById('btn-dialog-ok');
     const btnDialogYes = document.getElementById('btn-dialog-yes');
     const btnDialogNo = document.getElementById('btn-dialog-no');
+
+    const cardDetailModal = document.getElementById('card-detail-modal');
+    const cardDetailContent = document.getElementById('card-detail-content');
+    const cardDetailDesc = document.getElementById('card-detail-desc');
+    const btnCloseCardDetail = document.getElementById('btn-close-card-detail');
     // カットシーン
     const cutsceneModal = document.getElementById('cutscene-modal');
     const cutsceneBg = document.getElementById('cutscene-bg');
@@ -1747,11 +2151,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       deck: [],
       hand: [],
       discard: [],
+      exhausted: [],
       relics: [],
       items: [
-        { id: 'sandwich', used: false },
-        { id: 'elixir', used: false },
-        { id: 'perfume', used: false }
+        { id: 'sandwich', used: false }
       ],
       actions: 1,
       poison: 0,
@@ -1773,10 +2176,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     // キャラクターアバターアセットパス定義
     const AVATAR_IMAGES = {
-      yuusya: '/portfolio/roguelike/assets/characters/figure_rpg_character_yuusya.png',
-      kenshi: '/portfolio/roguelike/assets/characters/figure_rpg_character_kenshi.png',
-      mahoutsukai: '/portfolio/roguelike/assets/characters/figure_rpg_character_mahoutsukai.png',
-      butouka: '/portfolio/roguelike/assets/characters/figure_rpg_character_butouka.png'
+      yuusya: new URL('../../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png', import.meta.url).href,
+      kenshi: new URL('../../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png', import.meta.url).href,
+      mahoutsukai: new URL('../../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png', import.meta.url).href,
+      butouka: new URL('../../../assets/games/roguelike/images/characters/figure_rpg_character_butouka.png', import.meta.url).href
     };
 
     // --- 3. インゲーム汎用ダイアログ ---
@@ -1803,6 +2206,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     function showGameConfirm(title, message, onYes, onNo = null) {
+      if (dialogExtra) {
+        dialogExtra.innerHTML = '';
+        dialogExtra.style.display = 'none';
+      }
       if (dialogTitle) dialogTitle.innerHTML = title;
       if (dialogMessage) dialogMessage.innerHTML = message;
       if (btnDialogOk) {
@@ -1824,12 +2231,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     if (btnDialogOk) {
       btnDialogOk.addEventListener('click', () => {
+        stopLongSE();
         if (gameDialogModal) gameDialogModal.style.display = 'none';
         if (currentDialogCallback) currentDialogCallback();
       });
     }
     if (btnDialogYes) {
       btnDialogYes.addEventListener('click', () => {
+        stopLongSE();
         if (gameDialogModal) gameDialogModal.style.display = 'none';
         if (currentDialogCallback) currentDialogCallback();
       });
@@ -1864,20 +2273,104 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function showScreen(target) {
       const screens = [
         startScreen, classSelectScreen, mapScreen, innScreen,
-        fairyScreen, townScreen, eventScreen, document.querySelector('.battle-layout')
+        shopServiceScreen, townScreen, eventScreen, document.querySelector('.battle-layout')
       ];
       screens.forEach(s => {
         if (s) s.style.display = 'none';
       });
       if (target) {
-        target.style.display = (target === mapScreen) ? 'flex' : 'block';
-        if (target === mapScreen || target === document.querySelector('.battle-layout')) {
+        target.style.display = (target === document.querySelector('.battle-layout')) ? 'grid' : 'flex';
+        if (target === mapScreen || target === document.querySelector('.battle-layout') || target === townScreen || target === shopServiceScreen || target === eventScreen || target === innScreen) {
           if (gameHeader) gameHeader.style.display = 'flex';
+          if (gameFooter) gameFooter.style.display = 'flex';
           updateHeaderBar();
         } else {
           if (gameHeader) gameHeader.style.display = 'none';
+          if (gameFooter) gameFooter.style.display = 'none';
         }
       }
+    }
+
+    function hideGameAlert() {
+      if (gameAlertModal) gameAlertModal.style.display = 'none';
+      if (currentAlertCallback) {
+        currentAlertCallback();
+        currentAlertCallback = null;
+      }
+    }
+
+    if (btnCloseCardDetail) {
+      btnCloseCardDetail.addEventListener('click', () => {
+        if (cardDetailModal) cardDetailModal.style.display = 'none';
+      });
+    }
+
+    function showCardDetailModal(card) {
+      if (!cardDetailModal) return;
+      cardDetailContent.innerHTML = '';
+      const cardEl = makeCardEl(card, false);
+      cardEl.style.transform = 'scale(1.3)';
+      cardEl.style.transformOrigin = 'center top';
+      cardEl.style.cursor = 'default';
+      cardDetailContent.appendChild(cardEl);
+      const descHtml = (card.desc || '').replace(/\n/g, '<br>');
+      const flavorHtml = `<div style="margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
+      cardDetailDesc.innerHTML = `<div style="margin-bottom: 0.5rem;">${descHtml}</div>${flavorHtml}`;
+      cardDetailModal.style.display = 'flex';
+    }
+
+    if (btnRetireMap) {
+      btnRetireMap.addEventListener('click', () => {
+        showGameConfirm('リタイア', '現在のプレイを終了してタイトルに戻りますか？', () => {
+          showScreen(startScreen);
+          stopBGM();
+        });
+      });
+    }
+
+    function showItemDetailModal(item, type) {
+      if (!cardDetailModal) return;
+      cardDetailContent.innerHTML = '';
+
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.alignItems = 'center';
+      container.style.background = 'linear-gradient(160deg, #1a1a2e 0%, #16213e 100%)';
+      container.style.border = '2px solid ' + (type === 'relic' ? '#f1c40f' : '#3498db');
+      container.style.borderRadius = '10px';
+      container.style.padding = '1.5rem';
+      container.style.width = '240px';
+      container.style.color = '#fff';
+
+      const img = document.createElement('img');
+      img.src = item.image;
+      img.style.width = '64px';
+      img.style.height = '64px';
+      img.style.objectFit = 'contain';
+      img.style.marginBottom = '1rem';
+      container.appendChild(img);
+
+      const title = document.createElement('div');
+      title.textContent = item.name;
+      title.style.fontSize = '1.1rem';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '0.5rem';
+      container.appendChild(title);
+
+      const desc = document.createElement('div');
+      desc.innerHTML = (item.desc || '').replace(/\n/g, '<br>');
+      desc.style.fontSize = '0.85rem';
+      desc.style.color = 'var(--text-main)';
+      desc.style.textAlign = 'center';
+      container.appendChild(desc);
+
+      cardDetailContent.appendChild(container);
+
+      const typeName = type === 'relic' ? 'レリック' : 'アイテム';
+      const flavorHtml = `<div style="margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
+      cardDetailDesc.innerHTML = `<div style="text-align: center; color: #888;">【${typeName}】</div>${flavorHtml}`;
+      cardDetailModal.style.display = 'flex';
     }
 
     function updateHeaderBar() {
@@ -1893,9 +2386,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           if (relic) {
             const img = document.createElement('img');
             img.src = relic.image;
-            img.alt = relic.name;
-            img.title = `${relic.name}: ${relic.desc.replace(/<br>/g, ' ')}`;
-            img.style.cssText = 'width: 20px; height: 20px; object-fit: contain; border: 1px solid #444; border-radius: 3px; background: rgba(255,255,255,0.05);';
+            img.className = 'relic-icon';
+            img.title = `${relic.name}\n${relic.desc}`;
+            img.addEventListener('click', () => showItemDetailModal(relic, 'relic'));
+            img.style.cssText = 'width: 20px; height: 20px; object-fit: contain; border: 1px solid #444; border-radius: 3px; background: rgba(255,255,255,0.05); cursor: pointer;';
             headerRelicsList.appendChild(img);
           }
         });
@@ -1992,7 +2486,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (defaultCard) defaultCard.classList.add('selected');
 
       const preview = document.getElementById('class-select-preview');
-      if (preview) preview.textContent = '勇者が選択されています';
+      if (preview) preview.textContent = '職業をクリックして冒険を始めてください';
 
       classCards.forEach(card => {
         card.addEventListener('click', () => {
@@ -2001,7 +2495,45 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           // クリックしたカードにselectedを履用
           card.classList.add('selected');
           selectedClass = card.dataset.class;
-          if (preview) preview.textContent = `${CLASS_NAMES[selectedClass] || selectedClass}が選択されています`;
+          let initialCards = INITIAL_DECKS[selectedClass].map(id => CARD_DB[id]);
+
+          const classInfo = {
+            yuusya: { hp: 10, mp: 5, effect: '開始時に王様からレリックを2つ貰える' },
+            kenshi: { hp: 15, mp: 4, effect: '毎ターン開始時にHPが1回復する' },
+            mahoutsukai: { hp: 7, mp: 7, effect: '毎ターン開始時にMPが1回復する' },
+            butouka: { hp: 8, mp: 4, effect: '毎ターンの行動回数が+1' }
+          };
+          const info = classInfo[selectedClass];
+          const confirmMessage = `初期HP: ${info.hp} / 初期MP: ${info.mp}<br><span style="color: #ffb84d;">【特殊効果】 ${info.effect}</span>`;
+
+          showGameConfirm(`${CLASS_NAMES[selectedClass] || selectedClass}として冒険にでますか？`, confirmMessage, () => {
+            initGame();
+          });
+
+          if (dialogExtra) {
+            dialogExtra.innerHTML = '';
+            const deckWrap = document.createElement('div');
+            deckWrap.style.cssText = 'margin-top: 1rem; text-align: left; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 6px;';
+            const deckLabel = document.createElement('div');
+            deckLabel.style.cssText = 'font-size: 0.75rem; color: #aaa; margin-bottom: 0.4rem;';
+            deckLabel.textContent = '【初期デッキ】';
+            deckWrap.appendChild(deckLabel);
+            const deckGrid = document.createElement('div');
+            deckGrid.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-height: 245px; overflow-y: auto; padding: 4px 0;';
+            initialCards.forEach(c => {
+              const cardEl = makeCardEl(c, null);
+              cardEl.style.transform = 'scale(0.65)';
+              cardEl.style.transformOrigin = 'top left';
+              cardEl.style.margin = '0';
+              const wrapper = document.createElement('div');
+              wrapper.style.cssText = 'width: 58px; height: 94px;';
+              wrapper.appendChild(cardEl);
+              deckGrid.appendChild(wrapper);
+            });
+            deckWrap.appendChild(deckGrid);
+            dialogExtra.appendChild(deckWrap);
+            dialogExtra.style.display = 'block';
+          }
         });
       });
     }
@@ -2034,7 +2566,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       player.deck = INITIAL_DECKS[player.class].map(id => ({ ...CARD_DB[id] }));
       player.discard = [];
       player.hand = [];
-      player.items.forEach(i => i.used = false);
+      player.items = [
+        { id: 'sandwich', used: false }
+      ];
+
+      renderRelicsAndItems();
+      updateHeaderBar();
 
       if (playerBattleImage) playerBattleImage.src = AVATAR_IMAGES[player.class];
 
@@ -2061,10 +2598,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function generateAreaMap() {
       generatedMap = [];
-      const nonNormals = ['elite', 'mimic', 'inn', 'fairy', 'event'];
 
       function getRandomNonNormal() {
-        return nonNormals[Math.floor(Math.random() * nonNormals.length)];
+        let types = ['event', 'inn', 'fairy'];
+        if (currentArea === 1 && currentFloor <= 3) {
+          types = ['event', 'fairy'];
+        }
+        return types[Math.floor(Math.random() * types.length)];
       }
 
       function generateRoute3() {
@@ -2141,7 +2681,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             }
           }
 
-          const isNextTarget = (fIndex === currentFloor + 1 && !isGameOver);
+          const isNextTarget = (fIndex === currentFloor + 1 && !isGameOver && !isBattleModal);
           if (isNextTarget) {
             let canMove = false;
             if (currentFloor === 0 || currentFloor === 4 || currentFloor === 5) {
@@ -2231,26 +2771,40 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     function getMapImageForType(type) {
-      const base = '/portfolio/roguelike/assets/map/';
+
       switch (type) {
-        case 'start': return base + 'castle.png';
-        case 'normal': return base + 'mark_chuui.png';
-        case 'elite': return base + 'mark_chuui.png';
-        case 'mimic': return base + 'mark_chuui.png';
-        case 'inn': return base + 'building_hotel_pet.png';
-        case 'fairy': return base + 'mori.png';
-        case 'event': return base + 'mark_question.png';
-        case 'town': return base + 'omise_shop_tatemono.png';
+        case 'start': return new URL('../../../assets/games/roguelike/images/map/castle.png', import.meta.url).href;
+        case 'normal': return new URL('../../../assets/games/roguelike/images/map/mark_chuui.png', import.meta.url).href;
+        case 'elite': return new URL('../../../assets/games/roguelike/images/map/mark_chuui.png', import.meta.url).href;
+        case 'mimic': return new URL('../../../assets/games/roguelike/images/map/mark_chuui.png', import.meta.url).href;
+        case 'inn': return new URL('../../../assets/games/roguelike/images/map/building_hotel_pet.png', import.meta.url).href;
+        case 'fairy': return new URL('../../../assets/games/roguelike/images/map/mori.png', import.meta.url).href;
+        case 'event': return new URL('../../../assets/games/roguelike/images/map/mark_question.png', import.meta.url).href;
+        case 'town': return new URL('../../../assets/games/roguelike/images/map/omise_shop_tatemono.png', import.meta.url).href;
         case 'midboss':
-          if (currentArea === 1) return base + 'doukutsu.png'; // エリア1中ボス：バンディットリーダー
-          if (currentArea === 2) return base + 'mon_gate_western_close.png';
-          if (currentArea === 3) return base + 'arashi.png';
-          return base + 'yama_kiri.png';
+          if (currentArea === 1) return new URL('../../../assets/games/roguelike/images/map/doukutsu.png', import.meta.url).href; // エリア1中ボス：バンディット
+          if (currentArea === 2) return new URL('../../../assets/games/roguelike/images/map/mon_gate_western_close.png', import.meta.url).href;
+          if (currentArea === 3) return new URL('../../../assets/games/roguelike/images/map/arashi.png', import.meta.url).href;
+          return new URL('../../../assets/games/roguelike/images/map/yama_kiri.png', import.meta.url).href;
         case 'boss':
-          if (currentArea === 1) return base + 'yama_kiri.png'; // エリア1ボス：ダークエルフの森
-          return base + 'building_europe_kojou.png';
-        case 'lastboss': return base + 'building_europe_kojou.png';
-        default: return '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+          if (currentArea === 1) return new URL('../../../assets/games/roguelike/images/map/yama_kiri.png', import.meta.url).href; // エリア1ボス：ダークエルフの森
+          return new URL('../../../assets/games/roguelike/images/map/building_europe_kojou.png', import.meta.url).href;
+        case 'lastboss': return new URL('../../../assets/games/roguelike/images/map/building_europe_kojou.png', import.meta.url).href;
+        default: return new URL('../../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url).href;
+      }
+    }
+
+    function applyMapBackground(wrapper) {
+      if (!wrapper) return;
+      if (currentArea === 1) {
+        // 深いネイビーブルー（澄んだ空気・昼の森の暗がり）
+        wrapper.style.background = 'linear-gradient(to bottom, #111d2b, #1b3045)';
+      } else if (currentArea === 2) {
+        // ダークバーガンディ（夕暮れ・黄昏時）
+        wrapper.style.background = 'linear-gradient(to bottom, #2b1311, #451b18)';
+      } else {
+        // ミッドナイトパープル（真夜中・魔王城）
+        wrapper.style.background = 'linear-gradient(to bottom, #100b1a, #1f1533)';
       }
     }
 
@@ -2261,6 +2815,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       else if (currentArea === 2) playBGM('area2');
       else playBGM('area3');
       if (mapScrollWrapper) {
+        applyMapBackground(mapScrollWrapper);
         setTimeout(() => {
           mapScrollWrapper.scrollLeft = currentFloor * 70;
         }, 100);
@@ -2269,14 +2824,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     // --- 9. 各種マス（Node）進入処理 ---
     // --- カットシーンデータ定義 ---
-    const BASE_CH = '/portfolio/roguelike/assets/characters/';
-    const BASE_MAP = '/portfolio/roguelike/assets/map/';
+
+
 
     const CUTSCENE_PRE = {
       bandit: [
         {
-          bg: BASE_MAP + 'doukutsu.png',
-          portraits: [{ src: '/portfolio/roguelike/assets/monsters/character_sanzoku.png', size: '130px' }],
+          bg: new URL('../../../assets/games/roguelike/images/map/doukutsu.png', import.meta.url).href,
+          portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/character_sanzoku.png', import.meta.url).href, size: '130px' }],
           speaker: '山賊',
           lines: [
             'この一帯を荒らし回っているのはこのオレだ…！',
@@ -2286,8 +2841,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       ],
       boss_area1: [
         {
-          bg: BASE_MAP + 'yama_kiri.png',
-          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '130px' }],
+          bg: new URL('../../../assets/games/roguelike/images/map/yama_kiri.png', import.meta.url).href,
+          portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/fantasy_dark_elf.png', import.meta.url).href, size: '130px' }],
           speaker: 'ダークエルフ',
           lines: [
             'オマエ…\nコノ森ヲ\u30fb\u30fb\u30fb荒ラス者\u30fb\u30fb\u30fb？',
@@ -2297,8 +2852,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       ],
       midboss_area2: [
         {
-          bg: BASE_MAP + 'mon_gate_western_close.png',
-          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_golem.png', size: '130px' }],
+          bg: new URL('../../../assets/games/roguelike/images/map/mon_gate_western_close.png', import.meta.url).href,
+          portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/fantasy_golem.png', import.meta.url).href, size: '130px' }],
           speaker: '─── 状況 ───',
           lines: [
             '町の入口前に、石造りの巨体が立ち塞がっている。',
@@ -2308,8 +2863,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       ],
       boss_area2: [
         {
-          bg: BASE_MAP + 'building_europe_kojou.png',
-          portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dracula2.png', size: '130px' }],
+          bg: new URL('../../../assets/games/roguelike/images/map/building_europe_kojou.png', import.meta.url).href,
+          portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/fantasy_dracula2.png', import.meta.url).href, size: '130px' }],
           speaker: 'ヴァンパイア',
           lines: [
             'おやおや…\nこんな辺鄙な城までご足労いただけるとは。',
@@ -2320,7 +2875,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       ],
       midboss_area3: [
         {
-          bg: BASE_MAP + 'arashi.png',
+          bg: new URL('../../../assets/games/roguelike/images/map/arashi.png', import.meta.url).href,
           portraits: [],
           speaker: '─── 状況 ───',
           lines: [
@@ -2331,12 +2886,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       ]
     };
 
-    // エリア1中ボス（バンディットリーダー）の戦闘前カットシーン
+    // エリア1中ボス（バンディット）の戦闘前カットシーン
     const CUTSCENE_PRE_MIDBOSS_AREA1 = [
       {
-        bg: BASE_MAP + 'doukutsu.png',
-        portraits: [{ src: '/portfolio/roguelike/assets/monsters/character_sanzoku.png', size: '140px' }],
-        speaker: 'バンディットリーダー',
+        bg: new URL('../../../assets/games/roguelike/images/map/doukutsu.png', import.meta.url).href,
+        portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/character_sanzoku.png', import.meta.url).href, size: '140px' }],
+        speaker: 'バンディット',
         lines: [
           'ほぉ…よくここまで来たな。部下を散々やっつけてくれて。',
           'だが、ここからはオレが直々に相手してやる。\nこの洞窟の奥まで来て、生きて帰れると思うなよ！'
@@ -2384,7 +2939,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     // --- 10. 宿（回復） ---
-    const btnInnRest = document.getElementById('btn-inn-rest');
+    const btnInnRestHalf = document.getElementById('btn-inn-rest-half');
+    const btnInnRestFull = document.getElementById('btn-inn-rest-full');
     const btnInnLeave = document.getElementById('btn-inn-leave');
 
     function showInnScreen() {
@@ -2392,21 +2948,42 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       showScreen(innScreen);
     }
 
-    if (btnInnRest) {
-      btnInnRest.addEventListener('click', () => {
+    if (btnInnRestHalf) {
+      btnInnRestHalf.addEventListener('click', () => {
         if (player.gold >= 15) {
-          showGameConfirm('宿での休息', '15ゴールドを支払い休息しますか？<br>(HPが全回復し、状態異常が全解除されます)', () => {
+          showGameConfirm('小休憩', '15ゴールドを支払い小休憩しますか？<br>(HPとMPが最大値の50%回復します)', () => {
             player.gold -= 15;
             playSE('inn');
-            player.hp = player.maxHp;
-            player.poison = 0;
-            player.paralyze = 0;
-            showGameAlert('休息完了', '体力が完全に回復しました！', () => {
+            const healHp = Math.floor(player.maxHp * 0.5) || 1;
+            const healMp = Math.floor(player.maxMp * 0.5) || 1;
+            player.hp = Math.min(player.maxHp, player.hp + healHp);
+            player.mp = Math.min(player.maxMp, player.mp + healMp);
+            showGameAlert('小休憩完了', `HPが ${healHp} 、MPが ${healMp} 回復しました！`, () => {
               proceedNextFloor();
             });
           });
         } else {
-          showGameAlert('宿での休息', 'ゴールドが足りません！');
+          showGameAlert('宿屋', 'ゴールドが足りません！');
+        }
+      });
+    }
+
+    if (btnInnRestFull) {
+      btnInnRestFull.addEventListener('click', () => {
+        if (player.gold >= 30) {
+          showGameConfirm('宿泊', '30ゴールドを支払い宿泊しますか？<br>(HP・MPが全回復し、状態異常が全解除されます)', () => {
+            player.gold -= 30;
+            playSE('inn');
+            player.hp = player.maxHp;
+            player.mp = player.maxMp;
+            player.poison = 0;
+            player.paralyze = 0;
+            showGameAlert('宿泊完了', '完全に回復しました！', () => {
+              proceedNextFloor();
+            });
+          });
+        } else {
+          showGameAlert('宿屋', 'ゴールドが足りません！');
         }
       });
     }
@@ -2417,85 +2994,247 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       });
     }
 
-    // --- 11. 妖精（カード強化） ---
-    const btnFairyLeave = document.getElementById('btn-fairy-leave');
-    const fairyCardList = document.getElementById('fairy-card-list');
+    // --- 11. ショップ特別サービス ---
+    const btnShopServiceLeave = document.getElementById('btn-shop-service-leave');
+    const shopServiceCardList = document.getElementById('shop-service-card-list');
 
-    function showFairyScreen() {
-      playBGM('darkelf_pre');
-      showScreen(fairyScreen);
-      const desc = document.getElementById('fairy-desc');
-      if (desc) desc.textContent = '20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。';
+    function showShopServiceScreen(type) {
+      showScreen(shopServiceScreen);
+      const title = document.getElementById('shop-service-title');
+      const desc = document.getElementById('shop-service-desc');
+      if (title) title.textContent = type === 'upgrade' ? 'カード強化' : 'カード削除';
+      if (desc) desc.textContent = type === 'upgrade'
+        ? '20ゴールドを支払い、手札のカードを1枚「強化（+）」します。'
+        : '20ゴールドを支払い、手札のカードを1枚「削除」します。';
 
-      if (fairyCardList) {
-        fairyCardList.innerHTML = '';
+      if (shopServiceCardList) {
+        shopServiceCardList.innerHTML = '';
         const targets = [...player.deck, ...player.discard, ...player.hand];
 
         if (targets.length === 0) {
-          fairyCardList.innerHTML = '<div style="grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem;">カードがありません</div>';
+          shopServiceCardList.innerHTML = '<div style="grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem;">カードがありません</div>';
         } else {
-          // unique id
-          const uniqueIds = Array.from(new Set(targets.map(c => c.id)));
-          uniqueIds.forEach(id => {
-            const cardInstance = targets.find(c => c.id === id);
-            const isUpgraded = id.endsWith('+');
+          targets.forEach((cardInstance) => {
+            const isFullyUpgraded = (cardInstance.upgradeCount || 0) >= 3;
             const btn = makeCardEl(cardInstance, () => {
-              if (isUpgraded) return;
+              if (type === 'upgrade' && isFullyUpgraded) return;
               if (player.gold >= 20) {
-                showGameConfirm('カードの強化', `「${cardInstance.name}」を 20ゴールドで強化しますか？`, () => {
+                showGameConfirm(type === 'upgrade' ? 'カードの強化' : 'カードの削除', `「${cardInstance.name}」を 20ゴールドで${type === 'upgrade' ? '強化' : '削除'}しますか？`, () => {
                   player.gold -= 20;
-                  let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
+                  let index = player.deck.indexOf(cardInstance);
                   if (index !== -1) {
-                    player.deck[index] = upgradeCard(player.deck[index]);
+                    if (type === 'upgrade') player.deck[index] = upgradeCard(player.deck[index]);
+                    else player.deck.splice(index, 1);
                   } else {
-                    index = player.discard.findIndex(c => c.id === id && !c.upgraded);
+                    index = player.discard.indexOf(cardInstance);
                     if (index !== -1) {
-                      player.discard[index] = upgradeCard(player.discard[index]);
+                      if (type === 'upgrade') player.discard[index] = upgradeCard(player.discard[index]);
+                      else player.discard.splice(index, 1);
                     } else {
-                      index = player.hand.findIndex(c => c.id === id && !c.upgraded);
-                      if (index !== -1) player.hand[index] = upgradeCard(player.hand[index]);
+                      index = player.hand.indexOf(cardInstance);
+                      if (index !== -1) {
+                        if (type === 'upgrade') player.hand[index] = upgradeCard(player.hand[index]);
+                        else player.hand.splice(index, 1);
+                      }
                     }
                   }
-                  showGameAlert('強化成功', `「${cardInstance.name}」が強化され「${cardInstance.name}+」になりました！`, () => {
-                    proceedNextFloor();
+                  if (type === 'upgrade') {
+                    shopUpgradeUsed = true;
+                    if (btnTownUpgrade) { btnTownUpgrade.style.opacity = '0.5'; btnTownUpgrade.style.cursor = 'not-allowed'; }
+                  } else {
+                    shopRemoveUsed = true;
+                    if (btnTownRemove) { btnTownRemove.style.opacity = '0.5'; btnTownRemove.style.cursor = 'not-allowed'; }
+                  }
+                  showGameAlert(type === 'upgrade' ? '強化成功' : '削除成功', `「${cardInstance.name}」を${type === 'upgrade' ? '強化' : '削除'}しました！`, () => {
+                    renderShop();
+                    updateHeaderBar();
+                    showScreen(townScreen);
                   });
                 });
+              } else {
+                showGameAlert('ショップ', 'ゴールドが足りません！');
               }
             });
-            btn.style.cursor = isUpgraded ? 'not-allowed' : 'pointer';
-            if (isUpgraded) {
-              const mask = document.createElement('div');
-              mask.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10; border-radius:4px;';
-              btn.appendChild(mask);
-            } else if (player.gold < 20) {
-              btn.style.opacity = '0.5';
+            if (type === 'upgrade') {
+              btn.style.cursor = isFullyUpgraded ? 'not-allowed' : 'pointer';
+              if (isFullyUpgraded) {
+                const mask = document.createElement('div');
+                mask.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10; border-radius:4px;';
+                btn.appendChild(mask);
+              } else if (player.gold < 20) {
+                btn.style.opacity = '0.5';
+              }
+            } else {
+              btn.style.cursor = 'pointer';
+              if (player.gold < 20) btn.style.opacity = '0.5';
             }
-            fairyCardList.appendChild(btn);
+            shopServiceCardList.appendChild(btn);
           });
         }
       }
     }
 
-    if (btnFairyLeave) {
-      btnFairyLeave.addEventListener('click', () => {
-        proceedNextFloor();
+    if (btnShopServiceLeave) {
+      btnShopServiceLeave.addEventListener('click', () => {
+        showScreen(townScreen);
       });
+    }
+
+    function showFairyScreen() {
+      playBGM('darkelf_pre');
+      showScreen(eventScreen);
+      if (document.getElementById('event-image')) {
+        document.getElementById('event-image').src = new URL('../../../assets/games/roguelike/images/characters/fantasy_pixy2.png', import.meta.url).href;
+      }
+      if (document.getElementById('event-title')) document.getElementById('event-title').textContent = '妖精の泉';
+      if (document.getElementById('event-text')) document.getElementById('event-text').textContent = '澄み切った泉の周りに、妖精たちが集まって遊んでいます。\n「遊んでくれるの？お礼にいいことしてあげる！」';
+
+      const container = document.getElementById('event-options');
+      if (container) {
+        container.innerHTML = '';
+
+        const possibleEffects = [
+          {
+            text: '最大HP +1',
+            action: () => {
+              player.maxHp += 1;
+              player.hp = Math.min(player.maxHp, player.hp + 1);
+              playSE('heal');
+              updateHeaderBar();
+              showGameAlert('妖精の祝福', '最大HPが 1 上昇した！', () => proceedNextFloor());
+            }
+          },
+          {
+            text: '最大MP +1',
+            action: () => {
+              player.maxMp += 1;
+              player.mp = Math.min(player.maxMp, player.mp + 1);
+              playSE('heal');
+              updateHeaderBar();
+              showGameAlert('妖精の祝福', '最大MPが 1 上昇した！', () => proceedNextFloor());
+            }
+          },
+          {
+            text: 'HPを全回復',
+            action: () => {
+              player.hp = player.maxHp;
+              playSE('heal');
+              updateHeaderBar();
+              showGameAlert('妖精の祝福', 'HPが全回復した！', () => proceedNextFloor());
+            }
+          },
+          {
+            text: 'MPを全回復',
+            action: () => {
+              player.mp = player.maxMp;
+              playSE('heal');
+              updateHeaderBar();
+              showGameAlert('妖精の祝福', 'MPが全回復した！', () => proceedNextFloor());
+            }
+          },
+          {
+            text: 'ランダムなカード1枚強化',
+            action: () => {
+              const unupgraded = player.deck.filter(c => (c.upgradeCount || 0) < 3);
+              if (unupgraded.length > 0) {
+                shuffle(unupgraded);
+                const target = unupgraded[0];
+                const index = player.deck.findIndex(c => c === target);
+                if (index !== -1) {
+                  player.deck[index] = upgradeCard(player.deck[index]);
+                  playSE('reward_select');
+                  showGameAlert('妖精の祝福', `カード「${target.name}」が「${target.name}+」に強化された！`, () => proceedNextFloor());
+                }
+              } else {
+                showGameAlert('妖精の祝福', '強化できるカードがなかった…', () => proceedNextFloor());
+              }
+            }
+          },
+          {
+            text: '痛いけど我慢する (最大HPの30%ダメージを受け、レリック獲得)',
+            action: () => {
+              const dmg = Math.floor(player.maxHp * 0.3) || 1;
+              player.hp -= dmg;
+              playSE('damage');
+              updateHeaderBar();
+              if (player.hp <= 0) {
+                showGameAlert('妖精の悪戯', `激しい痛みに耐えきれず、あなたは倒れてしまった…`);
+                isGameOver = true;
+                showResultOverlay(false);
+                return;
+              }
+              const unowned = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
+              if (unowned.length > 0) {
+                shuffle(unowned);
+                const picked = unowned[0];
+                player.relics.push(picked);
+                playSE('relic');
+                showGameAlert('妖精の悪戯', `${dmg} ダメージを受けたが、レリック「${RELIC_DB[picked].name}」を手に入れた！`, () => proceedNextFloor());
+              } else {
+                showGameAlert('妖精の悪戯', `${dmg} ダメージを受けたが、見つかるレリックがなかった…`, () => proceedNextFloor());
+              }
+            }
+          }
+        ];
+
+        shuffle(possibleEffects);
+        const choices = possibleEffects.slice(0, 3);
+
+        choices.forEach(choice => {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-primary';
+          btn.style.width = '100%';
+          btn.textContent = choice.text;
+          btn.addEventListener('click', () => {
+            choice.action();
+            // action内部でproceedNextFloorを呼ぶためここでは不要
+          });
+          container.appendChild(btn);
+        });
+      }
     }
 
     // --- 12. 街（カード/アイテム購入ショップ） ---
     const townCards = document.getElementById('town-cards');
     const townItems = document.getElementById('town-items');
     const btnTownLeave = document.getElementById('btn-town-leave');
+    const btnTownUpgrade = document.getElementById('btn-town-upgrade');
+    const btnTownRemove = document.getElementById('btn-town-remove');
     let shopCardsPool = [];
     let shopItemsPool = [];
+    let shopUpgradeUsed = false;
+    let shopRemoveUsed = false;
 
     function showTownScreen() {
       playBGM('town');
       showScreen(townScreen);
-      const pool = [...REWARD_POOL];
+      shopUpgradeUsed = false;
+      shopRemoveUsed = false;
+      if (btnTownUpgrade) {
+        btnTownUpgrade.style.opacity = '1';
+        btnTownUpgrade.style.cursor = 'pointer';
+      }
+      if (btnTownRemove) {
+        btnTownRemove.style.opacity = '1';
+        btnTownRemove.style.cursor = 'pointer';
+      }
+
+      const pool = [...REWARD_POOL].filter(id => id !== 'meteor');
       shuffle(pool);
-      shopCardsPool = pool.slice(0, 3).map(id => ({ id, bought: false }));
-      const allItemKeys = Object.keys(ITEM_DB);
+      const area1UpgradedIdx = Math.floor(Math.random() * 6);
+      shopCardsPool = pool.slice(0, 6).map((id, idx) => {
+        let isBargain = (idx === 0);
+        let isUpgraded = false;
+        if (currentArea === 1) {
+          if (idx === area1UpgradedIdx) isUpgraded = true;
+        } else if (currentArea === 2) {
+          isUpgraded = (Math.random() < 0.5);
+        } else if (currentArea >= 3) {
+          isUpgraded = true;
+        }
+        return { id, bought: false, upgraded: isUpgraded, bargain: isBargain };
+      });
+      const allItemKeys = Object.keys(ITEM_DB).filter(id => !ITEM_DB[id].notForSale);
       shuffle(allItemKeys);
       shopItemsPool = allItemKeys.slice(0, 3).map(id => ({ id, bought: false }));
       renderShop();
@@ -2505,17 +3244,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (townCards) {
         townCards.innerHTML = '';
         shopCardsPool.forEach(item => {
-          const card = CARD_DB[item.id];
+          let card = { ...CARD_DB[item.id] };
+          if (item.upgraded) card = upgradeCard(card);
           const div = document.createElement('div');
           div.style.cssText = 'display: flex; flex-direction: column; align-items: center;';
-          const el = document.createElement('div');
-          el.className = `battle-card color-${card.color}`;
-          el.style.cssText = 'width: 80px; height: 110px; cursor: pointer; margin: 0; border-width:2px;';
-          el.innerHTML = `
-            <div class="card-cost">${card.cost}</div>
-            <div class="card-name" style="font-size:0.65rem; margin-top:0.6rem;">${card.name}</div>
-            <div class="card-desc" style="font-size:0.52rem; line-height:1.2;">${card.desc}</div>
-          `;
+          const el = makeCardEl(card, false);
+          el.style.cssText = 'width: 80px; height: 110px; cursor: pointer; margin: 0; border-width:2px; transform: scale(0.85); transform-origin: top center;';
           if (item.bought) {
             el.style.opacity = '0.2';
             el.style.cursor = 'not-allowed';
@@ -2526,11 +3260,23 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             div.appendChild(boughtText);
           } else {
             el.addEventListener('click', () => {
-              if (player.gold >= 15) {
-                showGameConfirm('商品の購入', `「${card.name}」を15ゴールドで購入しますか？`, () => {
-                  player.gold -= 15;
+              showCardDetailModal(card);
+            });
+            const price = item.bargain ? 7 : 15;
+            const bgColor = '#1976d2';
+            const borderColor = '#1565c0';
+            const priceColor = item.bargain ? '#4ade80' : '#fff';
+
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'btn btn-secondary';
+            buyBtn.style.cssText = `font-size: 0.75rem; padding: 4px 10px; margin-top: 4px; display: flex; align-items: center; justify-content: center; width: auto; min-width: 60px; height: auto; border-radius: 8px; background-color: ${bgColor}; border: 1px solid ${borderColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.3);`;
+            buyBtn.innerHTML = `<span style="color: ${priceColor}; font-weight: bold; margin-right: 2px;">${price}</span> <span style="color: #fff;">Gで購入</span>`;
+            buyBtn.addEventListener('click', () => {
+              if (player.gold >= price) {
+                showGameConfirm('商品の購入', `「${card.name}」を${price}ゴールドで購入しますか？`, () => {
+                  player.gold -= price;
                   playSE('reward_select');
-                  player.discard.push({ ...CARD_DB[item.id] });
+                  player.discard.push(card);
                   item.bought = true;
                   showGameAlert('購入完了', `「${card.name}」を購入し、デッキに追加しました！`, () => {
                     renderShop();
@@ -2541,11 +3287,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 showGameAlert('ショップ', 'ゴールドが足りません！');
               }
             });
-            const priceText = document.createElement('span');
-            priceText.style.cssText = 'font-size: 0.65rem; color: #ffd700; margin-top: 2px;';
-            priceText.textContent = '💰15';
             div.appendChild(el);
-            div.appendChild(priceText);
+            div.appendChild(buyBtn);
           }
           townCards.appendChild(div);
         });
@@ -2574,32 +3317,40 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             div.appendChild(boughtText);
           } else {
             btn.addEventListener('click', () => {
-              if (player.gold >= 20) {
-                const target = player.items.find(i => i.id === shopItem.id);
-                if (target) {
-                  if (!target.used) {
-                    showGameAlert('ショップ', '同じアイテムをすでに所持しています！');
-                    return;
-                  }
-                  showGameConfirm('商品の購入', `「${item.name}」を20ゴールドで購入・補充しますか？`, () => {
-                    player.gold -= 20;
-                    target.used = false;
-                    shopItem.bought = true;
-                    showGameAlert('購入完了', `「${item.name}」を補充しました！`, () => {
-                      renderShop();
-                      updateHeaderBar();
-                    });
-                  });
+              showItemDetailModal(item, 'item');
+            });
+            const price = item.price || 20;
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'btn btn-secondary';
+            buyBtn.style.cssText = 'font-size: 0.75rem; padding: 4px 10px; margin-top: 4px; display: flex; align-items: center; justify-content: center; width: auto; min-width: 60px; height: auto; border-radius: 8px; background-color: #1976d2; color: #fff; border: 1px solid #1565c0; box-shadow: 0 2px 4px rgba(0,0,0,0.3);';
+            buyBtn.textContent = `${price} Gで購入`;
+            buyBtn.addEventListener('click', () => {
+              if (player.gold >= price) {
+                let target = player.items.find(i => i.id === shopItem.id);
+                if (target && !target.used) {
+                  showGameAlert('ショップ', '同じアイテムをすでに所持しています！');
+                  return;
                 }
+                showGameConfirm('商品の購入', `「${item.name}」を${price}ゴールドで購入しますか？`, () => {
+                  player.gold -= price;
+                  if (target) {
+                    target.used = false;
+                  } else {
+                    player.items.push({ id: shopItem.id, used: false });
+                  }
+                  shopItem.bought = true;
+                  showGameAlert('購入完了', `「${item.name}」を購入しました！`, () => {
+                    renderShop();
+                    updateHeaderBar();
+                    renderRelicsAndItems();
+                  });
+                });
               } else {
                 showGameAlert('ショップ', 'ゴールドが足りません！');
               }
             });
-            const priceText = document.createElement('span');
-            priceText.style.cssText = 'font-size: 0.65rem; color: #ffd700; margin-top: 2px;';
-            priceText.textContent = '💰20';
             div.appendChild(btn);
-            div.appendChild(priceText);
+            div.appendChild(buyBtn);
           }
           townItems.appendChild(div);
         });
@@ -2608,95 +3359,107 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     if (btnTownLeave) {
       btnTownLeave.addEventListener('click', () => {
-        proceedNextFloor();
+        showGameConfirm('街を出る', '本当に街を出ますか？<br>やり残したことはありませんか？', () => {
+          proceedNextFloor();
+        });
+      });
+    }
+    if (btnTownUpgrade) {
+      btnTownUpgrade.addEventListener('click', () => {
+        if (shopUpgradeUsed) return;
+        showShopServiceScreen('upgrade');
+      });
+    }
+    if (btnTownRemove) {
+      btnTownRemove.addEventListener('click', () => {
+        if (shopRemoveUsed) return;
+        showShopServiceScreen('remove');
       });
     }
 
     // --- 13. 未知のイベント ---
+    // --- 13. 未知のイベント ---
+    function drinkMadScientistPotion() {
+      const roll = Math.random();
+      if (roll < 0.25) {
+        // 大成功 (25%)
+        player.maxHp += 5;
+        player.maxMp += 3;
+        player.hp += 5;
+        player.mp += 3;
+        playSE('heal');
+        updateHeaderBar();
+        showGameAlert('大成功！', '「ヒャーッハッハ！完璧な配合だ！」\n身体の底から力が湧いてくる！最大HPが5、最大MPが3上昇した！', () => proceedNextFloor());
+      } else if (roll < 0.5) {
+        // 成功 (25%)
+        const subRoll = Math.random();
+        if (subRoll < 0.5) {
+          player.gold += 50;
+          playSE('coin');
+          updateHeaderBar();
+          showGameAlert('成功', '「おっと、これは錬金術の副産物だ。持っていけ！」\n50ゴールドを手に入れた！', () => proceedNextFloor());
+        } else {
+          player.hp = player.maxHp;
+          player.mp = player.maxMp;
+          playSE('heal');
+          updateHeaderBar();
+          showGameAlert('成功', '「どうだ？疲れが吹っ飛んだだろう！」\nHPとMPが全回復した！', () => proceedNextFloor());
+        }
+      } else if (roll < 0.75) {
+        // 失敗 (25%)
+        const dmg = Math.floor(player.maxHp * 0.3) || 1;
+        player.hp -= dmg;
+        playSE('damage');
+        updateHeaderBar();
+        if (player.hp <= 0) {
+          showGameAlert('実験失敗…', `「あちゃー、少し刺激が強すぎたか…」\n${dmg} のダメージを受け、あなたは倒れ伏した…`);
+          isGameOver = true;
+          showResultOverlay(false);
+        } else {
+          showGameAlert('失敗', `「あちゃー、少し刺激が強すぎたか…」\n身体が焼け焦げるように熱い！ ${dmg} のダメージを受けた！`, () => proceedNextFloor());
+        }
+      } else {
+        // 大失敗 (25%)
+        const lostHp = 2;
+        const lostGold = Math.floor(player.gold * 0.5);
+        player.maxHp = Math.max(1, player.maxHp - lostHp);
+        player.hp = Math.min(player.hp, player.maxHp);
+        player.gold -= lostGold;
+        playSE('damage');
+        updateHeaderBar();
+        showGameAlert('大失敗！', `「ドッカーン！！」\n大爆発が起きた！\n最大HPが ${lostHp} 減少し、所持金が ${lostGold}G 吹き飛んだ！`, () => proceedNextFloor());
+      }
+    }
+
     const eventsList = [
       {
-        title: '怪しい泉',
-        image: '/portfolio/roguelike/assets/icons/water_shizuku.png',
-        text: '暗く澱んだ泉を見つけました。泉の底でなにかがきらりと光っています。手を伸ばしますか？',
+        title: 'マッドサイエンティストの実験',
+        image: new URL('../../../assets/games/roguelike/images/characters/job_scientist_mad.png', import.meta.url).href,
+        text: '薄暗い部屋で、怪しげな白衣の男が試験管を振っています。\n「ヒヒヒ…私の特製ドリンクを試してみないか？すごい効果があるぞぉ…？」',
         options: [
           {
-            text: '手を突っ込んでみる (HPを 3 失い、💰30 獲得)',
-            action: () => {
-              player.hp = Math.max(1, player.hp - 3);
-              player.gold += 30;
-              showGameAlert('泉の怪我', '冷たい泉に手を突っ込み、30ゴールドを掴み出しました！が、鋭い岩で腕を怪我しました。');
-            }
-          },
-          {
-            text: 'なにもせず離れる',
-            action: () => {
-              showGameAlert('平和な選択', 'あなたは慎重に泉を通り過ぎました。');
-            }
-          }
-        ]
-      },
-      {
-        title: '金細工師のチェスト',
-        image: '/portfolio/roguelike/assets/characters/job_nihontou_katanakaji.png',
-        text: '打ち捨てられた台座の上に、豪華な金のチェストが置かれています。罠でしょうか？',
-        options: [
-          {
-            text: 'こじ開けてみる (50%の確率で 💰40 獲得 / 50%の確率でミミックに襲われる！)',
-            action: () => {
-              if (Math.random() < 0.5) {
-                player.gold += 40;
-                showGameAlert('チェスト発見', 'チェストはただの古びた箱でした！中から40ゴールドを発見しました。', () => {
-                  proceedNextFloor();
-                });
-              } else {
-                showGameAlert('トラップ発動！', '箱がいきなり牙を剥きました！ミミックとの戦闘が開始されます！', () => {
-                  currentPathType = 'mimic';
-                  enterFloorNode();
-                });
-              }
-            },
+            text: '[飲む] 赤色の怪しい液体',
+            action: () => drinkMadScientistPotion(),
             isCustomNav: true
           },
           {
-            text: '無視して進む',
+            text: '[飲む] 青色の怪しい液体',
+            action: () => drinkMadScientistPotion(),
+            isCustomNav: true
+          },
+          {
+            text: '[飲む] 緑色の怪しい液体',
+            action: () => drinkMadScientistPotion(),
+            isCustomNav: true
+          },
+          {
+            text: 'やめておく (立ち去る)',
             action: () => {
-              showGameAlert('用心深さ', 'あなたは用心深くその場を離れました。', () => {
+              showGameAlert('拒絶', '「ちぇっ、つまらないヤツだ」\nあなたは急いでその場を立ち去りました。', () => {
                 proceedNextFloor();
               });
             },
             isCustomNav: true
-          }
-        ]
-      },
-      {
-        title: '妖精の悪戯',
-        image: '/portfolio/roguelike/assets/characters/fantasy_pixy2.png',
-        text: '空中を浮遊する小さな悪戯妖精が現れました。「力と引き換えに、何かを貰うよ？」',
-        options: [
-          {
-            text: '妖精に呪文を唱えてもらう (手札のランダムなカード1枚強化 ➔ 最大HP -1)',
-            action: () => {
-              player.maxHp = Math.max(5, player.maxHp - 1);
-              player.hp = Math.min(player.hp, player.maxHp);
-              const unupgraded = player.deck.filter(c => !c.upgraded);
-              if (unupgraded.length > 0) {
-                shuffle(unupgraded);
-                const target = unupgraded[0];
-                const index = player.deck.findIndex(c => c === target);
-                if (index !== -1) {
-                  player.deck[index] = upgradeCard(player.deck[index]);
-                  showGameAlert('妖精の祝福と代償', `最大HPが1減少しましたが、カード「${target.name}」が「${target.name}+」に強化されました！`);
-                }
-              } else {
-                showGameAlert('代償のみ', '最大HPが1減少しましたが、強化できるカードがありませんでした！');
-              }
-            }
-          },
-          {
-            text: '断って追い払う',
-            action: () => {
-              showGameAlert('拒絶', '妖精はつまらなそうに去っていきました。');
-            }
           }
         ]
       }
@@ -2706,7 +3469,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       showScreen(eventScreen);
       const evt = eventsList[Math.floor(Math.random() * eventsList.length)];
       if (document.getElementById('event-image')) {
-        document.getElementById('event-image').src = evt.image || '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+        document.getElementById('event-image').src = evt.image || new URL('../../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url).href;
       }
       if (document.getElementById('event-title')) document.getElementById('event-title').textContent = evt.title;
       if (document.getElementById('event-text')) document.getElementById('event-text').textContent = evt.text;
@@ -2740,7 +3503,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           // ===== エリア開始カットシーン =====
           if (currentArea === 2) {
             const scenes = [{
-              portraits: [{ src: BASE_CH + 'royal_daijin.png', size: '130px' }],
+              portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/royal_daijin.png', import.meta.url).href, size: '130px' }],
               speaker: '大臣',
               lines: [
                 '聖剣に選ばれし者よ、お耳を拝借いたします。',
@@ -2757,9 +3520,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             const scenes = [
               {
                 portraits: [
-                  { src: BASE_CH + 'royal_king.png', size: '130px' },
-                  { src: BASE_CH + 'royal_princess.png', size: '130px' },
-                  { src: BASE_CH + 'royal_daijin.png', size: '130px' }
+                  { src: new URL('../../../assets/games/roguelike/images/characters/royal_king.png', import.meta.url).href, size: '130px' },
+                  { src: new URL('../../../assets/games/roguelike/images/characters/royal_princess.png', import.meta.url).href, size: '130px' },
+                  { src: new URL('../../../assets/games/roguelike/images/characters/royal_daijin.png', import.meta.url).href, size: '130px' }
                 ],
                 speaker: '王',
                 lines: [
@@ -2768,7 +3531,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 ]
               },
               {
-                portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
+                portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/royal_princess.png', import.meta.url).href, size: '130px' }],
                 speaker: '姫',
                 lines: [
                   'どうかご無事に帰ってきてくださいまし。\nわたくしたちはいつもあなたのことを祈っております。'
@@ -2794,52 +3557,64 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     let pendingUseItemId = '';
 
     function renderRelicsAndItems() {
-      if (playerRelicsEl) {
-        playerRelicsEl.innerHTML = '';
-        if (player.relics.length === 0) {
-          playerRelicsEl.innerHTML = '<span style="font-size:0.7rem; color:var(--text-muted);">なし</span>';
-        } else {
-          player.relics.forEach(relicId => {
-            const relic = RELIC_DB[relicId];
-            if (relic) {
-              const img = document.createElement('img');
-              img.src = relic.image;
-              img.alt = relic.name;
-              img.title = `${relic.name}: ${relic.desc.replace(/<br>/g, ' ')}`;
-              img.style.cssText = 'width:24px; height:24px; object-fit:contain; border:1px solid #555; border-radius:4px; background:rgba(255,255,255,0.05);';
-              playerRelicsEl.appendChild(img);
-            }
-          });
-        }
-      }
+      const footerPlayerItemsEl = document.getElementById('footer-player-items');
 
-      if (playerItemsEl) {
-        playerItemsEl.innerHTML = '';
-        player.items.forEach(itemState => {
-          const item = ITEM_DB[itemState.id];
-          if (item) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-item';
-            btn.title = `${item.name}: ${item.desc}`;
-            btn.style.cssText = `width:28px; height:28px; padding:2px; border:1px solid #444; border-radius:4px; background:rgba(0,0,0,0.5); cursor:${itemState.used ? 'not-allowed' : 'pointer'}; display:flex; align-items:center; justify-content:center; opacity:${itemState.used ? '0.25' : '1'};`;
-            const img = document.createElement('img');
-            img.src = item.image;
-            img.alt = item.name;
-            img.style.cssText = 'width:100%; height:100%; object-fit:contain;';
-            btn.appendChild(img);
-            if (!itemState.used && isPlayerTurn && !isGameOver) {
-              btn.addEventListener('click', () => {
-                pendingUseItemId = itemState.id;
-                if (itemConfirmText && itemConfirmModal) {
-                  itemConfirmText.innerHTML = `<strong>${item.name}</strong>を使用しますか？<br><br><span style="font-size:0.7rem; color:var(--text-muted);">${item.desc}</span>`;
-                  itemConfirmModal.style.display = 'flex';
+      if (footerPlayerItemsEl) footerPlayerItemsEl.innerHTML = '';
+
+      player.items.forEach(itemState => {
+        const item = ITEM_DB[itemState.id];
+        if (item) {
+          if (footerPlayerItemsEl) {
+            const btnF = document.createElement('button');
+            btnF.className = 'btn-item';
+            btnF.title = `${item.name}: ${item.desc}`;
+            const battleLayout = document.querySelector('.battle-layout');
+            const inBattle = battleLayout && battleLayout.style.display !== 'none';
+            const canClick = inBattle && !itemState.used && isPlayerTurn && !isGameOver;
+
+            btnF.style.cssText = `width:28px; height:28px; padding:2px; border:1px solid #444; border-radius:4px; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; opacity:${itemState.used ? '0.25' : '1'}; flex-shrink:0; cursor:pointer;`;
+            const imgF = document.createElement('img');
+            imgF.src = item.image;
+            imgF.alt = item.name;
+            imgF.style.cssText = 'width:100%; height:100%; object-fit:contain;';
+            btnF.appendChild(imgF);
+
+            btnF.addEventListener('click', () => {
+              pendingUseItemId = itemState.id;
+              const titleEl = document.getElementById('item-confirm-title');
+              const textEl = document.getElementById('item-confirm-text');
+              const btnYes = document.getElementById('btn-item-confirm-yes');
+              const btnNo = document.getElementById('btn-item-confirm-no');
+              const modal = document.getElementById('item-confirm-modal');
+
+              if (textEl && modal && btnYes && btnNo && titleEl) {
+                if (canClick) {
+                  titleEl.textContent = 'アイテムの使用確認';
+                  textEl.innerHTML = `<strong>${item.name}</strong>を使用しますか？<br><br><span style="font-size:0.7rem; color:var(--text-muted);">${item.desc}</span>`;
+                  btnYes.style.display = 'block';
+                  btnNo.textContent = 'いいえ';
+                } else {
+                  titleEl.textContent = 'アイテムの詳細';
+                  let reason = '※アイテムは戦闘中（かつ自分のターン）にのみ使用可能です。';
+                  if (itemState.used) reason = '※このアイテムは既に使用済みです。';
+                  textEl.innerHTML = `<strong>${item.name}</strong><br><br><span style="font-size:0.75rem; color:var(--text-muted);">${item.desc}</span><br><br><span style="font-size:0.65rem; color:#ffb84d;">${reason}</span>`;
+                  btnYes.style.display = 'none';
+                  btnNo.textContent = '閉じる';
                 }
-              });
-            }
-            playerItemsEl.appendChild(btn);
+                modal.style.display = 'flex';
+              }
+            });
+            footerPlayerItemsEl.appendChild(btnF);
           }
-        });
-      }
+        }
+      });
+    }
+
+    const btnFooterViewDeck = document.getElementById('btn-footer-view-deck');
+    if (btnFooterViewDeck) {
+      btnFooterViewDeck.addEventListener('click', () => {
+        openDeckViewer();
+      });
     }
 
     if (document.getElementById('btn-item-confirm-yes')) {
@@ -2856,19 +3631,36 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function executeUseItem(itemId) {
       if (!isPlayerTurn || isGameOver) return;
-      const itemState = player.items.find(i => i.id === itemId);
-      if (!itemState || itemState.used) return;
-      itemState.used = true;
+      const itemIndex = player.items.findIndex(i => i.id === itemId);
+      if (itemIndex === -1) return;
+      const itemState = player.items[itemIndex];
+      if (itemState.used) return;
 
-      if (itemId === 'sandwich') {
+
+      // 使用したアイテムは所持品から完全に削除する（デバッグ用アイテム以外）
+      if (itemId !== 'debug_kill') {
+        player.items.splice(itemIndex, 1);
+      }
+
+      if (itemId === 'debug_kill') {
+        if (enemy) {
+          enemy.hp = Math.max(0, enemy.hp - 100);
+          logMessage(`デバッグアイテム「死神の鎌」を使用し、敵に 100 ダメージ！`, 'log-attack');
+        }
+      } else if (itemId === 'sandwich') {
+        player.hp = Math.min(player.maxHp, player.hp + 2);
+        player.mp = Math.min(player.maxMp, player.mp + 1);
+        logMessage('アイテム「サンドウィッチ」を使用し、HPが2、MPが1回復した！', 'log-heal');
+      } else if (itemId === 'hp_drink') {
         player.hp = Math.min(player.maxHp, player.hp + 3);
-        logMessage('アイテム「サンドイッチ」を使用し、HPが 3 回復した！', 'log-heal');
-      } else if (itemId === 'elixir') {
-        player.poison = 0;
-        player.paralyze = 0;
-        player.hp = Math.min(player.maxHp, player.hp + 1);
-        logMessage('アイテム「万能薬」を使用し、状態異常を解除してHPが 1 回復した！', 'log-heal');
-      } else if (itemId === 'perfume') {
+        logMessage('アイテム「HPドリンク」を使用し、HPが3回復した！', 'log-heal');
+      } else if (itemId === 'mp_drink') {
+        player.mp = Math.min(player.maxMp, player.mp + 3);
+        logMessage('アイテム「MPドリンク」を使用し、MPが3回復した！', 'log-heal');
+      } else if (itemId === 'action_drink') {
+        player.actions += 1;
+        logMessage('アイテム「行動ドリンク」を使用し、行動回数が1増えた！', 'log-heal');
+      } else if (itemId === 'poison_drug') {
         if (enemy) {
           if (enemy.isGolem || enemy.isVampire) {
             logMessage(`${enemy.name} は毒を無効化した！`, 'log-system');
@@ -2876,31 +3668,49 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             logMessage('魔王は状態異常を防いだ！', 'log-system');
           } else {
             enemy.poison = (enemy.poison || 0) + 1;
-            logMessage('アイテム「香水」を使用し、敵に毒1を付与した！', 'log-poison');
+            logMessage('アイテム「毒薬」を使用し、敵に毒1を付与した！', 'log-poison');
           }
+        }
+      } else if (itemId === 'perfume') {
+        if (enemy) {
+          enemy.paralyze = (enemy.paralyze || 0) + 1;
+          logMessage('アイテム「香水」を使用し、敵を1ターン行動不能にした！', 'log-poison');
+        }
+      } else if (itemId === 'elixir') {
+        player.poison = 0;
+        player.paralyze = 0;
+        logMessage('アイテム「万能薬」を使用し、すべての状態異常を解除した！', 'log-heal');
+      } else if (itemId === 'dynamite') {
+        if (enemy) {
+          const dmg = Math.floor(Math.random() * 11) + 5; // 5~15
+          enemy.hp = Math.max(0, enemy.hp - dmg);
+          logMessage(`アイテム「ダイナマイト」を使用し、敵に ${dmg} ダメージ！`, 'log-attack');
         }
       }
       updateUI();
+      if (enemy && enemy.hp <= 0) {
+        handleVictory();
+      }
     }
 
     // ===== カード画像マッピング =====
     const CARD_IMAGES = {
       strike: '',
-      heal: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
+      heal: new URL('../../../assets/games/roguelike/images/icons/math_mark01_plus.png', import.meta.url).href,
       smite: '',
       rush: '',
-      fire: '/portfolio/roguelike/assets/icons/honoo_hi_fire.png',
-      ice: '/portfolio/roguelike/assets/icons/water_shizuku.png',
-      wind: '/portfolio/roguelike/assets/icons/tenki_typhoon.png',
-      earth: '/portfolio/roguelike/assets/icons/ishi_stone.png',
-      stone: '/portfolio/roguelike/assets/icons/ishi_stone.png',
-      thunder: '/portfolio/roguelike/assets/icons/mark_tenkiu_kaminari.png',
-      venom: '/portfolio/roguelike/assets/icons/medical_doku.png',
-      fortify: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
-      draw_card: '/portfolio/roguelike/assets/icons/cardgame_deck_hiku.png',
-      buff_up: '/portfolio/roguelike/assets/icons/math_mark01_plus.png',
-      buff_down: '/portfolio/roguelike/assets/icons/math_mark02_minus.png',
-      meteor: '/portfolio/roguelike/assets/icons/kanden_gaikotsu.png',
+      fire: new URL('../../../assets/games/roguelike/images/icons/honoo_hi_fire.png', import.meta.url).href,
+      ice: new URL('../../../assets/games/roguelike/images/icons/water_shizuku.png', import.meta.url).href,
+      wind: new URL('../../../assets/games/roguelike/images/icons/tenki_typhoon.png', import.meta.url).href,
+      earth: new URL('../../../assets/games/roguelike/images/icons/ishi_stone.png', import.meta.url).href,
+      stone: new URL('../../../assets/games/roguelike/images/icons/ishi_stone.png', import.meta.url).href,
+      thunder: new URL('../../../assets/games/roguelike/images/icons/mark_tenkiu_kaminari.png', import.meta.url).href,
+      venom: new URL('../../../assets/games/roguelike/images/icons/medical_doku.png', import.meta.url).href,
+      fortify: new URL('../../../assets/games/roguelike/images/icons/math_mark01_plus.png', import.meta.url).href,
+      draw_card: new URL('../../../assets/games/roguelike/images/icons/cardgame_deck_hiku.png', import.meta.url).href,
+      buff_up: new URL('../../../assets/games/roguelike/images/icons/math_mark01_plus.png', import.meta.url).href,
+      buff_down: new URL('../../../assets/games/roguelike/images/icons/math_mark02_minus.png', import.meta.url).href,
+      meteor: new URL('../../../assets/games/roguelike/images/icons/kanden_gaikotsu.png', import.meta.url).href,
     };
 
     // 属性→ドットクラスのマッピング
@@ -2919,7 +3729,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       // MPコスト（左上丸）
       const cost = document.createElement('div');
       cost.className = 'card-cost';
-      cost.textContent = getCardCost(card);
+      const actualCost = getCardCost(card);
+      const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
+      const baseCard = CARD_DB[baseId] || card;
+      if (card.upgraded && card.cost < baseCard.cost) {
+        cost.innerHTML = `<span style="color: #4ade80;">${actualCost}</span>`;
+      } else {
+        cost.textContent = actualCost;
+      }
       div.appendChild(cost);
 
       // カード画像エリア
@@ -2928,9 +3745,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       let imgSrc = CARD_IMAGES[card.id] || (card.id.endsWith('+') ? CARD_IMAGES[card.id.slice(0, -1)] : '');
       if (!imgSrc) {
         if (card.type === 'attack' && card.element === 'none') {
-          imgSrc = '/portfolio/roguelike/assets/relics/game_ken.png';
+          imgSrc = new URL('../../../assets/games/roguelike/images/relics/game_ken.png', import.meta.url).href;
         } else {
-          imgSrc = '/portfolio/roguelike/assets/icons/no_image_square.jpg';
+          imgSrc = new URL('../../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url).href;
         }
       }
       if (imgSrc) {
@@ -2955,7 +3772,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const mainLine = buildCardMainText(card);
       const mainEl = document.createElement('span');
       mainEl.className = 'desc-main';
-      mainEl.textContent = mainLine;
+      mainEl.innerHTML = mainLine;
       desc.appendChild(mainEl);
 
       // 追加効果テキスト（状態異常/バフ等）
@@ -2963,7 +3780,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       subLines.forEach(line => {
         const subEl = document.createElement('span');
         subEl.className = 'desc-sub';
-        subEl.textContent = line;
+        subEl.innerHTML = line;
         desc.appendChild(subEl);
       });
       div.appendChild(desc);
@@ -2997,30 +3814,43 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
       if (tags.children.length > 0) div.appendChild(tags);
 
-      if (onClick) div.addEventListener('click', onClick);
+      div.addEventListener('click', () => {
+        if (typeof onClick === 'function') {
+          onClick();
+        } else {
+          showCardDetailModal(card);
+        }
+      });
       return div;
     }
 
     function buildCardMainText(card) {
+      const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
+      const base = CARD_DB[baseId] || card;
+      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span style="color: #4ade80; font-weight: bold;">${val}</span>` : val;
+
       if (card.type === 'attack') {
-        const hits = card.hits ? `×${card.hits}` : '';
+        const hits = card.hits ? `×${fmt(card.hits, base.hits || 1)}` : '';
         const elem = card.element && card.element !== 'none' ? ` [${getElemLabel(card.element)}]` : '';
-        return `⚔️ ${card.value}${hits}ダメージ${elem}`;
+        return `⚔️ ${fmt(card.value, base.value)}${hits}ダメージ${elem}`;
       } else if (card.healSelf) {
-        return `HP +${card.healSelf} 回復`;
+        return `HP +${fmt(card.healSelf, base.healSelf)} 回復`;
       } else if (card.draw) {
-        return `カードを${card.draw}枚引き、行動回数+1`;
+        return `カードを${fmt(card.draw, base.draw)}枚引き、行動回数+1`;
       } else if (card.buffUp) {
-        return `能昇 ${card.buffUp}ターン付与`;
+        return `能昇 ${fmt(card.buffUp, base.buffUp)}ターン付与`;
       } else if (card.buffDown) {
-        return `敵に能降 ${card.buffDown}ターン`;
+        return `敵に能降 ${fmt(card.buffDown, base.buffDown)}ターン`;
       }
       return card.desc || '';
     }
 
     function buildCardSubTexts(card) {
+      const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
+      const base = CARD_DB[baseId] || card;
+      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span style="color: #4ade80; font-weight: bold;">${val}</span>` : val;
       const lines = [];
-      if (card.poison) lines.push(`毒${card.poison}付与`);
+      if (card.poison) lines.push(`毒${fmt(card.poison, base.poison)}付与`);
       if (card.paralyze) lines.push('30%で麻痺付与');
       if (card.oncePerBattle) lines.push('1戦闘1回のみ');
       return lines;
@@ -3235,7 +4065,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
         setTimeout(() => {
           if (enemyImageEl) enemyImageEl.classList.remove('shake');
-          
+
           if (enemy.intent.type === 'heal') {
             playSE('heal');
             enemy.hp = Math.min(enemy.maxHp, enemy.hp + 5);
@@ -3282,15 +4112,21 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (!isPlayerTurn || isGameOver) return;
       const card = player.hand[index];
       const cardCost = getCardCost(card);
+      const isMagicCard = ['fire', 'ice', 'wind', 'stone', 'thunder', 'meteor'].includes(card.id);
+
       if (player.mp < cardCost) { logMessage('MPが足りません！', 'log-system'); return; }
-      if (player.actions <= 0) { logMessage('行動回数が残っていません！', 'log-system'); return; }
+      if (!isMagicCard && player.actions <= 0) { logMessage('行動回数が残っていません！', 'log-system'); return; }
 
       player.mp -= cardCost;
-      player.actions -= 1;
+      if (!isMagicCard) {
+        player.actions -= 1;
+      }
       player.hand.splice(index, 1);
       playSE('play');
       if (!card.oncePerBattle) {
         player.discard.push(card);
+      } else {
+        player.exhausted.push(card);
       }
 
       if (card.id === 'strike' || card.id === 'strike_plus') playSE('strike');
@@ -3368,6 +4204,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function handleVictory() {
       isGameOver = true;
+
+      // デッキ・手札・捨て札・除外カードをすべて山札に戻す
+      player.deck = [...player.deck, ...player.discard, ...player.hand, ...(player.exhausted || [])];
+      player.discard = [];
+      player.hand = [];
+      player.exhausted = [];
+
       if (btnEndTurn) btnEndTurn.disabled = true;
       playSE('victory');
       logMessage(enemy.name + ' を倒した！', 'log-system');
@@ -3388,7 +4231,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           player.relics.push(unownedRelics[0]);
           logMessage(`ミミックからレリック「${RELIC_DB[unownedRelics[0]].name}」を手に入れた！`, 'log-system');
         }
-        const unupgraded = player.deck.filter(c => !c.upgraded);
+        const unupgraded = player.deck.filter(c => (c.upgradeCount || 0) < 3);
         if (unupgraded.length > 0) {
           shuffle(unupgraded);
           const target = unupgraded[0];
@@ -3407,8 +4250,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           // エリア2中ボス（ゴーレム）
           if (currentArea === 2) {
             const postScenes = [{
-              bg: BASE_MAP + 'mon_gate_western_close.png',
-              portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
+              bg: new URL('../../../assets/games/roguelike/images/map/mon_gate_western_close.png', import.meta.url).href,
+              portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/knight.png', import.meta.url).href, size: '120px' }],
               speaker: '見回りの兵士',
               lines: [
                 'ありがとう！町を守るゴーレムが故障で暴走してしまい、誰も近づけなくなっていたんだ。',
@@ -3418,23 +4261,23 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
             const pick = unownedNonFixed.length > 0 ? unownedNonFixed[Math.floor(Math.random() * unownedNonFixed.length)] : null;
             if (pick) {
-              giveFixedRelic(pick, postScenes, () => triggerMidbossFairyUpgrade());
+              giveFixedRelic(pick, postScenes, () => proceedNextFloor());
             } else {
-              showCutscene(postScenes, () => triggerMidbossFairyUpgrade());
+              showCutscene(postScenes, () => proceedNextFloor());
             }
           }
           // エリア3中ボス（リヴァイアサン）
           else if (currentArea === 3) {
             const postScenes = [
               {
-                bg: BASE_MAP + 'arashi.png',
+                bg: new URL('../../../assets/games/roguelike/images/map/arashi.png', import.meta.url).href,
                 portraits: [],
                 speaker: '─── 状況 ───',
                 lines: ['ふと、嵐が止んだ。\nリヴァイアサンはあなたの実力を認めてくれたようだ。']
               },
               {
-                bg: BASE_MAP + 'arashi.png',
-                portraits: [{ src: BASE_CH + 'ningyohime.png', size: '130px' }],
+                bg: new URL('../../../assets/games/roguelike/images/map/arashi.png', import.meta.url).href,
+                portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/ningyohime.png', import.meta.url).href, size: '130px' }],
                 speaker: '人魚',
                 lines: [
                   '海神様に認められるなんて、本当に勇敢な人間ね！',
@@ -3442,13 +4285,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 ]
               }
             ];
-            giveFixedRelic('mermaid_necklace', postScenes, () => triggerMidbossFairyUpgrade());
+            giveFixedRelic('mermaid_necklace', postScenes, () => proceedNextFloor());
           }
-          // エリア1中ボス（バンディットリーダー）
+          // エリア1中ボス（バンディット）
           else {
             const postScenes = [{
-              bg: BASE_MAP + 'doukutsu.png',
-              portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
+              bg: new URL('../../../assets/games/roguelike/images/map/doukutsu.png', import.meta.url).href,
+              portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/knight.png', import.meta.url).href, size: '120px' }],
               speaker: '城の兵士',
               lines: [
                 'ご助力感謝します。この山賊は我々が連行します。',
@@ -3458,9 +4301,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
             const pick = unownedNonFixed.length > 0 ? unownedNonFixed[Math.floor(Math.random() * unownedNonFixed.length)] : null;
             if (pick) {
-              giveFixedRelic(pick, postScenes, () => triggerMidbossFairyUpgrade());
+              giveFixedRelic(pick, postScenes, () => proceedNextFloor());
             } else {
-              showCutscene(postScenes, () => triggerMidbossFairyUpgrade());
+              showCutscene(postScenes, () => proceedNextFloor());
             }
           }
         }, 800);
@@ -3474,14 +4317,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           if (currentArea === 1) {
             const postScenes = [
               {
-                bg: BASE_MAP + 'mori.png',
-                portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '120px' }],
+                bg: new URL('../../../assets/games/roguelike/images/map/mori.png', import.meta.url).href,
+                portraits: [{ src: new URL('../../../assets/games/roguelike/images/monsters/fantasy_dark_elf.png', import.meta.url).href, size: '120px' }],
                 speaker: 'ダークエルフ',
                 lines: ['きゅ～……']
               },
               {
-                bg: BASE_MAP + 'mori.png',
-                portraits: [{ src: BASE_CH + 'fantasy_elf2.png', size: '130px' }],
+                bg: new URL('../../../assets/games/roguelike/images/map/mori.png', import.meta.url).href,
+                portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/fantasy_elf2.png', import.meta.url).href, size: '130px' }],
                 speaker: 'エルフ',
                 lines: [
                   '闇に囚われた仲間を正気に戻してくれて、ありがとうございます。',
@@ -3490,13 +4333,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               }
             ];
             showMapScreen();
-            giveFixedRelic('game_ken_seiken', postScenes, () => progressArea());
+            giveFixedRelic('game_ken_seiken', postScenes, () => proceedNextFloor());
           }
           // エリア2ボス（ヴァンパイア）
           else if (currentArea === 2) {
             const postScenes = [{
-              bg: BASE_MAP + 'building_europe_kojou.png',
-              portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
+              bg: new URL('../../../assets/games/roguelike/images/map/building_europe_kojou.png', import.meta.url).href,
+              portraits: [{ src: new URL('../../../assets/games/roguelike/images/characters/royal_princess.png', import.meta.url).href, size: '130px' }],
               speaker: '姫',
               lines: [
                 '助けてくださいまして、誠にありがとうございます。\nあなたのような勇敢な方が来てくださるとは夢にも思いませんでした。',
@@ -3504,7 +4347,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               ]
             }];
             showMapScreen();
-            giveFixedRelic('yubiwa_diamond', postScenes, () => progressArea());
+            giveFixedRelic('yubiwa_diamond', postScenes, () => proceedNextFloor());
           }
           else {
             showBossRelicReward();
@@ -3542,50 +4385,6 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (rewardOverlay) rewardOverlay.style.display = 'flex';
     }
 
-    function triggerMidbossFairyUpgrade() {
-      showScreen(fairyScreen);
-      const desc = document.getElementById('fairy-desc');
-      if (desc) desc.textContent = '中ボス撃破ボーナス！カードを1枚選んで「強化（+）」します。(無料)';
-
-      if (fairyCardList) {
-        fairyCardList.innerHTML = '';
-        const targets = [...player.deck, ...player.discard, ...player.hand];
-        const upgradableCards = targets.filter(c => !c.upgraded);
-        if (upgradableCards.length === 0) {
-          fairyCardList.innerHTML = '<div style="grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem;">強化可能なカードがありません</div>';
-        } else {
-          const uniqueIds = Array.from(new Set(upgradableCards.map(c => c.id)));
-          uniqueIds.forEach(id => {
-            const card = CARD_DB[id];
-            const btn = document.createElement('div');
-            btn.className = `battle-card color-${card.color}`;
-            btn.style.cssText = 'width: 100%; height: 110px; cursor: pointer; position: relative; margin: 0; border-width:2px;';
-            btn.innerHTML = `
-              <div class="card-cost">${card.cost}</div>
-              <div class="card-name" style="font-size:0.7rem; margin-top:0.6rem;">${card.name}</div>
-              <div class="card-desc" style="font-size:0.55rem; line-height:1.2;">${card.desc}</div>
-            `;
-            btn.addEventListener('click', () => {
-              playSE('reward_select');
-              let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
-              if (index !== -1) {
-                player.deck[index] = upgradeCard(player.deck[index]);
-              } else {
-                index = player.discard.findIndex(c => c.id === id && !c.upgraded);
-                if (index !== -1) {
-                  player.discard[index] = upgradeCard(player.discard[index]);
-                }
-              }
-              showGameAlert('強化成功', `「${card.name}」が強化され「${card.name}+」になりました！`, () => {
-                proceedNextFloor();
-              });
-            });
-            fairyCardList.appendChild(btn);
-          });
-        }
-      }
-    }
-
     function showBossRelicReward() {
       if (rewardCards) rewardCards.innerHTML = '';
       if (rewardSubtitleText) rewardSubtitleText.textContent = 'エリアボス撃破！レリックを1つ選択してください';
@@ -3616,8 +4415,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     function showResultOverlay(isWin) {
-      if (isWin) playSE('victory');
-      else playSE('defeat');
+      if (isWin) {
+        playSE('victory');
+      } else {
+        stopBGM();
+        playSE('defeat');
+      }
 
       if (resultTitle) {
         resultTitle.textContent = isWin ? '戦闘勝利！' : 'ゲームオーバー';
@@ -3684,11 +4487,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       player.maxMp = player.relics.includes('ruby_ring') ? 6 : 5;
       player.items.forEach(i => i.used = false);
 
-      // 戦闘開始前に手札・捨て札を山札にまとめてシャッフル（初回以外）
+      // 戦闘開始前に山札をシャッフル（初回以外はhandleVictoryで山札に全て戻っているため、シャッフルのみ行う）
       if (!(currentFloor === 1 && currentArea === 1)) {
-        player.deck = shuffle([...player.deck, ...player.discard, ...player.hand]);
-        player.discard = [];
-        player.hand = [];
+        player.deck = shuffle([...player.deck]);
       }
 
       if (currentFloor === 1 && currentArea === 1) {
@@ -3702,9 +4503,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         player.buffUp = 0;
         player.buffDown = 0;
       } else {
-        // 通常の戦闘開始：前の戦闘のデッキを引き継ぎ、シャッフル
-        player.deck = shuffle([...player.deck, ...player.discard, ...player.hand]);
+        // 通常の戦闘開始：シャッフルのみ
+        player.deck = shuffle([...player.deck]);
         player.discard = [];
+        player.exhausted = [];
         player.poison = 0;
         player.paralyze = 0;
         player.buffUp = 0;
@@ -3755,6 +4557,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
       // 山札
       if (deckCountEl) deckCountEl.textContent = player.deck.length;
+      const footerDeckCountEl = document.getElementById('footer-deck-count');
+      if (footerDeckCountEl) footerDeckCountEl.textContent = player.deck.length;
 
       // 手札
       renderHand();
@@ -3794,12 +4598,26 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function renderHand() {
       if (!handArea) return;
       handArea.innerHTML = '';
+      let canPlayAny = false;
       player.hand.forEach((card, index) => {
-        const playable = player.actions > 0 && player.mp >= getCardCost(card);
+        const isMagicCard = ['fire', 'ice', 'wind', 'stone', 'thunder', 'meteor'].includes(card.id);
+        const playable = (isMagicCard || player.actions > 0) && player.mp >= getCardCost(card);
+        if (playable) canPlayAny = true;
         const cardEl = makeCardEl(card, playable ? () => playCard(index) : null);
         if (!playable) cardEl.classList.add('disabled');
         handArea.appendChild(cardEl);
       });
+
+      const btnEndTurn = document.getElementById('btn-end-turn');
+      if (btnEndTurn) {
+        if (!isPlayerTurn) {
+          btnEndTurn.classList.remove('btn-pulse');
+        } else if (!canPlayAny) {
+          btnEndTurn.classList.add('btn-pulse');
+        } else {
+          btnEndTurn.classList.remove('btn-pulse');
+        }
+      }
     }
 
     // --- 18. デッキ閲覧 ---
@@ -3850,8 +4668,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (btnTitle) {
       btnTitle.addEventListener('click', () => {
         if (overlay) overlay.style.display = 'none';
-        if (startScreen) startScreen.style.display = 'flex';
-        playBGM('start');
+        showScreen(startScreen);
+        stopBGM();
       });
     }
 
@@ -3872,6 +4690,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         openDeckViewer();
       });
     }
+    const btnTownViewDeck = document.getElementById('btn-town-view-deck');
+    if (btnTownViewDeck) {
+      btnTownViewDeck.addEventListener('click', () => {
+        openDeckViewer();
+      });
+    }
     if (closeDeckViewer) {
       closeDeckViewer.addEventListener('click', () => {
         if (deckViewerOverlay) deckViewerOverlay.style.display = 'none';
@@ -3888,7 +4712,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           if (battleMapBoard) {
             setTimeout(() => {
               const wrapper = document.getElementById('battle-map-scroll-wrapper');
-              if (wrapper) wrapper.scrollLeft = currentFloor * 70;
+              if (wrapper) {
+                applyMapBackground(wrapper);
+                wrapper.scrollLeft = currentFloor * 70;
+              }
             }, 100);
           }
         }
@@ -3897,6 +4724,16 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     if (btnCloseBattleMap) {
       btnCloseBattleMap.addEventListener('click', () => {
         if (battleMapOverlay) battleMapOverlay.style.display = 'none';
+      });
+    }
+
+    const btnBattleRetire = document.getElementById('btn-battle-retire');
+    if (btnBattleRetire) {
+      btnBattleRetire.addEventListener('click', () => {
+        showGameConfirm('リタイア', '現在のプレイを終了してタイトルに戻りますか？', () => {
+          showScreen(startScreen);
+          stopBGM();
+        });
       });
     }
 
@@ -3922,10 +4759,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       });
     }
 
-    const btnGameStart = document.getElementById('btn-game-start');
-    if (btnGameStart) {
-      btnGameStart.addEventListener('click', () => {
-        initGame();
+    const btnBackToTitle = document.getElementById('btn-back-to-title');
+    if (btnBackToTitle) {
+      btnBackToTitle.addEventListener('click', () => {
+        playSE('cancel');
+        stopBGM();
+        if (classSelectScreen) classSelectScreen.style.display = 'none';
+        if (startScreen) startScreen.style.display = 'flex';
       });
     }
 
@@ -4015,3 +4855,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         setSeVolume(e.target.value / 100);
       });
     }
+  </script>
+  </body>
+
+  </html>

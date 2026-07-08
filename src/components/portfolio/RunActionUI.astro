@@ -1,0 +1,240 @@
+---
+const { materialCategories } = Astro.props;
+---
+<div class="game-container" id="game-container">
+  <!-- Game Area (Canvas) -->
+  <!-- HUD (Score / Highscore) -->
+  <div class="game-hud" id="game-hud">
+    <div class="time-display">生存時間: <span id="survival-time">0.0</span>秒</div>
+    <div class="highscore-display" style="display: flex; align-items: center;">
+      ベスト: <span id="highscore">0.0</span>秒
+      <span id="hud-config-btn" class="icon-config" title="コンフィグ" style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
+    </div>
+  </div>
+  <div class="bottom-hud" id="bottom-hud" style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
+    <button id="retire-btn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">リタイア</button>
+  </div>
+  <canvas id="game-canvas"></canvas>
+
+  <!-- Screens -->
+  <div class="overlay" id="start-screen">
+    <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
+      ベスト: <span id="start-highscore-val">0.0</span>秒
+    </div>
+    <h2>エンドレス・ラン！</h2>
+    <p class="start-desc">スタートで走り出します</p>
+    <button id="start-btn" class="btn btn-full">スタート</button>
+    <button id="howto-btn" class="btn btn-secondary btn-full btn-howto">遊び方</button>
+    <span id="config-btn" class="icon-config" title="コンフィグ" style="cursor: pointer;">⚙️</span>
+  </div>
+
+  <div class="overlay" id="result-screen">
+    <p>記録: <span id="final-time" class="highlight">0.0</span> 秒</p>
+    <div class="result-actions">
+      <button id="retry-btn" class="btn btn-secondary btn-full">リトライ</button>
+      <button id="title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
+      <button id="share-btn" class="btn btn-primary btn-full btn-share">Xでシェア</button>
+    </div>
+  </div>
+
+  <!-- 遊び方モーダル -->
+  <div id="howto-modal" class="config-modal">
+    <h3>遊び方</h3>
+    <div class="howto-content">
+      <p>画面をタップするとキャラクターがジャンプします。</p>
+      <p>空中でもう一度タップすると2段ジャンプが可能です。</p>
+      <p>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p>
+    </div>
+    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+  <!-- コンフィグモーダル（ダミー） -->
+  <div id="modal-overlay" class="modal-overlay"></div>
+  <div id="config-modal" class="config-modal">
+    <h3>コンフィグ</h3>
+    <div class="config-item">
+      <label for="bgm-volume">BGM音量</label>
+      <input type="range" id="bgm-volume" min="0" max="100" value="50">
+    </div>
+    <div class="config-item">
+      <label for="se-volume">SE音量</label>
+      <input type="range" id="se-volume" min="0" max="100" value="50">
+    </div>
+
+    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
+    <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+  <!-- リタイアモーダル -->
+  <div id="retire-modal" class="config-modal">
+    <h3>リタイアしますか？</h3>
+    <div class="result-actions" style="margin-top: 1.5rem;">
+      <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
+      <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
+      <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
+    </div>
+  </div>
+  <!-- クレジットモーダル -->
+  <div id="credits-modal" class="config-modal">
+    <h3>クレジット・使用素材</h3>
+    <div class="howto-content">
+      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+      <ul class="credits-list">
+        {materialCategories.map((mat) => (
+        <li>{mat.category}: {mat.items.map((item, index) => (
+          <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+          ))}
+        </li>
+        ))}
+      </ul>
+    </div>
+    <button id="close-credits-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+  </GameLayout>
+
+  <style>
+    .game-hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.5rem 1rem;
+      z-index: 5;
+      pointer-events: none;
+      color: white;
+      display: none;
+      justify-content: space-between;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .highscore-display {
+      color: white;
+    }
+
+    /* game-containerの高さと枠線: インラインスタイルから移行 */
+    #game-container {
+      height: 450px;
+      background: #87CEEB;
+      /* 昼の空 */
+    }
+
+    :global([data-theme="dark"]) #game-container {
+      background: #1a2a40;
+      /* 夜の空 */
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    #result-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .start-desc {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+    }
+
+    .btn-howto {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .btn-full {
+      width: 100%;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-share {
+      background-color: #1DA1F2;
+      border-color: #1DA1F2;
+    }
+
+    .btn-credits {
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+      border-color: #dc3545;
+    }
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      width: 80%;
+      max-width: 300px;
+      gap: 1rem;
+      margin-top: 2rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .howto-content {
+      text-align: left;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .credits-list {
+      margin-top: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    /* overlay基底クラス: デフォルト非表示。JSで display:flex に切り替える */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 10;
+    }
+
+    /* start-screen は初期状態で表示。背景色も指定 */
+    #start-screen {
+      display: flex;
+      background-color: var(--bg-color);
+    }
+
+    .overlay h2 {
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .overlay p {
+      color: #f8f9fa;
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+
+    .highlight {
+      font-size: 2.5rem;
+      color: #ffea00;
+      margin: 0 0.5rem;
+    }
+  </style>

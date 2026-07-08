@@ -8,6 +8,7 @@
   --border-color: rgba(255, 255, 255, 0.05);
   --header-bg: rgba(15, 23, 42, 0.85);
   --card-shadow: rgba(0, 0, 0, 0.5);
+  --table-border: #0f3460;
 }
 
 [data-theme="light"] {
@@ -18,6 +19,7 @@
   --border-color: rgba(15, 23, 42, 0.05);
   --header-bg: rgba(248, 250, 252, 0.85);
   --card-shadow: rgba(0, 0, 0, 0.05);
+  --table-border: #cbd5e1;
 }
 
 * {
@@ -211,6 +213,7 @@ section p {
 
 .hero p {
   max-width: 600px;
+  color: var(--text-muted);
 }
 
 .btn {
@@ -218,9 +221,10 @@ section p {
   background-color: var(--primary);
   color: white;
   padding: 0.8rem 2rem;
-  border-radius: 9999px;
+  border-radius: 2rem;
+  text-decoration: none;
   font-weight: 600;
-  transition: transform 0.2s, background-color 0.2s;
+  transition: all 0.3s ease;
   border: none;
   cursor: pointer;
 }
@@ -260,8 +264,9 @@ section p {
 }
 
 /* Custom Utility Classes */
-nav a.active {
-  color: var(--primary) !important;
+.nav-links a.active {
+  /* 優先度を上げるために .nav-links a.active に変更し !important を削除 */
+  color: var(--primary);
 }
 
 /* Profile Page Styles */
@@ -297,9 +302,13 @@ nav a.active {
 }
 
 .empty-message {
-  color: var(--text-muted) !important;
-  font-weight: 600 !important;
-  font-size: 1.1rem !important;
+  /* 各ページのインラインスタイルを統合し、!important を削除 */
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 1.1rem;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
 }
 
 .profile-card {
@@ -338,11 +347,13 @@ nav a.active {
 .dummy-notice {
   margin-top: 2rem;
   margin-bottom: 0;
-  padding: 1rem;
-  background: var(--border-color);
-  border-radius: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 0.5rem 0.5rem 0;
   font-size: 0.9rem;
-  color: #cbd5e1;
+  color: var(--text-main);
+  line-height: 1.5;
 }
 
 .form-group {
@@ -370,11 +381,13 @@ nav a.active {
 }
 
 .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 .btn-full {
   width: 100%;
+  max-width: 300px;
   text-align: center;
   display: block;
 }
@@ -401,14 +414,14 @@ nav a.active {
 }
 
 .btn-secondary {
-  background-color: var(--surface);
-  color: white;
-  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-main);
+  border: 2px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-  background-color: #2a3b54;
-  color: white;
+  background-color: var(--border-color);
+  color: var(--text-main);
 }
 
 /* Certification Tree */
@@ -444,7 +457,7 @@ nav a.active {
   top: 50%;
   left: 0;
   width: 20px;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid var(--border-color);
 }
 
 /* Remove padding and stem from the outermost ul */
@@ -482,7 +495,7 @@ nav a.active {
   bottom: -20px;
   /* span the margin */
   left: calc(var(--branch-len) * -1);
-  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  border-left: 2px solid var(--border-color);
   z-index: 0;
 }
 
@@ -493,7 +506,7 @@ nav a.active {
   top: 50%;
   left: calc(var(--branch-len) * -1);
   width: var(--branch-len);
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid var(--border-color);
   z-index: 0;
 }
 
@@ -503,8 +516,8 @@ nav a.active {
   bottom: -20px;
   /* go down through the margin */
   height: auto;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
-  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid var(--border-color);
+  border-left: 2px solid var(--border-color);
   border-top-left-radius: 15px;
 }
 
@@ -519,8 +532,8 @@ nav a.active {
   bottom: 50%;
   height: auto;
   border-top: none;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid var(--border-color);
+  border-left: 2px solid var(--border-color);
   border-bottom-left-radius: 15px;
 }
 
@@ -535,7 +548,7 @@ nav a.active {
   bottom: auto;
   height: 0;
   border: none;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid var(--border-color);
   border-radius: 0;
 }
 
@@ -616,23 +629,32 @@ nav a.active {
 }
 
 /* 接続線：合格・一部合格・挑戦中カードに繋がる線は var(--primary) に変更
-   !important にすることで :first-child/:last-child ルールと同一詳細度になる問題を回避 */
+   :first-child や :last-child 等と同等の詳細度を持たせるため、セレクタを明示的に指定して !important を排除 */
 .cert-tree li.li-acquired::before,
 .cert-tree li.li-acquired::after,
 .cert-tree li.li-partial::before,
 .cert-tree li.li-partial::after,
 .cert-tree li.li-challenge::before,
-.cert-tree li.li-challenge::after {
-  border-left-color: var(--primary) !important;
-  border-top-color: var(--primary) !important;
-  border-bottom-color: var(--primary) !important;
+.cert-tree li.li-challenge::after,
+.cert-tree li.li-acquired:first-child::before,
+.cert-tree li.li-acquired:last-child::before,
+.cert-tree li.li-partial:first-child::before,
+.cert-tree li.li-partial:last-child::before,
+.cert-tree li.li-challenge:first-child::before,
+.cert-tree li.li-challenge:last-child::before,
+.cert-tree li.li-acquired:first-child:last-child::before,
+.cert-tree li.li-partial:first-child:last-child::before,
+.cert-tree li.li-challenge:first-child:last-child::before {
+  border-left-color: var(--primary);
+  border-top-color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
 /* 親カードから子 ul に伸びるスタブ（ul::before の 20px 水平線）
    取得済みカードのみ right スタブを primary に。
    挑戦中・一部合格はまだ右への道が開いていないのでデフォルト色のまま。 */
 .cert-tree li.li-acquired>ul::before {
-  border-top-color: var(--primary) !important;
+  border-top-color: var(--primary);
 }
 
 /* Root node (Me / 資格) */
@@ -743,14 +765,15 @@ footer p {
   height: 40px;
   border-radius: 50%;
   background: var(--surface);
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-muted);
+  opacity: 0.5;
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
   cursor: default;
 }
 
 .sns-icon:hover {
-  color: rgba(255, 255, 255, 0.2);
+  opacity: 0.8;
 }
 
 /* SNS icon - active (linked) */
@@ -760,6 +783,7 @@ footer p {
   background: rgba(99, 102, 241, 0.1);
   border-color: var(--primary);
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+  opacity: 1;
 }
 
 .sns-icon.linked:hover {
@@ -768,6 +792,7 @@ footer p {
   border-color: var(--primary);
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -817,7 +842,7 @@ footer p {
     /* Headerの直下から開始 */
     left: 0;
     width: 100%;
-    background-color: rgba(15, 23, 42, 0.95);
+    background-color: var(--header-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--border-color);
@@ -923,6 +948,7 @@ footer p {
     margin-right: 1rem;
   }
 }
+
 /* �X�L���E�c�[���̃O���b�h���C�A�E�g */
 .skill-grid {
   display: grid;
@@ -967,62 +993,71 @@ footer p {
   background: var(--surface);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   width: 90%;
   max-width: 400px;
   text-align: center;
 }
+
 .config-modal.active {
   display: block;
 }
+
 .config-modal h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
   color: var(--text-color);
 }
+
 .config-item {
   margin-bottom: 1.5rem;
   text-align: left;
 }
+
 .config-item label {
   display: block;
   margin-bottom: 0.5rem;
   color: var(--text-muted);
 }
+
 .config-item input[type="range"] {
   width: 100%;
 }
+
 .modal-overlay {
   display: none;
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 999;
   border-radius: inherit;
 }
+
 .modal-overlay.active {
   display: block;
 }
 
 
-/* === 追加：スタート画面（オーバーレイ）の統一スタイル === */
-.start-screen, .overlay {
-  background: var(--bg-color);
-  z-index: 10;
-}
-.start-screen button, .overlay button {
-  width: 80% !important;
-  max-width: 300px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  display: block !important;
-}
+/* === 注意：.start-screen / .overlay のグローバルルールは削除しました ===
+   各ゲームコンポーネント（RoguelikeUI.astro 等）の <style> ブロック内で
+   スコープを持って定義するため、ここに書くとサイト全体に漏れ出します。 */
 
 /* === 追加：SPでのリストマーカー位置調整 === */
 ul {
   padding-left: 1.5rem;
 }
+
+/* スマホ表示時の余白調整 */
+@media (max-width: 640px) {
+  .game-container {
+    padding: 1rem;
+  }
+}
+
 .project-details ul {
   padding-left: 1.5rem;
 }
@@ -1046,6 +1081,7 @@ ul {
   transition: transform 0.2s, filter 0.2s;
   z-index: 20;
 }
+
 .icon-config:hover {
   transform: rotate(90deg);
   filter: brightness(1.2);
@@ -1062,7 +1098,169 @@ ul {
   transition: color 0.2s;
   z-index: 20;
 }
+
 .link-credits:hover {
   color: var(--text-main);
 }
 
+
+
+/* =========================================
+   Game Layout & Portfolio Common Styles
+   ========================================= */
+/* 共通のゲームレイアウトCSS（ローグライクやエンドレスランに準拠） */
+.game-container {
+  --bg-color: #0f172a;
+  --surface: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --header-bg: rgba(15, 23, 42, 0.85);
+  --card-shadow: rgba(0, 0, 0, 0.5);
+  color: var(--text-main);
+}
+
+.game-container {
+  position: relative;
+  width: 100%;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  /* オーバーレイ要素がはみ出さないように */
+  background-color: var(--bg-color);
+  /* パディングやボーダーは適用しない（他ゲームと統一）*/
+}
+
+:global([data-theme="dark"]) .game-container {
+  background-color: var(--surface);
+}
+
+/* ゲーム内のボタンにテーマカラーを付与（悪目立ちしない程度に） */
+.game-container .btn-secondary {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--text-main);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.game-container .btn-secondary:hover {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: var(--primary);
+}
+
+.game-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  position: relative;
+  z-index: 1;
+  /* Canvasは1 */
+}
+
+/* オーバーレイ系UI（スタート画面・モーダルなど） */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 10;
+  /* Canvas(1)より手前 */
+  pointer-events: auto;
+  /* ボタンクリックを有効にするため */
+}
+
+.overlay.active {
+  display: flex;
+}
+
+/* モーダルインナー */
+.modal-inner {
+  background-color: var(--bg-secondary, #111111);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid var(--border-color, #0f3460);
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  pointer-events: auto;
+}
+
+/* ボタンの無効化スタイルなど補足 */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* プロジェクト概要などのセクション */
+.project-details {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--table-border);
+}
+
+.project-details h2 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--table-border);
+}
+
+.project-details h2:first-of-type {
+  margin-top: 0;
+}
+
+.description {
+  line-height: 1.8;
+  color: var(--text-muted, #aaa);
+}
+
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.tech-table th,
+.tech-table td {
+  padding: 1rem;
+  border: 1px solid var(--table-border);
+  text-align: left;
+}
+
+.tech-table th {
+  width: 30%;
+  font-weight: bold;
+}
+
+.materials-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.materials-list li {
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+  color: var(--text-muted, #aaa);
+}
+
+.materials-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary-color, #e94560);
+}

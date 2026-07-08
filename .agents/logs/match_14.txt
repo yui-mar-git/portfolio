@@ -1,0 +1,24 @@
+<USER_REQUEST>
+リタイアボタンが機能するようになりましたねが、これは戦闘場面でのみ出て欲しいもので、スタート画面やワールドマップ、ベースキャンプでは出現しない方が良い
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-29T05:36:03+09:00.
+
+The user's current state is as follows:
+Active Document: c:\Users\lemor\workspace\portfolio\src\pages\portfolio\tower-defense\index.astro (LANGUAGE_ASTRO)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\lemor\workspace\portfolio\dist\_astro\index.vqFMR8av.css (LANGUAGE_CSS)
+- c:\Users\lemor\workspace\portfolio\dist\style.css (LANGUAGE_CSS)
+- c:\Users\lemor\workspace\portfolio\src\pages\portfolio\tower-defense\index.astro (LANGUAGE_ASTRO)
+- c:\Users\lemor\workspace\portfolio\src\pages\portfolio\roguelike\index.astro (LANGUAGE_ASTRO)
+- c:\Users\lemor\workspace\portfolio\dist\_astro\hoisted.D7gcpd8K.js (LANGUAGE_JAVASCRIPT)
+Browser State:
+  Page 50E3015CEC091E323752D2724DF76152 () - http://localhost:4321/portfolio/tower-defense/ [ACTIVE]
+    Viewport: 0x0, Page Height: 928
+  Page 143DF3921B253E963AA43283827349E5 (ローグライクカードゲーム - My Portfolio - My Portfolio) - http://localhost:4321/portfolio/roguelike/
+    Viewport: 1399x917, Page Height: 1932
+Running terminal commands:
+- npm run dev
+ (in c:\Users\lemor\workspace\portfolio, running for 1h58m6s)
+</ADDITIONAL_METADATA>

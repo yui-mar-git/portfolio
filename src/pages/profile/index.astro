@@ -7,116 +7,116 @@ import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSSettings, MicroCMSProfile, MicroCMSListResponse } from '@/types/microcms';
 
 const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
-const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
-const allProfileItems = profileResponse.contents;
+  const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
+    const allProfileItems = profileResponse.contents;
 
-// 資格以外のアイテムをカテゴリごとにグループ化
-const groupedSkills = allProfileItems.reduce((acc, item) => {
-  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-  if (cat && !cat.includes('資格') && !cat.includes('検定')) {
+    // 資格以外のアイテムをカテゴリごとにグループ化
+    const groupedSkills = allProfileItems.reduce((acc, item) => {
+    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+    if (cat && !cat.includes('資格') && !cat.includes('検定')) {
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(item);
-  }
-  return acc;
-}, {} as Record<string, MicroCMSProfile[]>);
-
-// 資格のグルーピング
-const certs = allProfileItems.filter(item => {
-  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-  return cat && (cat.includes('資格') || cat.includes('検定'));
-});
-
-const rankDefinitions = [
-  { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
-  { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
-  { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
-  { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
-  { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
-];
-
-const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
-
-certs.forEach(cert => {
-  let systemName = '';
-  let rank = 99;
-
-  const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
-  
-  if (def) {
-    systemName = def.system;
-    if (def.gradeBased) {
-      const gradeMatch = cert.name.match(/([123])級/);
-      rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-    } else {
-      rank = def.rank as number;
     }
-  } else {
-    const gradeMatch = cert.name.match(/([123])級/);
-    rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-    systemName = cert.name.replace(/[123]級/, '').trim();
-  }
+    return acc;
+    }, {} as Record<string, MicroCMSProfile[]>);
 
-  if (!systems[systemName]) {
-    systems[systemName] = [];
-  }
-  systems[systemName].push({ ...cert, rank });
-});
+      // 資格のグルーピング
+      const certs = allProfileItems.filter(item => {
+      const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+      return cat && (cat.includes('資格') || cat.includes('検定'));
+      });
 
-// 各系統をランク順にソート
-Object.keys(systems).forEach(name => {
-  systems[name].sort((a, b) => b.rank - a.rank);
-});
----
+      const rankDefinitions = [
+      { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
+      { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
+      { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
+      { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
+      { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
+      ];
 
-<BaseLayout title="Profile" pageId="profile">
-  <Header activeId="profile" />
+      const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
 
-  <main class="container">
-    <article>
-      <span class="page-label">PROFILE</span>
-      <h1>プロフィール</h1>
+        certs.forEach(cert => {
+        let systemName = '';
+        let rank = 99;
 
-      <section class="profile-intro">
-        <p id="profile-title" class="profile-title-text">{settings.title}</p>
-        <h2 id="profile-name-display" class="profile-name-text">{settings.name}</h2>
-        <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>')} />
-      </section>
+        const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
 
-      {Object.keys(groupedSkills).length > 0 && (
-        <section>
-          <h2>使用技術・ツール</h2>
-          <div class="skill-grid">
-            {Object.entries(groupedSkills).map(([category, items]) => (
-              <div class="profile-card skill-card">
-                <h3>{category}</h3>
-                <ul>
-                  {items.map(item => <li>{item.name}</li>)}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        if (def) {
+        systemName = def.system;
+        if (def.gradeBased) {
+        const gradeMatch = cert.name.match(/([123])級/);
+        rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+        } else {
+        rank = def.rank as number;
+        }
+        } else {
+        const gradeMatch = cert.name.match(/([123])級/);
+        rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+        systemName = cert.name.replace(/[123]級/, '').trim();
+        }
 
-      <section>
-        <h2>保有資格・検定</h2>
-        <div class="cert-tree-container">
-          <div class="cert-tree" id="cert-tree-root">
-            <ul>
-              <li>
-                <div class="cert-node root">資格</div>
-                <ul>
-                  {Object.keys(systems).map(sysName => (
-                    <CertTree items={systems[sysName]} />
+        if (!systems[systemName]) {
+        systems[systemName] = [];
+        }
+        systems[systemName].push({ ...cert, rank });
+        });
+
+        // 各系統をランク順にソート
+        Object.keys(systems).forEach(name => {
+        systems[name].sort((a, b) => b.rank - a.rank);
+        });
+        ---
+
+        <BaseLayout title="Profile" pageId="profile">
+          <Header activeId="profile" />
+
+          <main class="container">
+            <article>
+              <span class="page-label">PROFILE</span>
+              <h1>自己紹介</h1>
+
+              <section class="profile-intro">
+                <p id="profile-title" class="profile-title-text">{settings.title}</p>
+                <h2 id="profile-name-display" class="profile-name-text">{settings.name}</h2>
+                <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>' )} />
+              </section>
+
+              {Object.keys(groupedSkills).length > 0 && (
+              <section>
+                <h2>使用技術・ツール</h2>
+                <div class="skill-grid">
+                  {Object.entries(groupedSkills).map(([category, items]) => (
+                  <div class="profile-card skill-card">
+                    <h3>{category}</h3>
+                    <ul>
+                      {items.map(item => <li>{item.name}</li>)}
+                    </ul>
+                  </div>
                   ))}
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    </article>
-  </main>
+                </div>
+              </section>
+              )}
 
-  <Footer />
-</BaseLayout>
+              <section>
+                <h2>保有資格・検定</h2>
+                <div class="cert-tree-container">
+                  <div class="cert-tree" id="cert-tree-root">
+                    <ul>
+                      <li>
+                        <div class="cert-node root">資格</div>
+                        <ul>
+                          {Object.keys(systems).map(sysName => (
+                          <CertTree items={systems[sysName]} />
+                          ))}
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+            </article>
+          </main>
+
+          <Footer />
+        </BaseLayout>

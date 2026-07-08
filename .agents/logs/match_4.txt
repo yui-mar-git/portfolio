@@ -1,0 +1,308 @@
+Created At: 2026-06-28T19:51:54Z
+Completed At: 2026-06-28T19:51:54Z
+File Path: `file:///c:/Users/lemor/workspace/portfolio/src/pages/portfolio/tower-defense/index.astro`
+Total Lines: 1008
+Total Bytes: 39455
+Showing lines 1 to 300
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: ---
+2: import BaseLayout from '../../../layouts/BaseLayout.astro';
+3: import Header from '../../../components/Header.astro';
+4: import Footer from '../../../components/Footer.astro';
+5: import { fetchMicroCMS } from '../../../lib/microcms';
+6: import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
+7: 
+8: const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+9:   const projectData = portfolioResponse.contents.find((c) => c.url.includes('/tower-defense/'));
+10: 
+11:   const techStack = [
+12:   { category: "開発言語", items: "HTML, CSS, JavaScript" },
+13:   { category: "フレームワーク", items: "Astro, Phaser 3 (ゲームエンジン)" },
+14:   { category: "その他ツール", items: "Google Antigravity, Gemini, Claude" }
+15: ];
+16: 
+17: const learningThemes = ["ゲームエンジン(Phaser 3)基礎", "Arcade Physicsによる衝突判定"];
+18: 
+19: const materialCategories = [
+20:   { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+21:   { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] },
+22:   { category: "音楽・効果音", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }] }
+23: ];
+24: ---
+25: 
+26:   <BaseLayout title="タワーディフェンス - My Portfolio" pageId="tower-defense">
+27:     <!-- Phaser 3 の CDN 読み込み -->
+28:     <script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+29: 
+30:     <Header activeId="portfolio" />
+31: 
+32:     <main class="container">
+33:       <article>
+34:         <span class="page-label">TOWER DEFENSE</span>
+35:         <h1>{projectData ? projectData.title : 'タワーディフェンス（Phaser.js雛形）'}</h1>
+36: 
+37:         <!-- ここにPhaserのCanvasが挿入されます -->
+38:         <div id="game-container" style="position: relative;">
+39:           <div class="game-ui" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between; align-items: center;">
+40:             <div class="status-bar" style="display: flex; gap: 1rem; align-items: center; width: 100%;">
+41:               <span style="min-width: 100px;">WAVE: <strong id="wave-display" style="color:#ffb84d;">1 / 3</strong></span>
+42:               <span style="min-width: 100px;">コスト: <strong id="コスト-display" style="color:#7cc5ff;">0</strong></span>
+43:               <span style="min-width: 100px; margin-left: auto;">G: <strong id="gold-display" style="color:#ffd700;">0</strong></span>
+44:             </div>
+45:           </div>
+46:           
+47:           <div class="deck-area">
+48:             <button class="unit-card" id="btn-spawn-hero" style="border-bottom-color:#FF4500;">
+49:               <div class="unit-name">勇者</div>
+50:               <div class="unit-stats">HP:<span id="stat-hero-hp">150</span> | 攻:<span id="stat-hero-atk">25</span></div>
+51:               <div class="unit-cost">コスト: 100</div>
+52:             </button>
+53:             <button class="unit-card" id="btn-spawn-sword">
+54:               <div class="unit-name">剣士</div>
+55:               <div class="unit-stats">HP:<span id="stat-sword-hp">100</span> | 攻:<span id="stat-sword-atk">15</span></div>
+56:               <div class="unit-cost">コスト: 50</div>
+57:             </button>
+58:             <button class="unit-card" id="btn-spawn-fighter" style="border-bottom-color:#4B0082;">
+59:               <div class="unit-name">格闘家</div>
+60:               <div class="unit-stats">HP:<span id="stat-fighter-hp">80</span> | 攻:<span id="stat-fighter-atk">25</span></div>
+61:               <div class="unit-cost">コスト: 80</div>
+62:             </button>
+63:             <button class="unit-card" id="btn-spawn-mage" style="border-bottom-color:#8A2BE2;">
+64:               <div class="unit-name">魔法使</div>
+65:               <div class="unit-stats">HP:<span id="stat-mage-hp">40</span> | 攻:<span id="stat-mage-atk">30</span></div>
+66:               <div class="unit-cost">コスト: 120</div>
+67:             </button>
+68:           </div>
+69: 
+70:           <span id="config-btn" class="icon-config" title="コンフィグ" style="z-index: 20; position: absolute; top: 3.5rem; right: 0.5rem;">⚙️</span>
+71:           
+72:           <!-- スタート画面 -->
+73:           <div class="overlay" id="start-screen" style="background-color: var(--bg-color); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+74:             <h2>タワーディフェンス</h2>
+75:             <p>コストを払って出撃し、拠点を防衛しよう</p>
+76:             <button id="start-btn" class="btn btn-full">ワールドマップへ</button>
+77:             <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">遊び方</button>
+78:           </div>
+79: 
+80:           <!-- ワールドマップ画面 -->
+81:           <div class="overlay" id="map-screen" style="display: none; background-color: var(--bg-color); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+82:             <h2>ワールドマップ</h2>
+83:             <div style="margin-bottom: 1.5rem; font-size: 1.2rem; color: #ffd700;">所持ゴールド: <strong id="map-gold">0</strong> G</div>
+84:             <div class="map-stages" style="display: flex; flex-direction: column; gap: 1rem; width: 80%; max-width: 300px;">
+85:               <button class="btn btn-primary" id="btn-stage1">ステージ1 (海岸)</button>
+86:               <button class="btn btn-secondary" id="btn-stage2" disabled>ステージ2 (平原)</button>
+87:               <button class="btn btn-secondary" id="btn-stage3" disabled>ステージ3 (魔王城)</button>
+88:               <button class="btn btn-secondary" id="btn-to-upgrade" style="margin-top: 2rem; background-color: #4b0082; color:white; border-color:#4b0082;">ベースキャンプ (強化)</button>
+89:             </div>
+90:           </div>
+91: 
+92:           <!-- ベースキャンプ（強化）画面 -->
+93:           <div class="overlay" id="upgrade-screen" style="display: none; background-color: var(--bg-color); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+94:             <h2>ベースキャンプ</h2>
+95:             <div style="margin-bottom: 1.5rem; font-size: 1.2rem; color: #ffd700;">所持ゴールド: <strong id="upg-gold">0</strong> G</div>
+96:             <div class="upgrade-list" style="display: flex; flex-direction: column; gap: 1rem; width: 80%; max-width: 350px;">
+97:               <div class="upgrade-item" style="display:flex; justify-content: space-between; align-items:center; background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+98:                 <div>勇者 Lv.<strong id="lv-hero">1</strong></div>
+99:                 <button class="btn btn-primary" id="btn-upg-hero" style="padding: 0.4rem 0.8rem;">強化 (<span id="cost-hero">100</span>G)</button>
+100:               </div>
+101:               <div class="upgrade-item" style="display:flex; justify-content: space-between; align-items:center; background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+102:                 <div>剣士 Lv.<strong id="lv-sword">1</strong></div>
+103:                 <button class="btn btn-primary" id="btn-upg-sword" style="padding: 0.4rem 0.8rem;">強化 (<span id="cost-sword">100</span>G)</button>
+104:               </div>
+105:               <div class="upgrade-item" style="display:flex; justify-content: space-between; align-items:center; background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+106:                 <div>格闘家 Lv.<strong id="lv-fighter">1</strong></div>
+107:                 <button class="btn btn-primary" id="btn-upg-fighter" style="padding: 0.4rem 0.8rem;">強化 (<span id="cost-fighter">100</span>G)</button>
+108:               </div>
+109:               <div class="upgrade-item" style="display:flex; justify-content: space-between; align-items:center; background: var(--bg-secondary); padding: 1rem; border-radius: 8px;">
+110:                 <div>魔法使 Lv.<strong id="lv-mage">1</strong></div>
+111:                 <button class="btn btn-primary" id="btn-upg-mage" style="padding: 0.4rem 0.8rem;">強化 (<span id="cost-mage">100</span>G)</button>
+112:               </div>
+113:               <button class="btn btn-secondary" id="btn-back-map" style="margin-top: 1rem; width: 100%;">マップへ戻る</button>
+114:             </div>
+115:           </div>
+116: 
+117:           <!-- リザルト画面 -->
+118:           <div class="overlay" id="result-screen" style="display: none; background-color: var(--bg-color); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+119:             <h2>ゲームオーバー</h2>
+120:             <p id="result-message" style="margin-top: 1rem; font-size: 1.2rem; color:#ffd700;"></p>
+121:             <div class="result-actions" style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+122:               <button class="btn btn-secondary" id="btn-retry" style="width: 100%;">リトライ</button>
+123:               <button class="btn btn-secondary" id="btn-title" style="width: 100%;">マップへ戻る</button>
+124:               <button class="btn btn-primary" id="btn-share" style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">Xでシェア</button>
+125:             </div>
+126:           </div>
+127:           <div id="howto-modal" class="config-modal">
+128:             <h3>遊び方</h3>
+129:             <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+130:               <p>時間経過で貯まるコストを払って味方を出撃させましょう。</p>
+131:               <p>味方は自動で前進して敵と戦ってくれます。</p>
+132:               <p>強力なユニットをタイミングよく出撃させ、迫りくる敵を倒して拠点を防衛してください！</p>
+133:             </div>
+134:             <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+135:           </div>
+136: 
+137:           <!-- コンフィグモーダル（ダミー） -->
+138:           <div id="modal-overlay" class="modal-overlay"></div>
+139:           <div id="config-modal" class="config-modal">
+140:             <h3>コンフィグ</h3>
+141:             <div class="config-item">
+142:               <label for="bgm-volume">BGM音量</label>
+143:               <input type="range" id="bgm-volume" min="0" max="100" value="50">
+144:             </div>
+145:             <div class="config-item">
+146:               <label for="se-volume">SE音量</label>
+147:               <input type="range" id="se-volume" min="0" max="100" value="50">
+148:             </div>
+149:             
+150:                 <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
+151:                 <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+152:           </div>
+153:           <!-- クレジットモーダル -->
+154:           <div id="credits-modal" class="config-modal">
+155:             <h3>クレジット・使用素材</h3>
+156:             <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+157:               <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+158:               <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+159:                 {materialCategories.map((mat) => (
+160:                   <li>{mat.category}: {mat.items.map((item, index) => (
+161:                     <span key={item.name}>
+162:                       <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+163:                       {index < mat.items.length - 1 ? " / " : ""}
+164:                     </span>
+165:                   ))}</li>
+166:                 ))}
+167:               </ul>
+168:             </div>
+169:             <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+170:           </div>
+171:         </div>
+172: 
+173:         <!-- ゲーム概要・使用技術セクション -->
+174:         <section class="project-details">
+175:           <h2>概要</h2>
+176:         {projectData && projectData.description ? (
+177:           <p class="description" set:html={projectData.description.replace(/\n/g, '<br>')} />
+178:         ) : (
+179:           <p class="description">（概要を取得できませんでした。microCMSのURL設定をご確認ください）</p>
+180:         )}
+181: 
+182:         <h2>学習テーマ</h2>
+183:         <div class="materials-list">
+184:           <ul>
+185:             {learningThemes.map((theme) => (
+186:               <li>{theme}</li>
+187:             ))}
+188:           </ul>
+189:         </div>
+190: 
+191:         <h2>使用技術・ツール</h2>
+192:         <div class="table-responsive">
+193:           <table class="tech-table">
+194:             <tbody>
+195:               {techStack.map((tech) => (
+196:               <tr>
+197:                 <th>{tech.category}</th>
+198:                 <td>{tech.items}</td>
+199:               </tr>
+200:               ))}
+201:             </tbody>
+202:           </table>
+203:         </div>
+204: 
+205:           <h2>使用素材</h2>
+206:           <div class="table-responsive">
+207:             <table class="tech-table">
+208:               <tbody>
+209:                 {materialCategories.map((mat) => (
+210:                 <tr>
+211:                   <th>{mat.category}</th>
+212:                   <td>
+213:                     {mat.items.map((item, index) => (
+214:                     <span key={item.name}>
+215:                       <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+216:                       {index < mat.items.length - 1 ? " / " : "" } </span>
+217:                         ))}
+218:                   </td>
+219:                 </tr>
+220:                 ))}
+221:               </tbody>
+222:             </table>
+223:           </div>
+224:         </section>
+225:       </article>
+226:     </main>
+227: 
+228:     <Footer />
+229:   </BaseLayout>
+230: 
+231:   <style>
+232:     .game-ui {
+233:       margin-top: 2rem;
+234:       margin-bottom: 1rem;
+235:       background: var(--bg-secondary);
+236:       padding: 1rem;
+237:       border-radius: 8px;
+238:       display: flex;
+239:       justify-content: space-between;
+240:       align-items: center;
+241:     }
+242: 
+243:     .status-bar {
+244:       display: flex;
+245:       align-items: center;
+246:       gap: 1.5rem;
+247:       font-size: 1.2rem;
+248:     }
+249: 
+250:     #game-container {
+251:       width: 100%;
+252:       max-width: 800px;
+253:       margin: 0 auto;
+254:       border: 4px solid var(--border-color);
+255:       border-radius: 8px;
+256:       overflow: hidden;
+257:     }
+258: 
+259:     /* Phaserが生成するcanvas要素をコンテナに合わせる */
+260:     #game-container canvas {
+261:       display: block;
+262:       width: 100%;
+263:       height: auto;
+264:     }
+265: 
+266:     .overlay {
+267:       position: absolute;
+268:       top: 0; left: 0; width: 100%; height: 100%;
+269:       background: rgba(0, 0, 0, 0.7);
+270:       display: flex;
+271:       flex-direction: column;
+272:       align-items: center;
+273:       justify-content: center;
+274:       color: white;
+275:       z-index: 10;
+276:     }
+277:     .overlay h2 {
+278:       margin-bottom: 1rem;
+279:     }
+280:     .overlay p {
+281:       margin-bottom: 2rem;
+282:       color: #fff;
+283:     }
+284: 
+285:     /* =============================
+286:        プロジェクト概要・使用技術
+287:        ============================= */
+288:     .project-details {
+289:       margin-top: 3rem;
+290:       padding-top: 2rem;
+291:       border-top: 1px solid var(--border-color);
+292:     }
+293: 
+294:     .project-details h2 {
+295:       font-size: 1.25rem;
+296:       margin-top: 2rem;
+297:       margin-bottom: 1rem;
+298:       padding-bottom: 0.5rem;
+299:       border-bottom: 1px solid var(--border-color);
+300:     }
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

@@ -1,0 +1,1603 @@
+---
+import imgYuusya from '../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
+import imgKenshi from '../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
+import imgMahoutsukai from '../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png';
+import imgButouka from '../../assets/games/roguelike/images/characters/figure_rpg_character_butouka.png';
+import imgHotelPet from '../../assets/games/roguelike/images/map/building_hotel_pet.png';
+import imgPixy from '../../assets/games/roguelike/images/characters/fantasy_pixy2.png';
+import imgShop from '../../assets/games/roguelike/images/map/omise_shop_tatemono.png';
+import imgNoImage from '../../assets/games/roguelike/images/icons/no_image_square.jpg';
+import imgKing from '../../assets/games/roguelike/images/characters/royal_king.png';
+---
+<!-- game-container: CSSで position:relative / height:580px / overflow:hidden を定義済み -->
+<div class="game-container" id="game-container">
+  <!-- icon-config: CSSで position/top/right/z-index を定義 -->
+  <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
+
+  <!-- ゲームヘッダーバー（ステータス常時表示） -->
+  <!-- game-header-bar: CSSで定義。初期 display:none はCSS側で管理 -->
+  <div id="game-header" class="game-header-bar">
+    <div class="header-status">
+      <span id="header-floor" class="header-floor">エリア 1 - 0層</span>
+      <span class="gold-badge">💰<span id="header-gold">50</span></span>
+      <span class="hp-badge">❤️<span id="header-hp">10/10</span></span>
+      <span class="mp-badge">💧<span id="header-mp">5/5</span></span>
+      <div class="header-relics">
+        <span class="header-relics-label">レリック:</span>
+        <div id="header-relics-list" class="header-relics-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ゲームオーバー/クリア画面 -->
+  <div class="overlay result-overlay" id="result-overlay">
+    <h2 id="result-title">戦闘終了</h2>
+    <p id="result-details" class="result-details"></p>
+    <div class="result-actions">
+      <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
+      <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
+      <button class="btn btn-share" id="btn-share">Xでシェア</button>
+    </div>
+  </div>
+
+  <!-- カード選択報酬画面 -->
+  <div class="overlay reward-overlay" id="reward-overlay">
+    <h2>🎉 戦闘勝利！</h2>
+    <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
+    <div id="reward-cards" class="reward-cards"></div>
+    <button class="btn btn-secondary btn-skip-reward" id="btn-skip-reward">スキップ</button>
+  </div>
+
+  <!-- デッキ閲覧モーダル -->
+  <div class="overlay deck-viewer-overlay" id="deck-viewer-overlay">
+    <h2 class="deck-viewer-title">デッキ確認</h2>
+    <div class="deck-viewer-tabs">
+      <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
+      <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
+      <button class="deck-tab" data-target="hand-list">手札 (<span id="dv-hand-count">0</span>)</button>
+    </div>
+    <div id="deck-list" class="dv-card-list active"></div>
+    <div id="discard-list" class="dv-card-list"></div>
+    <div id="hand-list" class="dv-card-list"></div>
+    <button class="btn btn-secondary btn-full btn-mt" id="close-deck-viewer">閉じる</button>
+  </div>
+
+  <!-- スタート画面 -->
+  <!-- start-screen: CSS で position/background/z-index 定義 -->
+  <div id="start-screen" class="game-screen start-screen">
+    <h2 class="screen-title">ローグライクカードゲーム</h2>
+    <p class="screen-desc">職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
+    <button id="start-btn" class="btn btn-full">冒険を始める</button>
+    <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
+  </div>
+
+  <!-- 職業選択画面 -->
+  <div id="class-select-screen" class="game-screen class-select-screen">
+    <h2 class="class-select-title">冒険者の選択</h2>
+    <p class="class-select-desc">あなたの戦闘スタイルを選んで旅立ちましょう。</p>
+    <div class="class-select-body">
+      <div class="class-grid">
+        <div class="class-card" data-class="yuusya">
+          <img src={imgYuusya.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+          <div style="font-size: 0.85rem; font-weight: bold;">勇者</div>
+          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP10 /
+            MP5<br>初期レリックが+1個</div>
+        </div>
+        <div class="class-card" data-class="kenshi">
+          <img src={imgKenshi.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+          <div style="font-size: 0.85rem; font-weight: bold;">戦士</div>
+          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP15 /
+            MP4<br>毎ターンHP+1回復</div>
+        </div>
+        <div class="class-card" data-class="mahoutsukai">
+          <img src={imgMahoutsukai.src}
+            style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+          <div style="font-size: 0.85rem; font-weight: bold;">魔法使い</div>
+          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP7 /
+            MP7<br>毎ターンMP+1回復</div>
+        </div>
+        <div class="class-card" data-class="butouka">
+          <img src={imgButouka.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
+          <div style="font-size: 0.85rem; font-weight: bold;">格闘家</div>
+          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP8 /
+            MP4<br>毎ターン行動回数+1</div>
+        </div>
+      </div>
+      <p id="class-select-preview"
+        style="font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem;">
+        勇者が選択されています</p>
+    </div>
+
+    <button id="btn-game-start" class="btn btn-full btn-mt">冒険の旅へ出る</button>
+  </div>
+
+  <!-- マップ進行画面（横スクロール双六マップ） -->
+  <div id="map-screen" class="game-screen game-screen-offset">
+    <div class="map-header">
+      <h3 class="map-title">マップ</h3>
+    </div>
+
+    <!-- 横スクロールすごろく本体 -->
+    <div id="map-scroll-wrapper" class="map-scroll-wrapper">
+      <div id="map-board" class="map-board">
+        <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
+      </div>
+    </div>
+
+    <div class="map-footer">
+      <button class="btn btn-secondary btn-deck-view" id="btn-map-view-deck">デッキ確認</button>
+      <span class="map-hint">接続された次のマスへ進めます</span>
+    </div>
+  </div>
+
+  <!-- 宿（回復）画面 -->
+  <div id="inn-screen" class="game-screen game-screen-offset inn-screen">
+    <div class="screen-box-image-wrap">
+      <img src={imgHotelPet.src} style="width: 100px; height: 100px; object-fit: contain;" />
+    </div>
+    <h3 style="color: #51cf66; font-size: 1.2rem; margin-bottom: 0.5rem;">旅人の宿</h3>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%;">
+      15ゴールドを支払って、宿屋でぐっすり休むことができます。<br>
+      <strong>効果: HP全回復 ＋ 毒/麻痺の全治</strong>
+    </p>
+    <div class="screen-actions">
+      <button id="btn-inn-rest" class="btn btn-primary btn-full">休む (💰15)</button>
+      <button id="btn-inn-leave" class="btn btn-secondary btn-full">立ち去る</button>
+    </div>
+  </div>
+
+  <!-- 妖精（強化）画面 -->
+  <div id="fairy-screen" class="game-screen game-screen-offset fairy-screen">
+    <div style="text-align: center;">
+      <div class="screen-box-image-wrap">
+        <img src={imgPixy.src} style="width: 100px; height: 100px; object-fit: contain;" />
+      </div>
+      <h3 style="color: #cc5de8; font-size: 1.2rem; margin-bottom: 0.2rem;">祝福の妖精</h3>
+      <p id="fairy-desc" style="font-size: 0.75rem; color: var(--text-muted);">
+        20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。</p>
+    </div>
+
+    <!-- 強化対象カード選択リスト -->
+    <div id="fairy-card-list"
+      style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
+      <!-- 所持カードがボタンとして並びます -->
+    </div>
+
+    <div class="screen-actions">
+      <button id="btn-fairy-leave" class="btn btn-secondary btn-flex">立ち去る</button>
+    </div>
+  </div>
+
+  <!-- 街（ショップ）画面 -->
+  <div id="town-screen" class="game-screen game-screen-offset town-screen">
+    <div style="text-align: center;">
+      <div class="screen-box-image-wrap">
+        <img src={imgShop.src} style="width: 100px; height: 100px; object-fit: contain;" />
+      </div>
+      <h3 style="color: #ff922b; font-size: 1.2rem; margin-bottom: 0.2rem;">よろず街の商い</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted);">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
+    </div>
+
+    <div
+      style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px;">
+      <div>
+        <p
+          style="font-size: 0.72rem; color: #ff922b; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+          販売カード (各 💰15)</p>
+        <div id="town-cards" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+      </div>
+      <div>
+        <p
+          style="font-size: 0.72rem; color: #ffd8a8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+          販売アイテム (各 💰20)</p>
+        <div id="town-items" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+      </div>
+    </div>
+
+    <button id="btn-town-leave" class="btn btn-secondary btn-full">街を出る</button>
+  </div>
+
+  <!-- イベント画面 -->
+  <div id="event-screen" class="game-screen game-screen-offset event-screen">
+    <div>
+      <div class="screen-box-image-wrap">
+        <img id="event-image" src={imgNoImage.src}
+          style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px;" />
+      </div>
+      <h3 id="event-title" style="color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.5rem;">未知のイベント</h3>
+      <p id="event-text"
+        style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto;">
+      </p>
+    </div>
+
+    <div id="event-options" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+      <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
+    </div>
+  </div>
+
+  <!-- アイテム使用確認モーダル -->
+  <div id="item-confirm-modal"
+    style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
+    <div
+      style="background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center;">
+      <h4 style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem;">アイテムの使用確認</h4>
+      <p id="item-confirm-text"
+        style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem;"></p>
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-item-confirm-yes" class="btn btn-primary" style="flex: 1; padding: 0.4rem 0;">はい</button>
+        <button id="btn-item-confirm-no" class="btn btn-secondary" style="flex: 1; padding: 0.4rem 0;">いいえ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 戦闘中マップ確認モーダル -->
+  <div id="battle-map-overlay" class="overlay"
+    style="display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column;">
+    <h3 style="color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">現在地確認</h3>
+    <div id="battle-map-scroll-wrapper"
+      style="flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem;">
+      <div id="battle-map-board"
+        style="display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content;"></div>
+    </div>
+    <button class="btn btn-secondary" id="btn-close-battle-map" style="margin-top: 0.8rem; width: 100%;">閉じる</button>
+  </div>
+
+  <!-- 王様遭遇イベントモーダル -->
+  <div id="king-event-modal" class="overlay"
+    style="display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center;">
+    <div class="screen-box-image-wrap">
+      <img src={imgKing.src} style="width: 100px; height: 100px; object-fit: contain;" />
+    </div>
+    <h3 style="color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem;">謁見の間：王からの餞別</h3>
+    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%;">
+      「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
+    </p>
+    <div id="king-relic-choices" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+      <!-- 3つのレリック選択カードがJSで挿入されます -->
+    </div>
+  </div>
+
+  <!-- 汎用カットシーンモーダル -->
+  <div id="cutscene-modal" class="overlay"
+    style="display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem;">
+    <!-- 背景イメージ -->
+    <div id="cutscene-bg"
+      style="position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none;">
+    </div>
+    <!-- キャラクターポートレート群 -->
+    <div id="cutscene-portraits"
+      style="position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2;">
+    </div>
+    <!-- セリフウィンドウ -->
+    <div
+      style="position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4);">
+      <div id="cutscene-speaker"
+        style="font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em;"></div>
+      <div id="cutscene-text" style="font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em;"></div>
+      <div style="text-align:right; margin-top:0.5rem;">
+        <button id="btn-cutscene-next" class="btn btn-primary" style="font-size:0.7rem; padding:0.25rem 1rem;">次へ
+          ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ゲーム内汎用メッセージダイアログ -->
+
+  <div id="game-dialog-modal" class="overlay"
+    style="display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div
+      style="background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
+      <h4 id="dialog-title" style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold;">通知
+      </h4>
+      <p id="dialog-message" style="font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem;">
+      </p>
+      <div id="dialog-buttons" style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btn-dialog-ok" class="btn btn-primary" style="padding: 0.3rem 1.5rem;">OK</button>
+        <button id="btn-dialog-yes" class="btn btn-primary" style="display:none; flex:1; padding: 0.3rem 0;">はい</button>
+        <button id="btn-dialog-no" class="btn btn-secondary"
+          style="display:none; flex:1; padding: 0.3rem 0;">いいえ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- バトル画面本体 -->
+  <div class="battle-layout"
+    style="top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem;">
+
+    <!--バトルフィールド -->
+    <div class="battle-field"
+      style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+
+      <!-- ① 左上：敵ステータス -->
+      <div class="enemy-status-panel"
+        style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
+        <div
+          style="font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+          <span id="enemy-name">敵</span>
+          <span id="enemy-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+          <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
+          <div
+            style="flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+            <div id="enemy-hp-bar"
+              style="height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s;">
+            </div>
+          </div>
+          <span id="enemy-hp-text"
+            style="font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0;">40/40</span>
+        </div>
+        <div id="enemy-intent"
+          style="font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666;">
+          ⚔️ 5</div>
+      </div>
+
+      <!-- ② 右上：敵画像 -->
+      <div style="display: flex; align-items: center; justify-content: center; position: relative;">
+        <img id="enemy-image" src="" alt="敵"
+          style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));" />
+      </div>
+
+      <!-- ③ 左下：自分画像 -->
+      <div
+        style="display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative;">
+        <img id="player-battle-image" src="" alt="自分"
+          style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8));" />
+      </div>
+
+      <!-- ④ 右下：自分ステータス -->
+      <div class="player-status-panel"
+        style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6);">
+        <div
+          style="font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+          <span id="player-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+          <span id="player-class-name">あなた</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+          <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
+          <div
+            style="flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+            <div id="player-hp-bar"
+              style="height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s;">
+            </div>
+          </div>
+          <span id="player-hp-text"
+            style="font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0;">10/10</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem;">
+          <span style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">MP</span>
+          <div id="player-mp-orbs" style="display: flex; gap: 2px; flex: 1;"></div>
+          <span id="player-mp-text" style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">5/5</span>
+        </div>
+        <div style="font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem;">
+          行動: <span id="player-actions">1</span>回
+        </div>
+      </div>
+
+    </div><!-- /.battle-field -->
+
+    <!-- バトルログ (コンパクト) -->
+    <div class="battle-log-panel" id="battle-log"
+      style="height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box;">
+      <p class="log-system">戦闘開始！</p>
+    </div>
+
+    <!-- レリック・アイテムエリア -->
+    <div
+      style="display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%;">
+      <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">レリック:</span>
+        <div id="player-relics" style="display: flex; gap: 4px; overflow-x: auto;"></div>
+      </div>
+      <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
+        <div id="player-items" style="display: flex; gap: 4px;"></div>
+      </div>
+    </div>
+
+    <!-- 手札エリア -->
+    <div style="display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <button class="btn btn-secondary" id="btn-view-deck"
+          style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem;">
+          山札 (<span id="deck-count">0</span>)
+        </button>
+        <button class="btn btn-secondary" id="btn-battle-view-map"
+          style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d;">
+          マップ
+        </button>
+      </div>
+      <div id="hand-area" class="hand-area"
+        style="height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start;">
+        <!-- カードがJSで挿入されます -->
+      </div>
+      <div style="margin-top: 0.1rem; width: 100%;">
+        <button class="btn btn-end-turn" id="btn-end-turn" style="width: 100%; padding: 0.4rem;">様子見</button>
+      </div>
+    </div>
+
+  </div><!-- /.battle-layout -->
+
+
+  <!-- 遊び方モーダル -->
+  <div id="howto-modal" class="config-modal">
+    <h3>遊び方</h3>
+    <div class="howto-content"
+      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+      <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+      <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+      <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+    </div>
+    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+
+  <!-- コンフィグモーダル -->
+  <div id="modal-overlay" class="modal-overlay"></div>
+  <div id="config-modal" class="config-modal">
+    <h3>コンフィグ</h3>
+    <div class="config-item">
+      <label for="bgm-volume">BGM音量</label>
+      <input type="range" id="bgm-volume" min="0" max="100" value="50">
+    </div>
+    <div class="config-item">
+      <label for="se-volume">SE音量</label>
+      <input type="range" id="se-volume" min="0" max="100" value="50">
+    </div>
+    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
+    <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+
+  <!-- クレジットモーダル -->
+  <div id="credits-modal" class="config-modal">
+    <h3>クレジット・使用素材</h3>
+    <div class="howto-content"
+      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+      <ul style="padding-left: 1.2rem; margin-top: 0.5rem;">
+        <li><strong>画像素材:</strong> いらすとや 様</li>
+        <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
+        <li><strong>フォント:</strong> Google Fonts</li>
+      </ul>
+    </div>
+    <button id="close-credits-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+
+</div><!-- /.game-container -->
+
+<!-- ゲーム概要・使用技術セクション -->
+</div>
+</GameLayout>
+
+<style>
+  /* =============================
+       インラインスタイルから移行したクラス群
+       ============================= */
+
+  /* config ボタン（コンフィグアイコン）の位置 */
+  .icon-config {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 999;
+  }
+
+  /* ゲームヘッダーバー: 初期は非表示・JSで flex に切り替え */
+  .game-header-bar {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 15, 26, 0.95);
+    border-bottom: 1px solid #333;
+    padding: 0.4rem 2.5rem 0.4rem 0.8rem;
+    font-size: 0.78rem;
+    z-index: 100;
+  }
+
+  .header-status {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .header-floor {
+    font-weight: bold;
+    color: #ffb84d;
+  }
+
+  .gold-badge {
+    color: #ffd700;
+    font-weight: bold;
+  }
+
+  .hp-badge {
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+
+  .mp-badge {
+    color: #7cc5ff;
+    font-weight: bold;
+  }
+
+  .header-relics {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
+
+  .header-relics-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .header-relics-list {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* 共通オーバーレイ画面 */
+  .result-overlay {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 200;
+  }
+
+  .result-details {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .reward-overlay {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 180;
+  }
+
+  .btn-skip-reward {
+    margin-top: 1rem;
+  }
+
+  .deck-viewer-overlay {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.95);
+    justify-content: flex-start;
+    padding-top: 2.5rem;
+    z-index: 190;
+  }
+
+  .deck-viewer-title {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  /* 汎用ボタンユーティリティ */
+  .btn-full {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .btn-mt {
+    margin-top: 1rem;
+  }
+
+  .btn-flex {
+    flex: 1;
+  }
+
+  .btn-credits {
+    margin-bottom: 0.5rem;
+  }
+
+  .btn-share {
+    background-color: #1DA1F2;
+    border-color: #1DA1F2;
+    color: white;
+  }
+
+  /* 共通ゲーム画面（全画面絶対配置） */
+  .game-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  /* スタート画面: 初期表示はflexで表示・中央揃え */
+  .start-screen {
+    background: #0f0f1a;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .screen-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .screen-desc {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+  }
+
+  /* 職業選択画面 */
+  .class-select-screen {
+    background: #0f0f1a;
+    z-index: 98;
+    padding: 1.2rem;
+    overflow-y: auto;
+  }
+
+  .class-select-title {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 0.4rem;
+    color: #ffb84d;
+  }
+
+  .class-select-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 0.8rem;
+  }
+
+  .class-select-body {
+    flex: 1;
+  }
+
+  /* ゲームヘッダー分のオフセット（top:40px / height:calc(100% - 40px)）*/
+  .game-screen-offset {
+    top: 40px;
+    height: calc(100% - 40px);
+  }
+
+  /* マップ画面 */
+  .game-screen.game-screen-offset#map-screen {
+    background: #0f0f1a;
+    z-index: 80;
+    padding: 1rem;
+    justify-content: space-between;
+  }
+
+  .map-header {
+    text-align: center;
+    margin-bottom: 0.3rem;
+  }
+
+  .map-title {
+    font-size: 1.1rem;
+    color: #ffb84d;
+    margin-bottom: 0.1rem;
+  }
+
+  .map-scroll-wrapper {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    margin-bottom: 0.8rem;
+    position: relative;
+  }
+
+  .map-board {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    min-width: max-content;
+  }
+
+  .map-footer {
+    border-top: 1px solid #333;
+    padding-top: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-deck-view {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .map-hint {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+
+  /* 宿・妖精・街・イベント画面 */
+  .inn-screen {
+    background: #0c1513;
+    z-index: 81;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .fairy-screen {
+    background: #150f1a;
+    z-index: 82;
+    padding: 1.2rem;
+    justify-content: space-between;
+  }
+
+  .town-screen {
+    background: #1a150f;
+    z-index: 83;
+    padding: 1.2rem;
+    justify-content: space-between;
+  }
+
+  .event-screen {
+    background: #11111a;
+    z-index: 84;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  /* 共通アクションボタン群 */
+  .screen-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  /* =============================
+       ゲームコンテナ
+       ============================= */
+  .game-container {
+    margin-top: 2rem;
+    background: var(--bg-secondary);
+    position: relative;
+    overflow: hidden;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 580px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  /* 職業選択カード */
+  .class-card {
+    border: 1px solid #444;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .class-card:hover {
+    border-color: #ffd700 !important;
+    background: rgba(255, 215, 0, 0.06) !important;
+    transform: translateY(-2px);
+  }
+
+  .class-card.selected {
+    border-color: #ff922b !important;
+    border-width: 2px !important;
+    background: rgba(255, 146, 43, 0.18) !important;
+    box-shadow: 0 0 10px rgba(255, 146, 43, 0.35);
+  }
+
+  /* 属性・特殊カラーテーマ (Vite動的生成用グローバルセレクタ) */
+  /* card-cost: 全カード共通（青丸） */
+  :global(.card-cost) {
+    background: #3d5af1 !important;
+    color: white !important;
+  }
+
+  /* ===== 属性カラードット（card-descの下・右下に出る小さな丸） ===== */
+  /* .card-color-dot はJS側でcardに.card-color-dot要素を追加して使う */
+  :global(.card-color-dot) {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+  }
+
+  /* 白 (回復・能昇) */
+  :global(.color-dot-white) {
+    background: #e9ecef;
+    box-shadow: 0 0 4px rgba(233, 236, 239, 0.8);
+  }
+
+  /* 黒 (状態異常・能降) */
+  :global(.color-dot-black) {
+    background: #495057;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  }
+
+  /* 赤 (炎) */
+  :global(.color-dot-red) {
+    background: #ff6b6b;
+    box-shadow: 0 0 4px rgba(255, 107, 107, 0.8);
+  }
+
+  /* 青 (水) */
+  :global(.color-dot-blue) {
+    background: #4dabf7;
+    box-shadow: 0 0 4px rgba(77, 171, 247, 0.8);
+  }
+
+  /* 緑 (風) */
+  :global(.color-dot-green) {
+    background: #51cf66;
+    box-shadow: 0 0 4px rgba(81, 207, 102, 0.8);
+  }
+
+  /* 橙 (土) */
+  :global(.color-dot-orange) {
+    background: #ff922b;
+    box-shadow: 0 0 4px rgba(255, 146, 43, 0.8);
+  }
+
+  /* 黄 (雷) */
+  :global(.color-dot-yellow) {
+    background: #fcc419;
+    box-shadow: 0 0 4px rgba(252, 196, 25, 0.8);
+  }
+
+  /* 紫 (特殊・スペシャル) */
+  :global(.color-dot-purple) {
+    background: #cc5de8;
+    box-shadow: 0 0 6px rgba(204, 93, 232, 0.9);
+  }
+
+  /* 紫カードのみ特殊グロー背景 */
+  :global(.color-purple) {
+    background: linear-gradient(135deg, rgba(20, 20, 35, 0.85), rgba(50, 15, 70, 0.6)) !important;
+    box-shadow: 0 0 8px rgba(204, 93, 232, 0.4) !important;
+  }
+
+
+
+
+
+  /* =============================
+       オーバーレイ共通
+       ============================= */
+  /* overlay基底クラス: 初期は非表示。各オーバーレイをJSで .active などでflexにする。
+       ただし start-screen は別扱い（初期表示が必要）なため game-screen で管理 */
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-secondary);
+    z-index: 99;
+    display: none;
+    /* デフォルト非表示。JSで display:flex に切り替える */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .overlay h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 280px;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .reward-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .reward-cards {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* =============================
+       デッキ閲覧
+       ============================= */
+  .deck-viewer-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  .deck-tab {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: 6px;
+    padding: 0.4rem 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+    flex: 1;
+    max-width: 120px;
+    white-space: nowrap;
+  }
+
+  .deck-tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .dv-card-list {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    justify-content: center;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+
+  .dv-card-list.active {
+    display: flex;
+  }
+
+  /* =============================
+       バトルレイアウト（2段）
+       ============================= */
+  /* =============================
+       バトルレイアウト（2段）
+       ============================= */
+  .battle-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    overflow: hidden;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* 上段：敵 + ログ横並び */
+  .battle-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    align-items: stretch;
+  }
+
+  /* 敵エリア */
+  .enemy-panel {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #dc3545;
+    border-radius: 8px;
+    padding: 0.6rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-height: 160px;
+  }
+
+  .enemy-intent {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #dc3545;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .enemy-image {
+    max-height: 80px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  .enemy-name-row {
+    font-weight: bold;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: white;
+  }
+
+  /* バトルログ */
+  .battle-log-panel {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 0.6rem;
+    overflow-y: auto;
+    max-height: 160px;
+    font-family: monospace;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: white;
+  }
+
+  .battle-log-panel p {
+    margin: 0 0 0.3rem 0;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.2rem;
+  }
+
+  .log-damage {
+    color: #ff6b6b;
+  }
+
+  .log-heal {
+    color: #51cf66;
+  }
+
+  .log-system {
+    color: #fcc419;
+  }
+
+  .log-poison {
+    color: #a9e34b;
+  }
+
+  /* =============================
+       HPバー（共通）
+       ============================= */
+  .hp-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: 100%;
+    font-size: 0.75rem;
+    color: white;
+  }
+
+  .bar-bg {
+    flex-grow: 1;
+    height: 10px;
+    background: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    min-width: 40px;
+  }
+
+  .bar-inline {
+    flex-grow: 1;
+    min-width: 60px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    transition: width 0.3s ease-out;
+  }
+
+  .hp-fill {
+    background: #28a745;
+  }
+
+  :global([data-theme="dark"]) .bar-bg {
+    background: #343a40;
+  }
+
+  .hp-num {
+    font-size: 0.72rem;
+    white-space: nowrap;
+    min-width: 42px;
+    text-align: right;
+  }
+
+  /* =============================
+       プレイヤーエリア
+       ============================= */
+  .player-panel {
+    background: rgba(0, 0, 50, 0.5);
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    color: white;
+  }
+
+  .player-top-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .player-name {
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .player-hp-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex: 1;
+    font-size: 0.78rem;
+  }
+
+  .shield-inline {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    font-weight: bold;
+    color: #17a2b8;
+  }
+
+  /* AP行 */
+  .ap-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .ap-label {
+    font-weight: bold;
+    color: #7cc5ff;
+    white-space: nowrap;
+  }
+
+  .ap-orbs {
+    display: flex;
+    gap: 4px;
+  }
+
+  :global(.ap-orb) {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid #555;
+  }
+
+  :global(.ap-orb.active) {
+    background: #007bff;
+    box-shadow: 0 0 6px #007bff;
+  }
+
+  .ap-num {
+    color: #7cc5ff;
+    font-size: 0.78rem;
+  }
+
+  /* =============================
+       手札エリア
+       ============================= */
+  .hand-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .hand-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .hand-area {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0 4px;
+    min-height: 140px;
+    scrollbar-width: thin;
+  }
+
+  .end-turn-row {
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .btn-end-turn {
+    background: linear-gradient(135deg, var(--primary-color), #5046e5);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 3rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-end-turn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(80, 70, 229, 0.4);
+  }
+
+  .btn-end-turn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-end-turn:disabled {
+    background: #444;
+    color: #888;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border-color: transparent;
+  }
+
+  /* =============================
+       カード（新デザイン）
+       縦型: MP丸、カード画像、名前帯、テキスト、属性ドット行
+       ============================= */
+  :global(.battle-card) {
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #3a3a5a;
+    border-radius: 10px;
+    width: 90px;
+    min-width: 90px;
+    height: 145px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    position: relative;
+    user-select: none;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  :global(.battle-card:hover) {
+    transform: translateY(-12px) scale(1.04);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+    border-color: #7cc5ff;
+    z-index: 10;
+  }
+
+  :global(.battle-card.disabled) {
+    opacity: 0.38;
+    cursor: not-allowed;
+    filter: grayscale(70%);
+  }
+
+  :global(.battle-card.disabled:hover) {
+    transform: none;
+    box-shadow: none;
+    border-color: #3a3a5a;
+  }
+
+  /* MP消費バッジ（左上丸） */
+  :global(.card-cost) {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    background: #3d5af1;
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.72rem;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    z-index: 3;
+  }
+
+  /* カード中央画像エリア */
+  :global(.card-image-wrap) {
+    width: 100%;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  :global(.card-image-wrap img) {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+
+  /* カード名帯（画像の下半分に重なるように） */
+  :global(.card-name) {
+    font-weight: bold;
+    font-size: 0.65rem;
+    text-align: center;
+    color: #fff;
+    padding: 1px 2px;
+    line-height: 1.1;
+    background: rgba(0, 0, 0, 0.75);
+    position: relative;
+    margin-top: -12px;
+    z-index: 2;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 効果テキスト */
+  :global(.card-desc) {
+    font-size: 0.58rem;
+    color: #ccc !important;
+    text-align: center;
+    padding: 2px 4px 0;
+    line-height: 1.25;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  :global(.card-desc .desc-main) {
+    color: #ddd;
+    font-size: 0.58rem;
+  }
+
+  :global(.card-desc .desc-sub) {
+    color: #aaa;
+    font-size: 0.55rem;
+    margin-top: 1px;
+  }
+
+  /* タグUI */
+  :global(.card-tags) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 0 4px 4px;
+    width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  :global(.card-tag) {
+    font-size: 0.45rem;
+    padding: 2px 4px;
+    border-radius: 2px;
+    color: #fff;
+    font-weight: bold;
+    line-height: 1.1;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+    text-align: center;
+    display: inline-block;
+  }
+
+  :global(.tag-purple) {
+    color: #d477ff;
+    border-color: #d477ff;
+  }
+
+  :global(.tag-white) {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  :global(.tag-buff-up) {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  :global(.tag-buff-down) {
+    color: #bbb;
+    border-color: #777;
+  }
+
+  :global(.tag-poison) {
+    color: #bbb;
+    border-color: #777;
+  }
+
+  :global(.tag-paralyze) {
+    color: #bbb;
+    border-color: #777;
+  }
+
+  :global(.tag-fire) {
+    color: #ff6666;
+    border-color: #ff6666;
+  }
+
+  :global(.tag-ice) {
+    color: #66ccff;
+    border-color: #66ccff;
+  }
+
+  :global(.tag-thunder) {
+    color: #ffee66;
+    border-color: #ffee66;
+  }
+
+  :global(.tag-wind) {
+    color: #88ff88;
+    border-color: #88ff88;
+  }
+
+  :global(.tag-stone) {
+    color: #ffaa66;
+    border-color: #ffaa66;
+  }
+
+  /* 紫カード特殊背景 */
+  :global(.color-purple) {
+    background: linear-gradient(160deg, #1a0a25 0%, #2d0a4a 100%) !important;
+    border-color: #9b3fbf !important;
+    box-shadow: 0 0 10px rgba(155, 63, 191, 0.4) !important;
+  }
+
+
+
+  /* すごろくマップノード・接続 */
+  :global(.map-node) {
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    background: #1e1e30;
+    border: 2px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  :global(.map-node img.node-icon) {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+
+  :global(.map-node.elite),
+  :global(.map-node.mimic) {
+    background: #4a1010;
+    border-color: #dc3545;
+  }
+
+  :global(.map-node.active) {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+    animation: pulseActive 1.5s infinite;
+    z-index: 10;
+    pointer-events: auto;
+  }
+
+  :global(.map-node.completed) {
+    background: #4dabf7 !important;
+    border-color: #4dabf7 !important;
+    opacity: 0.6;
+  }
+
+  :global(.map-node:hover) {
+    transform: scale(1.15);
+  }
+
+  /* プレイヤーコマ */
+  :global(.player-token) {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    z-index: 5;
+    animation: float-avatar 2s infinite ease-in-out;
+    pointer-events: none;
+  }
+
+  @keyframes float-avatar {
+
+    0%,
+    100% {
+      transform: translate(-50%, 0);
+    }
+
+    50% {
+      transform: translate(-50%, -6px);
+    }
+  }
+
+  @keyframes pulseActive {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.5);
+    }
+
+    70% {
+      box-shadow: 0 0 0 8px rgba(255, 215, 0, 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    }
+  }
+
+  /* マップの接続線 */
+  :global(.map-connection-line) {
+    position: absolute;
+    height: 3px;
+    background: #444;
+    transform-origin: 0 50%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* アクティブな接続線は !important なしで詳細度を上げて上書き */
+  :global(.map-connection-line.active) {
+    background: #ffd700;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+  }
+</style>

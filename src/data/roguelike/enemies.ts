@@ -19,7 +19,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'スライム',
       hp: 6, maxHp: 6, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_game_character_slime.png',
+      image: new URL('../../assets/games/tower-defense/images/enemy/fantasy_game_character_slime.png', import.meta.url).href,
       weaknesses: [],
       resistances: ['fire'],
       immunities: [],
@@ -28,7 +28,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ゴブリン',
       hp: 10, maxHp: 10, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_goblin.png',
+      image: new URL('../../assets/games/tower-defense/images/enemy/fantasy_goblin.png', import.meta.url).href,
       weaknesses: [],
       resistances: [],
       immunities: [],
@@ -37,7 +37,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'カラス',
       hp: 6, maxHp: 6, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/bird_karasu_kowai.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/bird_karasu_kowai.png', import.meta.url).href,
       weaknesses: ['fire', 'ice'],
       resistances: [],
       immunities: [],
@@ -46,7 +46,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'オオカミ',
       hp: 8, maxHp: 8, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/animal_ookami.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/animal_ookami.png', import.meta.url).href,
       weaknesses: ['fire', 'ice'],
       resistances: [],
       immunities: [],
@@ -59,7 +59,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ゴブリン',
       hp: 12, maxHp: 12, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_goblin.png',
+      image: new URL('../../assets/games/tower-defense/images/enemy/fantasy_goblin.png', import.meta.url).href,
       weaknesses: [],
       resistances: [],
       immunities: [],
@@ -68,7 +68,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'オオカミ',
       hp: 10, maxHp: 10, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/animal_ookami.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/animal_ookami.png', import.meta.url).href,
       weaknesses: ['fire', 'ice'],
       resistances: [],
       immunities: [],
@@ -77,7 +77,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ベアー',
       hp: 18, maxHp: 18, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/animal_bear_higuma.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/animal_bear_higuma.png', import.meta.url).href,
       weaknesses: ['fire', 'ice'],
       resistances: [],
       immunities: [],
@@ -86,7 +86,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ハーピー',
       hp: 15, maxHp: 15, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_harpy.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_harpy.png', import.meta.url).href,
       weaknesses: ['stone'],
       resistances: ['wind'],
       immunities: [],
@@ -95,7 +95,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'オーク',
       hp: 20, maxHp: 20, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_orc.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_orc.png', import.meta.url).href,
       weaknesses: ['wind'],
       resistances: [],
       immunities: [],
@@ -108,7 +108,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ハーピー',
       hp: 18, maxHp: 18, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_harpy.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_harpy.png', import.meta.url).href,
       weaknesses: ['stone'],
       resistances: ['wind'],
       immunities: [],
@@ -117,7 +117,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'オーク',
       hp: 24, maxHp: 24, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_orc.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_orc.png', import.meta.url).href,
       weaknesses: ['wind'],
       resistances: [],
       immunities: [],
@@ -126,7 +126,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ドラゴン',
       hp: 35, maxHp: 35, attackBase: 3,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_dragon.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_dragon.png', import.meta.url).href,
       weaknesses: ['ice'],
       resistances: ['fire'],
       immunities: [],
@@ -140,7 +140,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'バンディット',
       hp: 30, maxHp: 30, attackBase: 1,
-      image: '/portfolio/roguelike/assets/monsters/character_sanzoku.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/character_sanzoku.png', import.meta.url).href,
       weaknesses: [],
       resistances: [],
       immunities: [],
@@ -150,7 +150,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ダークエルフ',
       hp: 50, maxHp: 50, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_dark_elf.png', import.meta.url).href,
       weaknesses: [],
       resistances: [],
       immunities: [],
@@ -160,7 +160,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ゴーレム',
       hp: 60, maxHp: 60, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_golem.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_golem.png', import.meta.url).href,
       weaknesses: ['wind'],
       resistances: [],
       immunities: ['stone'], // 土無効
@@ -171,7 +171,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ヴァンパイア',
       hp: 75, maxHp: 75, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_dracula2.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_dracula2.png', import.meta.url).href,
       weaknesses: ['fire'],
       resistances: [],
       immunities: [], // 毒無効(JSロジック側で処理)
@@ -182,7 +182,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'リヴァイアサン',
       hp: 85, maxHp: 85, attackBase: 3,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_leviathan.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_leviathan.png', import.meta.url).href,
       weaknesses: ['thunder'],
       resistances: ['fire'],
       immunities: ['ice'], // 氷無効
@@ -192,7 +192,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: '魔王',
       hp: 120, maxHp: 120, attackBase: 3,
-      image: '/portfolio/roguelike/assets/monsters/fantasy_maou_devil.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/fantasy_maou_devil.png', import.meta.url).href,
       weaknesses: ['thunder'],
       resistances: ['stone'], // 土耐性
       immunities: [],
@@ -206,7 +206,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
     {
       name: 'ミミック',
       hp: 25, maxHp: 25, attackBase: 2,
-      image: '/portfolio/roguelike/assets/monsters/character_game_mimic.png',
+      image: new URL('../../assets/games/roguelike/images/monsters/character_game_mimic.png', import.meta.url).href,
       weaknesses: [],
       resistances: [],
       immunities: [],
@@ -218,7 +218,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
 /**
  * 階層(フロア)とエリアに応じて出現するモンスターを決定する関数
  */
-export function getEnemyTemplate(area: number, floor: number, type: 'battle' | 'elite' | 'mimic' | 'midboss' | 'boss'): EnemyTemplate {
+export function getEnemyTemplate(area: number, floor: number, type: 'battle' | 'elite' | 'mimic' | 'midboss' | 'boss' | 'lastboss'): EnemyTemplate {
   if (type === 'mimic') {
     return enemyTemplates.mimic[0];
   }
@@ -230,7 +230,7 @@ export function getEnemyTemplate(area: number, floor: number, type: 'battle' | '
     return enemyTemplates.bosses.find(b => b.name === 'リヴァイアサン')!;
   }
 
-  if (type === 'boss') {
+  if (type === 'boss' || type === 'lastboss') {
     // 各エリアのボス
     if (area === 1) return enemyTemplates.bosses.find(b => b.name === 'ダークエルフ')!;
     if (area === 2) return enemyTemplates.bosses.find(b => b.name === 'ヴァンパイア')!;

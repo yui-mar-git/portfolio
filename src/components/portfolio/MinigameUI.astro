@@ -1,0 +1,410 @@
+---
+const { materialCategories } = Astro.props;
+---
+<!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
+<div class="game-container" id="game-container">
+  <div class="game-hud" id="game-hud">
+    <div class="score-display">スコア: <span id="score">0</span> <span style="font-size: 0.75em; font-weight: normal; color: rgba(255,255,255,0.8); margin-left: 0.5rem;">(ハイスコア: <span id="highscore">0</span>)</span></div>
+    <div class="time-display" style="display: flex; align-items: center;">
+      残り時間: <span id="time" class="">30</span>秒
+      <span id="hud-config-btn" class="icon-config" title="コンフィグ" style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
+    </div>
+  </div>
+  <div class="bottom-hud" id="bottom-hud" style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
+    <button id="retire-btn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">リタイア</button>
+  </div>
+  <div class="overlay" id="start-screen">
+    <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
+      ハイスコア: <span id="start-highscore-val">0</span>
+    </div>
+    <h2></h2>
+    <button id="start-btn" class="btn btn-full">ゲームスタート</button>
+    <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
+    <span id="start-config-btn" class="icon-config" title="コンフィグ" style="cursor: pointer;">⚙️</span>
+  </div>
+
+  <div class="result-screen overlay" id="result-screen">
+    <p>あなたのスコアは <span id="final-score" class="highlight">0</span> 点でした！</p>
+    <div class="result-actions">
+      <button id="retry-btn" class="btn btn-secondary btn-full">リトライ</button>
+      <button id="title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
+      <button id="share-btn" class="btn btn-primary btn-full btn-share">Xでシェアする</button>
+    </div>
+  </div>
+
+  <!-- 遊び方モーダル -->
+  <div id="howto-modal" class="config-modal">
+    <h3>遊び方</h3>
+    <div class="howto-content">
+      <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
+      <div class="legend">
+        <p><span style="color:#007bff">■青</span>: +10点</p>
+        <p><span style="color:#fd7e14">■橙</span>: +5秒</p>
+        <p><span style="color:#dc3545">■赤</span>: -30点</p>
+        <p><span style="color:#6f42c1">■紫</span>: -5秒</p>
+        <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃう)</p>
+        <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
+      </div>
+    </div>
+    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
+  </div>
+
+  <!-- コンフィグモーダル -->
+  <div id="modal-overlay" class="modal-overlay"></div>
+  <div id="config-modal" class="config-modal">
+    <h3>コンフィグ</h3>
+    <div class="config-item">
+      <label for="bgm-volume">BGM音量</label>
+      <input type="range" id="bgm-volume" min="0" max="100" value="50">
+    </div>
+    <div class="config-item">
+      <label for="se-volume">SE音量</label>
+      <input type="range" id="se-volume" min="0" max="100" value="50">
+    </div>
+    <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
+    <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+  </div>
+
+  <!-- リタイアモーダル -->
+  <div id="retire-modal" class="config-modal">
+    <h3>リタイアしますか？</h3>
+    <div class="result-actions" style="margin-top: 1.5rem;">
+      <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
+      <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
+      <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
+    </div>
+  </div>
+  <!-- クレジットモーダル -->
+  <div id="credits-modal" class="config-modal">
+    <h3>クレジット・使用素材</h3>
+    <div class="howto-content"
+      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+      <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+        {materialCategories.map((mat) => (
+        <li>{mat.category}: {mat.items.map((item, index) => (
+          <span key={item.name}>
+            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+            {index < mat.items.length - 1 ? " / " : "" } </span>
+              ))}
+        </li>
+        ))}
+      </ul>
+    </div>
+    <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+  </div>
+</div>
+</GameLayout>
+
+<style>
+  .game-hud {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding: 0 1rem;
+  }
+
+  /* 時間が増減した時のアニメーション用 */
+  .time-heal {
+    animation: textPopHeal 0.5s ease-out;
+  }
+
+  .time-damage {
+    animation: textPopDamage 0.5s ease-out;
+  }
+
+  .time-alert {
+    color: #dc3545 !important;
+  }
+
+  @keyframes textPopHeal {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); color: #fd7e14; }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes textPopDamage {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); color: #dc3545; }
+    100% { transform: scale(1); }
+  }
+
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  [data-theme="dark"] .legend {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .legend p {
+    margin: 0;
+    font-weight: bold;
+  }
+
+  .game-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: var(--bg-color);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .start-screen,
+  .result-screen {
+    text-align: center;
+    z-index: 10;
+  }
+
+  .start-screen h2,
+  .result-screen h2 {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+  }
+
+  .highlight {
+    font-size: 2rem;
+    color: var(--primary-color);
+    font-weight: 800;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  /* --- 以下はJSで動的生成される要素のため、:global()でAstroのScoped CSSをバイパスする --- */
+
+  /* 的（共通スタイル） */
+  :global(.target) {
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    animation: popIn 0.2s ease-out;
+  }
+
+  @keyframes popIn {
+    0% {
+      transform: scale(0);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  :global(.target:active) {
+    transform: scale(0.9);
+  }
+
+  /* --- 的のバリエーション色（赤橙黄緑青紫） --- */
+  /* 通常 (青) */
+  :global(.target-normal) {
+    background: radial-gradient(circle, #007bff 30%, #0056b3 100%);
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+  }
+
+  /* 高得点 (黄) */
+  :global(.target-high) {
+    background: radial-gradient(circle, #ffea00 30%, #ffaa00 100%);
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.8);
+  }
+
+  /* 長居 (緑) */
+  :global(.target-long) {
+    background: radial-gradient(circle, #28a745 30%, #1e7e34 100%);
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+  }
+
+  /* 時間回復 (橙) */
+  :global(.target-heal) {
+    background: radial-gradient(circle, #fd7e14 30%, #e8590c 100%);
+    box-shadow: 0 0 15px rgba(253, 126, 20, 0.8);
+  }
+
+  /* マイナス点 (紫) */
+  :global(.target-minus-score) {
+    background: radial-gradient(circle, #6f42c1 30%, #5a32a3 100%);
+    box-shadow: 0 0 10px rgba(111, 66, 193, 0.5);
+  }
+
+  /* 時間減少 (赤) */
+  :global(.target-minus-time) {
+    background: radial-gradient(circle, #ff4b4b 30%, #dc3545 100%);
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+  }
+
+  /* ポップアップアニメーション用クラス */
+  :global(.popup-text) {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1.5rem;
+    pointer-events: none;
+    animation: popupAnim 0.6s ease-out forwards;
+    z-index: 20;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ポップアップの色分け */
+  :global(.popup-good) {
+    color: #28a745;
+  }
+
+  :global(.popup-great) {
+    color: #ffaa00;
+    font-size: 2rem;
+  }
+
+  :global(.popup-bad) {
+    color: #dc3545;
+    font-size: 1.8rem;
+  }
+
+  :global(.popup-time) {
+    color: #fd7e14;
+    font-size: 1.5rem;
+  }
+
+  @keyframes popupAnim {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(-40px) scale(1.2);
+    }
+  }
+
+  /* overlay\u57fa\u5e95\u30af\u30e9\u30b9: \u521d\u671f\u975e\u8868\u793a\u3002JS\u3067 display:flex \u306b\u5207\u308a\u66ff\u3048\u308b */
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 10;
+    background-color: var(--bg-color);
+  }
+
+  /* start-screen \u306f\u521d\u671f\u8868\u793a */
+  #start-screen {
+    display: flex;
+  }
+
+  /* game-hud: \u30a4\u30f3\u30e9\u30a4\u30f3\u30b9\u30bf\u30a4\u30eb\u304b\u3089\u79fb\u884c */
+  .game-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 1rem;
+    z-index: 5;
+    pointer-events: none;
+    color: white;
+    display: none;
+    justify-content: space-between;
+  }
+
+
+
+  /* \u30dc\u30bf\u30f3\u30e6\u30fc\u30c6\u30a3\u30ea\u30c6\u30a3 */
+  .btn-full {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .btn-mt {
+    margin-top: 1rem;
+  }
+
+  .btn-share {
+    background-color: #1DA1F2;
+    border-color: #1DA1F2;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+
+  /* howto コンテンツ */
+  .howto-content {
+    text-align: left;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* result-actions: \u30ea\u30b6\u30eb\u30c8\u30dc\u30bf\u30f3\u7fa4 */
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    max-width: 300px;
+    gap: 1rem;
+    margin-top: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* \u4f1d\u8aac\u306e\u8272\u6307\u5b9a\u30af\u30e9\u30b9\uff08CSS\u5909\u6570\u5316\uff09 */
+  .legend-blue {
+    color: #007bff;
+  }
+
+  .legend-orange {
+    color: #fd7e14;
+  }
+
+  .legend-red {
+    color: #dc3545;
+  }
+
+  .legend-purple {
+    color: #6f42c1;
+  }
+
+  .legend-yellow {
+    color: #ffea00;
+  }
+
+  .legend-green {
+    color: #28a745;
+  }
+</style>

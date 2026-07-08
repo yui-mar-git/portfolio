@@ -1,0 +1,117 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { MicroCMSPortfolio } from '../types/microcms';
+
+export interface TechItem {
+  category: string;
+  items: string;
+}
+
+export interface MaterialItem {
+  name: string;
+  url: string;
+}
+
+export interface MaterialCategory {
+  category: string;
+  items: MaterialItem[];
+}
+
+export interface Props {
+  title: string;
+  pageId: string;
+  pageLabel: string;
+  projectData?: MicroCMSPortfolio;
+  descriptionFallback: string;
+  techStack: TechItem[];
+  learningThemes: string[];
+  materialCategories: MaterialCategory[];
+}
+
+const {
+  title,
+  pageId,
+  pageLabel,
+  projectData,
+  descriptionFallback,
+  techStack,
+  learningThemes,
+  materialCategories
+} = Astro.props;
+---
+<BaseLayout title={title} pageId={pageId}>
+  <Header activeId="portfolio" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">{pageLabel}</span>
+      <h1>{projectData ? projectData.title : title.split(' - ')[0]}</h1>
+
+      <slot />
+
+      <!-- プロジェクト概要・使用技術セクション -->
+      <section class="project-details">
+        <h2>概要</h2>
+        {projectData && (projectData.description || projectData.content) ? (
+        <p class="description" set:html={(projectData.description || projectData.content).replace(/\n/g, '<br>')} />
+        ) : (
+        <p class="description">{descriptionFallback}</p>
+        )}
+
+        <h2>学習テーマ</h2>
+        <div class="materials-list">
+          <ul>
+            {learningThemes.map((theme) => (
+            <li>{theme}</li>
+            ))}
+          </ul>
+        </div>
+
+        <h2>使用技術・ツール</h2>
+        <div class="table-responsive">
+          <table class="tech-table">
+            <tbody>
+              {techStack.map((tech) => (
+              <tr>
+                <th>{tech.category}</th>
+                <td>{tech.items}</td>
+              </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {materialCategories.length > 0 && (
+          <>
+            <h2>使用素材</h2>
+            <div class="table-responsive">
+              <table class="tech-table">
+                <tbody>
+                  {materialCategories.map((mat) => (
+                  <tr>
+                    <th>{mat.category}</th>
+                    <td>
+                      {mat.items.map((item, index) => (
+                      <span key={item.name}>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                        {index < mat.items.length - 1 ? " / " : ""}
+                      </span>
+                      ))}
+                    </td>
+                  </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </section>
+    </article>
+  </main>
+  
+  <Footer />
+</BaseLayout>
+
+

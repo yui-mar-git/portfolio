@@ -73,7 +73,7 @@ const getItemsByCategory = (label: string, fullLabel: string) => {
                     ))
                   ) : (
                     <tr class="credits-empty">
-                      <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-color-light);">{cat.emptyMsg}</td>
+                      <td colspan="4" class="empty-td">{cat.emptyMsg}</td>
                     </tr>
                   )}
                 </tbody>
@@ -87,3 +87,11 @@ const getItemsByCategory = (label: string, fullLabel: string) => {
 
   <Footer />
 </BaseLayout>
+
+<style>
+  .empty-td {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-color-light);
+  }
+</style>

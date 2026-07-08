@@ -1,0 +1,68 @@
+    function updateMapUI() {
+      document.getElementById('btn-retire').style.display = 'none';
+
+      const mapGold = document.getElementById('map-gold');
+      if (mapGold) mapGold.textContent = saveData.gold;
+
+      const btnStage1 = document.getElementById('btn-stage1');
+      const btnStage2 = document.getElementById('btn-stage2');
+      const btnStage3 = document.getElementById('btn-stage3');
+
+      if (btnStage1) {
+        if (saveData.clearedStage >= 1) {
+          btnStage1.className = 'btn btn-primary';
+          btnStage1.innerHTML = 'ステージ1 (昼) <span style="color:#ffd700">★</span>';
+          btnStage1.style.backgroundColor = '#28a745';
+          btnStage1.style.borderColor = '#28a745';
+        } else {
+          btnStage1.className = 'btn btn-primary';
+          btnStage1.innerHTML = 'ステージ1 (昼)';
+          btnStage1.style.backgroundColor = '';
+          btnStage1.style.borderColor = '';
+        }
+      }
+
+      if (btnStage2) {
+        if (saveData.clearedStage >= 2) {
+          btnStage2.disabled = false;
+          btnStage2.className = 'btn btn-primary';
+          btnStage2.innerHTML = 'ステージ2 (夕) <span style="color:#ffd700">★</span>';
+          btnStage2.style.backgroundColor = '#28a745';
+          btnStage2.style.borderColor = '#28a745';
+        } else if (saveData.clearedStage >= 1) {
+          btnStage2.disabled = false;
+          btnStage2.className = 'btn btn-primary';
+          btnStage2.innerHTML = 'ステージ2 (夕)';
+          btnStage2.style.backgroundColor = '';
+          btnStage2.style.borderColor = '';
+        } else {
+          btnStage2.disabled = true;
+          btnStage2.className = 'btn btn-secondary';
+          btnStage2.innerHTML = 'ステージ2 (夕)';
+          btnStage2.style.backgroundColor = '';
+          btnStage2.style.borderColor = '';
+        }
+      }
+
+      if (btnStage3) {
+        if (saveData.clearedStage >= 3) {
+          btnStage3.disabled = false;
+          btnStage3.className = 'btn btn-primary';
+          btnStage3.innerHTML = 'ステージ3 (夜) <span style="color:#ffd700">★</span>';
+          btnStage3.style.backgroundColor = '#28a745';
+          btnStage3.style.borderColor = '#28a745';
+        } else if (saveData.clearedStage >= 2) {
+          btnStage3.disabled = false;
+          btnStage3.className = 'btn btn-primary';
+          btnStage3.innerHTML = 'ステージ3 (夜)';
+          btnStage3.style.backgroundColor = '';
+          btnStage3.style.borderColor = '';
+        } else {
+          btnStage3.disabled = true;
+          btnStage3.className = 'btn btn-secondary';
+          btnStage3.innerHTML = 'ステージ3 (夜)';
+          btnStage3.style.backgroundColor = '';
+          btnStage3.style.borderColor = '';
+        }
+      }
+    }

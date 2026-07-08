@@ -1,0 +1,643 @@
+﻿---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { fetchMicroCMS } from '../../../lib/microcms';
+import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
+
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+  const projectData = portfolioResponse.contents.find((c) => c.url.includes('/tower-defense/'));
+
+  const techStack = [
+  { category: "髢狗匱險隱・, items: "HTML, CSS, JavaScript" },
+  { category: "繝輔Ξ繝ｼ繝繝ｯ繝ｼ繧ｯ", items: "Astro, Phaser 3 (繧ｲ繝ｼ繝繧ｨ繝ｳ繧ｸ繝ｳ)" },
+  { category: "縺昴・莉悶ヤ繝ｼ繝ｫ", items: "Google Antigravity, Gemini, Claude" }
+  ];
+
+  const learningThemes = ["繧ｲ繝ｼ繝繧ｨ繝ｳ繧ｸ繝ｳ(Phaser 3)蝓ｺ遉・, "Arcade Physics縺ｫ繧医ｋ陦晉ｪ∝愛螳・];
+
+  const materialCategories = [
+  { category: "繝輔か繝ｳ繝・, items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
+  { category: "繧｢繧､繧ｳ繝ｳ", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] },
+  { category: "髻ｳ讌ｽ繝ｻ蜉ｹ譫憺浹", items: [{ name: "蜉ｹ譫憺浹繝ｩ繝・, url: "https://soundeffect-lab.info/" }] }
+  ];
+  ---
+
+  <BaseLayout title="繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ - My Portfolio" pageId="tower-defense">
+    <!-- Phaser 3 縺ｮ CDN 隱ｭ縺ｿ霎ｼ縺ｿ -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+    <Header activeId="portfolio" />
+
+    <main class="container">
+      <article>
+        <span class="page-label">TOWER DEFENSE</span>
+        <h1>{projectData ? projectData.title : '繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ・・haser.js髮帛ｽ｢・・}</h1>
+
+        <!-- 縺薙％縺ｫPhaser縺ｮCanvas縺梧諺蜈･縺輔ｌ縺ｾ縺・-->
+        <div id="game-container" style="position: relative;">
+          <!-- HUD (謇謖√・繝翫→蜃ｺ謦・・繧ｿ繝ｳ) -->
+          <div class="game-ui"
+            style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); color: white; padding: 0.5rem 1rem; z-index: 5; display: flex; justify-content: space-between; align-items: center;">
+            <div class="status-bar" style="display: flex; gap: 1rem; align-items: center;">
+              <span>謇謖√・繝・ <strong id="コスト-display">0</strong></span>
+              <button class="btn btn-primary" id="btn-spawn">蜃ｺ謦・(繧ｳ繧ｹ繝・ 50)</button>
+            </div>
+          </div>
+          <!-- 繧ｹ繧ｿ繝ｼ繝育判髱｢ -->
+          <div class="overlay" id="start-screen"
+            style="background-color: var(--bg-color); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <h2>繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ</h2>
+            <p>繝槭リ繧呈ｶ郁ｲｻ縺励※蜃ｺ謦・＠縲∵侠轤ｹ繧帝亟陦帙＠繧医≧</p>
+            <button id="start-btn" class="btn btn-full">繧ｹ繧ｿ繝ｼ繝・/button>
+              <button id="howto-btn" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">驕翫・譁ｹ</button>
+              <span id="config-btn" class="icon-config" title="繧ｳ繝ｳ繝輔ぅ繧ｰ">笞呻ｸ・/span>
+          </div>
+          <!-- 驕翫・譁ｹ繝｢繝ｼ繝繝ｫ -->
+          <div class="overlay" id="result-screen"
+            style="display: none; background-color: var(--bg-color); z-index: 10; flex-direction: column; align-items: center; justify-content: center;">
+            <h2>繧ｲ繝ｼ繝繧ｪ繝ｼ繝舌・</h2>
+            <div class="result-actions"
+              style="display: flex; flex-direction: column; width: 80%; max-width: 300px; gap: 1rem; margin-top: 2rem; margin-left: auto; margin-right: auto;">
+              <button class="btn btn-secondary" id="btn-retry" style="width: 100%;">繝ｪ繝医Λ繧､</button>
+              <button class="btn btn-secondary" id="btn-title" style="width: 100%;">繧ｿ繧､繝医Ν縺ｸ</button>
+              <button class="btn btn-primary" id="btn-share"
+                style="background-color: #1DA1F2; border-color: #1DA1F2; width: 100%;">X縺ｧ繧ｷ繧ｧ繧｢</button>
+            </div>
+          </div>
+          <div id="howto-modal" class="config-modal">
+            <h3>驕翫・譁ｹ</h3>
+            <div class="howto-content"
+              style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+              <p>譎る俣邨碁℃縺ｧ雋ｯ縺ｾ繧九・繝翫ｒ豸郁ｲｻ縺励※蜻ｳ譁ｹ繧貞・謦・＆縺帙∪縺励ｇ縺・・/p>
+              <p>蜻ｳ譁ｹ縺ｯ閾ｪ蜍輔〒蜑埼ｲ縺励※謨ｵ縺ｨ謌ｦ縺｣縺ｦ縺上ｌ縺ｾ縺吶・/p>
+              <p>蠑ｷ蜉帙↑繝ｦ繝九ャ繝医ｒ繧ｿ繧､繝溘Φ繧ｰ繧医￥蜃ｺ謦・＆縺帙∬ｿｫ繧翫￥繧区雰繧貞偵＠縺ｦ諡轤ｹ繧帝亟陦帙＠縺ｦ縺上□縺輔＞・・/p>
+            </div>
+            <button id="close-howto-btn" class="btn btn-secondary" style="width: 100%;">髢峨§繧・/button>
+          </div>
+
+          <!-- 繧ｳ繝ｳ繝輔ぅ繧ｰ繝｢繝ｼ繝繝ｫ・医ム繝溘・・・-->
+          <div id="modal-overlay" class="modal-overlay"></div>
+          <div id="config-modal" class="config-modal">
+            <h3>險ｭ螳夲ｼ医さ繝ｳ繝輔ぅ繧ｰ・・/h3>
+              <div class="config-item">
+                <label for="bgm-volume">BGM髻ｳ驥・/label>
+                  <input type="range" id="bgm-volume" min="0" max="100" value="50">
+              </div>
+              <div class="config-item">
+                <label for="se-volume">SE髻ｳ驥・/label>
+                  <input type="range" id="se-volume" min="0" max="100" value="50">
+              </div>
+
+              <button id="credits-btn" class="btn btn-secondary"
+                style="width: 100%; margin-bottom: 0.5rem;">繧ｯ繝ｬ繧ｸ繝・ヨ繝ｻ菴ｿ逕ｨ邏譚・/button>
+                <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">髢峨§繧・/button>
+          </div>
+          <!-- 繧ｯ繝ｬ繧ｸ繝・ヨ繝｢繝ｼ繝繝ｫ -->
+          <div id="credits-modal" class="config-modal">
+            <h3>繧ｯ繝ｬ繧ｸ繝・ヨ繝ｻ菴ｿ逕ｨ邏譚・/h3>
+              <div class="howto-content"
+                style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                <p>譛ｬ繧ｲ繝ｼ繝縺ｯ莉･荳九・邏譎ｴ繧峨＠縺・ｴ譚舌ｒ菴ｿ逕ｨ繝ｻ縺雁溘ｊ縺励※蛻ｶ菴懊＆繧後※縺・∪縺吶・/p>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                  {materialCategories.map((mat) => (
+                  <li>{mat.category}: {mat.items.map((item, index) => (
+                    <span key={item.name}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                      {index < mat.items.length - 1 ? " / " : "" } </span>
+                        ))}
+                  </li>
+                  ))}
+                </ul>
+              </div>
+              <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">髢峨§繧・/button>
+          </div>
+        </div>
+
+        <!-- 繧ｲ繝ｼ繝讎りｦ√・菴ｿ逕ｨ謚陦薙そ繧ｯ繧ｷ繝ｧ繝ｳ -->
+        <section class="project-details">
+          <h2>讎りｦ・/h2>
+            {projectData && projectData.description ? (
+            <p class="description" set:html={projectData.description.replace(/\n/g, '<br>' )} />
+            ) : (
+            <p class="description">・域ｦりｦ√ｒ蜿門ｾ励〒縺阪∪縺帙ｓ縺ｧ縺励◆縲ＮicroCMS縺ｮURL險ｭ螳壹ｒ縺皮｢ｺ隱阪￥縺縺輔＞・・/p>
+              )}
+
+            <h2>蟄ｦ鄙偵ユ繝ｼ繝・/h2>
+              <div class="materials-list">
+                <ul>
+                  {learningThemes.map((theme) => (
+                  <li>{theme}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <h2>菴ｿ逕ｨ謚陦薙・繝・・繝ｫ</h2>
+              <div class="table-responsive">
+                <table class="tech-table">
+                  <tbody>
+                    {techStack.map((tech) => (
+                    <tr>
+                      <th>{tech.category}</th>
+                      <td>{tech.items}</td>
+                    </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h2>菴ｿ逕ｨ邏譚・/h2>
+                <div class="table-responsive">
+                  <table class="tech-table">
+                    <tbody>
+                      {materialCategories.map((mat) => (
+                      <tr>
+                        <th>{mat.category}</th>
+                        <td>
+                          {mat.items.map((item, index) => (
+                          <span key={item.name}>
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                            {index < mat.items.length - 1 ? " / " : "" } </span>
+                              ))}
+                        </td>
+                      </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+        </section>
+      </article>
+    </main>
+
+    <Footer />
+  </BaseLayout>
+
+  <style>
+    .game-ui {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 1.2rem;
+    }
+
+    #game-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      border: 4px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* Phaser縺檎函謌舌☆繧議anvas隕∫ｴ繧偵さ繝ｳ繝・リ縺ｫ蜷医ｏ縺帙ｋ */
+    #game-container canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 10;
+    }
+
+    .overlay h2 {
+      margin-bottom: 1rem;
+    }
+
+    .overlay p {
+      margin-bottom: 2rem;
+      color: #fff;
+    }
+
+    /* =============================
+       繝励Ο繧ｸ繧ｧ繧ｯ繝域ｦりｦ√・菴ｿ逕ｨ謚陦・       ============================= */
+    .project-details {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .project-details h2 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .project-details h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .description {
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .tech-table th,
+    .tech-table td {
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .tech-table th {
+      background-color: var(--bg-secondary);
+      width: 30%;
+      font-weight: bold;
+    }
+
+    .materials-list ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+  </style>
+
+  <script is:inline>
+    /**
+     * ==========================================
+     * 繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ・域ｨｪ繧ｹ繧ｯ繝ｭ繝ｼ繝ｫ・峨・蝓ｺ遉弱Ο繧ｸ繝・け
+     * ==========================================
+     * 
+     * 縺薙・繧ｳ繝ｼ繝峨・譛ｬ譬ｼ逧・↑繧ｲ繝ｼ繝繧ｨ繝ｳ繧ｸ繝ｳ縲訓haser 3縲阪ｒ菴ｿ逕ｨ縺励※縺・∪縺吶・     * 閾ｪ菴懊☆繧九→螟ｧ螟峨↑縲碁㍾縺ｪ繧雁愛螳壹阪悟､ｧ驥上・繧ｪ繝悶ず繧ｧ繧ｯ繝育ｮ｡逅・阪梧緒逕ｻ繝ｫ繝ｼ繝励阪ｒ
+     * Phaser縺瑚｣丞・縺ｧ蜈ｨ縺ｦ蜃ｦ逅・＠縺ｦ縺上ｌ縺ｾ縺吶・     */
+
+    // --- 繧ｲ繝ｼ繝縺ｮ迥ｶ諷具ｼ・TML縺ｨ蜈ｱ譛峨☆繧句､画焚・・---
+    let コスト = 0;
+    const コストDisplay = document.getElementById('コスト-display');
+    const btnSpawn = document.getElementById('btn-spawn');
+
+    let configBgmVolume = 0.5;
+    let configSeVolume = 0.5;
+
+    const SE_DB = {
+      'cursor': '/portfolio/common/assets/audio/se/繧ｫ繝ｼ繧ｽ繝ｫ遘ｻ蜍・.mp3',
+      'confirm': '/portfolio/common/assets/audio/se/豎ｺ螳壹・繧ｿ繝ｳ繧呈款縺・.mp3',
+      'cancel': '/portfolio/common/assets/audio/se/繧ｭ繝｣繝ｳ繧ｻ繝ｫ1.mp3'
+    };
+
+    function playSE(seId) {
+      if (!SE_DB[seId]) return;
+      const se = new Audio(SE_DB[seId]);
+      se.volume = configSeVolume;
+      se.play().catch(e => console.log('SE play failed:', e));
+    }
+
+    // --- Phaser 繝｡繧､繝ｳ繧ｷ繝ｼ繝ｳ縺ｮ螳夂ｾｩ ---
+    class MainScene extends Phaser.Scene {
+      constructor() {
+        // 繧ｷ繝ｼ繝ｳ縺ｮ蜷榊燕繧貞ｮ夂ｾｩ
+        super({ key: 'MainScene' });
+      }
+
+      // 1. 逕ｻ蜒上ｄ髻ｳ螢ｰ縺ｮ隱ｭ縺ｿ霎ｼ縺ｿ・井ｻ雁屓縺ｯ蝗ｳ蠖｢繧剃ｽｿ縺・◆繧∫怐逡･・・      preload() {
+      // 縲仙ｭｦ鄙偵・繧､繝ｳ繝医・        // 邏譚舌′縺ｧ縺阪◆繧峨√％縺薙〒 this.load.image('cat', 'assets/cat.png'); 縺ｮ繧医≧縺ｫ隱ｭ縺ｿ霎ｼ縺ｿ縺ｾ縺吶・      }
+
+      // 2. 蛻晄悄驟咲ｽｮ・医ご繝ｼ繝髢句ｧ区凾縺ｫ1蝗槭□縺大ｮ溯｡鯉ｼ・      create() {
+      // 閭梧勹濶ｲ繧堤ｩｺ濶ｲ縺ｫ險ｭ螳・        this.cameras.main.setBackgroundColor('#87CEEB');
+
+      // 蝨ｰ髱｢繧呈緒逕ｻ
+      const ground = this.add.rectangle(400, 550, 800, 100, 0x228B22);
+
+        // 縲宣㍾隕√代が繝悶ず繧ｧ繧ｯ繝医げ繝ｫ繝ｼ繝暦ｼ磯・蛻励・蠑ｷ蛹也沿・峨ｒ菴懈・
+        // 蜻ｳ譁ｹ縺ｨ謨ｵ繧偵げ繝ｫ繝ｼ繝励〒邂｡逅・☆繧九％縺ｨ縺ｧ縲∽ｸ諡ｬ蜃ｦ逅・ｄ蠖薙◆繧雁愛螳壹′雜・ｰ｡蜊倥↓縺ｪ繧翫∪縺吶・        this.allies = this.physics.add.group();
+        this.enemies = this.physics.add.group();
+
+    // 蠖薙◆繧雁愛螳夲ｼ・verlap・峨・險ｭ螳・        // 蜻ｳ譁ｹ縺ｨ謨ｵ縺碁㍾縺ｪ縺｣縺滓凾縺ｫ `handleCombat` 繝｡繧ｽ繝・ラ繧貞他縺ｳ蜃ｺ縺・        this.physics.add.overlap(this.allies, this.enemies, this.handleCombat, null, this);
+
+    // --- 螳壽悄螳溯｡後ち繧､繝槭・ ---
+    // 1遘偵＃縺ｨ縺ｫ繝槭リ繧貞屓蠕ｩ縺吶ｋ繧ｿ繧､繝槭・
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        コスト += 10;
+        this.updateUI();
+      },
+      loop: true
+    });
+
+    // 3遘偵＃縺ｨ縺ｫ謨ｵ繧定・蜍慕函謌舌☆繧九ち繧､繝槭・
+    this.time.addEvent({
+      delay: 3000,
+      callback: this.spawnEnemy,
+      callbackScope: this,
+      loop: true
+    });
+
+    // HTML縺ｮ蜃ｺ謦・・繧ｿ繝ｳ縺ｨPhaser縺ｮ蜃ｦ逅・ｒ騾｣謳ｺ
+    btnSpawn.addEventListener('click', () => {
+      if (コスト >= 50) {
+        コスト -= 50;
+        this.updateUI();
+        this.spawnAlly();
+      }
+    });
+
+    // 蛻晄悄迥ｶ諷九・繝昴・繧ｺ縺励※縺翫￥
+    this.scene.pause();
+      }
+
+    // 3. 豈弱ヵ繝ｬ繝ｼ繝螳溯｡後＆繧後ｋ蜃ｦ逅・ｼ磯壼ｸｸ縺ｯ1遘帝俣縺ｫ60蝗橸ｼ・      update(time, delta) {
+    // 蜷・く繝｣繝ｩ繧ｯ繧ｿ繝ｼ縺ｮ陦悟虚・域ｭｩ陦後°謾ｻ謦・°・峨ｒ豈弱ヵ繝ｬ繝ｼ繝譖ｴ譁ｰ縺吶ｋ
+
+    // 蜻ｳ譁ｹ縺ｮ蜃ｦ逅・        this.allies.getChildren().forEach(ally => {
+    if (ally.state === 'walk') {
+      ally.body.setVelocityX(50); // 蜿ｳ縺ｸ豁ｩ縺・          } else if (ally.state === 'attack') {
+      ally.body.setVelocityX(0);  // 遶九■豁｢縺ｾ繧・          }
+    });
+
+    // 謨ｵ縺ｮ蜃ｦ逅・        this.enemies.getChildren().forEach(enemy => {
+    if (enemy.state === 'walk') {
+      enemy.body.setVelocityX(-40); // 蟾ｦ縺ｸ豁ｩ縺・          } else if (enemy.state === 'attack') {
+      enemy.body.setVelocityX(0);   // 遶九■豁｢縺ｾ繧・          }
+    });
+
+    // 逕ｻ髱｢螟厄ｼ亥ｷｦ繧・承・峨↓蜃ｺ縺溘く繝｣繝ｩ繧ｯ繧ｿ繝ｼ繧貞炎髯､縺励※繝｡繝｢繝ｪ繧堤ｯ邏・        this.allies.getChildren().forEach(ally => {
+    if (ally.x > 850) ally.destroy();
+        });
+    this.enemies.getChildren().forEach(enemy => {
+      if (enemy.x < -50) enemy.destroy(); // 繝励Ξ繧､繝､繝ｼ縺ｮ諡轤ｹ縺ｫ蛻ｰ驕斐＠縺溘ｉ譛ｬ蠖薙・繝繝｡繝ｼ繧ｸ
+    });
+      }
+
+    // --- 繧ｫ繧ｹ繧ｿ繝繝｡繧ｽ繝・ラ ---
+
+    // HTML縺ｮ陦ｨ遉ｺ繧呈峩譁ｰ縺吶ｋ
+    updateUI() {
+      コストDisplay.textContent = コスト;
+      btnSpawn.disabled = (コスト < 50);
+    }
+
+    // 蜻ｳ譁ｹ縺ｮ逕滓・
+    spawnAlly() {
+      // 縲舌き繧ｹ繧ｿ繝槭う繧ｺ繝昴う繝ｳ繝医・        // this.add.sprite(...) 縺ｫ螟峨∴繧後・逕ｻ蜒上〒陦ｨ遉ｺ縺ｧ縺阪∪縺呻ｼ・        const ally = this.add.rectangle(50, 480, 40, 40, 0x0000FF);
+      this.physics.add.existing(ally); // 迚ｩ逅・お繝ｳ繧ｸ繝ｳ・亥ｽ薙◆繧雁愛螳夲ｼ峨ｒ莉倅ｸ・
+      ally.hp = 100;
+      ally.attackPower = 10;
+      ally.lastAttackTime = 0; // 譛蠕後↓謾ｻ謦・＠縺滓凾髢難ｼ医け繝ｼ繝ｫ繝繧ｦ繝ｳ邂｡逅・畑・・        ally.state = 'walk';     // 蛻晄悄迥ｶ諷九・縲梧ｭｩ陦後・
+      this.allies.add(ally);
+    }
+
+    // 謨ｵ縺ｮ逕滓・
+    spawnEnemy() {
+      const enemy = this.add.rectangle(850, 480, 40, 40, 0xFF0000);
+      this.physics.add.existing(enemy);
+
+      enemy.hp = 80;
+      enemy.attackPower = 5;
+      enemy.lastAttackTime = 0;
+      enemy.state = 'walk';
+
+      this.enemies.add(enemy);
+    }
+
+    // 陦晉ｪ∵凾縺ｮ謌ｦ髣伜・逅・ｼ域ｯ弱ヵ繝ｬ繝ｼ繝驥阪↑縺｣縺ｦ縺・ｋ髢灘他縺ｰ繧檎ｶ壹￠繧具ｼ・      handleCombat(ally, enemy) {
+    // 迥ｶ諷九ｒ縲梧判謦・阪↓螟画峩縺励∵ｭｩ陦後ｒ豁｢繧√ｋ
+    ally.state = 'attack';
+    enemy.state = 'attack';
+
+    // Phaser縺ｮ迴ｾ蝨ｨ譎ょ綾繧貞叙蠕・        const currentTime = this.time.now;
+
+    // 蜻ｳ譁ｹ縺ｮ謾ｻ謦・ｼ医け繝ｼ繝ｫ繝繧ｦ繝ｳ・・遘・= 1000ms・・        if (currentTime - ally.lastAttackTime > 1000) {
+    enemy.hp -= ally.attackPower;
+    ally.lastAttackTime = currentTime;
+
+    // 謾ｻ謦・＠縺溘％縺ｨ繧定ｦ冶ｦ夂噪縺ｫ陦ｨ迴ｾ・井ｸ迸ｬ縺縺醍區縺上☆繧具ｼ・          enemy.fillColor = 0xFFFFFF;
+    this.time.delayedCall(100, () => { if (enemy.active) enemy.fillColor = 0xFF0000; });
+        }
+
+    // 謨ｵ縺ｮ謾ｻ謦・ｼ医け繝ｼ繝ｫ繝繧ｦ繝ｳ・・.5遘・= 1500ms・・        if (currentTime - enemy.lastAttackTime > 1500) {
+    ally.hp -= enemy.attackPower;
+    enemy.lastAttackTime = currentTime;
+
+    ally.fillColor = 0xFFFFFF;
+    this.time.delayedCall(100, () => { if (ally.active) ally.fillColor = 0x0000FF; });
+        }
+
+    // HP縺・莉･荳九↓縺ｪ縺｣縺溘ｉ豁ｻ莠｡蜃ｦ逅・        if (enemy.hp <= 0) {
+    enemy.destroy(); // 繧ｪ繝悶ず繧ｧ繧ｯ繝医ｒ螳悟・縺ｫ蜑企勁
+    ally.state = 'walk'; // 謨ｵ縺梧ｭｻ繧薙□縺ｮ縺ｧ蜀阪・豁ｩ縺榊・縺・          コスト += 20; // 謨ｵ繧貞偵＠縺溷ｱ驟ｬ
+    this.updateUI();
+        }
+
+    if (ally.hp <= 0) {
+      ally.destroy();
+      enemy.state = 'walk';
+      document.getElementById('result-screen').style.display = 'flex';
+      this.scene.pause();
+      // 繝励Ξ繧､繝､繝ｼ髯｣蝨ｰ・井ｻ雁屓縺ｯally・峨′蛟偵＆繧後◆繧峨ご繝ｼ繝繧ｪ繝ｼ繝舌・謇ｱ縺・          document.getElementById('result-screen').style.display = 'flex';
+      this.scene.pause();
+    }
+      }
+    }
+
+    // --- Phaser 繧ｲ繝ｼ繝縺ｮ險ｭ螳壹→襍ｷ蜍・---
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      parent: 'game-container',
+      physics: {
+        default: 'arcade',
+        arcade: {
+          debug: false
+        }
+      },
+      scene: [MainScene]
+    };
+
+    // 繧ｲ繝ｼ繝繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ縺ｮ菴懈・・亥・譛溽憾諷九〒繝昴・繧ｺ縺輔ｌ繧具ｼ・    const game = new Phaser.Game(config);
+
+    // --- 繧ｿ繧､繝医Ν逕ｻ髱｢縺ｨ繧ｳ繝ｳ繝輔ぅ繧ｰ蛻ｶ蠕｡ ---
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const howtoBtn = document.getElementById('howto-btn');
+    const closeHowtoBtn = document.getElementById('close-howto-btn');
+    const howtoModal = document.getElementById('howto-modal');
+    const configBtn = document.getElementById('config-btn');
+    const closeConfigBtn = document.getElementById('close-config-btn');
+    const configModal = document.getElementById('config-modal');
+
+    const creditsBtn = document.getElementById('credits-btn');
+    const closeCreditsBtn = document.getElementById('close-credits-btn');
+    const creditsModal = document.getElementById('credits-modal');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const resultScreen = document.getElementById('result-screen');
+    const btnRetry = document.getElementById('btn-retry');
+    const btnTitle = document.getElementById('btn-title');
+    const btnShare = document.getElementById('btn-share');
+
+
+
+    if (btnRetry) btnRetry.addEventListener('click', () => {
+      playSE('confirm');
+      resultScreen.style.display = 'none';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.resume('MainScene'); }, 100);
+    });
+
+    if (btnTitle) btnTitle.addEventListener('click', () => {
+      playSE('cancel');
+      resultScreen.style.display = 'none';
+      startScreen.style.display = 'flex';
+      game.scene.stop('MainScene');
+      game.scene.start('MainScene');
+      setTimeout(() => { game.scene.pause('MainScene'); }, 100);
+    });
+
+    if (btnShare) btnShare.addEventListener('click', () => {
+      const text = encodeURIComponent('繧ｿ繝ｯ繝ｼ繝・ぅ繝輔ぉ繝ｳ繧ｹ縺ｧ驕翫・縺ｾ縺励◆・―n#繝溘ル繧ｲ繝ｼ繝 #繝昴・繝医ヵ繧ｩ繝ｪ繧ｪ');
+      const url = encodeURIComponent(window.location.href);
+      window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+    });
+
+    if (startBtn) startBtn.addEventListener('click', () => {
+      playSE('confirm');
+      startScreen.style.display = 'none';
+      game.scene.resume('MainScene');
+    });
+
+    const _cfgBtn = document.getElementById('config-btn');
+    if (_cfgBtn) {
+      _cfgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('config-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+      _cfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _cfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+    const _closeCfgBtn = document.getElementById('close-config-btn');
+    if (_closeCfgBtn) {
+      _closeCfgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('config-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+      _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+
+    const _credBtn = document.getElementById('credits-btn');
+    if (_credBtn) {
+      _credBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('config-modal')?.classList.remove('active');
+        document.getElementById('credits-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+      _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+    const _closeCredBtn = document.getElementById('close-credits-btn');
+    if (_closeCredBtn) {
+      _closeCredBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('credits-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+      _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+      _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+    }
+
+    if (howtoBtn) {
+      howtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('howto-modal')?.classList.add('active');
+        document.getElementById('modal-overlay')?.classList.add('active');
+      });
+    }
+
+    if (closeHowtoBtn) {
+      closeHowtoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSE('cursor');
+        document.getElementById('howto-modal')?.classList.remove('active');
+        document.getElementById('modal-overlay')?.classList.remove('active');
+      });
+    }
+
+    // 繧ｰ繝ｭ繝ｼ繝舌Ν縺ｪ繝懊ち繝ｳ繧ｯ繝ｪ繝・け髻ｳ
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn, .icon-config');
+      if (btn) {
+        const id = btn.id;
+        if (id !== 'start-btn' && id !== 'btn-retry' && id !== 'btn-title') {
+          playSE('cursor');
+        }
+      }
+    });
+
+    const seVolumeInput = document.getElementById('se-volume');
+    if (seVolumeInput) {
+      seVolumeInput.addEventListener('input', (e) => {
+        configSeVolume = parseFloat(e.target.value) / 100;
+      });
+    }
+    const bgmVolumeInput = document.getElementById('bgm-volume');
+    if (bgmVolumeInput) {
+      bgmVolumeInput.addEventListener('input', (e) => {
+        configBgmVolume = parseFloat(e.target.value) / 100;
+      });
+    }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>

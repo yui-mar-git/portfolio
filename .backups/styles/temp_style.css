@@ -1,0 +1,113 @@
+
+    .game-ui {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 1.2rem;
+    }
+
+    #game-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      border: 4px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* Phaserが生成するcanvas要素をコンテナに合わせる */
+    #game-container canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 10;
+    }
+    .overlay h2 {
+      margin-bottom: 1rem;
+    }
+    .overlay p {
+      margin-bottom: 2rem;
+      color: #fff;
+    }
+
+    /* =============================
+       プロジェクト概要・使用技術
+       ============================= */
+    .project-details {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .project-details h2 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .project-details h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .description {
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .tech-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .tech-table th,
+    .tech-table td {
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .tech-table th {
+      background-color: var(--bg-secondary);
+      width: 30%;
+      font-weight: bold;
+    }
+
+    .materials-list ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+  

@@ -1,0 +1,31 @@
+<USER_REQUEST>
+・魔法使いは修正されました。
+・リタイアボタンは直っていません。タップで音はなりますが、マップには戻りません。
+・ベースキャンプにて、未解禁のユニットはグレーにして視覚的にわかりやすくしてほしい。
+・ベースキャンプ、ユニットのレベルがずれて見えますね。
+戦闘時に出るようなカード状態で盾に並べて、その横にレベルと強化ボタンを配置する方向で道だろう。
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-29T05:31:47+09:00.
+
+The user's current state is as follows:
+Active Document: c:\Users\lemor\workspace\portfolio\src\pages\portfolio\roguelike\index.astro (LANGUAGE_ASTRO)
+Cursor is on line: 2480
+Other open documents:
+- c:\Users\lemor\workspace\portfolio\dist\_astro\index.vqFMR8av.css (LANGUAGE_CSS)
+- c:\Users\lemor\workspace\portfolio\dist\style.css (LANGUAGE_CSS)
+- c:\Users\lemor\workspace\portfolio\src\pages\portfolio\roguelike\index.astro (LANGUAGE_ASTRO)
+- c:\Users\lemor\workspace\portfolio\dist\_astro\hoisted.D7gcpd8K.js (LANGUAGE_JAVASCRIPT)
+- c:\Users\lemor\workspace\portfolio\src\styles\global.css (LANGUAGE_CSS)
+Browser State:
+  Page 50E3015CEC091E323752D2724DF76152 () - http://localhost:4321/portfolio/tower-defense/ [ACTIVE]
+    Viewport: 0x0, Page Height: 928
+  Page 143DF3921B253E963AA43283827349E5 (ローグライクカードゲーム - My Portfolio - My Portfolio) - http://localhost:4321/portfolio/roguelike/
+    Viewport: 1399x917, Page Height: 1932
+Running terminal commands:
+- npm run dev
+ (in c:\Users\lemor\workspace\portfolio, running for 1h53m50s)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from Gemini 3.1 Pro (High) to Gemini 3.1 Pro (Low). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
