@@ -60,8 +60,7 @@ errorMsg = `送信中にエラーが発生しました。理由: ${err.message |
         <p>お仕事のご依頼やご相談は、こちらのフォームからお気軽にご連絡ください。</p>
 
         {errorMsg && (
-        <div
-          style="background: #ffcccc; color: #cc0000; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; text-align: center;">
+        <div class="error-message">
           {errorMsg}
         </div>
         )}
@@ -80,10 +79,9 @@ errorMsg = `送信中にエラーが発生しました。理由: ${err.message |
             <textarea rows="5" class="form-control" name="message" placeholder="ご用件をご記入ください"></textarea>
           </div>
 
-          <button type="submit" class="btn btn-full" style="margin: 0 auto; margin-bottom: 1.5rem;">送信する</button>
+          <button type="submit" class="btn btn-full submit-btn">送信する</button>
 
-          <div class="cf-turnstile" data-sitekey={siteKey}
-            style="margin-bottom: 1.5rem; display: flex; justify-content: center;"></div>
+          <div class="cf-turnstile turnstile-container" data-sitekey={siteKey}></div>
 
           <p class="dummy-notice">
             ※このフォームはポートフォリオ用のデモ（ダミー）です。<br>
@@ -97,3 +95,23 @@ errorMsg = `送信中にエラーが発生しました。理由: ${err.message |
 
   <Footer />
 </BaseLayout>
+
+<style>
+  .error-message {
+    background: #ffcccc;
+    color: #cc0000;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .submit-btn {
+    margin: 0 auto;
+    margin-bottom: 1.5rem;
+  }
+  .turnstile-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+</style>

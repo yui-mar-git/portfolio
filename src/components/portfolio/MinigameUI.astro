@@ -4,14 +4,14 @@ const { materialCategories, gameTitle } = Astro.props;
 <!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
 <div class="game-container" id="game-container">
   <div class="game-hud" id="game-hud">
-    <div class="score-display">スコア: <span id="score">0</span> <span style="font-size: 0.75em; font-weight: normal; color: rgba(255,255,255,0.8); margin-left: 0.5rem;">(ハイスコア: <span id="highscore">0</span>)</span></div>
-    <div class="time-display" style="display: flex; align-items: center;">
+    <div class="score-display">スコア: <span id="score">0</span> <span class="global-style-nz0j2p">(ハイスコア: <span id="highscore">0</span>)</span></div>
+    <div class="time-display global-style-40iz4x" >
       残り時間: <span id="time" class="">30</span>秒
-      <span id="hud-config-btn" class="icon-config" title="コンフィグ" style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
+      <span id="hud-config-btn" class="icon-config global-style-kg4mnf" title="コンフィグ" >⚙️</span>
     </div>
   </div>
-  <div class="bottom-hud" id="bottom-hud" style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
-    <button id="retire-btn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">リタイア</button>
+  <div class="bottom-hud global-style-24gtvk" id="bottom-hud" >
+    <button id="retire-btn" class="btn btn-danger global-style-ruina0" >リタイア</button>
   </div>
   <div class="overlay" id="start-screen">
     <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
@@ -20,7 +20,7 @@ const { materialCategories, gameTitle } = Astro.props;
     <h2>{gameTitle || ''}</h2>
     <button id="start-btn" class="btn btn-full">ゲームスタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
-    <span id="start-config-btn" class="icon-config" title="コンフィグ" style="cursor: pointer;">⚙️</span>
+    <span id="start-config-btn" class="icon-config global-style-dickuc" title="コンフィグ" >⚙️</span>
   </div>
 
   <div class="result-screen overlay" id="result-screen">
@@ -38,12 +38,12 @@ const { materialCategories, gameTitle } = Astro.props;
     <div class="howto-content">
       <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
       <div class="legend">
-        <p><span style="color:#007bff">■青</span>: +10点</p>
-        <p><span style="color:#fd7e14">■橙</span>: +5秒</p>
-        <p><span style="color:#dc3545">■赤</span>: -30点</p>
-        <p><span style="color:#6f42c1">■紫</span>: -5秒</p>
-        <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃう)</p>
-        <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
+        <p><span class="global-style-2zrcut">■青</span>: +10点</p>
+        <p><span class="global-style-huegtq">■橙</span>: +5秒</p>
+        <p><span class="global-style-1ayd41">■赤</span>: -30点</p>
+        <p><span class="global-style-ydrkkw">■紫</span>: -5秒</p>
+        <p><span class="global-style-m4nj5z">■黄</span>: +50点 (すぐ消えちゃう)</p>
+        <p><span class="global-style-jirdf8">■緑</span>: しばらくの間、的が消えにくくなる</p>
       </div>
     </div>
     <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
@@ -61,14 +61,14 @@ const { materialCategories, gameTitle } = Astro.props;
       <label for="se-volume">SE音量</label>
       <input type="range" id="se-volume" min="0" max="100" value="50">
     </div>
-    <button id="credits-btn" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">クレジット・使用素材</button>
-    <button id="close-config-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+    <button id="credits-btn" class="btn btn-secondary global-style-9glr4x" >クレジット・使用素材</button>
+    <button id="close-config-btn" class="btn btn-secondary global-style-m9a5iw" >閉じる</button>
   </div>
 
   <!-- リタイアモーダル -->
   <div id="retire-modal" class="config-modal">
     <h3>リタイアしますか？</h3>
-    <div class="result-actions" style="margin-top: 1.5rem;">
+    <div class="result-actions global-style-ghqh0e" >
       <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
       <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
       <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
@@ -80,7 +80,7 @@ const { materialCategories, gameTitle } = Astro.props;
     <div class="howto-content"
       style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
       <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-      <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+      <ul class="global-style-vd2h16">
         {materialCategories.map((mat) => (
         <li>{mat.category}: {mat.items.map((item, index) => (
           <span key={item.name}>
@@ -91,7 +91,7 @@ const { materialCategories, gameTitle } = Astro.props;
         ))}
       </ul>
     </div>
-    <button id="close-credits-btn" class="btn btn-secondary" style="width: 100%;">閉じる</button>
+    <button id="close-credits-btn" class="btn btn-secondary global-style-mbc3p8" >閉じる</button>
   </div>
 </div>
 </GameLayout>
@@ -409,4 +409,24 @@ const { materialCategories, gameTitle } = Astro.props;
   .legend-green {
     color: #28a745;
   }
+
+/* Auto-extracted styles */
+.global-style-nz0j2p { font-size: 0.75em; font-weight: normal; color: rgba(255,255,255,0.8); margin-left: 0.5rem; }
+.global-style-40iz4x { display: flex; align-items: center; }
+.global-style-kg4mnf { position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto; }
+.global-style-24gtvk { position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto; }
+.global-style-ruina0 { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.global-style-dickuc { cursor: pointer; }
+.global-style-2zrcut { color:#007bff }
+.global-style-huegtq { color:#fd7e14 }
+.global-style-1ayd41 { color:#dc3545 }
+.global-style-ydrkkw { color:#6f42c1 }
+.global-style-m4nj5z { color:#ffea00 }
+.global-style-jirdf8 { color:#28a745 }
+.global-style-9glr4x { width: 100%; margin-bottom: 0.5rem; }
+.global-style-m9a5iw { width: 100%; }
+.global-style-ghqh0e { margin-top: 1.5rem; }
+.global-style-vd2h16 { margin-top: 1rem; padding-left: 1.5rem; }
+.global-style-mbc3p8 { width: 100%; }
+
 </style>

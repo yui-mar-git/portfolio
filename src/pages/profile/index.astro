@@ -77,7 +77,7 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
               <section>
                 <h2>使用技術・ツール</h2>
                 <div class="skill-grid">
-                  <div class="profile-card skill-card" style="width: 100%; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+                  <div class="profile-card skill-card">
                     <h3>フロントエンド</h3>
                     <ul>
                       <li><strong>HTML</strong></li>
@@ -88,34 +88,34 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
                       <li><strong>Phaser 3</strong></li>
                     </ul>
                     
-                    <h3 style="margin-top: 1.5rem;">バックエンド・CMS</h3>
+                    <h3 class="skill-category">バックエンド・CMS</h3>
                     <ul>
                       <li><strong>Node.js</strong></li>
-                      <li style="opacity: 0.5;">PHP</li>
+                      <li class="skill-inactive">PHP</li>
                       <li><strong>microCMS</strong></li>
-                      <li style="opacity: 0.5;">WordPress</li>
+                      <li class="skill-inactive">WordPress</li>
                     </ul>
                     
-                    <h3 style="margin-top: 1.5rem;">インフラ・ホスティング</h3>
+                    <h3 class="skill-category">インフラ・ホスティング</h3>
                     <ul>
                       <li><strong>Cloudflare (Pages / Turnstile)</strong></li>
-                      <li style="opacity: 0.5;">Kinsta</li>
+                      <li class="skill-inactive">Kinsta</li>
                     </ul>
                     
-                    <h3 style="margin-top: 1.5rem;">開発環境・ツール</h3>
+                    <h3 class="skill-category">開発環境・ツール</h3>
                     <ul>
                       <li><strong>GitHub</strong></li>
                       <li><strong>Google Antigravity</strong></li>
-                      <li style="opacity: 0.5;">Cursor</li>
+                      <li class="skill-inactive">Cursor</li>
                     </ul>
                     
-                    <h3 style="margin-top: 1.5rem;">デザイン</h3>
+                    <h3 class="skill-category">デザイン</h3>
                     <ul>
-                      <li style="opacity: 0.5;">Figma</li>
-                      <li style="opacity: 0.5;">Photoshop</li>
+                      <li class="skill-inactive">Figma</li>
+                      <li class="skill-inactive">Photoshop</li>
                     </ul>
                     
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2rem; text-align: right;">※本ページで使用していないものは薄文字</p>
+                    <p class="skill-note">※本ページで使用していないものは薄文字</p>
                   </div>
                 </div>
               </section>
@@ -142,3 +142,24 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
 
           <Footer />
         </BaseLayout>
+
+<style>
+  .skill-card {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  .skill-category {
+    margin-top: 1.5rem;
+  }
+  .skill-inactive {
+    opacity: 0.5;
+  }
+  .skill-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 2rem;
+    text-align: right;
+  }
+</style>

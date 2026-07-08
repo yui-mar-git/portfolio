@@ -8,30 +8,30 @@ const { gameTitle } = Astro.props;
 <!-- Start Screen -->
 <div class="td-wrapper">
   <!-- Global Back Button -->
-  <div id="global-back-btn" class="global-back-btn" style="display: none;" title="戻る">◀</div>
+  <div id="global-back-btn" class="global-back-btn global-style-wj3iuu"  title="戻る">◀</div>
 
   <div class="overlay" id="start-screen">
     <h2 class="title-main">{gameTitle || '横スクロールタワーディフェンス'}</h2>
     <p class="desc-sub">コストを払ってユニットを召喚し、拠点を防衛しよう！<br>※スタートするとBGMが鳴ります</p>
     <button id="start-btn" class="btn btn-primary start-btn-wide">スタート</button>
     <button id="howto-btn" class="btn btn-secondary start-btn-wide howto-margin">遊び方</button>
-    <button id="reset-save-btn" class="btn"
-      style="position: absolute; bottom: 1.5rem; right: 1.5rem; padding: 0.4rem 0.8rem; background: transparent; border: 1px solid #ff4444; color: #ff4444; font-size: 0.75rem;">データリセット</button>
+    <button id="reset-save-btn" class="btn global-style-kk7pir"
+      >データリセット</button>
     <span id="start-config-btn" class="icon-config" title="コンフィグ">⚙️</span>
   </div>
 
   <!-- Reset Confirm Modal -->
   <div class="overlay modal-dim" id="reset-confirm-modal">
-    <div class="modal-inner" style="text-align: center;">
-      <h2 class="modal-title" style="color: #ff4444;">データリセット</h2>
-      <div style="margin: 2rem 0;">
+    <div class="modal-inner global-style-ffw7dw" >
+      <h2 class="modal-title global-style-70wgmu" >データリセット</h2>
+      <div class="global-style-08fu0c">
         <p>セーブデータを初期化しますか？</p>
-        <p style="font-size: 0.9rem; color: #ccc;">この操作は取り消せません。</p>
+        <p class="global-style-6v7fck">この操作は取り消せません。</p>
       </div>
-      <div style="display: flex; gap: 1rem; justify-content: center;">
+      <div class="global-style-bwkiby">
         <button id="btn-reset-cancel" class="btn btn-secondary">キャンセル</button>
-        <button id="btn-reset-execute" class="btn btn-primary"
-          style="background: #ff4444; border-color: #ff4444;">リセットする</button>
+        <button id="btn-reset-execute" class="btn btn-primary global-style-up1w8h"
+          >リセットする</button>
       </div>
     </div>
   </div>
@@ -73,12 +73,12 @@ const { gameTitle } = Astro.props;
   <div class="overlay" id="upgrade-screen">
     <span id="upgrade-config-btn" class="icon-config" title="コンフィグ">⚙️</span>
     <h2 class="basecamp-title">ベースキャンプ</h2>
-    <div class="upgrade-header" style="display:flex; justify-content:space-between; align-items:center; margin: 0 auto 10px auto; width: 100%; max-width: 400px; padding: 0 10px;">
-      <div class="basecamp-tabs" style="display:flex; gap: 10px; flex: 1; max-width: 240px;">
-        <button id="tab-btn-unit" class="btn btn-primary" style="flex: 1; padding: 0.3rem 0;">ユニット</button>
-        <button id="tab-btn-base" class="btn btn-secondary" style="flex: 1; padding: 0.3rem 0;">拠点</button>
+    <div class="upgrade-header global-style-ma9n3z" >
+      <div class="basecamp-tabs global-style-3fu4hk" >
+        <button id="tab-btn-unit" class="btn btn-primary global-style-eer6nk" >ユニット</button>
+        <button id="tab-btn-base" class="btn btn-secondary global-style-x3gcp6" >拠点</button>
       </div>
-      <span class="upgrade-gold" style="font-size:1.2rem; font-weight:bold; color:#ffd700;"><span id="upgrade-gold-display">0</span> G</span>
+      <span class="upgrade-gold global-style-brzc4b" ><span id="upgrade-gold-display">0</span> G</span>
     </div>
 
     <div id="tab-content-unit" class="upgrade-list">      <!-- Shield -->
@@ -158,44 +158,44 @@ const { gameTitle } = Astro.props;
     </div> <!-- /tab-content-unit -->
 
     <!-- Base Upgrade Tab Content -->
-    <div id="tab-content-base" class="upgrade-list" style="display:none;">
+    <div id="tab-content-base" class="upgrade-list global-style-4ndq6p" >
       
       <!-- Base HP -->
       <div class="upgrade-item-container" id="upg-container-base-hp">
-        <div class="upgrade-unit-card" style="border-color: #32cd32;"><div style="font-size: 1.5rem;">❤️</div></div>
+        <div class="upgrade-unit-card global-style-ct4ago" ><div class="global-style-oy0j0g">❤️</div></div>
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name"><span class="upgrade-unit-name">拠点耐久力</span><span class="upgrade-lv">Lv.<span id="upg-lv-base-hp">1</span></span></div>
-          <div class="upgrade-col-stats"><div style="font-size:0.8rem; color:#88f;">拠点の最大HPが1増加する</div></div>
+          <div class="upgrade-col-stats"><div class="global-style-j0ig98">拠点の最大HPが1増加する</div></div>
         </div>
         <button id="btn-upg-base-hp" class="btn btn-primary btn-upgrade">強化<br>(<span id="cost-base-hp">500</span>G)</button>
       </div>
 
       <!-- Base Stats -->
       <div class="upgrade-item-container" id="upg-container-base-stats">
-        <div class="upgrade-unit-card" style="border-color: #ff4500;"><div style="font-size: 1.5rem;">⚔️</div></div>
+        <div class="upgrade-unit-card global-style-tlfvyp" ><div class="global-style-psesgl">⚔️</div></div>
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name"><span class="upgrade-unit-name">ユニット能力</span><span class="upgrade-lv">Lv.<span id="upg-lv-base-stats">1</span></span></div>
-          <div class="upgrade-col-stats"><div style="font-size:0.8rem; color:#88f;">全味方のHPと攻撃力 +5%</div></div>
+          <div class="upgrade-col-stats"><div class="global-style-42c6lo">全味方のHPと攻撃力 +5%</div></div>
         </div>
         <button id="btn-upg-base-stats" class="btn btn-primary btn-upgrade">強化<br>(<span id="cost-base-stats">500</span>G)</button>
       </div>
 
       <!-- Base Cost -->
       <div class="upgrade-item-container" id="upg-container-base-cost">
-        <div class="upgrade-unit-card" style="border-color: #1e90ff;"><div style="font-size: 1.5rem;">💧</div></div>
+        <div class="upgrade-unit-card global-style-3ny67n" ><div class="global-style-jx6f88">💧</div></div>
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name"><span class="upgrade-unit-name">コスト効率</span><span class="upgrade-lv">Lv.<span id="upg-lv-base-cost">1</span></span></div>
-          <div class="upgrade-col-stats"><div style="font-size:0.8rem; color:#88f;">初期コストと回復量が +5%</div></div>
+          <div class="upgrade-col-stats"><div class="global-style-a9ge7u">初期コストと回復量が +5%</div></div>
         </div>
         <button id="btn-upg-base-cost" class="btn btn-primary btn-upgrade">強化<br>(<span id="cost-base-cost">500</span>G)</button>
       </div>
 
       <!-- Base Gold -->
       <div class="upgrade-item-container" id="upg-container-base-gold">
-        <div class="upgrade-unit-card" style="border-color: #ffd700;"><div style="font-size: 1.5rem;">💰</div></div>
+        <div class="upgrade-unit-card global-style-8g3bp0" ><div class="global-style-n5vauq">💰</div></div>
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name"><span class="upgrade-unit-name">獲得ゴールド</span><span class="upgrade-lv">Lv.<span id="upg-lv-base-gold">1</span></span></div>
-          <div class="upgrade-col-stats"><div style="font-size:0.8rem; color:#88f;">敵撃破時の獲得Gが +2G</div></div>
+          <div class="upgrade-col-stats"><div class="global-style-t5rfqh">敵撃破時の獲得Gが +2G</div></div>
         </div>
         <button id="btn-upg-base-gold" class="btn btn-primary btn-upgrade">強化<br>(<span id="cost-base-gold">500</span>G)</button>
       </div>
@@ -242,7 +242,7 @@ const { gameTitle } = Astro.props;
 
   <!-- Game UI Options -->
   <div class="game-ui-header">
-    <div class="status-bar" style="padding-left: 3.5rem;">
+    <div class="status-bar global-style-wtvhhc" >
       <div>WAVE: <span id="wave-display">1 / 3</span></div>
       <div class="text-hp">拠点: <span id="base-hp-display">3 / 3</span></div>
       <div class="text-コスト">コスト: <span id="コスト-display">0</span></div>
@@ -845,4 +845,34 @@ const { gameTitle } = Astro.props;
     .result-lose {
       color: #dc3545;
     }
-  </style>
+  
+/* Auto-extracted styles */
+.global-style-wj3iuu { display: none; }
+.global-style-kk7pir { position: absolute; bottom: 1.5rem; right: 1.5rem; padding: 0.4rem 0.8rem; background: transparent; border: 1px solid #ff4444; color: #ff4444; font-size: 0.75rem; }
+.global-style-ffw7dw { text-align: center; }
+.global-style-70wgmu { color: #ff4444; }
+.global-style-08fu0c { margin: 2rem 0; }
+.global-style-6v7fck { font-size: 0.9rem; color: #ccc; }
+.global-style-bwkiby { display: flex; gap: 1rem; justify-content: center; }
+.global-style-up1w8h { background: #ff4444; border-color: #ff4444; }
+.global-style-ma9n3z { display:flex; justify-content:space-between; align-items:center; margin: 0 auto 10px auto; width: 100%; max-width: 400px; padding: 0 10px; }
+.global-style-3fu4hk { display:flex; gap: 10px; flex: 1; max-width: 240px; }
+.global-style-eer6nk { flex: 1; padding: 0.3rem 0; }
+.global-style-x3gcp6 { flex: 1; padding: 0.3rem 0; }
+.global-style-brzc4b { font-size:1.2rem; font-weight:bold; color:#ffd700; }
+.global-style-4ndq6p { display:none; }
+.global-style-ct4ago { border-color: #32cd32; }
+.global-style-oy0j0g { font-size: 1.5rem; }
+.global-style-j0ig98 { font-size:0.8rem; color:#88f; }
+.global-style-tlfvyp { border-color: #ff4500; }
+.global-style-psesgl { font-size: 1.5rem; }
+.global-style-42c6lo { font-size:0.8rem; color:#88f; }
+.global-style-3ny67n { border-color: #1e90ff; }
+.global-style-jx6f88 { font-size: 1.5rem; }
+.global-style-a9ge7u { font-size:0.8rem; color:#88f; }
+.global-style-8g3bp0 { border-color: #ffd700; }
+.global-style-n5vauq { font-size: 1.5rem; }
+.global-style-t5rfqh { font-size:0.8rem; color:#88f; }
+.global-style-wtvhhc { padding-left: 3.5rem; }
+
+</style>

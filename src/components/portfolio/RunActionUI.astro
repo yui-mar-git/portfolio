@@ -6,15 +6,15 @@ const { materialCategories, gameTitle } = Astro.props;
   <!-- HUD (Score / Highscore) -->
   <div class="game-hud" id="game-hud">
     <div class="time-display">記録: <span id="survival-time">0.0</span>秒</div>
-    <div class="highscore-display" style="display: flex; align-items: center;">
+    <div class="highscore-display global-style-hrir4f" >
       ベスト: <span id="highscore">0.0</span>秒
-      <span id="hud-config-btn" class="icon-config" title="コンフィグ"
-        style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
+      <span id="hud-config-btn" class="icon-config global-style-sypb5s" title="コンフィグ"
+        >⚙️</span>
     </div>
   </div>
-  <div class="bottom-hud" id="bottom-hud"
-    style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
-    <button id="retire-btn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">リタイア</button>
+  <div class="bottom-hud global-style-736gi5" id="bottom-hud"
+    >
+    <button id="retire-btn" class="btn btn-danger global-style-5vllo3" >リタイア</button>
   </div>
   <canvas id="game-canvas"></canvas>
 
@@ -27,7 +27,7 @@ const { materialCategories, gameTitle } = Astro.props;
     <p class="start-desc">スタートで走り出します</p>
     <button id="start-btn" class="btn btn-full">スタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-howto">遊び方</button>
-    <span id="config-btn" class="icon-config" title="コンフィグ" style="cursor: pointer;">⚙️</span>
+    <span id="config-btn" class="icon-config global-style-d5t1mq" title="コンフィグ" >⚙️</span>
   </div>
 
   <div class="overlay" id="result-screen">
@@ -68,7 +68,7 @@ const { materialCategories, gameTitle } = Astro.props;
   <!-- リタイアモーダル -->
   <div id="retire-modal" class="config-modal">
     <h3>リタイアしますか？</h3>
-    <div class="result-actions" style="margin-top: 1.5rem;">
+    <div class="result-actions global-style-c5yyf6" >
       <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
       <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
       <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
@@ -245,4 +245,13 @@ const { materialCategories, gameTitle } = Astro.props;
       color: #ffea00;
       margin: 0 0.5rem;
     }
-  </style>
+  
+/* Auto-extracted styles */
+.global-style-hrir4f { display: flex; align-items: center; }
+.global-style-sypb5s { position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto; }
+.global-style-736gi5 { position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto; }
+.global-style-5vllo3 { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.global-style-d5t1mq { cursor: pointer; }
+.global-style-c5yyf6 { margin-top: 1.5rem; }
+
+</style>
