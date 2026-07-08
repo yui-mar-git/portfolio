@@ -2,3 +2,12 @@
 env.local.js
 node_modules/
 .DS_Store
+
+# Build output
+dist/
+.astro/
+
+# IDE and AI agents
+.agents/
+.backups/
+.vscode/
