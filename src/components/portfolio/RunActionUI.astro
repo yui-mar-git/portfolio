@@ -5,13 +5,15 @@ const { materialCategories, gameTitle } = Astro.props;
   <!-- Game Area (Canvas) -->
   <!-- HUD (Score / Highscore) -->
   <div class="game-hud" id="game-hud">
-    <div class="time-display">生存時間: <span id="survival-time">0.0</span>秒</div>
+    <div class="time-display">記録: <span id="survival-time">0.0</span>秒</div>
     <div class="highscore-display" style="display: flex; align-items: center;">
       ベスト: <span id="highscore">0.0</span>秒
-      <span id="hud-config-btn" class="icon-config" title="コンフィグ" style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
+      <span id="hud-config-btn" class="icon-config" title="コンフィグ"
+        style="position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto;">⚙️</span>
     </div>
   </div>
-  <div class="bottom-hud" id="bottom-hud" style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
+  <div class="bottom-hud" id="bottom-hud"
+    style="position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto;">
     <button id="retire-btn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">リタイア</button>
   </div>
   <canvas id="game-canvas"></canvas>
@@ -176,6 +178,7 @@ const { materialCategories, gameTitle } = Astro.props;
       color: white;
       border-color: #dc3545;
     }
+
     .btn-danger:hover {
       background-color: #c82333;
     }

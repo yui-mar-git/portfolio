@@ -46,9 +46,6 @@ const {
 
   <main class="container">
     <article>
-      <span class="page-label">{pageLabel}</span>
-      <h1>{projectData ? projectData.title : title.split(' - ')[0]}</h1>
-
       <div id="global-game-scaler" style="width: 100%; overflow: hidden; position: relative;">
         <div id="global-game-scaler-inner" style="transform-origin: top left; transition: transform 0.2s ease-out;">
           <slot />
