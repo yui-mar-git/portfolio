@@ -1,5 +1,5 @@
 ---
-const { materialCategories } = Astro.props;
+const { materialCategories, gameTitle } = Astro.props;
 ---
 <!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
 <div class="game-container" id="game-container">
@@ -17,7 +17,7 @@ const { materialCategories } = Astro.props;
     <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
       ハイスコア: <span id="start-highscore-val">0</span>
     </div>
-    <h2></h2>
+    <h2>{gameTitle || ''}</h2>
     <button id="start-btn" class="btn btn-full">ゲームスタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
     <span id="start-config-btn" class="icon-config" title="コンフィグ" style="cursor: pointer;">⚙️</span>

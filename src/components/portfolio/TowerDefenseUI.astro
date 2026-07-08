@@ -3,6 +3,7 @@ import heroImg from '../../assets/games/tower-defense/images/unit/figure_rpg_cha
 import warriorImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_kenshi.png';
 import mageImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_mahoutsukai.png';
 import fighterImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_butouka.png';
+const { gameTitle } = Astro.props;
 ---
 <!-- Start Screen -->
 <div class="td-wrapper">
@@ -10,7 +11,7 @@ import fighterImg from '../../assets/games/tower-defense/images/unit/figure_rpg_
   <div id="global-back-btn" class="global-back-btn" style="display: none;" title="戻る">◀</div>
 
   <div class="overlay" id="start-screen">
-    <h2 class="title-main">横スクロールタワーディフェンス</h2>
+    <h2 class="title-main">{gameTitle || '横スクロールタワーディフェンス'}</h2>
     <p class="desc-sub">コストを払ってユニットを召喚し、拠点を防衛しよう！<br>※スタートするとBGMが鳴ります</p>
     <button id="start-btn" class="btn btn-primary start-btn-wide">スタート</button>
     <button id="howto-btn" class="btn btn-secondary start-btn-wide howto-margin">遊び方</button>

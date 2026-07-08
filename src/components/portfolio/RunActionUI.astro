@@ -1,5 +1,5 @@
 ---
-const { materialCategories } = Astro.props;
+const { materialCategories, gameTitle } = Astro.props;
 ---
 <div class="game-container" id="game-container">
   <!-- Game Area (Canvas) -->
@@ -21,7 +21,7 @@ const { materialCategories } = Astro.props;
     <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
       ベスト: <span id="start-highscore-val">0.0</span>秒
     </div>
-    <h2>エンドレス・ラン！</h2>
+    <h2>{gameTitle || 'エンドレス・ラン！'}</h2>
     <p class="start-desc">スタートで走り出します</p>
     <button id="start-btn" class="btn btn-full">スタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-howto">遊び方</button>

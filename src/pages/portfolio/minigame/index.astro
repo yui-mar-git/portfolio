@@ -26,5 +26,5 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : 'モグラ叩き風スコアアタック！' } pageId="minigame"
     pageLabel="MINIGAME" projectData={projectData} descriptionFallback="" techStack={techStack}
     learningThemes={learningThemes} materialCategories={materialCategories}>
-    <MinigameUI materialCategories={materialCategories} />
+    <MinigameUI materialCategories={materialCategories} gameTitle={projectData?.title} />
     <script src="../../../scripts/minigame/main.js"></script>

@@ -32,7 +32,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     pageId="tower-defense" pageLabel="DEFENSE GAME" projectData={projectData} descriptionFallback=""
     techStack={techStack} learningThemes={learningThemes} materialCategories={materialCategories}>
     <div class="game-container" id="game-container">
-      <TowerDefenseUI />
+      <TowerDefenseUI gameTitle={projectData?.title} />
     </div>
   </GameLayout>
 
