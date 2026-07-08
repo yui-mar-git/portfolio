@@ -5,7 +5,7 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
 let errorMsg = '';
-const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const siteKey = Astro.locals.runtime?.env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
 if (Astro.request.method === 'POST') {
 try {
@@ -34,14 +34,15 @@ const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL
 return Astro.redirect(`${baseUrl}/contact/thanks/index.html`);
 } else {
 // エラー理由をより詳細に出力（デバッグ用）
-errorMsg = `ボット判定されました。理由: ${JSON.stringify(resultData['error-codes'] || resultData)} (Secret: ${secretKey ? '設定済' :
-'未設定'})`;
+const errorCodeStr = JSON.stringify(resultData['error-codes'] || resultData);
+const keyStatus = secretKey ? '取得成功' : '取得失敗(undefined)';
+errorMsg = `ボット判定されました。理由: ${errorCodeStr} (Secret: ${keyStatus})`;
 console.error('Turnstile verification failed:', resultData);
 }
 }
 } catch (err) {
 console.error(err);
-errorMsg = '送信中にエラーが発生しました。';
+errorMsg = `送信中にエラーが発生しました。理由: ${err.message || String(err)}`;
 }
 }
 
