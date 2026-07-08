@@ -19,33 +19,31 @@ const projects = portfolioResponse.contents;
       <section>
         <div class="project-grid" id="project-grid">
           {projects.length > 0 ? (
-            projects.map((project) => (
-              <div class="project-card">
-                {project.thumbnail && (
-                  <img src={project.thumbnail.url} alt={project.title} class="project-thumbnail" />
-                )}
-                <h3>{project.title}</h3>
-                {project.tags && (
-                  <div class="project-tags">
-                    <span>{project.tags}</span>
-                  </div>
-                )}
-                <p>{project.description}</p>
-                {project.url && (
-                  // URLが http から始まる場合は外部サイトとして新しいタブで開く
-                  // それ以外（自サイト内の相対パス）は同じウィンドウで遷移する
-                  project.url.startsWith('http') ? (
-                    <a href={project.url} target="_blank" rel="noopener noreferrer">
-                      詳細を見る →
-                    </a>
-                  ) : (
-                    <a href={project.url}>
-                      詳細を見る →
-                    </a>
-                  )
-                )}
-              </div>
-            ))
+            projects.map((project) => {
+              const isExternal = project.url && project.url.startsWith('http');
+              const Element = project.url ? 'a' : 'div';
+              const linkProps = project.url ? {
+                href: project.url,
+                target: isExternal ? '_blank' : undefined,
+                rel: isExternal ? 'noopener noreferrer' : undefined,
+                style: 'text-decoration: none; color: inherit; display: block;'
+              } : {};
+
+              return (
+                <Element class="project-card" {...linkProps}>
+                  {project.thumbnail && (
+                    <img src={project.thumbnail.url} alt={project.title} class="project-thumbnail" />
+                  )}
+                  <h3>{project.title}</h3>
+                  {project.tags && (
+                    <div class="project-tags">
+                      <span>{project.tags}</span>
+                    </div>
+                  )}
+                  <p>{project.description}</p>
+                </Element>
+              );
+            })
           ) : (
             <p class="empty-message">
               鋭意制作中です。
