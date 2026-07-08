@@ -8,9 +8,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   const projectData = portfolioResponse.contents.find((c) => c.url.includes('/run-action/'));
 
   const techStack = [
-  { category: "開発言語", items: "HTML5, CSS3, JavaScript (ES6+)" },
-  { category: "フレームワーク", items: "Astro (MIT License)" },
-  { category: "その他ツール", items: "Google Antigravity, Gemini, Claude" }
+  { category: "フロントエンド", items: "HTML, CSS, JavaScript, Astro" },
+  { category: "バックエンド・CMS", items: "Node.js, microCMS" },
+  { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
+  { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
   ];
 
   const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
