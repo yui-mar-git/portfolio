@@ -525,8 +525,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             if (!container) return;
             
             const style = window.getComputedStyle(container);
-            const logicalWidth = parseInt(style.maxWidth) || parseInt(style.width) || 800;
-            const logicalHeight = container.offsetHeight || parseInt(style.height) || 580;
+            const logicalWidth = 800;
+            const logicalHeight = 580;
             
             const parentWidth = scaler.parentElement.clientWidth;
             
@@ -2049,7 +2049,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 .rl-js-style-5 { font-size: 0.52rem; color: var(--text-muted); text-align: center; line-height: 1.2; padding: 0 2px; }
 .rl-js-style-6 { margin-top: 1rem; text-align: left; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 6px; }
 .rl-js-style-7 { font-size: 0.75rem; color: #aaa; margin-bottom: 0.4rem; }
-.rl-js-style-8 { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-height: 245px; overflow-y: auto; padding: 4px 0; }
+.rl-js-style-8 { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-height: 245px; overflow-y: auto; padding: 4px 0; width: 100%; }
 .rl-js-style-9 { width: 58px; height: 94px; }
 .rl-js-style-10 { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
 .rl-js-style-11 { display: flex; flex-direction: column; justify-content: center; gap: 30px; height: 100%; position: relative; }

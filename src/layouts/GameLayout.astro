@@ -63,8 +63,8 @@ const {
             if (!container) return;
             
             const style = window.getComputedStyle(container);
-            const logicalWidth = parseInt(style.maxWidth) || parseInt(style.width) || 800;
-            const logicalHeight = container.offsetHeight || parseInt(style.height) || 600;
+            const logicalWidth = 800;
+            const logicalHeight = 600;
             
             const parentWidth = scaler.parentElement.clientWidth;
             
