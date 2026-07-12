@@ -1623,17 +1623,19 @@ if (btnInnRest) {
 
     function buildCardMainText(card) {
       if (card.type === 'attack') {
-        const hits = card.hits ? `ÁE{card.hits}` : '';
+        const hits = card.hits ? `×${card.hits}` : '';
         const elem = card.element && card.element !== 'none' ? ` [${getElemLabel(card.element)}]` : '';
-        return `⚔︁E${card.value}${hits}ダメージ${elem}`;
+        return `⚔ ${card.value}${hits}ダメージ${elem}`;
       } else if (card.healSelf) {
         return `HP +${card.healSelf} 回復`;
       } else if (card.draw) {
-        return `カードを${card.draw}枚引き、行動回数+1`;
+        return `カードを${card.draw}枚引く`;
+      } else if (card.id === 'kakusei' || card.id === 'kakusei+') {
+        return `能昇＆能降 ${card.buffUp}ターン`;
       } else if (card.buffUp) {
-        return `能昁E${card.buffUp}ターン付与`;
+        return `${card.buffUp}ターン 能昇`;
       } else if (card.buffDown) {
-        return `敵に能陁E${card.buffDown}ターン`;
+        return `${card.buffDown}ターン 能降`;
       }
       return card.desc || '';
     }

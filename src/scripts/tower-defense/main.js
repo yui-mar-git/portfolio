@@ -1077,16 +1077,22 @@ document.addEventListener('click', (e) => {
   
   if (tabBtnUnit) {
     playSE('cursor');
-    tabBtnUnit.className = 'btn btn-primary';
-    document.getElementById('tab-btn-base').className = 'btn btn-secondary';
-    document.getElementById('tab-content-unit').style.display = '';
+    tabBtnUnit.classList.add('btn-primary');
+    tabBtnUnit.classList.remove('btn-secondary');
+    const tabBtnBaseEl = document.getElementById('tab-btn-base');
+    tabBtnBaseEl.classList.add('btn-secondary');
+    tabBtnBaseEl.classList.remove('btn-primary');
+    document.getElementById('tab-content-unit').style.display = 'flex';
     document.getElementById('tab-content-base').style.display = 'none';
     return;
   } else if (tabBtnBase) {
     playSE('cursor');
-    tabBtnBase.className = 'btn btn-primary';
-    document.getElementById('tab-btn-unit').className = 'btn btn-secondary';
-    document.getElementById('tab-content-base').style.display = '';
+    tabBtnBase.classList.add('btn-primary');
+    tabBtnBase.classList.remove('btn-secondary');
+    const tabBtnUnitEl = document.getElementById('tab-btn-unit');
+    tabBtnUnitEl.classList.add('btn-secondary');
+    tabBtnUnitEl.classList.remove('btn-primary');
+    document.getElementById('tab-content-base').style.display = 'flex';
     document.getElementById('tab-content-unit').style.display = 'none';
     return;
   }

@@ -17,6 +17,7 @@ export interface Card {
   oncePerBattle?: boolean; // 1戦闘で1回のみ
   upgraded?: boolean; // (後方互換性のため残す)
   upgradeCount?: number; // 強化回数(0〜3)
+  category?: 'physical' | 'spell' | 'special';
   flavor?: string;
 }
 
@@ -26,9 +27,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'strike',
     name: '攻撃',
     type: 'attack',
-    cost: 1,
-    value: 2,
-    desc: '敵に 2 ダメージ',
+    category: 'physical',
+    cost: 0,
+    value: 1,
+    desc: '敵に 1 ダメージ',
     color: 'none',
     element: 'none',
     flavor: 'フレーバーテキスト準備中'
@@ -37,6 +39,7 @@ export const CARD_DB: Record<string, Card> = {
     id: 'heal',
     name: '快癒',
     type: 'skill',
+    category: 'spell',
     cost: 1,
     value: 0,
     desc: 'HP +3 回復',
@@ -49,9 +52,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'smite',
     name: '強撃',
     type: 'attack',
-    cost: 2,
-    value: 4,
-    desc: '敵に 4 ダメージ',
+    category: 'physical',
+    cost: 1,
+    value: 3,
+    desc: '敵に 3 ダメージ',
     color: 'none',
     element: 'none',
     flavor: 'フレーバーテキスト準備中'
@@ -60,7 +64,8 @@ export const CARD_DB: Record<string, Card> = {
     id: 'rush',
     name: '連撃',
     type: 'attack',
-    cost: 2,
+    category: 'physical',
+    cost: 1,
     value: 1,
     desc: '敵に 1×2 ダメージ',
     color: 'none',
@@ -74,9 +79,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'fire',
     name: '火炎',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 3,
-    desc: '敵に 3 ダメージ (炎)',
+    desc: '敵に 3 ダメージ',
     color: 'red',
     element: 'fire',
     flavor: 'フレーバーテキスト準備中'
@@ -85,9 +91,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'ice',
     name: '冷気',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 3,
-    desc: '敵に 氷属性の 3 ダメージ',
+    desc: '敵に 3 ダメージ',
     color: 'blue',
     element: 'ice',
     flavor: 'フレーバーテキスト準備中'
@@ -96,9 +103,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'wind',
     name: '迅風',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 3,
-    desc: '敵に 3 ダメージ (風)',
+    desc: '敵に 3 ダメージ',
     color: 'green',
     element: 'wind',
     flavor: 'フレーバーテキスト準備中'
@@ -107,9 +115,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'stone',
     name: '礫石',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 3,
-    desc: '敵に 3 ダメージ (土)',
+    desc: '敵に 3 ダメージ',
     color: 'orange',
     element: 'stone',
     flavor: 'フレーバーテキスト準備中'
@@ -118,9 +127,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'thunder',
     name: '雷撃',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 2,
-    desc: '敵に 2 ダメージ (雷) ＋ 30%で麻痺付与',
+    desc: '敵に 2 ダメージ ＋ 30%で麻痺付与',
     color: 'yellow',
     element: 'thunder',
     paralyze: true , // 
@@ -132,6 +142,7 @@ export const CARD_DB: Record<string, Card> = {
     id: 'venom',
     name: '毒計',
     type: 'attack',
+    category: 'spell',
     cost: 1,
     value: 1,
     desc: '敵に 1 ダメージ ＋ 毒1 を付与',
@@ -144,6 +155,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'fortify',
     name: '治療',
     type: 'skill',
+    category: 'spell',
+    cost: 2,
+    value: 0,
+    category: 'spell',
     cost: 2,
     value: 0,
     desc: 'HP +6 回復',
@@ -156,9 +171,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'draw_card',
     name: 'ドロー',
     type: 'skill',
+    category: 'special',
     cost: 1,
     value: 0,
-    desc: 'カードを 2 枚引き、行動回数+1',
+    desc: '行動回数を消費せず、<br>カードを 2 枚引く',
     color: 'none',
     element: 'none',
     draw: 2,
@@ -168,9 +184,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'buff_up',
     name: '能昇',
     type: 'skill',
+    category: 'spell',
     cost: 1,
     value: 0,
-    desc: '自身に「能昇」を 3 ターン付与',
+    desc: '自分は 3 ターンの間、<br>与ダメージ +1、被ダメージ -1',
     color: 'white',
     element: 'none',
     buffUp: 3,
@@ -180,9 +197,10 @@ export const CARD_DB: Record<string, Card> = {
     id: 'buff_down',
     name: '能降',
     type: 'skill',
+    category: 'spell',
     cost: 1,
     value: 0,
-    desc: '敵に「能降」を 3 ターン付与',
+    desc: '敵は 3 ターンの間、<br>与ダメージ -1、被ダメージ +1',
     color: 'black',
     element: 'none',
     buffDown: 3,
@@ -192,20 +210,36 @@ export const CARD_DB: Record<string, Card> = {
   // ===== スペシャルカード =====
   'meteor': {
     id: 'meteor',
-    name: 'メテオ',
+    name: '流星群',
     type: 'attack',
+    category: 'special',
     cost: 3,
-    value: 8,
-    desc: '敵に 8 ダメージ (炎・氷・雷の全属性効果) (戦闘中1回のみ使用可能)',
+    value: 10,
+    desc: '敵に 10 ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能)',
     color: 'purple',
-    element: 'fire', // 炎として扱うが、全属性に強い(弱点)を突く特別計算をJSで行う
+    element: 'none', // 炎として扱うが、全属性に強い(弱点)を突く特別計算をJSで行う
+    oncePerBattle: true,
+    flavor: 'フレーバーテキスト準備中'
+  },
+  'kakusei': {
+    id: 'kakusei',
+    name: '覚醒',
+    type: 'skill',
+    category: 'special',
+    cost: 3,
+    value: 0,
+    desc: '自分に能昇を5ターン、敵に能降を5ターン付与する (戦闘中1回のみ使用可能)',
+    color: 'white',
+    element: 'none',
+    buffUp: 5,
+    buffDown: 5,
     oncePerBattle: true,
     flavor: 'フレーバーテキスト準備中'
   }
 };
 
 // 報酬候補プール
-export const REWARD_POOL = ['smite', 'rush', 'fire', 'ice', 'wind', 'stone', 'thunder', 'venom', 'fortify', 'draw_card', 'buff_up', 'buff_down', 'meteor'];
+export const REWARD_POOL = ['smite', 'rush', 'fire', 'ice', 'wind', 'stone', 'thunder', 'venom', 'fortify', 'draw_card', 'buff_up', 'buff_down', 'meteor', 'kakusei'];
 
 // 初期デッキの定義 (12枚)
 export const INITIAL_DECKS: Record<string, string[]> = {
@@ -217,7 +251,6 @@ export const INITIAL_DECKS: Record<string, string[]> = {
   mahoutsukai: ['fire', 'fire', 'ice', 'ice', 'wind', 'wind', 'stone', 'stone', 'buff_down', 'venom', 'draw_card', 'draw_card'],
   // 武闘家: 攻撃3, 強撃1, 連撃3, 快癒1, 能昇3, ドロー1 
   butouka: ['strike', 'strike', 'strike', 'smite', 'rush', 'rush', 'rush', 'heal', 'buff_up', 'buff_up', 'buff_up', 'draw_card'],
-    flavor: 'フレーバーテキスト準備中'
   };
 
 /**
@@ -250,8 +283,8 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'rush':
       upgradedCard.cost = 1;
-      upgradedCard.value = 1 + (1 * level);
-      upgradedCard.desc = `敵に ${upgradedCard.value}×2 ダメージ (<span style="color:#4ade80;font-weight:bold;">コスト1</span>)`;
+      upgradedCard.hits = 2 + level;
+      upgradedCard.desc = `敵に 1×<span style="color:#4ade80;font-weight:bold;">${upgradedCard.hits}</span> ダメージ (<span style="color:#4ade80;font-weight:bold;">コスト1</span>)`;
       break;
     case 'fire':
       upgradedCard.value = 3 + (2 * level);
@@ -285,23 +318,29 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'draw_card':
       upgradedCard.draw = 2 + (1 * level);
-      upgradedCard.desc = `カードを <span style="color:#4ade80;font-weight:bold;">${upgradedCard.draw}</span> 枚引き、行動回数+1`;
+      upgradedCard.desc = `行動回数を消費せず、<br>カードを <span style="color:#4ade80;font-weight:bold;">${upgradedCard.draw}</span> 枚引く`;
       break;
     case 'buff_up':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffUp = 3 + (1 * (level - 1)); // 2回目以降で効果ターン増
-      upgradedCard.desc = `自身に「能昇」を ${upgradedCard.buffUp} ターン付与 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
+      upgradedCard.desc = `自分は <span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffUp}</span> ターンの間、<br>与ダメージ +1、被ダメージ -1 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
       break;
     case 'buff_down':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffDown = 3 + (1 * (level - 1));
-      upgradedCard.desc = `敵に「能降」を ${upgradedCard.buffDown} ターン付与 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
+      upgradedCard.desc = `敵は <span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffDown}</span> ターンの間、<br>与ダメージ -1、被ダメージ +1 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
       break;
     case 'meteor':
       upgradedCard.cost = Math.max(0, 3 - level); // コスト減
-      upgradedCard.value = 8 + (2 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (炎・氷・雷の全属性効果) (戦闘中1回のみ使用可能) (<span style="color:#4ade80;font-weight:bold;">コスト${upgradedCard.cost}</span>)`;
+      upgradedCard.value = 10 + (2 * level);
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能) (<span style="color:#4ade80;font-weight:bold;">コスト${upgradedCard.cost}</span>)`;
       break;
+    case 'kakusei':
+      upgradedCard.buffUp = 5 + level;
+      upgradedCard.buffDown = 5 + level;
+      upgradedCard.desc = `自分に能昇を<span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffUp}</span>ターン、敵に能降を<span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffDown}</span>ターン付与する (戦闘中1回のみ使用可能)`;
+      break;
+
   }
   return upgradedCard;
 }

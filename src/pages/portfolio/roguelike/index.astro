@@ -45,491 +45,435 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     <main class="container">
       <div id="global-game-scaler" class="rl-style-1">
         <div id="global-game-scaler-inner" class="rl-style-2">
-          <div class="game-container rl-style-3"  id="game-container">
-        <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
+          <div class="game-container rl-style-3" id="game-container">
+            <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
 
-        <!-- ゲームヘッダーバー（ステータス常時表示） -->
-        <div id="game-header" class="game-header-bar rl-style-4" >
-          <div class="header-status">
-            <span id="header-floor" class="header-floor-text">エリア 1 - 0層</span>
-            <span class="gold-badge"><span id="header-gold">50</span> G</span>
-            <span class="hp-badge">HP: <span id="header-hp">10/10</span></span>
-            <span class="mp-badge">MP: <span id="header-mp">5/5</span></span>
-            <div class="header-relics">
-              <span class="header-relics-label">レリック:</span>
-              <div id="header-relics-list" class="header-relics-list-container"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ゲームフッターバー（アイテム・デッキ常時表示） -->
-        <div id="game-footer" class="game-footer-bar rl-style-5" >
-          <div
-            class="rl-style-6">
-            <span
-              class="rl-style-7">アイテム:</span>
-            <div id="footer-player-items" class="rl-style-8"></div>
-          </div>
-          <button class="btn btn-secondary rl-style-9" id="btn-footer-view-deck"
-            >デッキ確認
-            (<span id="footer-deck-count">0</span>)</button>
-        </div>
-        <!-- ゲームオーバー/クリア画面 -->
-        <div id="result-overlay" class="rl-overlay rl-style-10" >
-          <h2 id="result-title">戦闘終了</h2>
-          <p id="result-details"
-            class="rl-style-11">
-          </p>
-          <div class="result-actions">
-            <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
-            <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
-            <button class="btn rl-style-12" id="btn-share"
-              >Xでシェア</button>
-          </div>
-        </div>
-
-        <!-- カード選択報酬画面 -->
-        <div id="reward-overlay" class="rl-overlay rl-style-13" >
-          <h2>🎉 戦闘勝利！</h2>
-          <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
-          <div id="reward-cards" class="reward-cards"></div>
-          <button class="btn btn-secondary rl-style-14" id="btn-skip-reward" >スキップ</button>
-        </div>
-
-        <!-- デッキ閲覧モーダル -->
-        <div id="deck-viewer-overlay" class="rl-overlay rl-style-15" >
-          <h2 class="rl-style-16">デッキ確認</h2>
-          <div class="deck-viewer-tabs">
-            <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
-            <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
-            <button class="deck-tab" data-target="hand-list">手札 (<span id="dv-hand-count">0</span>)</button>
-          </div>
-          <div id="deck-list" class="dv-card-list active"></div>
-          <div id="discard-list" class="dv-card-list"></div>
-          <div id="hand-list" class="dv-card-list"></div>
-          <button class="btn btn-secondary rl-style-17" id="close-deck-viewer" >閉じる</button>
-        </div>
-
-        <!-- スタート画面 -->
-        <div id="start-screen"
-          class="rl-style-18">
-          <h2 class="rl-style-19">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
-          <p class="rl-style-20">
-            職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
-          <button id="start-btn" class="btn btn-full">冒険を始める</button>
-          <button id="howto-btn" class="btn btn-secondary btn-full rl-style-21" >遊び方</button>
-        </div>
-
-        <!-- 職業選択画面 -->
-        <div id="class-select-screen"
-          class="rl-style-22">
-          <h2 class="rl-style-23">冒険者の選択</h2>
-          <p class="rl-style-24">
-            あなたの戦闘スタイルを選んで旅立ちましょう。</p>
-          <div class="rl-style-25">
-            <div class="class-grid rl-style-26" >
-              <div class="class-card" data-class="yuusya">
-                <img src={yuusyaImg.src}
-                  class="rl-style-27" />
-                <div class="rl-style-28">勇者</div>
-                <div class="rl-style-29">HP10 /
-                  MP5<br>初期レリックが+1個</div>
-              </div>
-              <div class="class-card" data-class="kenshi">
-                <img src={kenshiImg.src}
-                  class="rl-style-30" />
-                <div class="rl-style-31">戦士</div>
-                <div class="rl-style-32">HP15 /
-                  MP4<br>毎ターンHP+1回復</div>
-              </div>
-              <div class="class-card" data-class="mahoutsukai">
-                <img src={mahoutsukaiImg.src}
-                  class="rl-style-33" />
-                <div class="rl-style-34">魔法使い</div>
-                <div class="rl-style-35">HP7 /
-                  MP7<br>毎ターンMP+1回復</div>
-              </div>
-              <div class="class-card" data-class="butouka">
-                <img src={butoukaImg.src}
-                  class="rl-style-36" />
-                <div class="rl-style-37">格闘家</div>
-                <div class="rl-style-38">HP8 /
-                  MP4<br>毎ターン行動回数+1</div>
-              </div>
-            </div>
-            <p id="class-select-preview"
-              class="rl-style-39">
-              勇者が選択されています</p>
-          </div>
-
-          <button id="btn-back-to-title" class="btn btn-secondary btn-full rl-style-40" >戻る</button>
-        </div>
-
-        <!-- マップ進行画面（横スクロール双六マップ） -->
-        <div id="map-screen"
-          class="rl-style-41">
-          <button id="btn-retire-map" class="btn btn-secondary rl-style-42"
-            >リタイア</button>
-
-          <!-- 横スクロールすごろく本体 -->
-          <div id="map-scroll-wrapper"
-            class="rl-style-43">
-            <div id="map-board"
-              class="rl-style-44">
-              <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
-            </div>
-          </div>
-
-
-        </div>
-
-        <!-- 宿（回復）画面 -->
-        <div id="inn-screen"
-          class="rl-style-45">
-          <img src={hotelImg.src} class="rl-style-46" />
-          <h3 class="rl-style-47">旅人の宿</h3>
-          <p class="rl-style-48">
-            お金を払って、宿屋で休むことができます。
-          </p>
-          <div class="rl-style-49">
-            <button id="btn-inn-rest-half" class="btn btn-primary rl-style-50" >小休憩 (💰15) <br><span
-                class="rl-style-51">HP/MP 50%回復</span></button>
-            <button id="btn-inn-rest-full" class="btn btn-primary rl-style-52" >宿泊 (💰30) <br><span
-                class="rl-style-53">HP/MP全快 ＋ 状態異常全治</span></button>
-            <button id="btn-inn-leave" class="btn btn-secondary rl-style-54" >立ち去る</button>
-          </div>
-        </div>
-
-        <!-- ショップサービス（強化・削除）画面 -->
-        <div id="shop-service-screen"
-          class="rl-style-55">
-          <div class="rl-style-56">
-            <h3 id="shop-service-title" class="rl-style-57">ショップサービス</h3>
-            <p id="shop-service-desc" class="rl-style-58"></p>
-          </div>
-
-          <!-- 対象カード選択リスト -->
-          <div id="shop-service-card-list"
-            class="rl-style-59">
-          </div>
-
-          <div class="rl-style-60">
-            <button id="btn-shop-service-leave" class="btn btn-secondary rl-style-61" >キャンセル</button>
-          </div>
-        </div>
-
-        <!-- 街（ショップ）画面 -->
-        <div id="town-screen"
-          class="rl-style-62">
-          <div
-            class="rl-style-63">
-            <h3 class="rl-style-64">よろず街の商い</h3>
-            <button id="btn-town-leave" class="btn btn-secondary rl-style-65"
-              >街を出る</button>
-          </div>
-
-          <div
-            class="rl-style-66">
-            <div>
-              <p
-                class="rl-style-67">
-                販売カード</p>
-              <div id="town-cards"
-                class="rl-style-68">
-              </div>
-            </div>
-            <div>
-              <p
-                class="rl-style-69">
-                販売アイテム</p>
-              <div id="town-items" class="rl-style-70"></div>
-            </div>
-            <div class="rl-style-71">
-              <p
-                class="rl-style-72">
-                特別サービス</p>
-              <div class="rl-style-73">
-                <button id="btn-town-upgrade" class="btn btn-primary rl-style-74"
-                  >カード強化 (20
-                  G)</button>
-                <button id="btn-town-remove" class="btn btn-primary rl-style-75"
-                  >カード削除 (20
-                  G)</button>
-              </div>
-            </div>
-
-
-          </div>
-        </div>
-
-        <!-- イベント画面 -->
-        <div id="event-screen"
-          class="rl-style-76">
-          <div>
-            <img id="event-image" src={noImageImg.src}
-              class="rl-style-77" />
-            <h3 id="event-title" class="rl-style-78">未知のイベント</h3>
-            <p id="event-text"
-              class="rl-style-79">
-            </p>
-          </div>
-
-          <div id="event-options" class="rl-style-80">
-            <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
-          </div>
-        </div>
-
-        <!-- アイテム使用確認モーダル -->
-        <div id="item-confirm-modal"
-          class="rl-style-81">
-          <div
-            class="rl-style-82">
-            <h4 id="item-confirm-title" class="rl-style-83">アイテムの使用確認</h4>
-            <p id="item-confirm-text"
-              class="rl-style-84"></p>
-            <div class="rl-style-85">
-              <button id="btn-item-confirm-yes" class="btn btn-primary rl-style-86" >はい</button>
-              <button id="btn-item-confirm-no" class="btn btn-secondary rl-style-87"
-                >いいえ</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- 戦闘中マップ確認モーダル -->
-        <div id="battle-map-overlay" class="overlay rl-style-88"
-          >
-          <h3 class="rl-style-89">現在地確認</h3>
-          <div id="battle-map-scroll-wrapper"
-            class="rl-style-90">
-            <div id="battle-map-board"
-              class="rl-style-91"></div>
-          </div>
-          <button class="btn btn-secondary rl-style-92" id="btn-close-battle-map"
-            >閉じる</button>
-        </div>
-
-        <!-- 王様遭遇イベントモーダル -->
-        <div id="king-event-modal" class="overlay rl-style-93"
-          >
-          <img src={kingImg.src} class="rl-style-94" />
-          <h3 class="rl-style-95">謁見の間：王からの餞別</h3>
-          <p
-            class="rl-style-96">
-            「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
-          </p>
-          <div id="king-relic-choices" class="rl-style-97">
-            <!-- 3つのレリック選択カードがJSで挿入されます -->
-          </div>
-        </div>
-
-        <!-- 汎用カットシーンモーダル -->
-        <div id="cutscene-modal" class="overlay rl-style-98"
-          >
-          <!-- 背景イメージ -->
-          <div id="cutscene-bg"
-            class="rl-style-99">
-          </div>
-          <!-- キャラクターポートレート群 -->
-          <div id="cutscene-portraits"
-            class="rl-style-100">
-          </div>
-          <!-- セリフウィンドウ -->
-          <div
-            class="rl-style-101">
-            <div id="cutscene-speaker"
-              class="rl-style-102"></div>
-            <div id="cutscene-text" class="rl-style-103"></div>
-            <div class="rl-style-104">
-              <button id="btn-cutscene-next" class="btn btn-primary rl-style-105" >次へ
-                ▶</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ゲーム内汎用メッセージダイアログ -->
-
-        <div id="game-dialog-modal" class="overlay rl-style-106"
-          >
-          <div
-            class="rl-style-107">
-            <h4 id="dialog-title" class="rl-style-108">通知
-            </h4>
-            <p id="dialog-message" class="rl-style-109">
-            </p>
-            <div id="dialog-buttons" class="rl-style-110">
-              <button id="btn-dialog-ok" class="btn btn-primary rl-style-111" >OK</button>
-              <button id="btn-dialog-yes" class="btn btn-primary rl-style-112"
-                >はい</button>
-              <button id="btn-dialog-no" class="btn btn-secondary rl-style-113"
-                >いいえ</button>
-            </div>
-            <div id="dialog-extra" class="rl-style-114"></div>
-          </div>
-        </div>
-
-        <!-- カード詳細モーダル -->
-        <div id="card-detail-modal" class="overlay card-detail-modal rl-style-115" >
-          <div class="card-detail-container">
-            <button id="btn-close-card-detail" class="btn-close-card-detail">&times;</button>
-            <div id="card-detail-content" class="card-detail-content">
-              <!-- カードが入る -->
-            </div>
-            <div id="card-detail-desc" class="card-detail-desc">
-            </div>
-          </div>
-        </div>
-
-
-        <!-- バトル画面本体 -->
-        <div class="battle-layout rl-style-116"
-          >
-
-          <button class="btn btn-secondary rl-style-117" id="btn-battle-retire"
-            >リタイア</button>
-
-          <!--バトルフィールド -->
-          <div class="battle-field">
-
-            <!-- ① 左上：敵ステータス -->
-            <div class="enemy-status-panel">
-              <div class="status-header enemy-header">
-                <span id="enemy-name">敵</span>
-                <span id="enemy-poison-badge" class="poison-badge rl-style-118" ></span>
-              </div>
-              <div class="status-row">
-                <span class="status-label">HP</span>
-                <div class="hp-bar-bg enemy-hp-bg">
-                  <div id="enemy-hp-bar" class="hp-bar-fill enemy-hp-fill"></div>
+            <!-- ゲームヘッダーバー（ステータス常時表示） -->
+            <div id="game-header" class="game-header-bar rl-style-4">
+              <div class="header-status">
+                <span id="header-floor" class="header-floor-text">エリア 1 - 0層</span>
+                <span class="gold-badge"><span id="header-gold">50</span> G</span>
+                <span class="hp-badge">HP: <span id="header-hp">10/10</span></span>
+                <span class="mp-badge">MP: <span id="header-mp">5/5</span></span>
+                <div class="header-relics">
+                  <span class="header-relics-label">レリック:</span>
+                  <div id="header-relics-list" class="header-relics-list-container"></div>
                 </div>
-                <span id="enemy-hp-text" class="status-text enemy-text">40/40</span>
               </div>
-              <div id="enemy-intent" class="enemy-intent-badge">⚔️ 5</div>
             </div>
 
-            <!-- ② 右上：敵画像 -->
-            <div class="battle-image-container">
-              <img id="enemy-image" src="" alt="敵" class="battle-image enemy-image" />
-            </div>
-
-            <!-- ③ 左下：自分画像 -->
-            <div class="battle-image-container player-image-container">
-              <img id="player-battle-image" src="" alt="自分" class="battle-image player-image" />
-            </div>
-
-            <!-- ④ 右下：自分ステータス -->
-            <div class="player-status-panel">
-              <div class="status-header player-header">
-                <span id="player-poison-badge" class="poison-badge rl-style-119" ></span>
-                <span id="player-class-name">あなた</span>
+            <!-- ゲームフッターバー（アイテム・デッキ常時表示） -->
+            <div id="game-footer" class="game-footer-bar rl-style-5">
+              <div class="rl-style-6">
+                <span class="rl-style-7">アイテム:</span>
+                <div id="footer-player-items" class="rl-style-8"></div>
               </div>
-              <div class="status-row">
-                <span class="status-label">HP</span>
-                <div class="hp-bar-bg player-hp-bg">
-                  <div id="player-hp-bar" class="hp-bar-fill player-hp-fill"></div>
+              <button class="btn btn-secondary rl-style-9" id="btn-footer-view-deck">デッキ確認
+                (<span id="footer-deck-count">0</span>)</button>
+            </div>
+            <!-- ゲームオーバー/クリア画面 -->
+            <div id="result-overlay" class="rl-overlay rl-style-10">
+              <h2 id="result-title">戦闘終了</h2>
+              <p id="result-details" class="rl-style-11">
+              </p>
+              <div class="result-actions">
+                <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
+                <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
+                <button class="btn rl-style-12" id="btn-share">Xでシェア</button>
+              </div>
+            </div>
+
+            <!-- カード選択報酬画面 -->
+            <div id="reward-overlay" class="rl-overlay rl-style-13">
+              <h2>🎉 戦闘勝利！</h2>
+              <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
+              <div id="reward-cards" class="reward-cards"></div>
+              <button class="btn btn-secondary rl-style-14" id="btn-skip-reward">スキップ</button>
+            </div>
+
+            <!-- デッキ閲覧モーダル -->
+            <div id="deck-viewer-overlay" class="rl-overlay rl-style-15">
+              <h2 class="rl-style-16">デッキ確認</h2>
+              <div class="deck-viewer-tabs">
+                <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
+                <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
+                <button class="deck-tab" data-target="hand-list">手札 (<span id="dv-hand-count">0</span>)</button>
+              </div>
+              <div id="deck-list" class="dv-card-list active"></div>
+              <div id="discard-list" class="dv-card-list"></div>
+              <div id="hand-list" class="dv-card-list"></div>
+              <button class="btn btn-secondary rl-style-17" id="close-deck-viewer">閉じる</button>
+            </div>
+
+            <!-- スタート画面 -->
+            <div id="start-screen" class="rl-style-18">
+              <h2 class="rl-style-19">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
+              <p class="rl-style-20">
+                職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
+              <button id="start-btn" class="btn btn-full">冒険を始める</button>
+              <button id="howto-btn" class="btn btn-secondary btn-full rl-style-21">遊び方</button>
+            </div>
+
+            <!-- 職業選択画面 -->
+            <div id="class-select-screen" class="rl-style-22">
+              <h2 class="rl-style-23">冒険者の選択</h2>
+              <p class="rl-style-24">
+                あなたの戦闘スタイルを選んで旅立ちましょう。</p>
+              <div class="rl-style-25">
+                <div class="class-grid rl-style-26">
+                  <div class="class-card" data-class="yuusya">
+                    <img src={yuusyaImg.src} class="rl-style-27" />
+                    <div class="rl-style-28">勇者</div>
+                    <div class="rl-style-29">HP10 /
+                      MP5<br>初期レリックが+1個</div>
+                  </div>
+                  <div class="class-card" data-class="kenshi">
+                    <img src={kenshiImg.src} class="rl-style-30" />
+                    <div class="rl-style-31">戦士</div>
+                    <div class="rl-style-32">HP15 /
+                      MP4<br>毎ターンHP+1回復</div>
+                  </div>
+                  <div class="class-card" data-class="mahoutsukai">
+                    <img src={mahoutsukaiImg.src} class="rl-style-33" />
+                    <div class="rl-style-34">魔法使い</div>
+                    <div class="rl-style-35">HP7 /
+                      MP7<br>毎ターンMP+1回復</div>
+                  </div>
+                  <div class="class-card" data-class="butouka">
+                    <img src={butoukaImg.src} class="rl-style-36" />
+                    <div class="rl-style-37">格闘家</div>
+                    <div class="rl-style-38">HP8 /
+                      MP4<br>毎ターン行動回数+1</div>
+                  </div>
                 </div>
-                <span id="player-hp-text" class="status-text player-text">10/10</span>
+                <p id="class-select-preview" class="rl-style-39">
+                  勇者が選択されています</p>
               </div>
-              <div class="status-row player-mp-row">
-                <span class="status-label mp-label">MP</span>
-                <div id="player-mp-orbs" class="player-mp-orbs"></div>
-                <span id="player-mp-text" class="status-text mp-text">5/5</span>
+
+              <button id="btn-back-to-title" class="btn btn-secondary btn-full rl-style-40">戻る</button>
+            </div>
+
+            <!-- マップ進行画面（横スクロール双六マップ） -->
+            <div id="map-screen" class="rl-style-41">
+              <button id="btn-retire-map" class="btn btn-secondary rl-style-42">リタイア</button>
+
+              <!-- 横スクロールすごろく本体 -->
+              <div id="map-scroll-wrapper" class="rl-style-43">
+                <div id="map-board" class="rl-style-44">
+                  <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
+                </div>
               </div>
-              <div class="player-actions-text">
-                行動: <span id="player-actions">1</span>回
+
+
+            </div>
+
+            <!-- 宿（回復）画面 -->
+            <div id="inn-screen" class="rl-style-45">
+              <img src={hotelImg.src} class="rl-style-46" />
+              <h3 class="rl-style-47">旅人の宿</h3>
+              <p class="rl-style-48">
+                お金を払って、宿屋で休むことができます。
+              </p>
+              <div class="rl-style-49">
+                <button id="btn-inn-rest-half" class="btn btn-primary rl-style-50">小休憩 (💰15) <br><span
+                    class="rl-style-51">HP/MP 50%回復</span></button>
+                <button id="btn-inn-rest-full" class="btn btn-primary rl-style-52">宿泊 (💰30) <br><span
+                    class="rl-style-53">HP/MP全快 ＋ 状態異常全治</span></button>
+                <button id="btn-inn-leave" class="btn btn-secondary rl-style-54">立ち去る</button>
               </div>
             </div>
 
-          </div><!-- /.battle-field -->
+            <!-- ショップサービス（強化・削除）画面 -->
+            <div id="shop-service-screen" class="rl-style-55">
+              <div class="rl-style-56">
+                <h3 id="shop-service-title" class="rl-style-57">ショップサービス</h3>
+                <p id="shop-service-desc" class="rl-style-58"></p>
+              </div>
 
-          <!-- バトルログ (コンパクト) -->
-          <div class="battle-log-panel rl-style-120" id="battle-log"
-            >
-            <p class="log-system">戦闘開始！</p>
-          </div>
+              <!-- 対象カード選択リスト -->
+              <div id="shop-service-card-list" class="rl-style-59">
+              </div>
 
-          <!-- 手札エリア -->
-          <div class="rl-style-121">
-            <div class="rl-style-122">
-              <button class="btn btn-secondary rl-style-123" id="btn-battle-view-map"
-                >マップ</button>
-              <button class="btn btn-end-turn rl-style-124" id="btn-end-turn"
-                >様子見</button>
+              <div class="rl-style-60">
+                <button id="btn-shop-service-leave" class="btn btn-secondary rl-style-61">キャンセル</button>
+              </div>
             </div>
-            <div id="hand-area" class="hand-area rl-style-125"
-              >
-              <!-- カードがJSで挿入されます -->
+
+            <!-- 街（ショップ）画面 -->
+            <div id="town-screen" class="rl-style-62">
+              <div class="rl-style-63">
+                <h3 class="rl-style-64">よろず街の商い</h3>
+                <button id="btn-town-leave" class="btn btn-secondary rl-style-65">街を出る</button>
+              </div>
+
+              <div class="rl-style-66">
+                <div>
+                  <p class="rl-style-67">
+                    販売カード</p>
+                  <div id="town-cards" class="rl-style-68">
+                  </div>
+                </div>
+                <div>
+                  <p class="rl-style-69">
+                    販売アイテム</p>
+                  <div id="town-items" class="rl-style-70"></div>
+                </div>
+                <div class="rl-style-71">
+                  <p class="rl-style-72">
+                    特別サービス</p>
+                  <div class="rl-style-73">
+                    <button id="btn-town-upgrade" class="btn btn-primary rl-style-74">カード強化 (20
+                      G)</button>
+                    <button id="btn-town-remove" class="btn btn-primary rl-style-75">カード削除 (20
+                      G)</button>
+                  </div>
+                </div>
+
+
+              </div>
             </div>
-          </div>
+
+            <!-- イベント画面 -->
+            <div id="event-screen" class="rl-style-76">
+              <div>
+                <img id="event-image" src={noImageImg.src} class="rl-style-77" />
+                <h3 id="event-title" class="rl-style-78">未知のイベント</h3>
+                <p id="event-text" class="rl-style-79">
+                </p>
+              </div>
+
+              <div id="event-options" class="rl-style-80">
+                <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
+              </div>
+            </div>
+
+            <!-- アイテム使用確認モーダル -->
+            <div id="item-confirm-modal" class="rl-style-81">
+              <div class="rl-style-82">
+                <h4 id="item-confirm-title" class="rl-style-83">アイテムの使用確認</h4>
+                <p id="item-confirm-text" class="rl-style-84"></p>
+                <div class="rl-style-85">
+                  <button id="btn-item-confirm-yes" class="btn btn-primary rl-style-86">はい</button>
+                  <button id="btn-item-confirm-no" class="btn btn-secondary rl-style-87">いいえ</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 戦闘中マップ確認モーダル -->
+            <div id="battle-map-overlay" class="overlay rl-style-88">
+              <h3 class="rl-style-89">現在地確認</h3>
+              <div id="battle-map-scroll-wrapper" class="rl-style-90">
+                <div id="battle-map-board" class="rl-style-91"></div>
+              </div>
+              <button class="btn btn-secondary rl-style-92" id="btn-close-battle-map">閉じる</button>
+            </div>
+
+            <!-- 王様遭遇イベントモーダル -->
+            <div id="king-event-modal" class="overlay rl-style-93">
+              <img src={kingImg.src} class="rl-style-94" />
+              <h3 class="rl-style-95">謁見の間：王からの餞別</h3>
+              <p class="rl-style-96">
+                「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
+              </p>
+              <div id="king-relic-choices" class="rl-style-97">
+                <!-- 3つのレリック選択カードがJSで挿入されます -->
+              </div>
+            </div>
+
+            <!-- 汎用カットシーンモーダル -->
+            <div id="cutscene-modal" class="overlay rl-style-98">
+              <!-- 背景イメージ -->
+              <div id="cutscene-bg" class="rl-style-99">
+              </div>
+              <!-- キャラクターポートレート群 -->
+              <div id="cutscene-portraits" class="rl-style-100">
+              </div>
+              <!-- セリフウィンドウ -->
+              <div class="rl-style-101">
+                <div id="cutscene-speaker" class="rl-style-102"></div>
+                <div id="cutscene-text" class="rl-style-103"></div>
+                <div class="rl-style-104">
+                  <button id="btn-cutscene-next" class="btn btn-primary rl-style-105">次へ
+                    ▶</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ゲーム内汎用メッセージダイアログ -->
+
+            <div id="game-dialog-modal" class="overlay rl-style-106">
+              <div class="rl-style-107">
+                <h4 id="dialog-title" class="rl-style-108">通知
+                </h4>
+                <p id="dialog-message" class="rl-style-109">
+                </p>
+                <div id="dialog-buttons" class="rl-style-110">
+                  <button id="btn-dialog-ok" class="btn btn-primary rl-style-111">OK</button>
+                  <button id="btn-dialog-yes" class="btn btn-primary rl-style-112">はい</button>
+                  <button id="btn-dialog-no" class="btn btn-secondary rl-style-113">いいえ</button>
+                </div>
+                <div id="dialog-extra" class="rl-style-114"></div>
+              </div>
+            </div>
+
+            <!-- カード詳細モーダル -->
+            <div id="card-detail-modal" class="overlay card-detail-modal rl-style-115">
+              <div class="card-detail-container">
+                <button id="btn-close-card-detail" class="btn-close-card-detail">&times;</button>
+                <div id="card-detail-content" class="card-detail-content">
+                  <!-- カードが入る -->
+                </div>
+                <div id="card-detail-desc" class="card-detail-desc">
+                </div>
+              </div>
+            </div>
+
+
+            <!-- バトル画面本体 -->
+            <div class="battle-layout rl-style-116">
+
+              <button class="btn btn-secondary rl-style-117" id="btn-battle-retire">リタイア</button>
+
+              <!--バトルフィールド -->
+              <div class="battle-field">
+
+                <!-- ① 左上：敵ステータス -->
+                <div class="enemy-status-panel">
+                  <div class="status-header enemy-header">
+                    <span id="enemy-name">敵</span>
+                    <span id="enemy-poison-badge" class="poison-badge rl-style-118"></span>
+                  </div>
+                  <div class="status-row">
+                    <span class="status-label">HP</span>
+                    <div class="hp-bar-bg enemy-hp-bg">
+                      <div id="enemy-hp-bar" class="hp-bar-fill enemy-hp-fill"></div>
+                    </div>
+                    <span id="enemy-hp-text" class="status-text enemy-text">40/40</span>
+                  </div>
+                  <div id="enemy-intent" class="enemy-intent-badge">⚔️ 5</div>
+                </div>
+
+                <!-- ② 右上：敵画像 -->
+                <div class="battle-image-container">
+                  <img id="enemy-image" src="" alt="敵" class="battle-image enemy-image" />
+                </div>
+
+                <!-- ③ 左下：自分画像 -->
+                <div class="battle-image-container player-image-container">
+                  <img id="player-battle-image" src="" alt="自分" class="battle-image player-image" />
+                </div>
+
+                <!-- ④ 右下：自分ステータス -->
+                <div class="player-status-panel">
+                  <div class="status-header player-header">
+                    <span id="player-poison-badge" class="poison-badge rl-style-119"></span>
+                    <span id="player-class-name">あなた</span>
+                  </div>
+                  <div class="status-row">
+                    <span class="status-label">HP</span>
+                    <div class="hp-bar-bg player-hp-bg">
+                      <div id="player-hp-bar" class="hp-bar-fill player-hp-fill"></div>
+                    </div>
+                    <span id="player-hp-text" class="status-text player-text">10/10</span>
+                  </div>
+                  <div class="status-row player-mp-row">
+                    <span class="status-label mp-label">MP</span>
+                    <div id="player-mp-orbs" class="player-mp-orbs"></div>
+                    <span id="player-mp-text" class="status-text mp-text">5/5</span>
+                  </div>
+                  <div class="player-actions-text">
+                    行動: <span id="player-actions">1</span>回
+                  </div>
+                </div>
+
+              </div><!-- /.battle-field -->
+
+              <!-- バトルログ (コンパクト) -->
+              <div class="battle-log-panel rl-style-120" id="battle-log">
+                <p class="log-system">戦闘開始！</p>
+              </div>
+
+              <!-- 手札エリア -->
+              <div class="rl-style-121">
+                <div class="rl-style-122">
+                  <button class="btn btn-secondary rl-style-123" id="btn-battle-view-map">マップ</button>
+                  <button class="btn btn-end-turn rl-style-124" id="btn-end-turn">様子見</button>
+                </div>
+                <div id="hand-area" class="hand-area rl-style-125">
+                  <!-- カードがJSで挿入されます -->
+                </div>
+              </div>
 
 
 
-        </div><!-- /.battle-layout -->
+            </div><!-- /.battle-layout -->
 
 
-        <!-- 遊び方モーダル -->
-        <div id="howto-modal" class="config-modal">
-          <h3>遊び方</h3>
-          <div class="howto-content rl-style-126"
-            >
-            <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
-            <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
-            <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
-          </div>
-          <button id="close-howto-btn" class="btn btn-secondary rl-style-127" >閉じる</button>
-        </div>
+            <!-- 遊び方モーダル -->
+            <div id="howto-modal" class="config-modal">
+              <h3>遊び方</h3>
+              <div class="howto-content rl-style-126">
+                <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+                <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+                <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+              </div>
+              <button id="close-howto-btn" class="btn btn-secondary rl-style-127">閉じる</button>
+            </div>
 
-        <!-- コンフィグモーダル -->
-        <div id="modal-overlay" class="modal-overlay"></div>
-        <div id="config-modal" class="config-modal">
-          <h3>コンフィグ</h3>
-          <div class="config-item">
-            <label for="bgm-volume">BGM音量</label>
-            <input type="range" id="bgm-volume" min="0" max="100" value="50">
-          </div>
-          <div class="config-item">
-            <label for="se-volume">SE音量</label>
-            <input type="range" id="se-volume" min="0" max="100" value="50">
-          </div>
-          <button id="credits-btn" class="btn btn-secondary rl-style-128"
-            >クレジット・使用素材</button>
-          <button id="close-config-btn" class="btn btn-secondary rl-style-129" >閉じる</button>
-        </div>
+            <!-- コンフィグモーダル -->
+            <div id="modal-overlay" class="modal-overlay"></div>
+            <div id="config-modal" class="config-modal">
+              <h3>コンフィグ</h3>
+              <div class="config-item">
+                <label for="bgm-volume">BGM音量</label>
+                <input type="range" id="bgm-volume" min="0" max="100" value="50">
+              </div>
+              <div class="config-item">
+                <label for="se-volume">SE音量</label>
+                <input type="range" id="se-volume" min="0" max="100" value="50">
+              </div>
+              <button id="credits-btn" class="btn btn-secondary rl-style-128">クレジット・使用素材</button>
+              <button id="close-config-btn" class="btn btn-secondary rl-style-129">閉じる</button>
+            </div>
 
-        <!-- クレジットモーダル -->
-        <div id="credits-modal" class="config-modal">
-          <h3>クレジット・使用素材</h3>
-          <div class="howto-content rl-style-130"
-            >
-            <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-            <ul class="rl-style-131">
-              <li><strong>画像素材:</strong> いらすとや 様</li>
-              <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
-              <li><strong>フォント:</strong> Google Fonts</li>
-            </ul>
-          </div>
-          <button id="close-credits-btn" class="btn btn-secondary rl-style-132" >閉じる</button>
-        </div>
+            <!-- クレジットモーダル -->
+            <div id="credits-modal" class="config-modal">
+              <h3>クレジット・使用素材</h3>
+              <div class="howto-content rl-style-130">
+                <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+                <ul class="rl-style-131">
+                  <li><strong>画像素材:</strong> いらすとや 様</li>
+                  <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
+                  <li><strong>フォント:</strong> Google Fonts</li>
+                </ul>
+              </div>
+              <button id="close-credits-btn" class="btn btn-secondary rl-style-132">閉じる</button>
+            </div>
 
-      </div><!-- /.game-container -->
+          </div><!-- /.game-container -->
         </div><!-- /#global-game-scaler-inner -->
       </div><!-- /#global-game-scaler -->
 
       <script is:inline>
-        (function() {
+        (function () {
           function applyScale() {
             const scaler = document.getElementById('global-game-scaler');
             const inner = document.getElementById('global-game-scaler-inner');
             if (!scaler || !inner) return;
-            
+
             const container = inner.querySelector('.game-container') || inner.firstElementChild;
             if (!container) return;
-            
+
             const style = window.getComputedStyle(container);
             const logicalWidth = 800;
             const logicalHeight = 580;
-            
-            const parentWidth = scaler.parentElement.clientWidth;
-            
+
+            const parent = scaler.parentElement;
+            const parentStyle = window.getComputedStyle(parent);
+            const paddingLeft = parseFloat(parentStyle.paddingLeft) || 0;
+            const paddingRight = parseFloat(parentStyle.paddingRight) || 0;
+            const parentWidth = parent.clientWidth - paddingLeft - paddingRight;
+
             if (parentWidth < logicalWidth) {
               const scale = parentWidth / logicalWidth;
               inner.style.width = `${logicalWidth}px`;
@@ -541,7 +485,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               scaler.style.height = `${logicalHeight}px`;
             }
           }
-          
+
           window.addEventListener('resize', applyScale);
           document.addEventListener('DOMContentLoaded', applyScale);
           setTimeout(applyScale, 100);
@@ -611,7 +555,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   <style>
     .rl-overlay {
       display: none;
-      background-color: rgba(0,0,0,0.95);
+      background-color: rgba(0, 0, 0, 0.95);
       position: absolute;
       top: 0;
       left: 0;
@@ -1192,26 +1136,28 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border-color: var(--primary-color);
     }
 
-    .dv-card-list {
+    :global(.dv-card-list) {
       display: none;
-      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 6px;
       max-height: 320px;
       overflow-y: auto;
       justify-content: center;
       width: 100%;
-      padding-bottom: 0.5rem;
+      padding: 0 8% 0.5rem 8%;
     }
 
-    .dv-card-list.active {
+    :global(.dv-card-list.active) {
       display: grid;
     }
 
-    .dv-card-list :global(.battle-card),
+    :global(.dv-card-list) :global(.battle-card),
+    .rl-style-59 :global(.battle-card),
     #fairy-card-list :global(.battle-card) {
       width: 100%;
       min-width: 0;
-      height: 120px;
+      height: auto;
+      aspect-ratio: 90 / 145;
     }
 
     /* =============================
@@ -1592,12 +1538,46 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       justify-content: center;
       overflow: hidden;
       background: rgba(0, 0, 0, 0.2);
+      position: relative;
     }
 
     :global(.card-image-wrap img) {
       width: 48px;
       height: 48px;
       object-fit: contain;
+    }
+
+    /* カテゴリバッジ（画像右上オーバーレイ） */
+    :global(.card-category-badge) {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      font-size: 0.52rem;
+      font-weight: bold;
+      padding: 1px 4px;
+      border-radius: 3px;
+      line-height: 1.4;
+      z-index: 3;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+    }
+
+    :global(.cat-physical) {
+      background: rgba(200, 40, 40, 0.82);
+      color: #ffe0e0;
+      border: 1px solid rgba(255, 120, 120, 0.6);
+    }
+
+    :global(.cat-spell) {
+      background: rgba(100, 40, 180, 0.82);
+      color: #e8d0ff;
+      border: 1px solid rgba(160, 100, 255, 0.6);
+    }
+
+    :global(.cat-special-cat) {
+      background: rgba(160, 120, 0, 0.82);
+      color: #fff5cc;
+      border: 1px solid rgba(255, 210, 60, 0.6);
     }
 
     /* カード名帯（画像の下半分に重なるように） */
@@ -1725,6 +1705,28 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     :global(.tag-stone) {
       color: #ffaa66;
       border-color: #ffaa66;
+    }
+
+    /* カテゴリバッジ（物理/呪文/特殊） */
+    :global(.tag-physical) {
+      color: #ff8888;
+      border-color: #ff6666;
+      background: rgba(255, 80, 80, 0.12);
+      font-weight: bold;
+    }
+
+    :global(.tag-spell) {
+      color: #cc88ff;
+      border-color: #aa55ff;
+      background: rgba(150, 60, 255, 0.12);
+      font-weight: bold;
+    }
+
+    :global(.tag-special-cat) {
+      color: #ffd966;
+      border-color: #ffcc00;
+      background: rgba(255, 200, 0, 0.12);
+      font-weight: bold;
     }
 
     /* 紫カード特殊背景 */
@@ -1889,182 +1891,1301 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     .materials-list li {
       margin-bottom: 0.5rem;
     }
-  
-/* Auto-extracted styles */
-.rl-style-1 { width: 100%; overflow: hidden; position: relative; margin-top: 2rem; }
-.rl-style-2 { transform-origin: top left; transition: transform 0.2s ease-out; }
-.rl-style-3 { position: relative; height: 580px; overflow: hidden; width: 800px; max-width: 800px; margin: 0 auto; border-radius: 8px; }
-.rl-style-4 { display: none; }
-.rl-style-5 { display: none; }
-.rl-style-6 { flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden; background: rgba(0,0,0,0.3); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; }
-.rl-style-7 { font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap; }
-.rl-style-8 { display: flex; gap: 4px; overflow-x: auto; }
-.rl-style-9 { font-size: 0.72rem; padding: 0.3rem 0.8rem; flex-shrink: 0; margin-left: 0.5rem; white-space: nowrap; border-color: #ffb84d; color: #ffb84d; }
-.rl-style-10 { z-index: 200; }
-.rl-style-11 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; text-align: center; line-height: 1.5; }
-.rl-style-12 { background-color: #1DA1F2; border-color: #1DA1F2; color:white; }
-.rl-style-13 { z-index: 180; }
-.rl-style-14 { margin-top:1rem; }
-.rl-style-15 { justify-content: flex-start; padding-top: 2.5rem; z-index: 190; }
-.rl-style-16 { color: white; margin-bottom: 0.5rem; font-size: 1.2rem; }
-.rl-style-17 { margin-top:0.8rem; width:100%; }
-.rl-style-18 { position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; }
-.rl-style-19 { font-size: 1.8rem; margin-bottom: 0.3rem; }
-.rl-style-20 { color: var(--text-muted); margin-bottom:2rem; font-size: 0.85rem; }
-.rl-style-21 { margin-top: 1rem; }
-.rl-style-22 { position:absolute; top:0; left:0; width:100%; height:100%; background:#0f0f1a; z-index:98; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; overflow-y:auto; }
-.rl-style-23 { font-size: 1.2rem; text-align: center; margin-bottom: 0.4rem; color: #ffb84d; }
-.rl-style-24 { font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-bottom: 0.8rem; }
-.rl-style-25 { flex: 1; }
-.rl-style-26 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.rl-style-27 { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
-.rl-style-28 { font-size: 0.85rem; font-weight: bold; }
-.rl-style-29 { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
-.rl-style-30 { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
-.rl-style-31 { font-size: 0.85rem; font-weight: bold; }
-.rl-style-32 { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
-.rl-style-33 { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
-.rl-style-34 { font-size: 0.85rem; font-weight: bold; }
-.rl-style-35 { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
-.rl-style-36 { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
-.rl-style-37 { font-size: 0.85rem; font-weight: bold; }
-.rl-style-38 { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
-.rl-style-39 { font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem; }
-.rl-style-40 { margin-top: 0.5rem; }
-.rl-style-41 { position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#0f0f1a; z-index:80; display:none; flex-direction:column; padding:1rem; box-sizing:border-box; justify-content: space-between; }
-.rl-style-42 { position: absolute; top: 10px; right: 10px; z-index: 100; font-size: 0.75rem; padding: 0.3rem 0.6rem; }
-.rl-style-43 { flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem; margin-bottom: 0.8rem; position: relative; }
-.rl-style-44 { display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content; }
-.rl-style-45 { position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#0c1513; z-index:81; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; text-align:center; }
-.rl-style-46 { width: 64px; height: 64px; object-fit: contain; margin-bottom: 1rem; }
-.rl-style-47 { color: #51cf66; font-size: 1.2rem; margin-bottom: 0.5rem; }
-.rl-style-48 { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%; }
-.rl-style-49 { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-.rl-style-50 { width: 100%; }
-.rl-style-51 { font-size:0.65rem; }
-.rl-style-52 { width: 100%; }
-.rl-style-53 { font-size:0.65rem; }
-.rl-style-54 { width: 100%; }
-.rl-style-55 { position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#150f1a; z-index:85; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between; }
-.rl-style-56 { text-align: center; }
-.rl-style-57 { color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.2rem; }
-.rl-style-58 { font-size: 0.75rem; color: var(--text-muted); }
-.rl-style-59 { flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px; }
-.rl-style-60 { display: flex; gap: 8px; width: 100%; }
-.rl-style-61 { flex: 1; }
-.rl-style-62 { position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#1a150f; z-index:83; display:none; flex-direction:column; padding:1.2rem; box-sizing:border-box; justify-content: space-between; }
-.rl-style-63 { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
-.rl-style-64 { color: #ff922b; font-size: 1.2rem; margin: 0; }
-.rl-style-65 { font-size: 0.75rem; padding: 0.4rem 1rem; width: auto; font-weight: bold; }
-.rl-style-66 { flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0.5rem; overflow-y: auto; }
-.rl-style-67 { font-size: 0.72rem; color: #ff922b; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444; }
-.rl-style-68 { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; padding: 4px 0; overflow-y: auto; max-height: 260px; }
-.rl-style-69 { font-size: 0.72rem; color: #ffd8a8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444; }
-.rl-style-70 { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
-.rl-style-71 { margin-top: 4px; }
-.rl-style-72 { font-size: 0.72rem; color: #cc5de8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444; }
-.rl-style-73 { display: flex; gap: 8px; margin-top: 8px; }
-.rl-style-74 { flex: 1; font-size: 0.75rem; background-color: #1976d2; border-color: #1565c0; }
-.rl-style-75 { flex: 1; font-size: 0.75rem; background-color: #c0392b; border-color: #922b21; }
-.rl-style-76 { position:absolute; top:40px; left:0; width:100%; height:calc(100% - 84px); background:#11111a; z-index:84; display:none; flex-direction:column; padding:1.5rem; box-sizing:border-box; justify-content: space-between; text-align: center; }
-.rl-style-77 { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #444; }
-.rl-style-78 { color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.5rem; }
-.rl-style-79 { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto; }
-.rl-style-80 { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-.rl-style-81 { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; }
-.rl-style-82 { background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; }
-.rl-style-83 { font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem; }
-.rl-style-84 { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem; }
-.rl-style-85 { display: flex; gap: 10px; }
-.rl-style-86 { flex: 1; padding: 0.4rem 0; }
-.rl-style-87 { flex: 1; padding: 0.4rem 0; }
-.rl-style-88 { display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column; }
-.rl-style-89 { color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem; }
-.rl-style-90 { flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem; }
-.rl-style-91 { display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content; }
-.rl-style-92 { margin-top: 0.8rem; width: 100%; }
-.rl-style-93 { display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center; }
-.rl-style-94 { width: 80px; height: 80px; object-fit: contain; margin-bottom: 1rem; }
-.rl-style-95 { color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem; }
-.rl-style-96 { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%; }
-.rl-style-97 { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-.rl-style-98 { display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem; }
-.rl-style-99 { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none; }
-.rl-style-100 { position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2; }
-.rl-style-101 { position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4); }
-.rl-style-102 { font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em; }
-.rl-style-103 { font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em; }
-.rl-style-104 { text-align:right; margin-top:0.5rem; }
-.rl-style-105 { font-size:0.7rem; padding:0.25rem 1rem; }
-.rl-style-106 { display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem; }
-.rl-style-107 { background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 460px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-.rl-style-108 { font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold; }
-.rl-style-109 { font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem; }
-.rl-style-110 { display: flex; gap: 10px; justify-content: center; }
-.rl-style-111 { padding: 0.3rem 1.5rem; }
-.rl-style-112 { display:none; flex:1; padding: 0.3rem 0; }
-.rl-style-113 { display:none; flex:1; padding: 0.3rem 0; }
-.rl-style-114 { display: none; width: 100%; }
-.rl-style-115 { display: none; }
-.rl-style-116 { top: 40px; height:calc(100% - 84px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem; }
-.rl-style-117 { position: absolute; top: 12px; right: 0.5rem; z-index: 100; font-size: 0.7rem; width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; border-color: #ffb84d; color: #ffb84d; background: rgba(0,0,0,0.6); }
-.rl-style-118 { display: none; }
-.rl-style-119 { display: none; }
-.rl-style-120 { height: 80px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box; }
-.rl-style-121 { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box; }
-.rl-style-122 { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.rl-style-123 { width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d; flex-shrink: 0; }
-.rl-style-124 { width: 65px; padding: 0.2rem 0; text-align: center; box-sizing: border-box; border-radius: 20px; font-size: 0.7rem; }
-.rl-style-125 { height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start; }
-.rl-style-126 { text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-.rl-style-127 { width: 100%; }
-.rl-style-128 { width: 100%; margin-bottom: 0.5rem; }
-.rl-style-129 { width: 100%; }
-.rl-style-130 { text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-.rl-style-131 { padding-left: 1.2rem; margin-top: 0.5rem; }
-.rl-style-132 { width: 100%; }
-.rl-style-133 { margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic; }
-.rl-style-134 { margin-bottom: 0.5rem; }
-.rl-style-135 { margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic; }
-.rl-style-136 { text-align: center; color: #888; }
-.rl-style-137 { font-size:0.75rem; color:var(--text-muted); }
-.rl-style-138 { color: #ffb84d; }
-.rl-style-139 { grid-column: span 3; font-size:0.75rem; color:var(--text-muted); text-align:center; padding:1rem; }
-.rl-style-140 { color: #fff; }
-.rl-style-141 { font-size:0.7rem; color:var(--text-muted); }
-.rl-style-142 { font-size:0.75rem; color:var(--text-muted); }
-.rl-style-143 { font-size:0.65rem; color:#ffb84d; }
-.rl-style-144 { color: #4ade80; }
-.rl-style-145 { color: #4ade80; font-weight: bold; }
-.rl-style-146 { color: #4ade80; font-weight: bold; }
-.rl-style-147 { font-size:0.7rem; color:var(--text-muted); }
-.rl-style-148 { background:#ffd700; color:#1a1a2e; font-size:0.65rem; }
-.rl-style-149 { color:#ffd700; font-size:0.55rem; line-height:1.2; margin-top:0.6rem; padding:0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box; width:100%; text-align:center; }
-.rl-style-150 { font-size:0.55rem; line-height:1.2; padding:2px; }
-.rl-style-151 { color:var(--text-muted);font-size:0.85rem; }
-.rl-js-style-1 { width: 20px; height: 20px; object-fit: contain; border: 1px solid #444; border-radius: 3px; background: rgba(255,255,255,0.05); cursor: pointer; }
-.rl-js-style-2 { border: 2px solid #ffd700; width: 96px; min-width: 96px; height: 128px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 0.4rem; position: relative; background: rgba(15,12,5,0.9); border-radius: 8px; box-shadow: 0 0 12px rgba(255,215,0,0.3); transition: transform 0.15s; flex-shrink: 0; }
-.rl-js-style-3 { width: 36px; height: 36px; object-fit: contain; margin-top: 0.3rem; margin-bottom: 0.2rem; }
-.rl-js-style-4 { font-size: 0.55rem; font-weight: bold; color: #ffd700; text-align: center; line-height: 1.2; margin-bottom: 0.15rem; }
-.rl-js-style-5 { font-size: 0.52rem; color: var(--text-muted); text-align: center; line-height: 1.2; padding: 0 2px; }
-.rl-js-style-6 { margin-top: 1rem; text-align: left; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 6px; }
-.rl-js-style-7 { font-size: 0.75rem; color: #aaa; margin-bottom: 0.4rem; }
-.rl-js-style-8 { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-height: 245px; overflow-y: auto; padding: 4px 0; width: 100%; }
-.rl-js-style-9 { width: 58px; height: 94px; }
-.rl-js-style-10 { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
-.rl-js-style-11 { display: flex; flex-direction: column; justify-content: center; gap: 30px; height: 100%; position: relative; }
-.rl-js-style-12 { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10; border-radius:4px; }
-.rl-js-style-13 { display: flex; flex-direction: column; align-items: center; }
-.rl-js-style-14 { width: 80px; height: 110px; cursor: pointer; margin: 0; border-width:2px; transform: scale(0.85); transform-origin: top center; }
-.rl-js-style-15 { font-size: 0.65rem; color: #ffb84d; margin-top: 2px; }
-.rl-js-style-16 { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-.rl-js-style-17 { width: 44px; height: 44px; border: 1px solid #444; border-radius: 6px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 4px; }
-.rl-js-style-18 { width: 100%; height: 100%; object-fit: contain; }
-.rl-js-style-19 { font-size: 0.65rem; color: #ffb84d; margin-top: 2px; }
-.rl-js-style-20 { font-size: 0.75rem; padding: 4px 10px; margin-top: 4px; display: flex; align-items: center; justify-content: center; width: auto; min-width: 60px; height: auto; border-radius: 8px; background-color: #1976d2; color: #fff; border: 1px solid #1565c0; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.rl-js-style-21 { width:100%; height:100%; object-fit:contain; }
 
-</style>
+    /* Auto-extracted styles */
+    .rl-style-1 {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      margin-top: 2rem;
+    }
+
+    .rl-style-2 {
+      transform-origin: top left;
+      transition: transform 0.2s ease-out;
+    }
+
+    .rl-style-3 {
+      position: relative;
+      height: 580px;
+      overflow: hidden;
+      width: 800px;
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: 8px;
+    }
+
+    .rl-style-4 {
+      display: none;
+    }
+
+    .rl-style-5 {
+      display: none;
+    }
+
+    .rl-style-6 {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #333;
+      box-sizing: border-box;
+    }
+
+    .rl-style-7 {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .rl-style-8 {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .rl-style-9 {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.8rem;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+      white-space: nowrap;
+      border-color: #ffb84d;
+      color: #ffb84d;
+    }
+
+    .rl-style-10 {
+      z-index: 200;
+    }
+
+    .rl-style-11 {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .rl-style-12 {
+      background-color: #1DA1F2;
+      border-color: #1DA1F2;
+      color: white;
+    }
+
+    .rl-style-13 {
+      z-index: 180;
+    }
+
+    .rl-style-14 {
+      margin-top: 1rem;
+    }
+
+    .rl-style-15 {
+      justify-content: flex-start;
+      padding-top: 2.5rem;
+      z-index: 190;
+    }
+
+    .rl-style-16 {
+      color: white;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .rl-style-17 {
+      margin-top: 0.8rem;
+      width: 100%;
+    }
+
+    .rl-style-18 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f0f1a;
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .rl-style-19 {
+      font-size: 1.8rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .rl-style-20 {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+    }
+
+    .rl-style-21 {
+      margin-top: 1rem;
+    }
+
+    .rl-style-22 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0f0f1a;
+      z-index: 98;
+      display: none;
+      flex-direction: column;
+      padding: 1.2rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .rl-style-23 {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 0.4rem;
+      color: #ffb84d;
+    }
+
+    .rl-style-24 {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .rl-style-25 {
+      flex: 1;
+    }
+
+    .rl-style-26 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .rl-style-27 {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 0.3rem;
+    }
+
+    .rl-style-28 {
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .rl-style-29 {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 0.25rem;
+    }
+
+    .rl-style-30 {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 0.3rem;
+    }
+
+    .rl-style-31 {
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .rl-style-32 {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 0.25rem;
+    }
+
+    .rl-style-33 {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 0.3rem;
+    }
+
+    .rl-style-34 {
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .rl-style-35 {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 0.25rem;
+    }
+
+    .rl-style-36 {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 0.3rem;
+    }
+
+    .rl-style-37 {
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .rl-style-38 {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      margin-top: 0.25rem;
+    }
+
+    .rl-style-39 {
+      font-size: 0.7rem;
+      color: #ffb84d;
+      text-align: center;
+      margin-top: 0.8rem;
+      min-height: 1.2rem;
+    }
+
+    .rl-style-40 {
+      margin-top: 0.5rem;
+    }
+
+    .rl-style-41 {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 84px);
+      background: #0f0f1a;
+      z-index: 80;
+      display: none;
+      flex-direction: column;
+      padding: 1rem;
+      box-sizing: border-box;
+      justify-content: space-between;
+    }
+
+    .rl-style-42 {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .rl-style-43 {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem 1rem;
+      margin-bottom: 0.8rem;
+      position: relative;
+    }
+
+    .rl-style-44 {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+      min-width: max-content;
+    }
+
+    .rl-style-45 {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 84px);
+      background: #0c1513;
+      z-index: 81;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .rl-style-46 {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+
+    .rl-style-47 {
+      color: #51cf66;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-48 {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 80%;
+    }
+
+    .rl-style-49 {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .rl-style-50 {
+      width: 100%;
+    }
+
+    .rl-style-51 {
+      font-size: 0.65rem;
+    }
+
+    .rl-style-52 {
+      width: 100%;
+    }
+
+    .rl-style-53 {
+      font-size: 0.65rem;
+    }
+
+    .rl-style-54 {
+      width: 100%;
+    }
+
+    .rl-style-55 {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 84px);
+      background: #150f1a;
+      z-index: 85;
+      display: none;
+      flex-direction: column;
+      padding: 1.2rem;
+      box-sizing: border-box;
+      justify-content: space-between;
+    }
+
+    .rl-style-56 {
+      text-align: center;
+    }
+
+    .rl-style-57 {
+      color: #ffb84d;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .rl-style-58 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .rl-style-59 {
+      flex: 1;
+      overflow-y: auto;
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 15px 10px;
+      padding: 1rem 8%;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      max-height: 400px;
+      justify-items: center;
+      align-items: start;
+      grid-auto-rows: max-content;
+    }
+
+    .rl-style-60 {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .rl-style-61 {
+      flex: 1;
+    }
+
+    .rl-style-62 {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 84px);
+      background: #1a150f;
+      z-index: 83;
+      display: none;
+      flex-direction: column;
+      padding: 1.2rem;
+      box-sizing: border-box;
+      justify-content: space-between;
+    }
+
+    .rl-style-63 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-64 {
+      color: #ff922b;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .rl-style-65 {
+      font-size: 0.75rem;
+      padding: 0.4rem 1rem;
+      width: auto;
+      font-weight: bold;
+    }
+
+    .rl-style-66 {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 0.5rem;
+      overflow-y: auto;
+    }
+
+    .rl-style-67 {
+      font-size: 0.72rem;
+      color: #ff922b;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      border-bottom: 1px solid #444;
+    }
+
+    .rl-style-68 {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      padding: 4px 0;
+      overflow-y: auto;
+      max-height: 260px;
+    }
+
+    .rl-style-69 {
+      font-size: 0.72rem;
+      color: #ffd8a8;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      border-bottom: 1px solid #444;
+    }
+
+    .rl-style-70 {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+
+    .rl-style-71 {
+      margin-top: 4px;
+    }
+
+    .rl-style-72 {
+      font-size: 0.72rem;
+      color: #cc5de8;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      border-bottom: 1px solid #444;
+    }
+
+    .rl-style-73 {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .rl-style-74 {
+      flex: 1;
+      font-size: 0.75rem;
+      background-color: #1976d2;
+      border-color: #1565c0;
+    }
+
+    .rl-style-75 {
+      flex: 1;
+      font-size: 0.75rem;
+      background-color: #c0392b;
+      border-color: #922b21;
+    }
+
+    .rl-style-76 {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 84px);
+      background: #11111a;
+      z-index: 84;
+      display: none;
+      flex-direction: column;
+      padding: 1.5rem;
+      box-sizing: border-box;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .rl-style-77 {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #444;
+    }
+
+    .rl-style-78 {
+      color: #ffb84d;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-79 {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 90%;
+      margin: 1rem auto;
+    }
+
+    .rl-style-80 {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .rl-style-81 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 300;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .rl-style-82 {
+      background: #151522;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 1.2rem;
+      width: 85%;
+      max-width: 320px;
+      text-align: center;
+    }
+
+    .rl-style-83 {
+      font-size: 1rem;
+      color: #ffb84d;
+      margin-bottom: 0.4rem;
+    }
+
+    .rl-style-84 {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .rl-style-85 {
+      display: flex;
+      gap: 10px;
+    }
+
+    .rl-style-86 {
+      flex: 1;
+      padding: 0.4rem 0;
+    }
+
+    .rl-style-87 {
+      flex: 1;
+      padding: 0.4rem 0;
+    }
+
+    .rl-style-88 {
+      display: none;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 250;
+      padding: 1rem;
+      flex-direction: column;
+    }
+
+    .rl-style-89 {
+      color: #ffb84d;
+      font-size: 1.1rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-90 {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem 1rem;
+    }
+
+    .rl-style-91 {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+      min-width: max-content;
+    }
+
+    .rl-style-92 {
+      margin-top: 0.8rem;
+      width: 100%;
+    }
+
+    .rl-style-93 {
+      display: none;
+      background-color: rgba(15, 15, 26, 0.98);
+      z-index: 210;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .rl-style-94 {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+
+    .rl-style-95 {
+      color: #ffd700;
+      font-size: 1.2rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .rl-style-96 {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 80%;
+    }
+
+    .rl-style-97 {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .rl-style-98 {
+      display: none;
+      background: rgba(5, 5, 20, 0.97);
+      z-index: 300;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 2rem;
+    }
+
+    .rl-style-99 {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .rl-style-100 {
+      position: absolute;
+      bottom: 120px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 20px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .rl-style-101 {
+      position: relative;
+      z-index: 3;
+      width: 92%;
+      max-width: 420px;
+      background: rgba(10, 8, 25, 0.92);
+      border: 2px solid #6a5acd;
+      border-radius: 12px;
+      padding: 1rem 1.2rem 0.8rem;
+      box-shadow: 0 0 30px rgba(106, 90, 205, 0.4);
+    }
+
+    .rl-style-102 {
+      font-size: 0.72rem;
+      font-weight: bold;
+      color: #c9b8ff;
+      margin-bottom: 0.3rem;
+      min-height: 1em;
+    }
+
+    .rl-style-103 {
+      font-size: 0.78rem;
+      color: #e8e0ff;
+      line-height: 1.7;
+      min-height: 3.2em;
+    }
+
+    .rl-style-104 {
+      text-align: right;
+      margin-top: 0.5rem;
+    }
+
+    .rl-style-105 {
+      font-size: 0.7rem;
+      padding: 0.25rem 1rem;
+    }
+
+    .rl-style-106 {
+      display: none;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .rl-style-107 {
+      background: #151522;
+      border: 2px solid #555;
+      border-radius: 10px;
+      padding: 1.2rem;
+      width: 85%;
+      max-width: 530px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .rl-style-107 :global(.dv-card-list) {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .rl-style-108 {
+      font-size: 1rem;
+      color: #ffb84d;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .rl-style-109 {
+      font-size: 0.78rem;
+      color: #eee;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .rl-style-110 {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .rl-style-111 {
+      padding: 0.3rem 1.5rem;
+    }
+
+    .rl-style-112 {
+      display: none;
+      flex: 1;
+      padding: 0.3rem 0;
+    }
+
+    .rl-style-113 {
+      display: none;
+      flex: 1;
+      padding: 0.3rem 0;
+    }
+
+    .rl-style-114 {
+      display: none;
+      width: 100%;
+    }
+
+    .rl-style-115 {
+      display: none;
+    }
+
+    .rl-style-116 {
+      top: 40px;
+      height: calc(100% - 84px);
+      position: absolute;
+      width: 100%;
+      display: none;
+      box-sizing: border-box;
+      padding: 0.4rem 0.5rem 0.3rem;
+    }
+
+    .rl-style-117 {
+      position: absolute;
+      top: 12px;
+      right: 0.5rem;
+      z-index: 100;
+      font-size: 0.7rem;
+      width: 65px;
+      padding: 0.2rem 0;
+      text-align: center;
+      box-sizing: border-box;
+      border-radius: 20px;
+      border-color: #ffb84d;
+      color: #ffb84d;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .rl-style-118 {
+      display: none;
+    }
+
+    .rl-style-119 {
+      display: none;
+    }
+
+    .rl-style-120 {
+      height: 80px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.68rem;
+      overflow-y: auto;
+      margin-bottom: 0.3rem;
+      text-align: left;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .rl-style-121 {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .rl-style-122 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .rl-style-123 {
+      width: 65px;
+      padding: 0.2rem 0;
+      text-align: center;
+      box-sizing: border-box;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      border-color: #ffb84d;
+      color: #ffb84d;
+      flex-shrink: 0;
+    }
+
+    .rl-style-124 {
+      width: 65px;
+      padding: 0.2rem 0;
+      text-align: center;
+      box-sizing: border-box;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+
+    .rl-style-125 {
+      height: 148px;
+      gap: 6px;
+      padding: 2px 0;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      overflow-x: auto;
+      align-items: flex-start;
+    }
+
+    .rl-style-126 {
+      text-align: left;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .rl-style-127 {
+      width: 100%;
+    }
+
+    .rl-style-128 {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-129 {
+      width: 100%;
+    }
+
+    .rl-style-130 {
+      text-align: left;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .rl-style-131 {
+      padding-left: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .rl-style-132 {
+      width: 100%;
+    }
+
+    .rl-style-133 {
+      margin-top: auto;
+      padding-top: 1rem;
+      color: #888;
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    .rl-style-134 {
+      margin-bottom: 0.5rem;
+    }
+
+    .rl-style-135 {
+      margin-top: auto;
+      padding-top: 1rem;
+      color: #888;
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    .rl-style-136 {
+      text-align: center;
+      color: #888;
+    }
+
+    .rl-style-137 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .rl-style-138 {
+      color: #ffb84d;
+    }
+
+    .rl-style-139 {
+      grid-column: span 3;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .rl-style-140 {
+      color: #fff;
+    }
+
+    .rl-style-141 {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .rl-style-142 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .rl-style-143 {
+      font-size: 0.65rem;
+      color: #ffb84d;
+    }
+
+    .rl-style-144 {
+      color: #4ade80;
+    }
+
+    .rl-style-145 {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .rl-style-146 {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .rl-style-147 {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .rl-style-148 {
+      background: #ffd700;
+      color: #1a1a2e;
+      font-size: 0.65rem;
+    }
+
+    .rl-style-149 {
+      color: #ffd700;
+      font-size: 0.55rem;
+      line-height: 1.2;
+      margin-top: 0.6rem;
+      padding: 0 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-sizing: border-box;
+      width: 100%;
+      text-align: center;
+    }
+
+    .rl-style-150 {
+      font-size: 0.55rem;
+      line-height: 1.2;
+      padding: 2px;
+    }
+
+    .rl-style-151 {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    :global(.rl-js-style-1) {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      border: 1px solid #444;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    :global(.rl-js-style-2) {
+      border: 2px solid #ffd700;
+      width: 96px;
+      min-width: 96px;
+      height: 128px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.4rem;
+      position: relative;
+      background: rgba(15, 12, 5, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+
+    :global(.rl-js-style-3) {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      margin-top: 0.3rem;
+      margin-bottom: 0.2rem;
+    }
+
+    :global(.rl-js-style-4) {
+      font-size: 0.55rem;
+      font-weight: bold;
+      color: #ffd700;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 0.15rem;
+    }
+
+    :global(.rl-js-style-5) {
+      font-size: 0.52rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.2;
+      padding: 0 2px;
+    }
+
+    :global(.rl-js-style-6) {
+      margin-top: 1rem;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
+
+    :global(.rl-js-style-7) {
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-bottom: 0.4rem;
+    }
+
+    :global(.rl-js-style-8) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      max-height: 245px;
+      overflow-y: auto;
+      padding: 4px 0;
+      width: 100%;
+    }
+
+    :global(.rl-js-style-9) {
+      width: 58px;
+      height: 94px;
+    }
+
+    :global(.rl-js-style-10) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    :global(.rl-js-style-11) {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 30px;
+      height: 100%;
+      position: relative;
+    }
+
+    :global(.rl-js-style-12) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 10;
+      border-radius: 4px;
+    }
+
+    :global(.rl-js-style-13) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    :global(.rl-js-style-14) {
+      width: 80px;
+      height: 110px;
+      cursor: pointer;
+      margin: 0;
+      border-width: 2px;
+      transform: scale(0.85);
+      transform-origin: top center;
+    }
+
+    :global(.rl-js-style-15) {
+      font-size: 0.65rem;
+      color: #ffb84d;
+      margin-top: 2px;
+    }
+
+    :global(.rl-js-style-16) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    :global(.rl-js-style-17) {
+      width: 44px;
+      height: 44px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    :global(.rl-js-style-18) {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    :global(.rl-js-style-19) {
+      font-size: 0.65rem;
+      color: #ffb84d;
+      margin-top: 2px;
+    }
+
+    :global(.rl-js-style-20) {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      min-width: 60px;
+      height: auto;
+      border-radius: 8px;
+      background-color: #1976d2;
+      color: #fff;
+      border: 1px solid #1565c0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    :global(.rl-js-style-21) {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  </style>
 
   <script>
     // ===================================================
@@ -2543,8 +3664,15 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       cardEl.style.cursor = 'default';
       cardDetailContent.appendChild(cardEl);
       const descHtml = (card.desc || '').replace(/\n/g, '<br>');
-      const flavorHtml = `<div class="rl-style-133">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
-      cardDetailDesc.innerHTML = `<div class="rl-style-134">${descHtml}</div>${flavorHtml}`;
+      const catLabelMap = {
+        physical: '<span style="color:#ff8888;font-weight:bold;">【物理】</span>',
+        spell: '<span style="color:#cc88ff;font-weight:bold;">【呪文】</span>',
+        special: '<span style="color:#ffd966;font-weight:bold;">【特殊】</span>',
+      };
+      const catPrefix = card.category && catLabelMap[card.category] ? `${catLabelMap[card.category]} ` : '';
+      const flavorStyle = "margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;";
+      const flavorHtml = `<div style="${flavorStyle}">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
+      cardDetailDesc.innerHTML = `<div class="rl-style-134">${catPrefix}${descHtml}</div>${flavorHtml}`;
       cardDetailModal.style.display = 'flex';
     }
 
@@ -2597,7 +3725,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       cardDetailContent.appendChild(container);
 
       const typeName = type === 'relic' ? 'レリック' : 'アイテム';
-      const flavorHtml = `<div class="rl-style-135">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
+      const flavorStyle = "margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;";
+      const flavorHtml = `<div style="${flavorStyle}">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
       cardDetailDesc.innerHTML = `<div class="rl-style-136">【${typeName}】</div>${flavorHtml}`;
       cardDetailModal.style.display = 'flex';
     }
@@ -2748,16 +3877,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             deckLabel.textContent = '【初期デッキ】';
             deckWrap.appendChild(deckLabel);
             const deckGrid = document.createElement('div');
-            deckGrid.classList.add('rl-js-style-8');
+            deckGrid.classList.add('dv-card-list', 'active');
             initialCards.forEach(c => {
               const cardEl = makeCardEl(c, null);
-              cardEl.style.transform = 'scale(0.65)';
-              cardEl.style.transformOrigin = 'top left';
-              cardEl.style.margin = '0';
-              const wrapper = document.createElement('div');
-              wrapper.classList.add('rl-js-style-9');
-              wrapper.appendChild(cardEl);
-              deckGrid.appendChild(wrapper);
+              cardEl.style.cursor = 'default';
+              deckGrid.appendChild(cardEl);
             });
             deckWrap.appendChild(deckGrid);
             dialogExtra.appendChild(deckWrap);
@@ -3448,7 +4572,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         btnTownRemove.style.cursor = 'pointer';
       }
 
-      const pool = [...REWARD_POOL].filter(id => id !== 'meteor');
+      // ショップには特殊カード(special)は出現しないようにする
+      const pool = [...REWARD_POOL].filter(id => CARD_DB[id] && CARD_DB[id].category !== 'special');
       shuffle(pool);
       const area1UpgradedIdx = Math.floor(Math.random() * 6);
       shopCardsPool = pool.slice(0, 6).map((id, idx) => {
@@ -3985,6 +5110,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         img.alt = card.name;
         imgWrap.appendChild(img);
       }
+
+      // カテゴリバッジ（右上オーバーレイ）
+      if (card.category) {
+        const catMap = { physical: '物理', spell: '呪文', special: '特殊' };
+        const catColorMap = { physical: 'physical', spell: 'spell', special: 'special-cat' };
+        const catBadge = document.createElement('span');
+        catBadge.className = `card-category-badge cat-${catColorMap[card.category] || 'none'}`;
+        catBadge.textContent = catMap[card.category] || card.category;
+        imgWrap.appendChild(catBadge);
+      }
+
       div.appendChild(imgWrap);
 
       // カード名帯
@@ -4025,6 +5161,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         tags.appendChild(span);
       }
 
+      // カテゴリバッジは画像右上に移動済み
+
       // 属性
       if (card.element && card.element !== 'none') {
         const elemMap = { fire: '炎', ice: '氷', thunder: '雷', wind: '風', stone: '土' };
@@ -4060,16 +5198,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
       if (card.type === 'attack') {
         const hits = card.hits ? `×${fmt(card.hits, base.hits || 1)}` : '';
-        const elem = card.element && card.element !== 'none' ? ` [${getElemLabel(card.element)}]` : '';
-        return `⚔️ ${fmt(card.value, base.value)}${hits}ダメージ${elem}`;
+        return `${fmt(card.value, base.value)}${hits}ダメージ`;
       } else if (card.healSelf) {
         return `HP +${fmt(card.healSelf, base.healSelf)} 回復`;
       } else if (card.draw) {
-        return `カードを${fmt(card.draw, base.draw)}枚引き、行動回数+1`;
+        return `カードを${fmt(card.draw, base.draw)}枚引く`;
+      } else if (card.id === 'kakusei' || card.id === 'kakusei+') {
+        return `能昇＆能降 ${fmt(card.buffUp, base.buffUp)}ターン`;
       } else if (card.buffUp) {
-        return `能昇 ${fmt(card.buffUp, base.buffUp)}ターン付与`;
+        return `${fmt(card.buffUp, base.buffUp)}ターン 能昇`;
       } else if (card.buffDown) {
-        return `敵に能降 ${fmt(card.buffDown, base.buffDown)}ターン`;
+        return `${fmt(card.buffDown, base.buffDown)}ターン 能降`;
       }
       return card.desc || '';
     }
@@ -4145,26 +5284,34 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
     function getCardCost(card) {
       let cost = card.cost;
-      if (card.type === 'attack' && card.element && card.element !== 'none' && player.relics.includes('book_madousyo')) {
+      if ((card.category === 'spell' || card.id === 'meteor' || card.id === 'meteor+') && player.relics.includes('book_madousyo')) {
         cost = Math.max(0, cost - 1);
       }
       return cost;
     }
 
-    function calculateDamage(baseVal, element, isPlayerAttacking) {
+    function calculateDamage(baseVal, element, isPlayerAttacking, cardId = null) {
       let bonus = 0;
 
       if (isPlayerAttacking) {
         if (player.relics.includes('game_ken') && element === 'none') bonus += 1;
         if (player.relics.includes('game_ken_seiken') && element === 'none') bonus += 1;
+        // プレイヤーのバフ・デバフ
         if (player.buffUp > 0) bonus += 1;
         if (player.buffDown > 0) bonus -= 1;
+        // 敵のバフ・デバフ（能降で与ダメ増加、能昇で与ダメ減少）
+        if (enemy.buffDown > 0) bonus += 1;
+        if (enemy.buffUp > 0) bonus -= 1;
 
         let dmg = baseVal + bonus;
 
-        if (element === 'fire' && CARD_DB['meteor'] && CARD_DB['meteor'].id === 'meteor') {
+        if (cardId === 'meteor' || cardId === 'meteor+') {
+          // 流星群: 炎・氷・雷のどれかが弱点なら弱点を突く
           const hasWeakness = enemy.weaknesses.includes('fire') || enemy.weaknesses.includes('ice') || enemy.weaknesses.includes('thunder');
-          if (hasWeakness) dmg = Math.floor(dmg * 1.5);
+          if (hasWeakness) {
+            dmg = Math.floor(dmg * 1.5);
+            logMessage('弱点属性！ダメージ1.5倍！', 'log-heal');
+          }
         } else {
           if (enemy.weaknesses.includes(element)) {
             dmg = Math.floor(dmg * 1.5);
@@ -4185,8 +5332,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
         return Math.max(0, dmg);
       } else {
+        // プレイヤーのバフ・デバフ
         if (player.buffUp > 0) bonus -= 1;
         if (player.buffDown > 0) bonus += 1;
+        // 敵のバフ・デバフ（能昇で被ダメ増加、能降で被ダメ減少）
+        if (enemy.buffUp > 0) bonus += 1;
+        if (enemy.buffDown > 0) bonus -= 1;
         if (player.relics.includes('game_tate')) bonus -= 1;
         if (player.relics.includes('yubiwa_diamond')) bonus -= 1;
 
@@ -4341,13 +5492,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       if (!isPlayerTurn || isGameOver) return;
       const card = player.hand[index];
       const cardCost = getCardCost(card);
-      const isMagicCard = ['fire', 'ice', 'wind', 'stone', 'thunder', 'meteor'].includes(card.id);
+      const isSpellCard = card.category === 'spell';
 
       if (player.mp < cardCost) { logMessage('MPが足りません！', 'log-system'); return; }
-      if (!isMagicCard && player.actions <= 0) { logMessage('行動回数が残っていません！', 'log-system'); return; }
+      if (!isSpellCard && player.actions <= 0) { logMessage('行動回数が残っていません！', 'log-system'); return; }
 
       player.mp -= cardCost;
-      if (!isMagicCard) {
+      if (!isSpellCard) {
         player.actions -= 1;
       }
       player.hand.splice(index, 1);
@@ -4377,7 +5528,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         const hits = card.hits || 1;
         let total = 0;
         for (let i = 0; i < hits; i++) {
-          const d = calculateDamage(card.value, card.element, true);
+          const d = calculateDamage(card.value, card.element, true, card.id);
           enemy.hp = Math.max(0, enemy.hp - d);
           total += d;
         }
@@ -4393,10 +5544,10 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
           }
         }
       } else if (card.type === 'skill') {
-        if (card.draw) { drawCards(card.draw); player.actions++; logMessage(card.name + '！ カードを' + card.draw + '枚引き、行動回数+1！'); }
+        if (card.draw) { drawCards(card.draw); player.actions++; logMessage(card.name + '！ カードを' + card.draw + '枚引く！'); }
         if (card.healSelf) { player.hp = Math.min(player.maxHp, player.hp + card.healSelf); logMessage(card.name + '！ HP +' + card.healSelf, 'log-heal'); }
-        if (card.buffUp) { player.buffUp = card.buffUp; logMessage('能昇！能昇（与ダメ+1/被ダメ-1）を3ターン得た！', 'log-heal'); }
-        if (card.buffDown) { enemy.buffDown = card.buffDown; logMessage('能降！敵に能降（与ダメ-1/被ダメ+1）を3ターン付与！', 'log-poison'); }
+        if (card.buffUp) { player.buffUp = card.buffUp; logMessage(`能昇！能昇（与ダメ+1/被ダメ-1）を${card.buffUp}ターン得た！`, 'log-heal'); }
+        if (card.buffDown) { enemy.buffDown = card.buffDown; logMessage(`能降！敵に能降（与ダメ-1/被ダメ+1）を${card.buffDown}ターン付与！`, 'log-poison'); }
       }
       updateUI();
       if (enemy.hp <= 0) {
@@ -4597,7 +5748,22 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       playBGM('reward');
       if (rewardCards) rewardCards.innerHTML = '';
       if (rewardSubtitleText) rewardSubtitleText.textContent = '1枚カードを選んでデッキに追加';
-      const pool = [...REWARD_POOL];
+      const basePool = [...REWARD_POOL].filter(id => CARD_DB[id] && CARD_DB[id].category !== 'special');
+      const specialIds = REWARD_POOL.filter(id => CARD_DB[id] && CARD_DB[id].category === 'special');
+      let pool = [...basePool];
+
+      // エリアに応じた特殊カードの混入率調整
+      if (currentArea === 1) {
+        // エリア1: 手に入りづらい (20%の確率で混入)
+        if (Math.random() < 0.2) pool.push(...specialIds);
+      } else if (currentArea === 2) {
+        // エリア2: 通常通り
+        pool.push(...specialIds);
+      } else if (currentArea >= 3) {
+        // エリア3: 手に入りやすい (3セット混入)
+        pool.push(...specialIds, ...specialIds, ...specialIds);
+      }
+
       shuffle(pool);
       const picks = pool.slice(0, 3);
       picks.forEach(id => {
@@ -4829,8 +5995,8 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       handArea.innerHTML = '';
       let canPlayAny = false;
       player.hand.forEach((card, index) => {
-        const isMagicCard = ['fire', 'ice', 'wind', 'stone', 'thunder', 'meteor'].includes(card.id);
-        const playable = (isMagicCard || player.actions > 0) && player.mp >= getCardCost(card);
+        const isSpellCard = card.category === 'spell';
+        const playable = (isSpellCard || player.actions > 0) && player.mp >= getCardCost(card);
         if (playable) canPlayAny = true;
         const cardEl = makeCardEl(card, playable ? () => playCard(index) : null);
         if (!playable) cardEl.classList.add('disabled');
