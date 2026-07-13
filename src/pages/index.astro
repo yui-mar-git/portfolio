@@ -4,6 +4,11 @@ import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSListResponse, MicroCMSPortfolio } from '@/types/microcms';
+import { getCalendarInfo } from '@/lib/dashboard';
+import dashboardData from '@/data/dashboard.json';
+
+const cal = getCalendarInfo();
+const { weather, air, sunset, moonStr, law } = dashboardData;
 
 let portfolioData: MicroCMSPortfolio[] = [];
 try {
@@ -101,8 +106,113 @@ const tree = [rootNode];
         <p>ここは私のポートフォリオのページです。<br>コンテンツは随時追加していきます。</p>
       </section>
 
+      <!-- ダッシュボード (本日) -->
+      <section id="dashboard-today" class="dashboard-section">
+        <div class="profile-card dashboard-card">
+          <div class="dashboard-block">
+            <ul class="tree-list root-tree dashboard-tree">
+              <li class="tree-item">
+                <h3 class="tree-node dashboard-date-title">{cal.dateStr} {cal.zodiac}</h3>
+                <ul class="tree-list tree-children">
+                  <li class="tree-item">
+                    <div class="tree-node text-muted">
+                      {cal.kanshi} / {cal.rokuyo} / {cal.nijushisekki} / {cal.shichijuniko}
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dashboard-block">
+            <ul class="tree-list root-tree dashboard-tree">
+              <li class="tree-item">
+                <h3 class="tree-node tree-title">予報:</h3>
+                <ul class="tree-list tree-children">
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">
+                      <div class="forecast-row">
+                        <span class="forecast-label">気温:</span>
+                        <div class="forecast-values">
+                          <span class="forecast-item">最高: {weather.max}°C</span>
+                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                          <span class="forecast-item">最低: {weather.min}°C</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">
+                      <div class="forecast-row">
+                        <span class="forecast-label">天気:</span>
+                        <div class="forecast-values">
+                          <span class="forecast-item">06時台: {weather.mornCond}</span>
+                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                          <span class="forecast-item">12時台: {weather.noonCond}</span>
+                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                          <span class="forecast-item">18時台: {weather.eveCond}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">日没: {sunset} / {moonStr}</div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dashboard-block">
+            <ul class="tree-list root-tree dashboard-tree">
+              <li class="tree-item">
+                <h3 class="tree-node tree-title">警報・注意報:</h3>
+                <ul class="tree-list tree-children">
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">紫外線: {weather.uvIndex} / {weather.uvLabel}</div>
+                  </li>
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">大気: PM2.5 {air.pm25}μg/m³ {air.pm25Label}</div>
+                  </li>
+                  <li class="tree-item">
+                    <div class="tree-node fw-normal">花粉: {air.pollenLabel}</div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <p class="api-note">
+            ※ このセクションは、Open-Meteo API および Sunrise-Sunset API を使用し、毎時定期バッチにて最新の気象・日没データを取得して表示するデモ実装です。
+          </p>
+        </div>
+      </section>
+
+      <!-- 今日の条文 -->
+      <section id="dashboard-law" class="dashboard-section">
+        <h2 class="section-title">今日の条文</h2>
+        <div class="profile-card law-card">
+          <ul class="tree-list root-tree dashboard-tree">
+            <li class="tree-item">
+              <h3 class="tree-node tree-title">📜 {law.name} {law.title}:</h3>
+              <ul class="tree-list tree-children">
+                <li class="tree-item">
+                  <div class="tree-node text-muted law-sentence">
+                    {law.sentence}
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <p class="api-note">
+            ※ このセクションは、e-Gov法令API を使用し、毎時定期バッチにて指定の法令（憲法、個人情報保護法など）からランダムな条文を抽出して表示するデモ実装です。
+          </p>
+        </div>
+      </section>
+
       <section class="toc-section">
-        <h2 class="toc-title">目次</h2>
+        <h2 class="section-title">サイトマップ</h2>
         <div class="profile-card toc-card">
           <ul class="tree-list root-tree">
             {tree.map(node => (
@@ -140,8 +250,84 @@ const tree = [rootNode];
           </ul>
         </div>
       </section>
-      
+
       <style>
+        .dashboard-section {
+          margin-top: 2rem;
+          margin-bottom: 2rem;
+          text-align: center;
+        }
+        .api-note {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          margin-top: 1.5rem;
+          padding-top: 1rem;
+          border-top: 1px dashed var(--border-color);
+          line-height: 1.5;
+          text-align: left;
+        }
+        .law-sentence {
+          line-height: 1.5;
+        }
+        .dashboard-card, .law-card {
+          margin: 0 auto;
+          max-width: 600px;
+          text-align: left;
+        }
+        .section-title {
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          display: inline-block;
+          color: var(--heading-color, var(--text-main));
+        }
+        .tree-title {
+          margin: 0;
+          font-size: 1.1rem;
+          color: var(--heading-color, var(--text-main));
+        }
+        .dashboard-date-title {
+          padding: 0.5rem 0;
+          font-size: 1.2rem;
+          color: var(--heading-color, var(--text-main));
+        }
+        .dashboard-block {
+          margin-bottom: 1rem;
+        }
+        .dashboard-tree .fw-normal {
+          font-weight: normal !important;
+        }
+        .dashboard-tree .text-muted {
+          color: var(--text-muted);
+        }
+        .forecast-row {
+          display: flex;
+          align-items: flex-start;
+        }
+        .forecast-label {
+          white-space: nowrap;
+          margin-right: 0.5rem;
+        }
+        .forecast-values {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .sp-break {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .sp-slash-text {
+            display: none;
+          }
+          .forecast-values {
+            flex-direction: column;
+          }
+          .sp-break {
+            display: block;
+            height: 0;
+            margin: 0;
+          }
+        }
+        
         .toc-section {
           margin-top: 3rem;
           text-align: center;
@@ -149,11 +335,6 @@ const tree = [rootNode];
         .toc-card {
           margin: 0 auto;
           max-width: 500px;
-        }
-        .toc-title {
-          font-size: 1.5rem;
-          margin-bottom: 1.5rem;
-          display: inline-block;
         }
         .tree-list {
           list-style: none;
