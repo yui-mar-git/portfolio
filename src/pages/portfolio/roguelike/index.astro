@@ -1,4 +1,5 @@
----
+﻿---
+export const pageTitle = "ローグライク";
 
 import yuusyaImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
 import kenshiImg from '../../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
@@ -5219,7 +5220,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span class="rl-style-146">${val}</span>` : val;
       const lines = [];
       if (card.poison) lines.push(`毒${fmt(card.poison, base.poison)}付与`);
-      if (card.paralyze) lines.push('30%で麻痺付与');
+      if (card.paralyze) lines.push('30%で麻痺');
       if (card.oncePerBattle) lines.push('1戦闘1回のみ');
       return lines;
     }

@@ -128,12 +128,12 @@ export const CARD_DB: Record<string, Card> = {
     name: '雷撃',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 2,
-    desc: '敵に 2 ダメージ ＋ 30%で麻痺付与',
+    desc: '敵に 2 ダメージ <br> 30%で麻痺付与',
     color: 'yellow',
     element: 'thunder',
-    paralyze: true , // 
+    paralyze: true, // 
     flavor: 'フレーバーテキスト準備中'
   },
 
@@ -145,7 +145,7 @@ export const CARD_DB: Record<string, Card> = {
     category: 'spell',
     cost: 1,
     value: 1,
-    desc: '敵に 1 ダメージ ＋ 毒1 を付与',
+    desc: '敵に 1 ダメージ <br> 毒1 を付与',
     color: 'black',
     element: 'none',
     poison: 1,
@@ -251,7 +251,7 @@ export const INITIAL_DECKS: Record<string, string[]> = {
   mahoutsukai: ['fire', 'fire', 'ice', 'ice', 'wind', 'wind', 'stone', 'stone', 'buff_down', 'venom', 'draw_card', 'draw_card'],
   // 武闘家: 攻撃3, 強撃1, 連撃3, 快癒1, 能昇3, ドロー1 
   butouka: ['strike', 'strike', 'strike', 'smite', 'rush', 'rush', 'rush', 'heal', 'buff_up', 'buff_up', 'buff_up', 'draw_card'],
-  };
+};
 
 /**
  * カードを強化(アップグレード)した時の性能変化を適用する関数
@@ -288,23 +288,23 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'fire':
       upgradedCard.value = 3 + (2 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (炎)`;
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'ice':
       upgradedCard.value = 3 + (2 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (氷)`;
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'wind':
       upgradedCard.value = 3 + (2 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (風)`;
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'stone':
       upgradedCard.value = 3 + (2 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (土)`;
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'thunder':
       upgradedCard.value = 2 + (1 * level);
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (雷) ＋ 30%で麻痺付与`;
+      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ ＋ 30%で麻痺付与`;
       break;
     case 'venom':
       upgradedCard.value = 1 + (1 * level);

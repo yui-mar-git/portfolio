@@ -2,6 +2,92 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
+import { fetchMicroCMS } from '@/lib/microcms';
+import type { MicroCMSListResponse, MicroCMSPortfolio } from '@/types/microcms';
+
+let portfolioData: MicroCMSPortfolio[] = [];
+try {
+  const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+  portfolioData = portfolioResponse.contents;
+} catch (e) {
+  console.error("Failed to fetch microCMS portfolio for TOC", e);
+}
+
+const allPages = await Astro.glob('./**/*.astro');
+const nodes = allPages.filter(page => {
+  if (page.url === '' || page.url === '/') return false;
+  if (page.url?.includes('/contact/thanks')) return false;
+  return !!page.url;
+}).map(page => {
+  // Better CMS match: either CMS url includes page url or page url includes CMS url
+  const pageUrlRaw = page.url || '';
+  const cmsEntry = portfolioData.find(c => {
+    if (!c.url) return false;
+    const cleanCms = c.url.replace(/^\/|\/$/g, '');
+    const cleanPage = pageUrlRaw.replace(/^\/|\/$/g, '');
+    return cleanCms === cleanPage || cleanCms.endsWith(cleanPage) || cleanPage.endsWith(cleanCms);
+  });
+  
+  const title = cmsEntry ? cmsEntry.title : (page.pageTitle || page.url);
+  const cleanUrl = pageUrlRaw.replace(/^\/|\/$/g, '');
+  const parts = cleanUrl.split('/').filter(Boolean);
+  return {
+    url: page.url,
+    title,
+    parts,
+    depth: parts.length,
+    children: [] as any[]
+  };
+});
+
+nodes.sort((a, b) => a.depth - b.depth);
+const rawTree: any[] = [];
+for (const node of nodes) {
+  if (node.depth === 1) {
+    rawTree.push(node);
+  } else if (node.depth > 1) {
+    const parentParts = node.parts.slice(0, -1);
+    const parentUrlMatch1 = '/' + parentParts.join('/') + '/';
+    const parentUrlMatch2 = '/' + parentParts.join('/');
+    const parentNode = nodes.find(n => n.url === parentUrlMatch1 || n.url === parentUrlMatch2);
+    if (parentNode) {
+      parentNode.children.push(node);
+    } else {
+      rawTree.push(node);
+    }
+  }
+}
+
+const rootOrder = ['profile', 'portfolio', 'credits', 'contact'];
+const childOrder = ['minigame', 'run-action', 'roguelike', 'tower-defense'];
+
+function sortNodes(nodesArray: any[], orderList: string[]) {
+  nodesArray.sort((a, b) => {
+    const aKey = a.parts[a.parts.length - 1];
+    const bKey = b.parts[b.parts.length - 1];
+    const aIdx = orderList.indexOf(aKey);
+    const bIdx = orderList.indexOf(bKey);
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return -1;
+    if (bIdx !== -1) return 1;
+    return a.title.localeCompare(b.title);
+  });
+}
+
+sortNodes(rawTree, rootOrder);
+rawTree.forEach(node => {
+  if (node.children && node.children.length > 0) {
+    sortNodes(node.children, childOrder);
+  }
+});
+
+const rootNode = {
+  url: '/',
+  title: 'ルート',
+  parts: ['root'],
+  children: rawTree
+};
+const tree = [rootNode];
 ---
 
 <BaseLayout title="Home" pageId="home">
@@ -14,6 +100,162 @@ import Footer from '@/components/Footer.astro';
       <section class="hero">
         <p>ここは私のポートフォリオのページです。<br>コンテンツは随時追加していきます。</p>
       </section>
+
+      <section class="toc-section">
+        <h2 class="toc-title">目次</h2>
+        <div class="profile-card toc-card">
+          <ul class="tree-list root-tree">
+            {tree.map(node => (
+              <li class="tree-item">
+                <div class="tree-node parent-node">
+                  <a href={node.url} class="tree-link">{node.title}</a>
+                </div>
+                {node.children.length > 0 && (
+                  <ul id="children-root" class="tree-list tree-children">
+                    {node.children.map(child => (
+                      <li class="tree-item">
+                        <div class="tree-node parent-node">
+                          <a href={child.url} class="tree-link">{child.title}</a>
+                          {child.children.length > 0 && (
+                            <button class="toggle-btn" onclick={`toggleChildren('${child.parts.join('-')}')`}>−</button>
+                          )}
+                        </div>
+                        {child.children.length > 0 && (
+                          <ul id={`children-${child.parts.join('-')}`} class="tree-list tree-children">
+                            {child.children.map(subChild => (
+                              <li class="tree-item">
+                                <div class="tree-node child-node">
+                                  <a href={subChild.url} class="tree-link">{subChild.title}</a>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+      
+      <style>
+        .toc-section {
+          margin-top: 3rem;
+          text-align: center;
+        }
+        .toc-card {
+          margin: 0 auto;
+          max-width: 500px;
+        }
+        .toc-title {
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          display: inline-block;
+        }
+        .tree-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          text-align: left;
+        }
+        .tree-list li {
+          position: relative;
+          padding-left: 1.5rem;
+        }
+        .tree-list li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background-color: var(--border-color);
+        }
+        .tree-list li::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 1.2rem; /* Adjust if line is not vertically centered */
+          width: 1rem;
+          height: 2px;
+          background-color: var(--border-color);
+        }
+        .tree-list li:last-child::before {
+          bottom: auto;
+          height: 1.2rem;
+        }
+        .tree-list.root-tree > li > .tree-node {
+          font-weight: bold;
+        }
+        /* No vertical line before the single root node "ルート" */
+        .tree-list.root-tree > li::before {
+          display: none;
+        }
+        .tree-list.root-tree > li::after {
+          display: none;
+        }
+        .tree-list.root-tree > li {
+          padding-left: 0;
+        }
+        .tree-node {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 0;
+        }
+        .parent-node {
+          /* optional */
+        }
+        .child-node {
+          padding: 0.3rem 0;
+        }
+        .tree-children {
+          display: block;
+        }
+        .tree-link {
+          text-decoration: none;
+          color: var(--text-main);
+          transition: color 0.2s;
+        }
+        .tree-link:hover {
+          color: var(--primary);
+        }
+        .toggle-btn {
+          background: none;
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: var(--text-main);
+          font-size: 0.9rem;
+          transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+          border-color: var(--primary);
+          color: var(--primary);
+        }
+      </style>
+
+      <script is:inline>
+        function toggleChildren(id) {
+          const el = document.getElementById('children-' + id);
+          const btn = event.currentTarget;
+          if (el.style.display === 'none') {
+            el.style.display = 'block';
+            btn.textContent = '−';
+          } else {
+            el.style.display = 'none';
+            btn.textContent = '+';
+          }
+        }
+      </script>
     </article>
   </main>
 

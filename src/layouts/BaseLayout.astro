@@ -5,9 +5,10 @@ interface Props {
   title: string;
   description?: string;
   pageId?: string;
+  ogImage?: string;
 }
 
-const { title, description = "My Portfolio", pageId } = Astro.props;
+const { title, description = "My Portfolio", pageId, ogImage = "/og-image.png" } = Astro.props;
 const siteTitle = `${title} - My Portfolio`;
 ---
 
@@ -19,6 +20,20 @@ const siteTitle = `${title} - My Portfolio`;
   <title>{siteTitle}</title>
   <meta name="description" content={description} />
   <meta name="robots" content="noindex, nofollow" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" />
+  
+  <!-- OGP / Twitter Card -->
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content={new URL(ogImage, Astro.site || Astro.url)} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={new URL(ogImage, Astro.site || Astro.url)} />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
