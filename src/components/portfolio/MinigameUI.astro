@@ -35,15 +35,18 @@ const { materialCategories, gameTitle } = Astro.props;
 
   <!-- 遊び方モーダル -->
   <HowToPlayModal>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・1~9のパネルをタップして、合計が「10」になるように素早く選びます。</p>
+      <div class="howto-content">
+        <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
+        <div class="legend" style="margin-top: 1rem;">
+          <p><span style="color:#007bff">■青</span>: +10点</p>
+          <p><span style="color:#fd7e14">■橙</span>: +50点</p>
+          <p><span style="color:#dc3545">■赤</span>: -30点</p>
+          <p><span style="color:#6f42c1">■紫</span>: -50点</p>
+          <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃう)</p>
+          <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
+        </div>
       </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・10になるとパネルが消え、スコアが加算されます。</p>
-      </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・制限時間内にできるだけ多くのパネルを消して高得点を目指しましょう。</p>
-      </div></HowToPlayModal>
+    </HowToPlayModal>
 
   <!-- コンフィグモーダル -->
   <div id="modal-overlay" class="modal-overlay"></div>
@@ -60,7 +63,7 @@ const { materialCategories, gameTitle } = Astro.props;
     </div>
     <button id="credits-btn" class="btn btn-secondary global-style-9glr4x" >クレジット・使用素材</button>
     <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
-          <button id="close-config-btn" class="btn btn-secondary global-style-m9a5iw" >閉じる</button>
+          
   </div>
 
   <!-- リタイアモーダル -->
@@ -90,7 +93,7 @@ const { materialCategories, gameTitle } = Astro.props;
         ))}
       </ul>
     </div>
-    <button id="close-credits-btn" class="btn btn-secondary global-style-mbc3p8" >閉じる</button>
+    
   </div>
 </div>
 </GameLayout>
