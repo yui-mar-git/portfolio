@@ -15,8 +15,8 @@
   <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
 </div>
 
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
+<script>
+  (() => {
     const howtoModal = document.getElementById('howto-modal');
     if (!howtoModal) return;
     
@@ -106,7 +106,7 @@
     });
     
     updatePage();
-  });
+  })();
 </script>
 
 <style>
