@@ -1,4 +1,5 @@
 ---
+import HowToPlayModal from './HowToPlayModal.astro';
 const { materialCategories, gameTitle } = Astro.props;
 ---
 <!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
@@ -33,26 +34,22 @@ const { materialCategories, gameTitle } = Astro.props;
   </div>
 
   <!-- 遊び方モーダル -->
-  <div id="howto-modal" class="config-modal">
-    <h3>遊び方</h3>
-    <div class="howto-content">
-      <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
-      <div class="legend">
-        <p><span class="global-style-2zrcut">■青</span>: +10点</p>
-        <p><span class="global-style-huegtq">■橙</span>: +5秒</p>
-        <p><span class="global-style-1ayd41">■赤</span>: -30点</p>
-        <p><span class="global-style-ydrkkw">■紫</span>: -5秒</p>
-        <p><span class="global-style-m4nj5z">■黄</span>: +50点 (すぐ消えちゃう)</p>
-        <p><span class="global-style-jirdf8">■緑</span>: しばらくの間、的が消えにくくなる</p>
+  <HowToPlayModal>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・1~9のパネルをタップして、合計が「10」になるように素早く選びます。</p>
       </div>
-    </div>
-    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
-  </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・10になるとパネルが消え、スコアが加算されます。</p>
+      </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・制限時間内にできるだけ多くのパネルを消して高得点を目指しましょう。</p>
+      </div></HowToPlayModal>
 
   <!-- コンフィグモーダル -->
   <div id="modal-overlay" class="modal-overlay"></div>
   <div id="config-modal" class="config-modal">
-    <h3>コンフィグ</h3>
+    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
+      <h3>コンフィグ</h3>
     <div class="config-item">
       <label for="bgm-volume">BGM音量</label>
       <input type="range" id="bgm-volume" min="0" max="100" value="50">
@@ -62,7 +59,8 @@ const { materialCategories, gameTitle } = Astro.props;
       <input type="range" id="se-volume" min="0" max="100" value="50">
     </div>
     <button id="credits-btn" class="btn btn-secondary global-style-9glr4x" >クレジット・使用素材</button>
-    <button id="close-config-btn" class="btn btn-secondary global-style-m9a5iw" >閉じる</button>
+    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
+          <button id="close-config-btn" class="btn btn-secondary global-style-m9a5iw" >閉じる</button>
   </div>
 
   <!-- リタイアモーダル -->
@@ -76,7 +74,8 @@ const { materialCategories, gameTitle } = Astro.props;
   </div>
   <!-- クレジットモーダル -->
   <div id="credits-modal" class="config-modal">
-    <h3>クレジット・使用素材</h3>
+    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
+      <h3>クレジット・使用素材</h3>
     <div class="howto-content"
       style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
       <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>

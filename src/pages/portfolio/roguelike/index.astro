@@ -44,13 +44,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     <Header activeId="portfolio" />
 
     <main class="container">
-      <div id="global-game-scaler" class="rl-style-1">
-        <div id="global-game-scaler-inner" class="rl-style-2">
-          <div class="game-container rl-style-3" id="game-container">
+      <div id="global-game-scaler" class="global-game-scaler-custom">
+        <div id="global-game-scaler-inner" class="global-game-scaler-inner-custom">
+          <div class="game-container game-container-custom" id="game-container">
             <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
 
             <!-- ゲームヘッダーバー（ステータス常時表示） -->
-            <div id="game-header" class="game-header-bar rl-style-4">
+            <div id="game-header" class="game-header-bar game-header-custom">
               <div class="header-status">
                 <span id="header-floor" class="header-floor-text">エリア 1 - 0層</span>
                 <span class="gold-badge"><span id="header-gold">50</span> G</span>
@@ -64,37 +64,37 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             </div>
 
             <!-- ゲームフッターバー（アイテム・デッキ常時表示） -->
-            <div id="game-footer" class="game-footer-bar rl-style-5">
-              <div class="rl-style-6">
-                <span class="rl-style-7">アイテム:</span>
-                <div id="footer-player-items" class="rl-style-8"></div>
+            <div id="game-footer" class="game-footer-bar game-footer-custom">
+              <div class="btn-shop-service-leave-custom">
+                <span class="town-items-custom">アイテム:</span>
+                <div id="footer-player-items" class="footer-player-items-custom"></div>
               </div>
-              <button class="btn btn-secondary rl-style-9" id="btn-footer-view-deck">デッキ確認
+              <button class="btn btn-secondary btn-footer-view-deck-custom" id="btn-footer-view-deck">デッキ確認
                 (<span id="footer-deck-count">0</span>)</button>
             </div>
             <!-- ゲームオーバー/クリア画面 -->
-            <div id="result-overlay" class="rl-overlay rl-style-10">
+            <div id="result-overlay" class="rl-overlay result-overlay-custom">
               <h2 id="result-title">戦闘終了</h2>
-              <p id="result-details" class="rl-style-11">
+              <p id="result-details" class="result-details-custom">
               </p>
               <div class="result-actions">
                 <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
                 <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
-                <button class="btn rl-style-12" id="btn-share">Xでシェア</button>
+                <button class="btn btn-share-custom" id="btn-share">Xでシェア</button>
               </div>
             </div>
 
             <!-- カード選択報酬画面 -->
-            <div id="reward-overlay" class="rl-overlay rl-style-13">
+            <div id="reward-overlay" class="rl-overlay reward-overlay-custom">
               <h2>🎉 戦闘勝利！</h2>
               <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
               <div id="reward-cards" class="reward-cards"></div>
-              <button class="btn btn-secondary rl-style-14" id="btn-skip-reward">スキップ</button>
+              <button class="btn btn-secondary btn-skip-reward-custom" id="btn-skip-reward">スキップ</button>
             </div>
 
             <!-- デッキ閲覧モーダル -->
-            <div id="deck-viewer-overlay" class="rl-overlay rl-style-15">
-              <h2 class="rl-style-16">デッキ確認</h2>
+            <div id="deck-viewer-overlay" class="rl-overlay deck-viewer-overlay-custom">
+              <h2 class="ui-custom-16">デッキ確認</h2>
               <div class="deck-viewer-tabs">
                 <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
                 <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
@@ -103,64 +103,64 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               <div id="deck-list" class="dv-card-list active"></div>
               <div id="discard-list" class="dv-card-list"></div>
               <div id="hand-list" class="dv-card-list"></div>
-              <button class="btn btn-secondary rl-style-17" id="close-deck-viewer">閉じる</button>
+              <button class="btn btn-secondary close-deck-viewer-custom" id="close-deck-viewer">閉じる</button>
             </div>
 
             <!-- スタート画面 -->
-            <div id="start-screen" class="rl-style-18">
-              <h2 class="rl-style-19">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
-              <p class="rl-style-20">
+            <div id="start-screen" class="start-screen-custom">
+              <h2 class="ui-custom-19">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
+              <p class="ui-custom-20">
                 職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
               <button id="start-btn" class="btn btn-full">冒険を始める</button>
-              <button id="howto-btn" class="btn btn-secondary btn-full rl-style-21">遊び方</button>
+              <button id="howto-btn" class="btn btn-secondary btn-full howto-btn-custom">遊び方</button>
             </div>
 
             <!-- 職業選択画面 -->
-            <div id="class-select-screen" class="rl-style-22">
-              <h2 class="rl-style-23">冒険者の選択</h2>
-              <p class="rl-style-24">
+            <div id="class-select-screen" class="class-select-screen-custom">
+              <h2 class="ui-custom-23">冒険者の選択</h2>
+              <p class="ui-custom-24">
                 あなたの戦闘スタイルを選んで旅立ちましょう。</p>
-              <div class="rl-style-25">
-                <div class="class-grid rl-style-26">
+              <div class="ui-custom-25">
+                <div class="class-grid class-grid-custom">
                   <div class="class-card" data-class="yuusya">
-                    <img src={yuusyaImg.src} class="rl-style-27" />
-                    <div class="rl-style-28">勇者</div>
-                    <div class="rl-style-29">HP10 /
+                    <img src={yuusyaImg.src} class="ui-custom-27" />
+                    <div class="ui-custom-28">勇者</div>
+                    <div class="ui-custom-29">HP10 /
                       MP5<br>初期レリックが+1個</div>
                   </div>
                   <div class="class-card" data-class="kenshi">
-                    <img src={kenshiImg.src} class="rl-style-30" />
-                    <div class="rl-style-31">戦士</div>
-                    <div class="rl-style-32">HP15 /
+                    <img src={kenshiImg.src} class="ui-custom-30" />
+                    <div class="ui-custom-31">戦士</div>
+                    <div class="ui-custom-32">HP15 /
                       MP4<br>毎ターンHP+1回復</div>
                   </div>
                   <div class="class-card" data-class="mahoutsukai">
-                    <img src={mahoutsukaiImg.src} class="rl-style-33" />
-                    <div class="rl-style-34">魔法使い</div>
-                    <div class="rl-style-35">HP7 /
+                    <img src={mahoutsukaiImg.src} class="ui-custom-33" />
+                    <div class="ui-custom-34">魔法使い</div>
+                    <div class="ui-custom-35">HP7 /
                       MP7<br>毎ターンMP+1回復</div>
                   </div>
                   <div class="class-card" data-class="butouka">
-                    <img src={butoukaImg.src} class="rl-style-36" />
-                    <div class="rl-style-37">格闘家</div>
-                    <div class="rl-style-38">HP8 /
+                    <img src={butoukaImg.src} class="ui-custom-36" />
+                    <div class="ui-custom-37">格闘家</div>
+                    <div class="ui-custom-38">HP8 /
                       MP4<br>毎ターン行動回数+1</div>
                   </div>
                 </div>
-                <p id="class-select-preview" class="rl-style-39">
+                <p id="class-select-preview" class="class-select-preview-custom">
                   勇者が選択されています</p>
               </div>
 
-              <button id="btn-back-to-title" class="btn btn-secondary btn-full rl-style-40">戻る</button>
+              <button id="btn-back-to-title" class="btn btn-secondary btn-full btn-back-to-title-custom">戻る</button>
             </div>
 
             <!-- マップ進行画面（横スクロール双六マップ） -->
-            <div id="map-screen" class="rl-style-41">
-              <button id="btn-retire-map" class="btn btn-secondary rl-style-42">リタイア</button>
+            <div id="map-screen" class="map-screen-custom">
+              <button id="btn-retire-map" class="btn btn-secondary btn-retire-map-custom">リタイア</button>
 
               <!-- 横スクロールすごろく本体 -->
-              <div id="map-scroll-wrapper" class="rl-style-43">
-                <div id="map-board" class="rl-style-44">
+              <div id="map-scroll-wrapper" class="map-scroll-wrapper-custom">
+                <div id="map-board" class="map-board-custom">
                   <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
                 </div>
               </div>
@@ -169,63 +169,63 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             </div>
 
             <!-- 宿（回復）画面 -->
-            <div id="inn-screen" class="rl-style-45">
-              <img src={hotelImg.src} class="rl-style-46" />
-              <h3 class="rl-style-47">旅人の宿</h3>
-              <p class="rl-style-48">
+            <div id="inn-screen" class="inn-screen-custom">
+              <img src={hotelImg.src} class="ui-custom-46" />
+              <h3 class="ui-custom-47">旅人の宿</h3>
+              <p class="ui-custom-48">
                 お金を払って、宿屋で休むことができます。
               </p>
-              <div class="rl-style-49">
-                <button id="btn-inn-rest-half" class="btn btn-primary rl-style-50">小休憩 (💰15) <br><span
-                    class="rl-style-51">HP/MP 50%回復</span></button>
-                <button id="btn-inn-rest-full" class="btn btn-primary rl-style-52">宿泊 (💰30) <br><span
-                    class="rl-style-53">HP/MP全快 ＋ 状態異常全治</span></button>
-                <button id="btn-inn-leave" class="btn btn-secondary rl-style-54">立ち去る</button>
+              <div class="ui-custom-49">
+                <button id="btn-inn-rest-half" class="btn btn-primary btn-inn-rest-half-custom">小休憩 (💰15) <br><span
+                    class="ui-custom-51">HP/MP 50%回復</span></button>
+                <button id="btn-inn-rest-full" class="btn btn-primary btn-inn-rest-full-custom">宿泊 (💰30) <br><span
+                    class="ui-custom-53">HP/MP全快 ＋ 状態異常全治</span></button>
+                <button id="btn-inn-leave" class="btn btn-secondary btn-inn-leave-custom">立ち去る</button>
               </div>
             </div>
 
             <!-- ショップサービス（強化・削除）画面 -->
-            <div id="shop-service-screen" class="rl-style-55">
-              <div class="rl-style-56">
-                <h3 id="shop-service-title" class="rl-style-57">ショップサービス</h3>
-                <p id="shop-service-desc" class="rl-style-58"></p>
+            <div id="shop-service-screen" class="shop-service-screen-custom">
+              <div class="ui-custom-56">
+                <h3 id="shop-service-title" class="shop-service-title-custom">ショップサービス</h3>
+                <p id="shop-service-desc" class="shop-service-desc-custom"></p>
               </div>
 
               <!-- 対象カード選択リスト -->
-              <div id="shop-service-card-list" class="rl-style-59">
+              <div id="shop-service-card-list" class="shop-service-card-list-custom">
               </div>
 
-              <div class="rl-style-60">
-                <button id="btn-shop-service-leave" class="btn btn-secondary rl-style-61">キャンセル</button>
+              <div class="ui-custom-60">
+                <button id="btn-shop-service-leave" class="btn btn-secondary btn-shop-service-leave-custom">キャンセル</button>
               </div>
             </div>
 
             <!-- 街（ショップ）画面 -->
-            <div id="town-screen" class="rl-style-62">
-              <div class="rl-style-63">
-                <h3 class="rl-style-64">よろず街の商い</h3>
-                <button id="btn-town-leave" class="btn btn-secondary rl-style-65">街を出る</button>
+            <div id="town-screen" class="town-screen-custom">
+              <div class="ui-custom-63">
+                <h3 class="ui-custom-64">よろず街の商い</h3>
+                <button id="btn-town-leave" class="btn btn-secondary btn-town-leave-custom">街を出る</button>
               </div>
 
-              <div class="rl-style-66">
+              <div class="ui-custom-66">
                 <div>
-                  <p class="rl-style-67">
+                  <p class="ui-custom-67">
                     販売カード</p>
-                  <div id="town-cards" class="rl-style-68">
+                  <div id="town-cards" class="town-cards-custom">
                   </div>
                 </div>
                 <div>
-                  <p class="rl-style-69">
+                  <p class="ui-custom-69">
                     販売アイテム</p>
-                  <div id="town-items" class="rl-style-70"></div>
+                  <div id="town-items" class="town-items-custom"></div>
                 </div>
-                <div class="rl-style-71">
-                  <p class="rl-style-72">
+                <div class="ui-custom-71">
+                  <p class="ui-custom-72">
                     特別サービス</p>
-                  <div class="rl-style-73">
-                    <button id="btn-town-upgrade" class="btn btn-primary rl-style-74">カード強化 (20
+                  <div class="ui-custom-73">
+                    <button id="btn-town-upgrade" class="btn btn-primary btn-town-upgrade-custom">カード強化 (20
                       G)</button>
-                    <button id="btn-town-remove" class="btn btn-primary rl-style-75">カード削除 (20
+                    <button id="btn-town-remove" class="btn btn-primary btn-town-remove-custom">カード削除 (20
                       G)</button>
                   </div>
                 </div>
@@ -235,66 +235,66 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             </div>
 
             <!-- イベント画面 -->
-            <div id="event-screen" class="rl-style-76">
+            <div id="event-screen" class="event-screen-custom">
               <div>
-                <img id="event-image" src={noImageImg.src} class="rl-style-77" />
-                <h3 id="event-title" class="rl-style-78">未知のイベント</h3>
-                <p id="event-text" class="rl-style-79">
+                <img id="event-image" src={noImageImg.src} class="event-image-custom" />
+                <h3 id="event-title" class="event-title-custom">未知のイベント</h3>
+                <p id="event-text" class="event-text-custom">
                 </p>
               </div>
 
-              <div id="event-options" class="rl-style-80">
+              <div id="event-options" class="event-options-custom">
                 <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
               </div>
             </div>
 
             <!-- アイテム使用確認モーダル -->
-            <div id="item-confirm-modal" class="rl-style-81">
-              <div class="rl-style-82">
-                <h4 id="item-confirm-title" class="rl-style-83">アイテムの使用確認</h4>
-                <p id="item-confirm-text" class="rl-style-84"></p>
-                <div class="rl-style-85">
-                  <button id="btn-item-confirm-yes" class="btn btn-primary rl-style-86">はい</button>
-                  <button id="btn-item-confirm-no" class="btn btn-secondary rl-style-87">いいえ</button>
+            <div id="item-confirm-modal" class="item-confirm-modal-custom">
+              <div class="ui-custom-82">
+                <h4 id="item-confirm-title" class="item-confirm-title-custom">アイテムの使用確認</h4>
+                <p id="item-confirm-text" class="item-confirm-text-custom"></p>
+                <div class="ui-custom-85">
+                  <button id="btn-item-confirm-yes" class="btn btn-primary btn-item-confirm-yes-custom">はい</button>
+                  <button id="btn-item-confirm-no" class="btn btn-secondary btn-item-confirm-no-custom">いいえ</button>
                 </div>
               </div>
             </div>
 
             <!-- 戦闘中マップ確認モーダル -->
-            <div id="battle-map-overlay" class="overlay rl-style-88">
-              <h3 class="rl-style-89">現在地確認</h3>
-              <div id="battle-map-scroll-wrapper" class="rl-style-90">
-                <div id="battle-map-board" class="rl-style-91"></div>
+            <div id="battle-map-overlay" class="overlay battle-map-overlay-custom">
+              <h3 class="ui-custom-89">現在地確認</h3>
+              <div id="battle-map-scroll-wrapper" class="battle-map-scroll-wrapper-custom">
+                <div id="battle-map-board" class="battle-map-board-custom"></div>
               </div>
-              <button class="btn btn-secondary rl-style-92" id="btn-close-battle-map">閉じる</button>
+              <button class="btn btn-secondary btn-close-battle-map-custom" id="btn-close-battle-map">閉じる</button>
             </div>
 
             <!-- 王様遭遇イベントモーダル -->
-            <div id="king-event-modal" class="overlay rl-style-93">
-              <img src={kingImg.src} class="rl-style-94" />
-              <h3 class="rl-style-95">謁見の間：王からの餞別</h3>
-              <p class="rl-style-96">
+            <div id="king-event-modal" class="overlay king-event-modal-custom">
+              <img src={kingImg.src} class="ui-custom-94" />
+              <h3 class="ui-custom-95">謁見の間：王からの餞別</h3>
+              <p class="ui-custom-96">
                 「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
               </p>
-              <div id="king-relic-choices" class="rl-style-97">
+              <div id="king-relic-choices" class="king-relic-choices-custom">
                 <!-- 3つのレリック選択カードがJSで挿入されます -->
               </div>
             </div>
 
             <!-- 汎用カットシーンモーダル -->
-            <div id="cutscene-modal" class="overlay rl-style-98">
+            <div id="cutscene-modal" class="overlay cutscene-modal-custom">
               <!-- 背景イメージ -->
-              <div id="cutscene-bg" class="rl-style-99">
+              <div id="cutscene-bg" class="cutscene-bg-custom">
               </div>
               <!-- キャラクターポートレート群 -->
-              <div id="cutscene-portraits" class="rl-style-100">
+              <div id="cutscene-portraits" class="cutscene-portraits-custom">
               </div>
               <!-- セリフウィンドウ -->
-              <div class="rl-style-101">
-                <div id="cutscene-speaker" class="rl-style-102"></div>
-                <div id="cutscene-text" class="rl-style-103"></div>
-                <div class="rl-style-104">
-                  <button id="btn-cutscene-next" class="btn btn-primary rl-style-105">次へ
+              <div class="ui-custom-101">
+                <div id="cutscene-speaker" class="cutscene-speaker-custom"></div>
+                <div id="cutscene-text" class="cutscene-text-custom"></div>
+                <div class="ui-custom-104">
+                  <button id="btn-cutscene-next" class="btn btn-primary btn-cutscene-next-custom">次へ
                     ▶</button>
                 </div>
               </div>
@@ -302,23 +302,23 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
             <!-- ゲーム内汎用メッセージダイアログ -->
 
-            <div id="game-dialog-modal" class="overlay rl-style-106">
-              <div class="rl-style-107">
-                <h4 id="dialog-title" class="rl-style-108">通知
+            <div id="game-dialog-modal" class="overlay game-dialog-modal-custom">
+              <div class="ui-custom-107">
+                <h4 id="dialog-title" class="dialog-title-custom">通知
                 </h4>
-                <p id="dialog-message" class="rl-style-109">
+                <p id="dialog-message" class="dialog-message-custom">
                 </p>
-                <div id="dialog-buttons" class="rl-style-110">
-                  <button id="btn-dialog-ok" class="btn btn-primary rl-style-111">OK</button>
-                  <button id="btn-dialog-yes" class="btn btn-primary rl-style-112">はい</button>
-                  <button id="btn-dialog-no" class="btn btn-secondary rl-style-113">いいえ</button>
+                <div id="dialog-buttons" class="dialog-buttons-custom">
+                  <button id="btn-dialog-ok" class="btn btn-primary btn-dialog-ok-custom">OK</button>
+                  <button id="btn-dialog-yes" class="btn btn-primary btn-dialog-yes-custom">はい</button>
+                  <button id="btn-dialog-no" class="btn btn-secondary btn-dialog-no-custom">いいえ</button>
                 </div>
-                <div id="dialog-extra" class="rl-style-114"></div>
+                <div id="dialog-extra" class="dialog-extra-custom"></div>
               </div>
             </div>
 
             <!-- カード詳細モーダル -->
-            <div id="card-detail-modal" class="overlay card-detail-modal rl-style-115">
+            <div id="card-detail-modal" class="overlay card-detail-modal card-detail-modal-custom">
               <div class="card-detail-container">
                 <button id="btn-close-card-detail" class="btn-close-card-detail">&times;</button>
                 <div id="card-detail-content" class="card-detail-content">
@@ -331,9 +331,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
 
             <!-- バトル画面本体 -->
-            <div class="battle-layout rl-style-116">
+            <div class="battle-layout battle-layout-custom">
 
-              <button class="btn btn-secondary rl-style-117" id="btn-battle-retire">リタイア</button>
+              <button class="btn btn-secondary btn-battle-retire-custom" id="btn-battle-retire">リタイア</button>
 
               <!--バトルフィールド -->
               <div class="battle-field">
@@ -342,7 +342,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 <div class="enemy-status-panel">
                   <div class="status-header enemy-header">
                     <span id="enemy-name">敵</span>
-                    <span id="enemy-poison-badge" class="poison-badge rl-style-118"></span>
+                    <span id="enemy-poison-badge" class="poison-badge enemy-poison-badge-custom"></span>
                   </div>
                   <div class="status-row">
                     <span class="status-label">HP</span>
@@ -367,7 +367,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 <!-- ④ 右下：自分ステータス -->
                 <div class="player-status-panel">
                   <div class="status-header player-header">
-                    <span id="player-poison-badge" class="poison-badge rl-style-119"></span>
+                    <span id="player-poison-badge" class="poison-badge player-poison-badge-custom"></span>
                     <span id="player-class-name">あなた</span>
                   </div>
                   <div class="status-row">
@@ -390,17 +390,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               </div><!-- /.battle-field -->
 
               <!-- バトルログ (コンパクト) -->
-              <div class="battle-log-panel rl-style-120" id="battle-log">
+              <div class="battle-log-panel battle-log-custom" id="battle-log">
                 <p class="log-system">戦闘開始！</p>
               </div>
 
               <!-- 手札エリア -->
-              <div class="rl-style-121">
-                <div class="rl-style-122">
-                  <button class="btn btn-secondary rl-style-123" id="btn-battle-view-map">マップ</button>
-                  <button class="btn btn-end-turn rl-style-124" id="btn-end-turn">様子見</button>
+              <div class="ui-custom-121">
+                <div class="ui-custom-122">
+                  <button class="btn btn-secondary btn-battle-view-map-custom" id="btn-battle-view-map">マップ</button>
+                  <button class="btn btn-end-turn btn-end-turn-custom" id="btn-end-turn">様子見</button>
                 </div>
-                <div id="hand-area" class="hand-area rl-style-125">
+                <div id="hand-area" class="hand-area hand-area-custom">
                   <!-- カードがJSで挿入されます -->
                 </div>
               </div>
@@ -413,12 +413,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             <!-- 遊び方モーダル -->
             <div id="howto-modal" class="config-modal">
               <h3>遊び方</h3>
-              <div class="howto-content rl-style-126">
+              <div class="howto-content howto-content-custom">
                 <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
                 <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
                 <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
               </div>
-              <button id="close-howto-btn" class="btn btn-secondary rl-style-127">閉じる</button>
+              <button id="close-howto-btn" class="btn btn-secondary close-howto-btn-custom">閉じる</button>
             </div>
 
             <!-- コンフィグモーダル -->
@@ -433,22 +433,22 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
                 <label for="se-volume">SE音量</label>
                 <input type="range" id="se-volume" min="0" max="100" value="50">
               </div>
-              <button id="credits-btn" class="btn btn-secondary rl-style-128">クレジット・使用素材</button>
-              <button id="close-config-btn" class="btn btn-secondary rl-style-129">閉じる</button>
+              <button id="credits-btn" class="btn btn-secondary credits-btn-custom">クレジット・使用素材</button>
+              <button id="close-config-btn" class="btn btn-secondary close-config-btn-custom">閉じる</button>
             </div>
 
             <!-- クレジットモーダル -->
             <div id="credits-modal" class="config-modal">
               <h3>クレジット・使用素材</h3>
-              <div class="howto-content rl-style-130">
+              <div class="howto-content howto-content-custom">
                 <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-                <ul class="rl-style-131">
+                <ul class="ui-custom-131">
                   <li><strong>画像素材:</strong> いらすとや 様</li>
                   <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
                   <li><strong>フォント:</strong> Google Fonts</li>
                 </ul>
               </div>
-              <button id="close-credits-btn" class="btn btn-secondary rl-style-132">閉じる</button>
+              <button id="close-credits-btn" class="btn btn-secondary close-credits-btn-custom">閉じる</button>
             </div>
 
           </div><!-- /.game-container -->
@@ -1153,7 +1153,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     :global(.dv-card-list) :global(.battle-card),
-    .rl-style-59 :global(.battle-card),
+    .shop-service-card-list-custom :global(.battle-card),
     #fairy-card-list :global(.battle-card) {
       width: 100%;
       min-width: 0;
@@ -1894,19 +1894,19 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     }
 
     /* Auto-extracted styles */
-    .rl-style-1 {
+    .global-game-scaler-custom {
       width: 100%;
       overflow: hidden;
       position: relative;
       margin-top: 2rem;
     }
 
-    .rl-style-2 {
+    .global-game-scaler-inner-custom {
       transform-origin: top left;
       transition: transform 0.2s ease-out;
     }
 
-    .rl-style-3 {
+    .game-container-custom {
       position: relative;
       height: 580px;
       overflow: hidden;
@@ -1916,15 +1916,15 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border-radius: 8px;
     }
 
-    .rl-style-4 {
+    .game-header-custom {
       display: none;
     }
 
-    .rl-style-5 {
+    .game-footer-custom {
       display: none;
     }
 
-    .rl-style-6 {
+    .btn-shop-service-leave-custom {
       flex: 1;
       display: flex;
       align-items: center;
@@ -1937,20 +1937,20 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
-    .rl-style-7 {
+    .town-items-custom {
       font-size: 0.65rem;
       color: var(--text-muted);
       font-weight: bold;
       white-space: nowrap;
     }
 
-    .rl-style-8 {
+    .footer-player-items-custom {
       display: flex;
       gap: 4px;
       overflow-x: auto;
     }
 
-    .rl-style-9 {
+    .btn-footer-view-deck-custom {
       font-size: 0.72rem;
       padding: 0.3rem 0.8rem;
       flex-shrink: 0;
@@ -1960,11 +1960,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       color: #ffb84d;
     }
 
-    .rl-style-10 {
+    .result-overlay-custom {
       z-index: 200;
     }
 
-    .rl-style-11 {
+    .result-details-custom {
       font-size: 0.85rem;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
@@ -1972,38 +1972,38 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       line-height: 1.5;
     }
 
-    .rl-style-12 {
+    .btn-share-custom {
       background-color: #1DA1F2;
       border-color: #1DA1F2;
       color: white;
     }
 
-    .rl-style-13 {
+    .reward-overlay-custom {
       z-index: 180;
     }
 
-    .rl-style-14 {
+    .btn-skip-reward-custom {
       margin-top: 1rem;
     }
 
-    .rl-style-15 {
+    .deck-viewer-overlay-custom {
       justify-content: flex-start;
       padding-top: 2.5rem;
       z-index: 190;
     }
 
-    .rl-style-16 {
+    .ui-custom-16 {
       color: white;
       margin-bottom: 0.5rem;
       font-size: 1.2rem;
     }
 
-    .rl-style-17 {
+    .close-deck-viewer-custom {
       margin-top: 0.8rem;
       width: 100%;
     }
 
-    .rl-style-18 {
+    .start-screen-custom {
       position: absolute;
       top: 0;
       left: 0;
@@ -2019,22 +2019,22 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
-    .rl-style-19 {
+    .ui-custom-19 {
       font-size: 1.8rem;
       margin-bottom: 0.3rem;
     }
 
-    .rl-style-20 {
+    .ui-custom-20 {
       color: var(--text-muted);
       margin-bottom: 2rem;
       font-size: 0.85rem;
     }
 
-    .rl-style-21 {
+    .howto-btn-custom {
       margin-top: 1rem;
     }
 
-    .rl-style-22 {
+    .class-select-screen-custom {
       position: absolute;
       top: 0;
       left: 0;
@@ -2049,107 +2049,107 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       overflow-y: auto;
     }
 
-    .rl-style-23 {
+    .ui-custom-23 {
       font-size: 1.2rem;
       text-align: center;
       margin-bottom: 0.4rem;
       color: #ffb84d;
     }
 
-    .rl-style-24 {
+    .ui-custom-24 {
       font-size: 0.7rem;
       color: var(--text-muted);
       text-align: center;
       margin-bottom: 0.8rem;
     }
 
-    .rl-style-25 {
+    .ui-custom-25 {
       flex: 1;
     }
 
-    .rl-style-26 {
+    .class-grid-custom {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
-    .rl-style-27 {
+    .ui-custom-27 {
       width: 40px;
       height: 40px;
       object-fit: contain;
       margin-bottom: 0.3rem;
     }
 
-    .rl-style-28 {
+    .ui-custom-28 {
       font-size: 0.85rem;
       font-weight: bold;
     }
 
-    .rl-style-29 {
+    .ui-custom-29 {
       font-size: 0.62rem;
       color: var(--text-muted);
       line-height: 1.3;
       margin-top: 0.25rem;
     }
 
-    .rl-style-30 {
+    .ui-custom-30 {
       width: 40px;
       height: 40px;
       object-fit: contain;
       margin-bottom: 0.3rem;
     }
 
-    .rl-style-31 {
+    .ui-custom-31 {
       font-size: 0.85rem;
       font-weight: bold;
     }
 
-    .rl-style-32 {
+    .ui-custom-32 {
       font-size: 0.62rem;
       color: var(--text-muted);
       line-height: 1.3;
       margin-top: 0.25rem;
     }
 
-    .rl-style-33 {
+    .ui-custom-33 {
       width: 40px;
       height: 40px;
       object-fit: contain;
       margin-bottom: 0.3rem;
     }
 
-    .rl-style-34 {
+    .ui-custom-34 {
       font-size: 0.85rem;
       font-weight: bold;
     }
 
-    .rl-style-35 {
+    .ui-custom-35 {
       font-size: 0.62rem;
       color: var(--text-muted);
       line-height: 1.3;
       margin-top: 0.25rem;
     }
 
-    .rl-style-36 {
+    .ui-custom-36 {
       width: 40px;
       height: 40px;
       object-fit: contain;
       margin-bottom: 0.3rem;
     }
 
-    .rl-style-37 {
+    .ui-custom-37 {
       font-size: 0.85rem;
       font-weight: bold;
     }
 
-    .rl-style-38 {
+    .ui-custom-38 {
       font-size: 0.62rem;
       color: var(--text-muted);
       line-height: 1.3;
       margin-top: 0.25rem;
     }
 
-    .rl-style-39 {
+    .class-select-preview-custom {
       font-size: 0.7rem;
       color: #ffb84d;
       text-align: center;
@@ -2157,11 +2157,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       min-height: 1.2rem;
     }
 
-    .rl-style-40 {
+    .btn-back-to-title-custom {
       margin-top: 0.5rem;
     }
 
-    .rl-style-41 {
+    .map-screen-custom {
       position: absolute;
       top: 40px;
       left: 0;
@@ -2176,7 +2176,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       justify-content: space-between;
     }
 
-    .rl-style-42 {
+    .btn-retire-map-custom {
       position: absolute;
       top: 10px;
       right: 10px;
@@ -2185,7 +2185,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding: 0.3rem 0.6rem;
     }
 
-    .rl-style-43 {
+    .map-scroll-wrapper-custom {
       flex: 1;
       overflow-x: auto;
       overflow-y: hidden;
@@ -2199,7 +2199,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       position: relative;
     }
 
-    .rl-style-44 {
+    .map-board-custom {
       display: flex;
       gap: 40px;
       align-items: center;
@@ -2207,7 +2207,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       min-width: max-content;
     }
 
-    .rl-style-45 {
+    .inn-screen-custom {
       position: absolute;
       top: 40px;
       left: 0;
@@ -2224,54 +2224,54 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       text-align: center;
     }
 
-    .rl-style-46 {
+    .ui-custom-46 {
       width: 64px;
       height: 64px;
       object-fit: contain;
       margin-bottom: 1rem;
     }
 
-    .rl-style-47 {
+    .ui-custom-47 {
       color: #51cf66;
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-48 {
+    .ui-custom-48 {
       font-size: 0.8rem;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       max-width: 80%;
     }
 
-    .rl-style-49 {
+    .ui-custom-49 {
       display: flex;
       flex-direction: column;
       gap: 10px;
       width: 100%;
     }
 
-    .rl-style-50 {
+    .btn-inn-rest-half-custom {
       width: 100%;
     }
 
-    .rl-style-51 {
+    .ui-custom-51 {
       font-size: 0.65rem;
     }
 
-    .rl-style-52 {
+    .btn-inn-rest-full-custom {
       width: 100%;
     }
 
-    .rl-style-53 {
+    .ui-custom-53 {
       font-size: 0.65rem;
     }
 
-    .rl-style-54 {
+    .btn-inn-leave-custom {
       width: 100%;
     }
 
-    .rl-style-55 {
+    .shop-service-screen-custom {
       position: absolute;
       top: 40px;
       left: 0;
@@ -2286,22 +2286,22 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       justify-content: space-between;
     }
 
-    .rl-style-56 {
+    .ui-custom-56 {
       text-align: center;
     }
 
-    .rl-style-57 {
+    .shop-service-title-custom {
       color: #ffb84d;
       font-size: 1.2rem;
       margin-bottom: 0.2rem;
     }
 
-    .rl-style-58 {
+    .shop-service-desc-custom {
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .rl-style-59 {
+    .shop-service-card-list-custom {
       flex: 1;
       overflow-y: auto;
       margin: 1rem 0;
@@ -2318,17 +2318,17 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       grid-auto-rows: max-content;
     }
 
-    .rl-style-60 {
+    .ui-custom-60 {
       display: flex;
       gap: 8px;
       width: 100%;
     }
 
-    .rl-style-61 {
+    .btn-shop-service-leave-custom {
       flex: 1;
     }
 
-    .rl-style-62 {
+    .town-screen-custom {
       position: absolute;
       top: 40px;
       left: 0;
@@ -2343,7 +2343,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       justify-content: space-between;
     }
 
-    .rl-style-63 {
+    .ui-custom-63 {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -2352,20 +2352,20 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-64 {
+    .ui-custom-64 {
       color: #ff922b;
       font-size: 1.2rem;
       margin: 0;
     }
 
-    .rl-style-65 {
+    .btn-town-leave-custom {
       font-size: 0.75rem;
       padding: 0.4rem 1rem;
       width: auto;
       font-weight: bold;
     }
 
-    .rl-style-66 {
+    .ui-custom-66 {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -2374,7 +2374,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       overflow-y: auto;
     }
 
-    .rl-style-67 {
+    .ui-custom-67 {
       font-size: 0.72rem;
       color: #ff922b;
       font-weight: bold;
@@ -2382,7 +2382,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border-bottom: 1px solid #444;
     }
 
-    .rl-style-68 {
+    .town-cards-custom {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
@@ -2392,7 +2392,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       max-height: 260px;
     }
 
-    .rl-style-69 {
+    .ui-custom-69 {
       font-size: 0.72rem;
       color: #ffd8a8;
       font-weight: bold;
@@ -2400,18 +2400,18 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border-bottom: 1px solid #444;
     }
 
-    .rl-style-70 {
+    .town-items-custom {
       display: flex;
       gap: 6px;
       overflow-x: auto;
       padding: 4px 0;
     }
 
-    .rl-style-71 {
+    .ui-custom-71 {
       margin-top: 4px;
     }
 
-    .rl-style-72 {
+    .ui-custom-72 {
       font-size: 0.72rem;
       color: #cc5de8;
       font-weight: bold;
@@ -2419,27 +2419,27 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border-bottom: 1px solid #444;
     }
 
-    .rl-style-73 {
+    .ui-custom-73 {
       display: flex;
       gap: 8px;
       margin-top: 8px;
     }
 
-    .rl-style-74 {
+    .btn-town-upgrade-custom {
       flex: 1;
       font-size: 0.75rem;
       background-color: #1976d2;
       border-color: #1565c0;
     }
 
-    .rl-style-75 {
+    .btn-town-remove-custom {
       flex: 1;
       font-size: 0.75rem;
       background-color: #c0392b;
       border-color: #922b21;
     }
 
-    .rl-style-76 {
+    .event-screen-custom {
       position: absolute;
       top: 40px;
       left: 0;
@@ -2455,7 +2455,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       text-align: center;
     }
 
-    .rl-style-77 {
+    .event-image-custom {
       width: 80px;
       height: 80px;
       object-fit: cover;
@@ -2464,13 +2464,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       border: 1px solid #444;
     }
 
-    .rl-style-78 {
+    .event-title-custom {
       color: #ffb84d;
       font-size: 1.2rem;
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-79 {
+    .event-text-custom {
       font-size: 0.82rem;
       color: var(--text-muted);
       line-height: 1.6;
@@ -2478,14 +2478,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       margin: 1rem auto;
     }
 
-    .rl-style-80 {
+    .event-options-custom {
       display: flex;
       flex-direction: column;
       gap: 10px;
       width: 100%;
     }
 
-    .rl-style-81 {
+    .item-confirm-modal-custom {
       position: absolute;
       top: 0;
       left: 0;
@@ -2501,7 +2501,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
-    .rl-style-82 {
+    .ui-custom-82 {
       background: #151522;
       border: 1px solid #444;
       border-radius: 8px;
@@ -2511,35 +2511,35 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       text-align: center;
     }
 
-    .rl-style-83 {
+    .item-confirm-title-custom {
       font-size: 1rem;
       color: #ffb84d;
       margin-bottom: 0.4rem;
     }
 
-    .rl-style-84 {
+    .item-confirm-text-custom {
       font-size: 0.78rem;
       color: var(--text-muted);
       line-height: 1.5;
       margin-bottom: 1.2rem;
     }
 
-    .rl-style-85 {
+    .ui-custom-85 {
       display: flex;
       gap: 10px;
     }
 
-    .rl-style-86 {
+    .btn-item-confirm-yes-custom {
       flex: 1;
       padding: 0.4rem 0;
     }
 
-    .rl-style-87 {
+    .btn-item-confirm-no-custom {
       flex: 1;
       padding: 0.4rem 0;
     }
 
-    .rl-style-88 {
+    .battle-map-overlay-custom {
       display: none;
       background-color: rgba(0, 0, 0, 0.9);
       z-index: 250;
@@ -2547,14 +2547,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       flex-direction: column;
     }
 
-    .rl-style-89 {
+    .ui-custom-89 {
       color: #ffb84d;
       font-size: 1.1rem;
       text-align: center;
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-90 {
+    .battle-map-scroll-wrapper-custom {
       flex: 1;
       overflow-x: auto;
       overflow-y: hidden;
@@ -2566,7 +2566,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding: 1.5rem 1rem;
     }
 
-    .rl-style-91 {
+    .battle-map-board-custom {
       display: flex;
       gap: 40px;
       align-items: center;
@@ -2574,12 +2574,12 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       min-width: max-content;
     }
 
-    .rl-style-92 {
+    .btn-close-battle-map-custom {
       margin-top: 0.8rem;
       width: 100%;
     }
 
-    .rl-style-93 {
+    .king-event-modal-custom {
       display: none;
       background-color: rgba(15, 15, 26, 0.98);
       z-index: 210;
@@ -2590,20 +2590,20 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       text-align: center;
     }
 
-    .rl-style-94 {
+    .ui-custom-94 {
       width: 80px;
       height: 80px;
       object-fit: contain;
       margin-bottom: 1rem;
     }
 
-    .rl-style-95 {
+    .ui-custom-95 {
       color: #ffd700;
       font-size: 1.2rem;
       margin-bottom: 0.4rem;
     }
 
-    .rl-style-96 {
+    .ui-custom-96 {
       font-size: 0.8rem;
       color: var(--text-muted);
       line-height: 1.6;
@@ -2611,13 +2611,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       max-width: 80%;
     }
 
-    .rl-style-97 {
+    .king-relic-choices-custom {
       display: flex;
       gap: 10px;
       margin-bottom: 1.5rem;
     }
 
-    .rl-style-98 {
+    .cutscene-modal-custom {
       display: none;
       background: rgba(5, 5, 20, 0.97);
       z-index: 300;
@@ -2627,7 +2627,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding-bottom: 2rem;
     }
 
-    .rl-style-99 {
+    .cutscene-bg-custom {
       position: absolute;
       inset: 0;
       background-size: cover;
@@ -2636,7 +2636,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       pointer-events: none;
     }
 
-    .rl-style-100 {
+    .cutscene-portraits-custom {
       position: absolute;
       bottom: 120px;
       left: 0;
@@ -2649,7 +2649,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       z-index: 2;
     }
 
-    .rl-style-101 {
+    .ui-custom-101 {
       position: relative;
       z-index: 3;
       width: 92%;
@@ -2661,7 +2661,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-shadow: 0 0 30px rgba(106, 90, 205, 0.4);
     }
 
-    .rl-style-102 {
+    .cutscene-speaker-custom {
       font-size: 0.72rem;
       font-weight: bold;
       color: #c9b8ff;
@@ -2669,24 +2669,24 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       min-height: 1em;
     }
 
-    .rl-style-103 {
+    .cutscene-text-custom {
       font-size: 0.78rem;
       color: #e8e0ff;
       line-height: 1.7;
       min-height: 3.2em;
     }
 
-    .rl-style-104 {
+    .ui-custom-104 {
       text-align: right;
       margin-top: 0.5rem;
     }
 
-    .rl-style-105 {
+    .btn-cutscene-next-custom {
       font-size: 0.7rem;
       padding: 0.25rem 1rem;
     }
 
-    .rl-style-106 {
+    .game-dialog-modal-custom {
       display: none;
       background-color: rgba(0, 0, 0, 0.85);
       z-index: 500;
@@ -2695,7 +2695,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding: 1.5rem;
     }
 
-    .rl-style-107 {
+    .ui-custom-107 {
       background: #151522;
       border: 2px solid #555;
       border-radius: 10px;
@@ -2706,57 +2706,57 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
 
-    .rl-style-107 :global(.dv-card-list) {
+    .ui-custom-107 :global(.dv-card-list) {
       padding-left: 0;
       padding-right: 0;
     }
 
-    .rl-style-108 {
+    .dialog-title-custom {
       font-size: 1rem;
       color: #ffb84d;
       margin-bottom: 0.5rem;
       font-weight: bold;
     }
 
-    .rl-style-109 {
+    .dialog-message-custom {
       font-size: 0.78rem;
       color: #eee;
       line-height: 1.5;
       margin-bottom: 1.2rem;
     }
 
-    .rl-style-110 {
+    .dialog-buttons-custom {
       display: flex;
       gap: 10px;
       justify-content: center;
     }
 
-    .rl-style-111 {
+    .btn-dialog-ok-custom {
       padding: 0.3rem 1.5rem;
     }
 
-    .rl-style-112 {
+    .btn-dialog-yes-custom {
       display: none;
       flex: 1;
       padding: 0.3rem 0;
     }
 
-    .rl-style-113 {
+    .btn-dialog-no-custom {
       display: none;
       flex: 1;
       padding: 0.3rem 0;
     }
 
-    .rl-style-114 {
+    .dialog-extra-custom {
       display: none;
       width: 100%;
     }
 
-    .rl-style-115 {
+    .card-detail-modal-custom {
       display: none;
     }
 
-    .rl-style-116 {
+    .battle-layout-custom {
       top: 40px;
       height: calc(100% - 84px);
       position: absolute;
@@ -2766,7 +2766,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding: 0.4rem 0.5rem 0.3rem;
     }
 
-    .rl-style-117 {
+    .btn-battle-retire-custom {
       position: absolute;
       top: 12px;
       right: 0.5rem;
@@ -2782,15 +2782,15 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       background: rgba(0, 0, 0, 0.6);
     }
 
-    .rl-style-118 {
+    .enemy-poison-badge-custom {
       display: none;
     }
 
-    .rl-style-119 {
+    .player-poison-badge-custom {
       display: none;
     }
 
-    .rl-style-120 {
+    .battle-log-custom {
       height: 80px;
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid #333;
@@ -2804,7 +2804,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
-    .rl-style-121 {
+    .ui-custom-121 {
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
@@ -2812,14 +2812,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       box-sizing: border-box;
     }
 
-    .rl-style-122 {
+    .ui-custom-122 {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
     }
 
-    .rl-style-123 {
+    .btn-battle-view-map-custom {
       width: 65px;
       padding: 0.2rem 0;
       text-align: center;
@@ -2831,7 +2831,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       flex-shrink: 0;
     }
 
-    .rl-style-124 {
+    .btn-end-turn-custom {
       width: 65px;
       padding: 0.2rem 0;
       text-align: center;
@@ -2840,7 +2840,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       font-size: 0.7rem;
     }
 
-    .rl-style-125 {
+    .hand-area-custom {
       height: 148px;
       gap: 6px;
       padding: 2px 0;
@@ -2851,43 +2851,43 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       align-items: flex-start;
     }
 
-    .rl-style-126 {
+    .howto-content-custom {
       text-align: left;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       line-height: 1.6;
     }
 
-    .rl-style-127 {
+    .close-howto-btn-custom {
       width: 100%;
     }
 
-    .rl-style-128 {
+    .credits-btn-custom {
       width: 100%;
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-129 {
+    .close-config-btn-custom {
       width: 100%;
     }
 
-    .rl-style-130 {
+    .howto-content-custom {
       text-align: left;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       line-height: 1.6;
     }
 
-    .rl-style-131 {
+    .ui-custom-131 {
       padding-left: 1.2rem;
       margin-top: 0.5rem;
     }
 
-    .rl-style-132 {
+    .close-credits-btn-custom {
       width: 100%;
     }
 
-    .rl-style-133 {
+    .ui-custom-133 {
       margin-top: auto;
       padding-top: 1rem;
       color: #888;
@@ -2895,11 +2895,11 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       font-style: italic;
     }
 
-    .rl-style-134 {
+    .ui-custom-134 {
       margin-bottom: 0.5rem;
     }
 
-    .rl-style-135 {
+    .ui-custom-135 {
       margin-top: auto;
       padding-top: 1rem;
       color: #888;
@@ -2907,21 +2907,21 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       font-style: italic;
     }
 
-    .rl-style-136 {
+    .ui-custom-136 {
       text-align: center;
       color: #888;
     }
 
-    .rl-style-137 {
+    .ui-custom-137 {
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .rl-style-138 {
+    .ui-custom-138 {
       color: #ffb84d;
     }
 
-    .rl-style-139 {
+    .ui-custom-139 {
       grid-column: span 3;
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -2929,51 +2929,51 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       padding: 1rem;
     }
 
-    .rl-style-140 {
+    .ui-custom-140 {
       color: #fff;
     }
 
-    .rl-style-141 {
+    .ui-custom-141 {
       font-size: 0.7rem;
       color: var(--text-muted);
     }
 
-    .rl-style-142 {
+    .ui-custom-142 {
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .rl-style-143 {
+    .ui-custom-143 {
       font-size: 0.65rem;
       color: #ffb84d;
     }
 
-    .rl-style-144 {
+    .ui-custom-144 {
       color: #4ade80;
     }
 
-    .rl-style-145 {
-      color: #4ade80;
-      font-weight: bold;
-    }
-
-    .rl-style-146 {
+    .ui-custom-145 {
       color: #4ade80;
       font-weight: bold;
     }
 
-    .rl-style-147 {
+    .ui-custom-146 {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .ui-custom-147 {
       font-size: 0.7rem;
       color: var(--text-muted);
     }
 
-    .rl-style-148 {
+    .card-cost-custom {
       background: #ffd700;
       color: #1a1a2e;
       font-size: 0.65rem;
     }
 
-    .rl-style-149 {
+    .card-name-custom {
       color: #ffd700;
       font-size: 0.55rem;
       line-height: 1.2;
@@ -2987,13 +2987,13 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       text-align: center;
     }
 
-    .rl-style-150 {
+    .card-desc-custom {
       font-size: 0.55rem;
       line-height: 1.2;
       padding: 2px;
     }
 
-    .rl-style-151 {
+    .ui-custom-151 {
       color: var(--text-muted);
       font-size: 0.85rem;
     }
@@ -3673,7 +3673,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const catPrefix = card.category && catLabelMap[card.category] ? `${catLabelMap[card.category]} ` : '';
       const flavorStyle = "margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;";
       const flavorHtml = `<div style="${flavorStyle}">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
-      cardDetailDesc.innerHTML = `<div class="rl-style-134">${catPrefix}${descHtml}</div>${flavorHtml}`;
+      cardDetailDesc.innerHTML = `<div class="ui-custom-134">${catPrefix}${descHtml}</div>${flavorHtml}`;
       cardDetailModal.style.display = 'flex';
     }
 
@@ -3728,7 +3728,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const typeName = type === 'relic' ? 'レリック' : 'アイテム';
       const flavorStyle = "margin-top: auto; padding-top: 1rem; color: #888; font-size: 0.8rem; font-style: italic;";
       const flavorHtml = `<div style="${flavorStyle}">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
-      cardDetailDesc.innerHTML = `<div class="rl-style-136">【${typeName}】</div>${flavorHtml}`;
+      cardDetailDesc.innerHTML = `<div class="ui-custom-136">【${typeName}】</div>${flavorHtml}`;
       cardDetailModal.style.display = 'flex';
     }
 
@@ -3792,7 +3792,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         el.addEventListener('click', () => {
           showGameConfirm(
             'レリック選択',
-            `レリック「${relic.name}」を選択しますか？<br><br><span class="rl-style-137">${relic.desc}</span>`,
+            `レリック「${relic.name}」を選択しますか？<br><br><span class="ui-custom-137">${relic.desc}</span>`,
             () => {
               playSE('relic');
               player.relics.push(relicId);
@@ -3863,7 +3863,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             butouka: { hp: 8, mp: 4, effect: '毎ターンの行動回数が+1' }
           };
           const info = classInfo[selectedClass];
-          const confirmMessage = `初期HP: ${info.hp} / 初期MP: ${info.mp}<br><span class="rl-style-138">【特殊効果】 ${info.effect}</span>`;
+          const confirmMessage = `初期HP: ${info.hp} / 初期MP: ${info.mp}<br><span class="ui-custom-138">【特殊効果】 ${info.effect}</span>`;
 
           showGameConfirm(`${CLASS_NAMES[selectedClass] || selectedClass}として冒険にでますか？`, confirmMessage, () => {
             initGame();
@@ -4366,7 +4366,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         const targets = [...player.deck, ...player.discard, ...player.hand];
 
         if (targets.length === 0) {
-          shopServiceCardList.innerHTML = '<div class="rl-style-139">カードがありません</div>';
+          shopServiceCardList.innerHTML = '<div class="ui-custom-139">カードがありません</div>';
         } else {
           targets.forEach((cardInstance) => {
             const isFullyUpgraded = (cardInstance.upgradeCount || 0) >= 3;
@@ -4625,7 +4625,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
             const buyBtn = document.createElement('button');
             buyBtn.className = 'btn btn-secondary';
             buyBtn.style.cssText = `font-size: 0.75rem; padding: 4px 10px; margin-top: 4px; display: flex; align-items: center; justify-content: center; width: auto; min-width: 60px; height: auto; border-radius: 8px; background-color: ${bgColor}; border: 1px solid ${borderColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.3);`;
-            buyBtn.innerHTML = `<span style="color: ${priceColor}; font-weight: bold; margin-right: 2px;">${price}</span> <span class="rl-style-140">Gで購入</span>`;
+            buyBtn.innerHTML = `<span style="color: ${priceColor}; font-weight: bold; margin-right: 2px;">${price}</span> <span class="ui-custom-140">Gで購入</span>`;
             buyBtn.addEventListener('click', () => {
               if (player.gold >= price) {
                 showGameConfirm('商品の購入', `「${card.name}」を${price}ゴールドで購入しますか？`, () => {
@@ -4945,14 +4945,14 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
               if (textEl && modal && btnYes && btnNo && titleEl) {
                 if (canClick) {
                   titleEl.textContent = 'アイテムの使用確認';
-                  textEl.innerHTML = `<strong>${item.name}</strong>を使用しますか？<br><br><span class="rl-style-141">${item.desc}</span>`;
+                  textEl.innerHTML = `<strong>${item.name}</strong>を使用しますか？<br><br><span class="ui-custom-141">${item.desc}</span>`;
                   btnYes.style.display = 'block';
                   btnNo.textContent = 'いいえ';
                 } else {
                   titleEl.textContent = 'アイテムの詳細';
                   let reason = '※アイテムは戦闘中（かつ自分のターン）にのみ使用可能です。';
                   if (itemState.used) reason = '※このアイテムは既に使用済みです。';
-                  textEl.innerHTML = `<strong>${item.name}</strong><br><br><span class="rl-style-142">${item.desc}</span><br><br><span class="rl-style-143">${reason}</span>`;
+                  textEl.innerHTML = `<strong>${item.name}</strong><br><br><span class="ui-custom-142">${item.desc}</span><br><br><span class="ui-custom-143">${reason}</span>`;
                   btnYes.style.display = 'none';
                   btnNo.textContent = '閉じる';
                 }
@@ -5088,7 +5088,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
       const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
       const baseCard = CARD_DB[baseId] || card;
       if (card.upgraded && card.cost < baseCard.cost) {
-        cost.innerHTML = `<span class="rl-style-144">${actualCost}</span>`;
+        cost.innerHTML = `<span class="ui-custom-144">${actualCost}</span>`;
       } else {
         cost.textContent = actualCost;
       }
@@ -5195,7 +5195,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function buildCardMainText(card) {
       const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
       const base = CARD_DB[baseId] || card;
-      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span class="rl-style-145">${val}</span>` : val;
+      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span class="ui-custom-145">${val}</span>` : val;
 
       if (card.type === 'attack') {
         const hits = card.hits ? `×${fmt(card.hits, base.hits || 1)}` : '';
@@ -5217,7 +5217,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
     function buildCardSubTexts(card) {
       const baseId = card.id.endsWith('+') ? card.id.slice(0, -1) : card.id;
       const base = CARD_DB[baseId] || card;
-      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span class="rl-style-146">${val}</span>` : val;
+      const fmt = (val, bVal) => (card.upgraded && val > (bVal || 0)) ? `<span class="ui-custom-146">${val}</span>` : val;
       const lines = [];
       if (card.poison) lines.push(`毒${fmt(card.poison, base.poison)}付与`);
       if (card.paralyze) lines.push('30%で麻痺');
@@ -5577,7 +5577,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         // レリック即時効果の適用
         if (relicId === 'yubiwa_gold') { player.maxHp += 1; player.hp = Math.min(player.hp, player.maxHp); }
         if (relicId === 'yubiwa_silver') { player.maxMp += 1; }
-        showGameAlert('レリック入手', `「${relic.name}」を入手しました！<br><span class="rl-style-147">${relic.desc}</span>`, () => {
+        showGameAlert('レリック入手', `「${relic.name}」を入手しました！<br><span class="ui-custom-147">${relic.desc}</span>`, () => {
           onDone?.();
         });
       });
@@ -5794,9 +5794,9 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         el.style.borderColor = '#ffd700';
         el.style.borderWidth = '2px';
         el.innerHTML = `
-          <div class="card-cost rl-style-148" >宝</div>
-          <div class="card-name rl-style-149" >${relic.name}</div>
-          <div class="card-desc rl-style-150" >${relic.desc}</div>
+          <div class="card-cost card-cost-custom" >宝</div>
+          <div class="card-name card-name-custom" >${relic.name}</div>
+          <div class="card-desc card-desc-custom" >${relic.desc}</div>
         `;
         el.addEventListener('click', () => {
           playSE('relic');
@@ -6029,7 +6029,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
         if (!el) return;
         el.innerHTML = '';
         if (cards.length === 0) {
-          el.innerHTML = '<p class="rl-style-151">カードなし</p>';
+          el.innerHTML = '<p class="ui-custom-151">カードなし</p>';
           return;
         }
         cards.forEach(c => {

@@ -2651,3 +2651,75 @@ if (btnInnRest) {
         setSeVolume(e.target.value / 100);
       });
     }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cardTooltip = document.getElementById('card-tooltip');
+  if (!cardTooltip) return;
+  const tName = document.getElementById('tooltip-name');
+  const tCost = document.getElementById('tooltip-cost');
+  const tCat = document.getElementById('tooltip-category');
+  const tDesc = document.getElementById('tooltip-desc');
+  
+  document.addEventListener('mouseover', (e) => {
+    const cardEl = e.target.closest('.battle-card');
+    if (cardEl && cardEl.dataset.cardId) {
+      const cardData = Object.values(window._gameContext?.cards || {}).find(c => c.id === cardEl.dataset.cardId);
+      if (cardData) {
+        tName.textContent = cardData.name + (cardData.upgraded ? '+' : '');
+        tCost.textContent = 'MP: ' + cardData.cost;
+        tCat.textContent = cardData.category || '攻撃';
+        tDesc.innerHTML = (cardData.description || '').replace(/\n/g, '<br>');
+        
+        const rect = cardEl.getBoundingClientRect();
+        cardTooltip.style.display = 'block';
+        cardTooltip.style.left = Math.min(rect.right + 10, window.innerWidth - 230) + 'px';
+        cardTooltip.style.top = Math.min(rect.top, window.innerHeight - cardTooltip.offsetHeight - 10) + 'px';
+      }
+    }
+  });
+  
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('.battle-card')) {
+      cardTooltip.style.display = 'none';
+    }
+  });
+});
+
+function showUpgradeConfirm(card, cardEl, cost, callback) {
+  const modal = document.getElementById('upgrade-confirm-modal');
+  const overlay = document.getElementById('modal-overlay');
+  if (!modal || !overlay) {
+    callback(confirm(`「${card.name}」を強化しますか？\n\n(必要ゴールド: ${cost})`));
+    return;
+  }
+  
+  const container = document.getElementById('upgrade-confirm-card');
+  container.innerHTML = '';
+  const clone = cardEl.cloneNode(true);
+  clone.style.pointerEvents = 'none';
+  container.appendChild(clone);
+  
+  document.getElementById('upgrade-cost-text').textContent = `必要ゴールド: ${cost}G`;
+  
+  modal.classList.add('active');
+  overlay.classList.add('active');
+  
+  const btnYes = document.getElementById('btn-upgrade-yes');
+  const btnNo = document.getElementById('btn-upgrade-no');
+  const btnClose = document.getElementById('close-upgrade-confirm-btn-x');
+  
+  const cleanup = () => {
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+    btnYes.removeEventListener('click', onYes);
+    btnNo.removeEventListener('click', onNo);
+    btnClose.removeEventListener('click', onNo);
+  };
+  
+  const onYes = () => { cleanup(); callback(true); };
+  const onNo = () => { cleanup(); callback(false); };
+  
+  btnYes.addEventListener('click', onYes);
+  btnNo.addEventListener('click', onNo);
+  btnClose.addEventListener('click', onNo);
+}

@@ -1,4 +1,5 @@
 ---
+import HowToPlayModal from './HowToPlayModal.astro';
 import heroImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_yuusya.png';
 import warriorImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_kenshi.png';
 import mageImg from '../../assets/games/tower-defense/images/unit/figure_rpg_character_mahoutsukai.png';
@@ -236,7 +237,8 @@ const { gameTitle } = Astro.props;
         <label class="config-label">SE音量</label>
         <input type="range" id="se-volume" class="config-range" min="0" max="100" value="50">
       </div>
-      <button id="close-config-btn" class="btn btn-secondary btn-full-width">閉じる</button>
+      <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
+          <button id="close-config-btn" class="btn btn-secondary btn-full-width">閉じる</button>
     </div>
   </div>
 

@@ -1,4 +1,5 @@
 ---
+import HowToPlayModal from './HowToPlayModal.astro';
 const { materialCategories, gameTitle } = Astro.props;
 ---
 <div class="game-container" id="game-container">
@@ -40,19 +41,21 @@ const { materialCategories, gameTitle } = Astro.props;
   </div>
 
   <!-- 遊び方モーダル -->
-  <div id="howto-modal" class="config-modal">
-    <h3>遊び方</h3>
-    <div class="howto-content">
-      <p>画面をタップするとキャラクターがジャンプします。</p>
-      <p>空中でもう一度タップすると2段ジャンプが可能です。</p>
-      <p>迫り来る障害物や穴を避けながら、どこまで長く生き延びられるか挑戦しましょう！</p>
-    </div>
-    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
-  </div>
+  <HowToPlayModal>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・自動で走るキャラクターを操作して、障害物を避けながら進むゲームです。</p>
+      </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・画面タップでジャンプします。</p>
+      </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・障害物に当たるとゲームオーバーです。どこまで進めるか挑戦しましょう。</p>
+      </div></HowToPlayModal>
   <!-- コンフィグモーダル（ダミー） -->
   <div id="modal-overlay" class="modal-overlay"></div>
   <div id="config-modal" class="config-modal">
-    <h3>コンフィグ</h3>
+    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
+      <h3>コンフィグ</h3>
     <div class="config-item">
       <label for="bgm-volume">BGM音量</label>
       <input type="range" id="bgm-volume" min="0" max="100" value="50">
@@ -63,7 +66,8 @@ const { materialCategories, gameTitle } = Astro.props;
     </div>
 
     <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-    <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
+    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
+          <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
   </div>
   <!-- リタイアモーダル -->
   <div id="retire-modal" class="config-modal">
@@ -76,7 +80,8 @@ const { materialCategories, gameTitle } = Astro.props;
   </div>
   <!-- クレジットモーダル -->
   <div id="credits-modal" class="config-modal">
-    <h3>クレジット・使用素材</h3>
+    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
+      <h3>クレジット・使用素材</h3>
     <div class="howto-content">
       <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
       <ul class="credits-list">

@@ -1,4 +1,5 @@
 ---
+import HowToPlayModal from './HowToPlayModal.astro';
 import imgYuusya from '../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
 import imgKenshi from '../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
 import imgMahoutsukai from '../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png';
@@ -420,21 +421,26 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
 
 
   <!-- 遊び方モーダル -->
-  <div id="howto-modal" class="config-modal">
-    <h3>遊び方</h3>
-    <div class="howto-content"
-      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-      <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
-      <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
-      <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
-    </div>
-    <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
-  </div>
+  <HowToPlayModal>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+        <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+        <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください。</p>
+      </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>毒や火傷などの状態異常はターン終了時にダメージを受けます。</p>
+        <p>回復カードを使って素早く対処しましょう。</p>
+      </div>
+      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>「町」や「妖精」でカードを強化できます。</p>
+        <p>自分だけの最強のデッキを作り上げましょう。</p>
+      </div></HowToPlayModal>
 
   <!-- コンフィグモーダル -->
   <div id="modal-overlay" class="modal-overlay"></div>
   <div id="config-modal" class="config-modal">
-    <h3>コンフィグ</h3>
+    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
+      <h3>コンフィグ</h3>
     <div class="config-item">
       <label for="bgm-volume">BGM音量</label>
       <input type="range" id="bgm-volume" min="0" max="100" value="50">
@@ -444,12 +450,14 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
       <input type="range" id="se-volume" min="0" max="100" value="50">
     </div>
     <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-    <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
+    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
+          <button id="close-config-btn" class="btn btn-secondary btn-full">閉じる</button>
   </div>
 
   <!-- クレジットモーダル -->
   <div id="credits-modal" class="config-modal">
-    <h3>クレジット・使用素材</h3>
+    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
+      <h3>クレジット・使用素材</h3>
     <div class="howto-content"
       style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
       <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
@@ -1610,3 +1618,66 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
   }
 </style>
+  <!-- Upgrade Confirm Modal -->
+  <div id="upgrade-confirm-modal" class="config-modal">
+    <button class="modal-close-x-btn" id="close-upgrade-confirm-btn-x">&times;</button>
+    <h3>カード強化</h3>
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+      <div id="upgrade-confirm-card" style="display: inline-block; margin-bottom: 1rem;"></div>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem;">このカードを強化しますか？</p>
+      <p id="upgrade-cost-text" style="color: #ffb84d; font-weight: bold;"></p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button id="btn-upgrade-yes" class="btn btn-primary" style="flex: 1;">強化する</button>
+      <button id="btn-upgrade-no" class="btn btn-secondary" style="flex: 1;">キャンセル</button>
+    </div>
+  </div>
+  <!-- Tooltip Element -->
+  <div id="card-tooltip" class="card-tooltip" style="display: none;">
+    <div class="tooltip-header">
+      <span id="tooltip-name" class="tooltip-name"></span>
+      <span id="tooltip-cost" class="tooltip-cost"></span>
+    </div>
+    <div id="tooltip-category" class="tooltip-category"></div>
+    <div id="tooltip-desc" class="tooltip-desc"></div>
+  </div>
+  
+  <style>
+  .card-tooltip {
+    position: fixed;
+    background: rgba(10, 10, 20, 0.95);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 10px;
+    width: 220px;
+    z-index: 10000;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+  }
+  .tooltip-name {
+    font-weight: bold;
+    color: var(--primary-color);
+  }
+  .tooltip-cost {
+    color: #ffb84d;
+  }
+  .tooltip-category {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-bottom: 5px;
+  }
+  .tooltip-desc {
+    color: #ddd;
+  }
+  </style>
+  
