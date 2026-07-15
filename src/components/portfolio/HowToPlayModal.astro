@@ -1,0 +1,138 @@
+---
+// src/components/portfolio/HowToPlayModal.astro
+---
+<div id="howto-modal" class="config-modal">
+  <button class="modal-close-x-btn" id="close-howto-btn-x">&times;</button>
+  <h3>遊び方</h3>
+  <div id="howto-pages" class="howto-pages-container">
+    <slot />
+  </div>
+  <div class="howto-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <button id="howto-prev-btn" class="btn btn-primary pagination-btn" style="padding: 0.3rem 1rem;">◀</button>
+    <span id="howto-page-indicator" style="font-size: 0.9rem;">1 / 1</span>
+    <button id="howto-next-btn" class="btn btn-primary pagination-btn" style="padding: 0.3rem 1rem;">▶</button>
+  </div>
+  <button id="close-howto-btn" class="btn btn-secondary btn-full">閉じる</button>
+</div>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const howtoModal = document.getElementById('howto-modal');
+    if (!howtoModal) return;
+    
+    const pagesContainer = document.getElementById('howto-pages');
+    const pages = Array.from(pagesContainer.children);
+    if (pages.length === 0) return;
+    
+    pages.forEach((p, i) => {
+      p.style.display = i === 0 ? 'block' : 'none';
+      p.classList.add('howto-page-item');
+    });
+
+    let currentPage = 0;
+    const prevBtn = document.getElementById('howto-prev-btn');
+    const nextBtn = document.getElementById('howto-next-btn');
+    const indicator = document.getElementById('howto-page-indicator');
+    
+    const closeBtns = [document.getElementById('close-howto-btn-x'), document.getElementById('close-howto-btn')];
+    
+    const howtoBtns = document.querySelectorAll('#howto-btn, #howto-btn-in-config, .btn-howto');
+
+    function updatePage() {
+      pages.forEach((p, i) => {
+        p.style.display = i === currentPage ? 'block' : 'none';
+      });
+      if (indicator) {
+        indicator.textContent = (currentPage + 1) + " / " + pages.length;
+      }
+      
+      const paginationEl = document.querySelector('.howto-pagination');
+      if (paginationEl && pages.length <= 1) {
+          paginationEl.style.display = 'none';
+      }
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.playSE === 'function') window.playSE('cursor');
+        currentPage = (currentPage > 0) ? currentPage - 1 : pages.length - 1;
+        updatePage();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.playSE === 'function') window.playSE('cursor');
+        currentPage = (currentPage < pages.length - 1) ? currentPage + 1 : 0;
+        updatePage();
+      });
+    }
+
+    closeBtns.forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.playSE === 'function') window.playSE('cursor');
+          howtoModal.classList.remove('active');
+          const mainOverlay = document.getElementById('modal-overlay');
+          if (mainOverlay) mainOverlay.classList.remove('active');
+        });
+      }
+    });
+
+    howtoBtns.forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof window.playSE === 'function') window.playSE('cursor');
+          
+          currentPage = 0;
+          updatePage();
+          
+          const configModal = document.getElementById('config-modal');
+          if (configModal) configModal.classList.remove('active');
+          
+          howtoModal.classList.add('active');
+          const mainOverlay = document.getElementById('modal-overlay');
+          if (mainOverlay) mainOverlay.classList.add('active');
+        });
+      }
+    });
+    
+    updatePage();
+  });
+</script>
+
+<style>
+  .howto-pages-container {
+    min-height: 150px;
+    margin-bottom: 20px;
+  }
+  .howto-page-item {
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-close-x-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .modal-close-x-btn:hover {
+    color: #ffb84d;
+  }
+</style>
