@@ -78,34 +78,34 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     <p class="class-select-desc">あなたの戦闘スタイルを選んで旅立ちましょう。</p>
     <div class="class-select-body">
       <div class="class-grid">
-        <div class="class-card" data-class="yuusya">
-          <img src={imgYuusya.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
-          <div style="font-size: 0.85rem; font-weight: bold;">勇者</div>
-          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP10 /
+        <div data- class="class-card yuusya">
+          <img src={imgYuusya.src} class="rl-char-img" />
+          <div class="rl-char-name">勇者</div>
+          <div class="rl-char-desc">HP10 /
             MP5<br>初期レリックが+1個</div>
         </div>
-        <div class="class-card" data-class="kenshi">
-          <img src={imgKenshi.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
-          <div style="font-size: 0.85rem; font-weight: bold;">戦士</div>
-          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP15 /
+        <div data- class="class-card kenshi">
+          <img src={imgKenshi.src} class="rl-char-img" />
+          <div class="rl-char-name">戦士</div>
+          <div class="rl-char-desc">HP15 /
             MP4<br>毎ターンHP+1回復</div>
         </div>
-        <div class="class-card" data-class="mahoutsukai">
+        <div data- class="class-card mahoutsukai">
           <img src={imgMahoutsukai.src}
-            style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
-          <div style="font-size: 0.85rem; font-weight: bold;">魔法使い</div>
-          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP7 /
+            class="rl-char-img" />
+          <div class="rl-char-name">魔法使い</div>
+          <div class="rl-char-desc">HP7 /
             MP7<br>毎ターンMP+1回復</div>
         </div>
-        <div class="class-card" data-class="butouka">
-          <img src={imgButouka.src} style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem;" />
-          <div style="font-size: 0.85rem; font-weight: bold;">格闘家</div>
-          <div style="font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem;">HP8 /
+        <div data- class="class-card butouka">
+          <img src={imgButouka.src} class="rl-char-img" />
+          <div class="rl-char-name">格闘家</div>
+          <div class="rl-char-desc">HP8 /
             MP4<br>毎ターン行動回数+1</div>
         </div>
       </div>
       <p id="class-select-preview"
-        style="font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem;">
+        class="rl-char-preview">
         勇者が選択されています</p>
     </div>
 
@@ -134,10 +134,10 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   <!-- 宿（回復）画面 -->
   <div id="inn-screen" class="game-screen game-screen-offset inn-screen">
     <div class="screen-box-image-wrap">
-      <img src={imgHotelPet.src} style="width: 100px; height: 100px; object-fit: contain;" />
+      <img src={imgHotelPet.src} class="rl-event-img" />
     </div>
-    <h3 style="color: #51cf66; font-size: 1.2rem; margin-bottom: 0.5rem;">旅人の宿</h3>
-    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%;">
+    <h3 class="rl-event-title rl-event-hotel">旅人の宿</h3>
+    <p class="rl-event-desc">
       15ゴールドを支払って、宿屋でぐっすり休むことができます。<br>
       <strong>効果: HP全回復 ＋ 毒/麻痺の全治</strong>
     </p>
@@ -149,18 +149,18 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
 
   <!-- 妖精（強化）画面 -->
   <div id="fairy-screen" class="game-screen game-screen-offset fairy-screen">
-    <div style="text-align: center;">
+    <div class="rl-text-center">
       <div class="screen-box-image-wrap">
-        <img src={imgPixy.src} style="width: 100px; height: 100px; object-fit: contain;" />
+        <img src={imgPixy.src} class="rl-event-img" />
       </div>
-      <h3 style="color: #cc5de8; font-size: 1.2rem; margin-bottom: 0.2rem;">祝福の妖精</h3>
-      <p id="fairy-desc" style="font-size: 0.75rem; color: var(--text-muted);">
+      <h3 class="rl-event-title rl-event-fairy">祝福の妖精</h3>
+      <p id="fairy-desc" class="rl-event-desc-small">
         20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。</p>
     </div>
 
     <!-- 強化対象カード選択リスト -->
     <div id="fairy-card-list"
-      style="flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px;">
+      class="rl-fairy-options">
       <!-- 所持カードがボタンとして並びます -->
     </div>
 
@@ -171,27 +171,27 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
 
   <!-- 街（ショップ）画面 -->
   <div id="town-screen" class="game-screen game-screen-offset town-screen">
-    <div style="text-align: center;">
+    <div class="rl-text-center">
       <div class="screen-box-image-wrap">
-        <img src={imgShop.src} style="width: 100px; height: 100px; object-fit: contain;" />
+        <img src={imgShop.src} class="rl-event-img" />
       </div>
-      <h3 style="color: #ff922b; font-size: 1.2rem; margin-bottom: 0.2rem;">よろず街の商い</h3>
-      <p style="font-size: 0.75rem; color: var(--text-muted);">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
+      <h3 class="rl-event-title rl-event-shop">よろず街の商い</h3>
+      <p class="rl-event-desc-small">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
     </div>
 
     <div
-      style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px;">
+      class="rl-shop-container">
       <div>
         <p
-          style="font-size: 0.72rem; color: #ff922b; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+          class="rl-shop-subtitle rl-text-orange">
           販売カード (各 💰15)</p>
-        <div id="town-cards" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+        <div id="town-cards" class="rl-shop-row"></div>
       </div>
       <div>
         <p
-          style="font-size: 0.72rem; color: #ffd8a8; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444;">
+          class="rl-shop-subtitle rl-text-lightorange">
           販売アイテム (各 💰20)</p>
-        <div id="town-items" style="display: flex; gap: 6px; overflow-x: auto; padding: 4px 0;"></div>
+        <div id="town-items" class="rl-shop-row"></div>
       </div>
     </div>
 
@@ -203,54 +203,52 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     <div>
       <div class="screen-box-image-wrap">
         <img id="event-image" src={imgNoImage.src}
-          style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px;" />
+          class="rl-event-img-rounded" />
       </div>
-      <h3 id="event-title" style="color: #ffb84d; font-size: 1.2rem; margin-bottom: 0.5rem;">未知のイベント</h3>
+      <h3 id="event-title" class="rl-event-title rl-text-warning">未知のイベント</h3>
       <p id="event-text"
-        style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto;">
+        class="rl-event-desc-large">
       </p>
     </div>
 
-    <div id="event-options" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+    <div id="event-options" class="rl-event-options">
       <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
     </div>
   </div>
 
   <!-- アイテム使用確認モーダル -->
   <div id="item-confirm-modal"
-    style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box;">
+    class="rl-overlay-full">
     <div
-      style="background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center;">
-      <h4 style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem;">アイテムの使用確認</h4>
+      class="rl-modal-box">
+      <h4 class="rl-modal-title">アイテムの使用確認</h4>
       <p id="item-confirm-text"
-        style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem;"></p>
-      <div style="display: flex; gap: 10px;">
-        <button id="btn-item-confirm-yes" class="btn btn-primary" style="flex: 1; padding: 0.4rem 0;">はい</button>
-        <button id="btn-item-confirm-no" class="btn btn-secondary" style="flex: 1; padding: 0.4rem 0;">いいえ</button>
+        class="rl-modal-desc"></p>
+      <div class="rl-modal-actions">
+        <button id="btn-item-confirm-yes" class="btn btn-primary rl-modal-btn">はい</button>
+        <button id="btn-item-confirm-no" class="btn btn-secondary rl-modal-btn">いいえ</button>
       </div>
     </div>
   </div>
 
   <!-- 戦闘中マップ確認モーダル -->
-  <div id="battle-map-overlay" class="overlay"
-    style="display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column;">
-    <h3 style="color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">現在地確認</h3>
+  <div id="battle-map-overlay" class="overlay rl-battle-map-overlay">
+    <h3 class="rl-battle-map-title">現在地確認</h3>
     <div id="battle-map-scroll-wrapper"
-      style="flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem;">
+      class="rl-battle-map-container">
       <div id="battle-map-board"
-        style="display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content;"></div>
+        class="rl-battle-map-inner"></div>
     </div>
-    <button class="btn btn-secondary" id="btn-close-battle-map" style="margin-top: 0.8rem; width: 100%;">閉じる</button>
+    <button id="btn-close-battle-map" class="btn btn-secondary rl-battle-map-close-btn">閉じる</button>
   </div>
 
   <!-- 王様遭遇イベントモーダル -->
-  <div id="king-event-modal" class="overlay"
-    style="display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center;">
+  <div id="king-event-modal" class="overlay rl-king-overlay">
     <div class="screen-box-image-wrap">
-      <img src={imgKing.src} style="width: 100px; height: 100px; object-fit: contain;" />
+      <img src={imgKing.src} class="rl-event-img" />
     </div>
-    <h3 style="color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem;">謁見の間：王からの餞別</h3>
-    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%;">
+    <h3 class="rl-king-title">謁見の間：王からの餞別</h3>
+    <p class="rl-king-desc">
       「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
     </p>
     <div id="king-relic-choices" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
@@ -267,7 +265,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     </div>
     <!-- キャラクターポートレート群 -->
     <div id="cutscene-portraits"
-      style="position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2;">
+      class="rl-cutscene-chars">
     </div>
     <!-- セリフウィンドウ -->
     <div
@@ -292,7 +290,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
       </h4>
       <p id="dialog-message" style="font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem;">
       </p>
-      <div id="dialog-buttons" style="display: flex; gap: 10px; justify-content: center;">
+      <div id="dialog-buttons" class="rl-dialog-actions">
         <button id="btn-dialog-ok" class="btn btn-primary" style="padding: 0.3rem 1.5rem;">OK</button>
         <button id="btn-dialog-yes" class="btn btn-primary" style="display:none; flex:1; padding: 0.3rem 0;">はい</button>
         <button id="btn-dialog-no" class="btn btn-secondary"
@@ -317,10 +315,10 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
           <span id="enemy-name">敵</span>
           <span id="enemy-poison-badge" style="font-size: 0.65rem; display: none;"></span>
         </div>
-        <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+        <div class="rl-stat-row">
           <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
           <div
-            style="flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+            class="rl-stat-bar-bg">
             <div id="enemy-hp-bar"
               style="height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s;">
             </div>
@@ -334,7 +332,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
       </div>
 
       <!-- ② 右上：敵画像 -->
-      <div style="display: flex; align-items: center; justify-content: center; position: relative;">
+      <div class="rl-battle-sprite-wrap">
         <img id="enemy-image" src="" alt="敵"
           style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));" />
       </div>
@@ -354,10 +352,10 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
           <span id="player-poison-badge" style="font-size: 0.65rem; display: none;"></span>
           <span id="player-class-name">あなた</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 4px; width: 100%;">
+        <div class="rl-stat-row">
           <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
           <div
-            style="flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555;">
+            class="rl-stat-bar-bg-player">
             <div id="player-hp-bar"
               style="height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s;">
             </div>
@@ -367,7 +365,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
         </div>
         <div style="display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem;">
           <span style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">MP</span>
-          <div id="player-mp-orbs" style="display: flex; gap: 2px; flex: 1;"></div>
+          <div id="player-mp-orbs" class="rl-mp-orbs"></div>
           <span id="player-mp-text" style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">5/5</span>
         </div>
         <div style="font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem;">
@@ -388,17 +386,17 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
       style="display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%;">
       <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
         <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">レリック:</span>
-        <div id="player-relics" style="display: flex; gap: 4px; overflow-x: auto;"></div>
+        <div id="player-relics" class="rl-inventory-items"></div>
       </div>
       <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
         <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
-        <div id="player-items" style="display: flex; gap: 4px;"></div>
+        <div id="player-items" class="rl-inventory-items-fixed"></div>
       </div>
     </div>
 
     <!-- 手札エリア -->
     <div style="display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box;">
-      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div class="rl-action-header">
         <button class="btn btn-secondary" id="btn-view-deck"
           style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem;">
           山札 (<span id="deck-count">0</span>)
@@ -408,8 +406,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
           マップ
         </button>
       </div>
-      <div id="hand-area" class="hand-area"
-        style="height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start;">
+      <div id="hand-area" class="hand-area rl-hand-cards">
         <!-- カードがJSで挿入されます -->
       </div>
       <div style="margin-top: 0.1rem; width: 100%;">
@@ -450,7 +447,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
       <input type="range" id="se-volume" min="0" max="100" value="50">
     </div>
     <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
+    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto rl-mt-1rem">遊び方を見る</button>
           
   </div>
 
@@ -481,10 +478,12 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
        インラインスタイルから移行したクラス群
        ============================= */
 
+  /* ゲームの高さ・最大幅の設定 */
   .game-container {
-    height: 580px;
+    --game-height: 580px;
     max-width: 800px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
     overflow: hidden;
     border-radius: 8px;
@@ -1623,17 +1622,17 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     <button class="modal-close-x-btn" id="close-upgrade-confirm-btn-x">&times;</button>
     <h3>カード強化</h3>
     <div style="margin-bottom: 1.5rem; text-align: center;">
-      <div id="upgrade-confirm-card" style="display: inline-block; margin-bottom: 1rem;"></div>
+      <div id="upgrade-confirm-card" class="rl-upgrade-card"></div>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem;">このカードを強化しますか？</p>
-      <p id="upgrade-cost-text" style="color: #ffb84d; font-weight: bold;"></p>
+      <p id="upgrade-cost-text" class="rl-upgrade-cost"></p>
     </div>
-    <div style="display: flex; gap: 10px;">
-      <button id="btn-upgrade-yes" class="btn btn-primary" style="flex: 1;">強化する</button>
-      <button id="btn-upgrade-no" class="btn btn-secondary" style="flex: 1;">キャンセル</button>
+    <div class="rl-modal-actions">
+      <button id="btn-upgrade-yes" class="btn btn-primary rl-flex-1">強化する</button>
+      <button id="btn-upgrade-no" class="btn btn-secondary rl-flex-1">キャンセル</button>
     </div>
   </div>
   <!-- Tooltip Element -->
-  <div id="card-tooltip" class="card-tooltip" style="display: none;">
+  <div id="card-tooltip" class="card-tooltip rl-hidden-default">
     <div class="tooltip-header">
       <span id="tooltip-name" class="tooltip-name"></span>
       <span id="tooltip-cost" class="tooltip-cost"></span>
@@ -1679,5 +1678,150 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   .tooltip-desc {
     color: #ddd;
   }
-  </style>
+  
+<style>
+  /* ====== RoguelikeUI Extracted Inline Styles ====== */
+  .rl-char-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
+  .rl-char-name { font-size: 0.85rem; font-weight: bold; }
+  .rl-char-desc { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
+  .rl-char-preview { font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem; }
+  
+  .rl-event-img { width: 100px; height: 100px; object-fit: contain; }
+  .rl-event-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .rl-event-hotel { color: #51cf66; }
+  .rl-event-fairy { color: #cc5de8; margin-bottom: 0.2rem; }
+  .rl-event-shop { color: #ff922b; margin-bottom: 0.2rem; }
+  .rl-event-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%; }
+  .rl-text-center { text-align: center; }
+  .rl-event-desc-small { font-size: 0.75rem; color: var(--text-muted); }
+  .rl-fairy-options { flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px; }
+  .rl-shop-container { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px; }
+  .rl-shop-subtitle { font-size: 0.72rem; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444; }
+  .rl-text-orange { color: #ff922b; }
+  .rl-text-lightorange { color: #ffd8a8; }
+  .rl-shop-row { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
+  
+  .rl-event-img-rounded { width: 100px; height: 100px; object-fit: contain; border-radius: 4px; }
+  .rl-text-warning { color: #ffb84d; margin-bottom: 0.5rem; }
+  .rl-event-desc-large { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto; }
+  .rl-event-options { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  
+  .rl-overlay-full { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; }
+  .rl-modal-box { background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; }
+  .rl-modal-title { font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem; }
+  .rl-modal-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem; }
+  .rl-modal-actions { display: flex; gap: 10px; }
+  .rl-modal-btn { flex: 1; padding: 0.4rem 0; }
+  
+  .rl-battle-map-overlay { display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column; }
+  .rl-battle-map-title { color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem; }
+  .rl-battle-map-container { flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem; }
+  .rl-battle-map-inner { display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content; }
+  .rl-battle-map-close-btn { margin-top: 0.8rem; width: 100%; }
+  
+  .rl-king-overlay { display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center; }
+  .rl-king-title { color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .rl-king-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%; }
+  
+  .rl-deck-overlay { display: none; background-color: rgba(15,15,26,0.95); z-index: 200; flex-direction: column; padding: 1rem; }
+  .rl-deck-title { color: #fff; font-size: 1.2rem; text-align: center; margin-bottom: 0.2rem; }
+  .rl-deck-subtitle { color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-bottom: 1rem; }
+  .rl-deck-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+  .rl-deck-close-btn { margin-top: 1rem; width: 100%; }
+  .rl-relic-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 60vh; }
+  .rl-log-list { width: 100%; max-height: 70vh; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 5px; }
+  
+  .rl-battle-enemy-name { color: #ff8888; text-shadow: 1px 1px 2px #000; margin-bottom: 0.2rem; }
+  .rl-battle-hp-text { color: #ff6b6b; font-weight: bold; }
+  .rl-hp-bar-bg { display: inline-block; width: 100%; max-width: 150px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; border: 1px solid #555; vertical-align: middle; margin-left: 5px; }
+  .rl-hp-bar-fill { height: 100%; background: #ff4444; width: 100%; transition: width 0.3s; }
+  .rl-enemy-img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
+  .rl-enemy-buffs { display: flex; gap: 5px; min-height: 20px; justify-content: center; margin-top: 0.5rem; }
+  
+  .rl-hand-container { display: flex; justify-content: center; gap: 8px; width: 100%; max-width: 600px; padding: 0 10px; box-sizing: border-box; overflow-x: auto; }
+</style>
+\n
+<style>
+  /* ====== RoguelikeUI Extracted Inline Styles Part 2 ====== */
+  .rl-cutscene-overlay { display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem; }
+  .rl-cutscene-bg { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none; }
+  .rl-cutscene-chars { position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2; }
+  .rl-cutscene-dialog { position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4); }
+  .rl-cutscene-speaker { font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em; }
+  .rl-cutscene-text { font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em; }
+  .rl-cutscene-actions { text-align:right; margin-top:0.5rem; }
+  .rl-cutscene-btn { font-size:0.7rem; padding:0.25rem 1rem; }
+  
+  .rl-dialog-overlay { display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem; }
+  .rl-dialog-box { background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+  .rl-dialog-title { font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold; }
+  .rl-dialog-msg { font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem; }
+  .rl-dialog-actions { display: flex; gap: 10px; justify-content: center; }
+  .rl-dialog-btn { padding: 0.3rem 1.5rem; }
+  .rl-dialog-btn-flex { display:none; flex:1; padding: 0.3rem 0; }
+  
+  .rl-battle-area-wrapper { top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem; }
+  .rl-battle-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+  
+  .rl-battle-enemy-stats { padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
+  .rl-battle-stat-name { font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem; }
+  .rl-poison-badge { font-size: 0.65rem; display: none; }
+  .rl-stat-row { display: flex; align-items: center; gap: 4px; width: 100%; }
+  .rl-stat-label { font-size: 0.62rem; color: #ccc; flex-shrink: 0; }
+  .rl-stat-bar-bg { flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555; }
+  .rl-enemy-hp-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s; }
+  .rl-stat-value { font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0; }
+  .rl-action-intent { font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666; }
+  
+  .rl-battle-sprite-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
+  .rl-enemy-sprite { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8)); }
+  .rl-battle-player-wrap { display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative; }
+  .rl-player-sprite { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8)); }
+  
+  .rl-battle-player-stats { padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6); }
+  .rl-battle-stat-name-player { font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem; }
+  .rl-stat-bar-bg-player { flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555; }
+  .rl-player-hp-fill { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s; }
+  .rl-stat-value-player { font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0; }
+  
+  .rl-stat-row-mp { display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem; }
+  .rl-stat-label-mp { font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0; }
+  .rl-mp-orbs { display: flex; gap: 2px; flex: 1; }
+  .rl-relic-buffs { font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem; }
+  
+  .rl-battle-log { height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box; }
+  .rl-inventory-bar { display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%; }
+  .rl-inventory-section { flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden; }
+  .rl-inventory-label { font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap; }
+  .rl-inventory-items { display: flex; gap: 4px; overflow-x: auto; }
+  .rl-inventory-items-fixed { display: flex; gap: 4px; }
+  
+  .rl-action-area { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box; }
+  .rl-action-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+  .rl-deck-btn { padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; }
+  .rl-item-btn { padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d; }
+  .rl-hand-cards { height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start; }
+  .rl-end-turn-wrap { margin-top: 0.1rem; width: 100%; }
+  .rl-end-turn-btn { width: 100%; padding: 0.4rem; }
+  
+  .rl-upgrade-box { margin-bottom: 1.5rem; text-align: center; }
+  .rl-upgrade-card { display: inline-block; margin-bottom: 1rem; }
+  .rl-upgrade-msg { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .rl-upgrade-cost { color: #ffb84d; font-weight: bold; }
+  .rl-flex-1 { flex: 1; }
+  .rl-hidden-default { display: none; }
+  
+  .rl-howto-content { text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+  .rl-howto-list { padding-left: 1.2rem; margin-top: 0.5rem; }
+  .rl-mt-1rem { margin-top: 1rem; }
+</style>
+\n
+<style>
+  /* ====== RoguelikeUI Extracted Inline Styles Part 3 ====== */
+  .rl-king-choices { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .rl-dialog-btn-ok { padding: 0.3rem 1.5rem; }
+  .rl-dialog-btn-choice { display:none; flex:1; padding: 0.3rem 0; }
+  .rl-mp-value { font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0; }
+</style>
+\n</style>
   

@@ -1,6 +1,5 @@
 ---
-import HowToPlayModal from './HowToPlayModal.astro';
-const { materialCategories, gameTitle } = Astro.props;
+const { gameTitle } = Astro.props;
 ---
 <div class="game-container" id="game-container">
   <!-- Game Area (Canvas) -->
@@ -40,62 +39,7 @@ const { materialCategories, gameTitle } = Astro.props;
     </div>
   </div>
 
-  <!-- 遊び方モーダル -->
-  <HowToPlayModal>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・自動で走るキャラクターを操作して、障害物を避けながら進むゲームです。</p>
-      </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・画面タップでジャンプします。</p>
-      </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>・障害物に当たるとゲームオーバーです。どこまで進めるか挑戦しましょう。</p>
-      </div></HowToPlayModal>
-  <!-- コンフィグモーダル（ダミー） -->
-  <div id="modal-overlay" class="modal-overlay"></div>
-  <div id="config-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
-      <h3>コンフィグ</h3>
-    <div class="config-item">
-      <label for="bgm-volume">BGM音量</label>
-      <input type="range" id="bgm-volume" min="0" max="100" value="50">
-    </div>
-    <div class="config-item">
-      <label for="se-volume">SE音量</label>
-      <input type="range" id="se-volume" min="0" max="100" value="50">
-    </div>
 
-    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
-          
-  </div>
-  <!-- リタイアモーダル -->
-  <div id="retire-modal" class="config-modal">
-    <h3>リタイアしますか？</h3>
-    <div class="result-actions global-style-c5yyf6" >
-      <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
-      <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
-      <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
-    </div>
-  </div>
-  <!-- クレジットモーダル -->
-  <div id="credits-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
-      <h3>クレジット・使用素材</h3>
-    <div class="howto-content">
-      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-      <ul class="credits-list">
-        {materialCategories.map((mat) => (
-        <li>{mat.category}: {mat.items.map((item, index) => (
-          <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-          ))}
-        </li>
-        ))}
-      </ul>
-    </div>
-    
-  </div>
-  </GameLayout>
 
   <style>
     .game-hud {
@@ -119,21 +63,14 @@ const { materialCategories, gameTitle } = Astro.props;
       color: white;
     }
 
-    /* game-containerの高さと枠線: インラインスタイルから移行 */
+    /* game-containerの高さと背景色: 天の空 */
     #game-container {
-      height: 450px;
-      width: 800px;
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      overflow: hidden;
-      background: #87CEEB;
-      /* 昼の空 */
+      --game-height: 450px;
+      background: #87CEEB; 
     }
 
     :global([data-theme="dark"]) #game-container {
-      background: #1a2a40;
-      /* 夜の空 */
+      background: #1a2a40; /* 夜の空 */
     }
 
     canvas {
@@ -157,6 +94,7 @@ const { materialCategories, gameTitle } = Astro.props;
       font-size: 0.85rem;
     }
 
+    /* タイトル画面の遊び方ボタン */
     .btn-howto {
       margin-top: 1rem;
       width: 100%;
@@ -174,7 +112,8 @@ const { materialCategories, gameTitle } = Astro.props;
       border-color: #1DA1F2;
     }
 
-    .btn-credits {
+    /* コンフィグ内ボタン: 遊び方（上）→ クレジット（下）の間隔 */
+    .btn-config-howto {
       margin-bottom: 0.5rem;
     }
 
@@ -204,6 +143,16 @@ const { materialCategories, gameTitle } = Astro.props;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
       line-height: 1.6;
+    }
+
+    /* 遊び方モーダルのページテキスト */
+    .howto-page {
+      text-align: left;
+      line-height: 1.8;
+    }
+    .howto-text {
+      color: var(--text-muted);
+      margin: 0;
     }
 
     .credits-list {
@@ -250,7 +199,7 @@ const { materialCategories, gameTitle } = Astro.props;
       color: #ffea00;
       margin: 0 0.5rem;
     }
-  
+
 /* Auto-extracted styles */
 .global-style-hrir4f { display: flex; align-items: center; }
 .global-style-sypb5s { position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto; }
@@ -259,4 +208,4 @@ const { materialCategories, gameTitle } = Astro.props;
 .global-style-d5t1mq { cursor: pointer; }
 .global-style-c5yyf6 { margin-top: 1.5rem; }
 
-</style>
+  </style>

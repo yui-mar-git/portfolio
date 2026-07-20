@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import HowToPlayModal from '../components/portfolio/HowToPlayModal.astro';
 import type { MicroCMSPortfolio } from '../types/microcms';
 
 export interface TechItem {
@@ -28,6 +29,9 @@ export interface Props {
   techStack: TechItem[];
   learningThemes: string[];
   materialCategories: MaterialCategory[];
+  hasConfig?: boolean;
+  hasHowToPlay?: boolean;
+  hasRetire?: boolean;
 }
 
 const {
@@ -38,7 +42,10 @@ const {
   descriptionFallback,
   techStack,
   learningThemes,
-  materialCategories
+  materialCategories,
+  hasConfig = true,
+  hasHowToPlay = true,
+  hasRetire = false,
 } = Astro.props;
 ---
 <BaseLayout title={title} pageId={pageId}>
@@ -46,45 +53,170 @@ const {
 
   <main class="container">
     <article>
-      <div id="global-game-scaler" class="global-style-qjunur">
-        <div id="global-game-scaler-inner" class="global-style-5jp6zk">
+      <div id="global-game-scaler">
+        <div id="global-game-scaler-inner" style="position: relative; margin: 0 auto;">
+          <!-- ゲーム本体用スロット -->
           <slot />
+          
+          <!-- モーダル・オーバーレイ（ゲーム枠内に重なる） -->
+          <!-- 遊び方モーダル -->
+          {hasHowToPlay && (
+            <HowToPlayModal>
+              <slot name="howto-content" />
+            </HowToPlayModal>
+          )}
+
+          <!-- コンフィグ/クレジット モーダル -->
+          {hasConfig && (
+            <>
+              <div id="modal-overlay" class="modal-overlay"></div>
+              <div id="config-modal" class="config-modal">
+                <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
+                <h3>コンフィグ</h3>
+                <div class="config-item">
+                  <label for="bgm-volume">BGM音量</label>
+                  <input type="range" id="bgm-volume" min="0" max="100" value="50" />
+                </div>
+                <div class="config-item">
+                  <label for="se-volume">SE音量</label>
+                  <input type="range" id="se-volume" min="0" max="100" value="50" />
+                </div>
+
+                <slot name="config-extra" />
+
+                {hasHowToPlay && (
+                  <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-config-howto" style="margin-bottom: 0.5rem;">遊び方を見る</button>
+                )}
+                <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
+              </div>
+
+              <!-- クレジットモーダル -->
+              <div id="credits-modal" class="config-modal">
+                <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
+                <h3>クレジット・使用素材</h3>
+                <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                  <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+                  <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    {materialCategories.map((mat) => (
+                    <li>{mat.category}: {mat.items.map((item, index) => (
+                      <span key={item.name}>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                        {index < mat.items.length - 1 ? " / " : ""}
+                      </span>
+                    ))}
+                    </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </>
+          )}
+
+          <!-- リタイアモーダル -->
+          {hasRetire && (
+            <div id="retire-modal" class="config-modal">
+              <h3>リタイアしますか？</h3>
+              <div class="result-actions" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; width: 80%; max-width: 300px; margin-left: auto; margin-right: auto;">
+                <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
+                <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
+                <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <script is:inline>
-        (function() {
+        (function () {
+          // --- スケーリングロジック ---
           function applyScale() {
             const scaler = document.getElementById('global-game-scaler');
             const inner = document.getElementById('global-game-scaler-inner');
             if (!scaler || !inner) return;
-            
+
             const container = inner.querySelector('.game-container') || inner.firstElementChild;
             if (!container) return;
-            
-            const style = window.getComputedStyle(container);
-            const logicalWidth = 800;
-            const logicalHeight = 600;
-            
+
+            // コンテナの実際のサイズを論理サイズとして取得
+            const logicalWidth = container.clientWidth || 800;
+            const logicalHeight = container.clientHeight || 600;
+
+            // DOMContentLoaded時に一度だけモーダルをgame-container内に移動する（完全な中央揃えのため）
+            if (!container.dataset.modalsMoved) {
+              container.dataset.modalsMoved = 'true';
+              const modals = ['modal-overlay', 'config-modal', 'credits-modal', 'howto-modal', 'retire-modal'];
+              modals.forEach(id => {
+                const m = document.getElementById(id);
+                if (m && m.parentElement !== container) {
+                  container.appendChild(m);
+                }
+              });
+            }
+
             const parentWidth = scaler.parentElement.clientWidth;
-            
+
             if (parentWidth < logicalWidth) {
               const scale = parentWidth / logicalWidth;
               inner.style.width = `${logicalWidth}px`;
               inner.style.transform = `scale(${scale})`;
               scaler.style.height = `${logicalHeight * scale}px`;
             } else {
-              inner.style.width = '100%';
+              inner.style.width = `${logicalWidth}px`;
               inner.style.transform = 'none';
               scaler.style.height = `${logicalHeight}px`;
             }
           }
-          
+
           window.addEventListener('resize', applyScale);
           document.addEventListener('DOMContentLoaded', applyScale);
           setTimeout(applyScale, 100);
           setTimeout(applyScale, 500);
           window.addEventListener('load', applyScale);
+
+          // --- モーダル制御ロジック ---
+          document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('modal-overlay');
+            const configModal = document.getElementById('config-modal');
+            const creditsModal = document.getElementById('credits-modal');
+            const howToModal = document.getElementById('howto-modal');
+            const retireModal = document.getElementById('retire-modal');
+
+            // 閉じる関数
+            function closeAllModals() {
+              if (overlay) overlay.classList.remove('active');
+              if (configModal) configModal.classList.remove('active');
+              if (creditsModal) creditsModal.classList.remove('active');
+              if (howToModal) howToModal.classList.remove('active');
+              if (retireModal) retireModal.classList.remove('active');
+            }
+
+            // オーバーレイクリックで閉じる
+            if (overlay) {
+              overlay.addEventListener('click', closeAllModals);
+            }
+
+            // Xボタンで閉じる
+            document.querySelectorAll('.modal-close-x-btn').forEach(btn => {
+              btn.addEventListener('click', closeAllModals);
+            });
+
+            // コンフィグを開くボタン（外から呼ばれる可能性を考慮してグローバルに委譲、stopPropagationを回避するためcaptureフェーズで実行）
+            document.addEventListener('click', (e) => {
+              if (e.target.closest('.icon-config')) {
+                if (overlay) overlay.classList.add('active');
+                if (configModal) configModal.classList.add('active');
+              }
+              if (e.target.closest('#credits-btn')) {
+                if (configModal) configModal.classList.remove('active');
+                if (creditsModal) creditsModal.classList.add('active');
+              }
+              if (e.target.closest('#howto-btn-in-config') || e.target.closest('#howto-btn')) {
+                if (configModal) configModal.classList.remove('active');
+                if (overlay) overlay.classList.add('active'); // #howto-btnからの直接起動用
+                if (howToModal) howToModal.classList.add('active');
+              }
+            }, true);
+          });
         })();
       </script>
 
@@ -92,7 +224,7 @@ const {
       <section class="project-details">
         <h2>概要</h2>
         {projectData && (projectData.description || projectData.content) ? (
-        <p class="description" set:html={(projectData.description || projectData.content).replace(/\n/g, '<br>')} />
+        <p class="description" set:html={(projectData.description || projectData.content).replace(/\n/g, '<br>' )} />
         ) : (
         <p class="description">{descriptionFallback}</p>
         )}
@@ -106,7 +238,7 @@ const {
           </ul>
         </div>
 
-        <h2>使用技術・ツール</h2>
+        <h2>スキルセット</h2>
         <div class="table-responsive">
           <table class="tech-table">
             <tbody>
@@ -121,40 +253,50 @@ const {
         </div>
 
         {materialCategories.length > 0 && (
-          <>
-            <h2>使用素材</h2>
-            <div class="table-responsive">
-              <table class="tech-table">
-                <tbody>
-                  {materialCategories.map((mat) => (
-                  <tr>
-                    <th>{mat.category}</th>
-                    <td>
-                      {mat.items.map((item, index) => (
-                      <span key={item.name}>
-                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-                        {index < mat.items.length - 1 ? " / " : ""}
-                      </span>
-                      ))}
-                    </td>
-                  </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
+        <>
+          <h2>使用素材</h2>
+          <div class="table-responsive">
+            <table class="tech-table">
+              <tbody>
+                {materialCategories.map((mat) => (
+                <tr>
+                  <th>{mat.category}</th>
+                  <td>
+                    {mat.items.map((item, index) => (
+                    <span key={item.name}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+                      {index < mat.items.length - 1 ? " / " : "" } </span>
+                        ))}
+                  </td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
         )}
       </section>
     </article>
   </main>
-  
+
   <Footer />
-<style>
-/* Auto-extracted styles */
-.global-style-qjunur { width: 100%; overflow: hidden; position: relative; }
-.global-style-5jp6zk { transform-origin: top left; transition: transform 0.2s ease-out; }
 
-</style>
+  <style>
+    #global-game-scaler {
+      width: 100%;
+      /* overflow:clip は視覚的クリッピングを行うが、
+         position:fixed の containing block にはならないため
+         モーダルが正しく viewport 基準で表示される */
+      overflow: clip;
+      position: relative;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    #global-game-scaler-inner {
+      transform-origin: top left;
+      transition: transform 0.2s ease-out;
+    }
+  </style>
+
 </BaseLayout>
-
-

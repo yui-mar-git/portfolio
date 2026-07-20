@@ -10,7 +10,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   const techStack = [
   { category: "フロントエンド", items: "HTML, CSS, JavaScript, Astro" },
-  { category: "バックエンド・CMS", items: "Node.js, microCMS" },
+  { category: "バックエンド", items: "Node.js, microCMS" },
   { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
   { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
   ];
@@ -19,13 +19,26 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   const materialCategories = [
   { category: "フォント", items: [{ name: "Google Fonts（SIL Open Font License 1.1）", url: "https://fonts.google.com/" }] },
-  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url: "http://pansound.com/panicpumpkin/" }] },
+  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url:
+  "http://pansound.com/panicpumpkin/" }] },
   { category: "アイコン", items: [{ name: "Simple Icons（CC0 1.0 Universal）", url: "https://simpleicons.org/" }] }
   ];
   ---
 
   <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : 'エンドレス・ラン - My Portfolio' }
     pageId="run-action" pageLabel="ACTION GAME" projectData={projectData} descriptionFallback="" techStack={techStack}
-    learningThemes={learningThemes} materialCategories={materialCategories}>
-    <RunActionUI materialCategories={materialCategories} gameTitle={projectData?.title} />
+    learningThemes={learningThemes} materialCategories={materialCategories} hasRetire={true}>
+    <RunActionUI gameTitle={projectData?.title} />
+    <div slot="howto-content" style="text-align: left; line-height: 1.8;">
+      <div style="margin-bottom: 1rem;">
+        <p style="color: var(--text-muted); margin: 0;">・自動で走るキャラクターを操作して、障害物を避けながら進むゲームです。</p>
+      </div>
+      <div style="margin-bottom: 1rem;">
+        <p style="color: var(--text-muted); margin: 0;">・画面タップ（またはスペースキー）でジャンプします。</p>
+      </div>
+      <div>
+        <p style="color: var(--text-muted); margin: 0;">・障害物に当たるとゲームオーバーです。どこまで進めるか挑戦しましょう！</p>
+      </div>
+    </div>
     <script src="../../../scripts/run-action/main.js"></script>
+  </GameLayout>

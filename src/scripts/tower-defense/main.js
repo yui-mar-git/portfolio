@@ -302,29 +302,31 @@ class MainScene extends Phaser.Scene {
     }
 
     this.cameras.main.setBackgroundColor(skyColor);
-    const ground = this.add.rectangle(400, 515, 800, 170, groundColor);
+    
+    // Y shifted up by 50px (515 -> 465). Height increased so the ground still hits the bottom edge (600+).
+    const ground = this.add.rectangle(400, 465, 800, 270, groundColor);
 
     // 簡易的な拠点のグラフィック（塔と入り口）
     const towerColor = 0x8B4513; // 茶色
     const towerLineColor = 0x4A2511;
 
-    // 塔本体
-    const baseTower = this.add.rectangle(0, 430, 90, 240, towerColor);
+    // 塔本体 (Y: 430 -> 380)
+    const baseTower = this.add.rectangle(0, 380, 90, 240, towerColor);
     baseTower.setOrigin(0, 1);
     baseTower.setStrokeStyle(2, towerLineColor);
 
-    // せり出し部分（バルコニー状）
-    const baseOverhang = this.add.rectangle(0, 190, 110, 20, towerColor);
+    // せり出し部分（バルコニー状） (Y: 190 -> 140)
+    const baseOverhang = this.add.rectangle(0, 140, 110, 20, towerColor);
     baseOverhang.setOrigin(0, 1);
     baseOverhang.setStrokeStyle(2, towerLineColor);
 
-    // 塔頭（塔本体と同じ幅）
-    const baseTop = this.add.rectangle(0, 170, 90, 40, towerColor);
+    // 塔頭（塔本体と同じ幅） (Y: 170 -> 120)
+    const baseTop = this.add.rectangle(0, 120, 90, 40, towerColor);
     baseTop.setOrigin(0, 1);
     baseTop.setStrokeStyle(2, towerLineColor);
 
-    // 入り口
-    const baseEntrance = this.add.rectangle(50, 430, 50, 70, 0x111111);
+    // 入り口 (Y: 430 -> 380)
+    const baseEntrance = this.add.rectangle(50, 380, 50, 70, 0x111111);
     baseEntrance.setOrigin(0.5, 1);
 
     // Generate projectile texture if not exists
@@ -579,7 +581,7 @@ class MainScene extends Phaser.Scene {
   }
 
   createAlly(unitData) {
-    const ally = this.add.image(50, 430, unitData.texture);
+    const ally = this.add.image(50, 380, unitData.texture);
     ally.setOrigin(0.5, 1);
     ally.displayHeight = unitData.height || 80;
     ally.scaleX = ally.scaleY;
@@ -631,7 +633,7 @@ class MainScene extends Phaser.Scene {
       attack = Math.floor(attack * stageBuff);
     }
 
-    const enemy = this.add.image(850, 430, textureKey);
+    const enemy = this.add.image(850, 380, textureKey);
     enemy.setOrigin(0.5, 1);
     if (textureKey === 'enemy_slime') enemy.y += 10;
     enemy.displayHeight = height;
@@ -1003,7 +1005,7 @@ _cfgBtns.forEach(btn => {
   btn.addEventListener('mousedown', (e) => e.stopPropagation());
   btn.addEventListener('touchstart', (e) => e.stopPropagation());
 });
-const _closeCfgBtn = document.getElementById('close-config-btn');
+const _closeCfgBtn = document.getElementById('close-config-btn-x');
 if (_closeCfgBtn) {
   _closeCfgBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1017,6 +1019,19 @@ if (_closeCfgBtn) {
   });
   _closeCfgBtn.addEventListener('mousedown', (e) => e.stopPropagation());
   _closeCfgBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+}
+
+const _modalOverlay = document.getElementById('modal-overlay');
+if (_modalOverlay) {
+  _modalOverlay.addEventListener('click', (e) => {
+    // 画面外クリック（オーバーレイクリック）で閉じた際もゲームを再開する
+    if (typeof game !== 'undefined') {
+      const scene = game.scene.getScene('MainScene');
+      if (scene && scene.scene.isPaused()) {
+        scene.scene.resume();
+      }
+    }
+  });
 }
 
 const _credBtn = document.getElementById('credits-btn');

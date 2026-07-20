@@ -1,6 +1,5 @@
 ---
-import HowToPlayModal from './HowToPlayModal.astro';
-const { materialCategories, gameTitle } = Astro.props;
+const { gameTitle } = Astro.props;
 ---
 <!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
 <div class="game-container" id="game-container">
@@ -33,70 +32,7 @@ const { materialCategories, gameTitle } = Astro.props;
     </div>
   </div>
 
-  <!-- 遊び方モーダル -->
-  <HowToPlayModal>
-      <div class="howto-content">
-        <p>時間内にターゲットをタップしてスコアを稼ごう！</p>
-        <div class="legend" style="margin-top: 1rem;">
-          <p><span style="color:#007bff">■青</span>: +10点</p>
-          <p><span style="color:#fd7e14">■橙</span>: +50点</p>
-          <p><span style="color:#dc3545">■赤</span>: -30点</p>
-          <p><span style="color:#6f42c1">■紫</span>: -50点</p>
-          <p><span style="color:#ffea00">■黄</span>: +50点 (すぐ消えちゃう)</p>
-          <p><span style="color:#28a745">■緑</span>: しばらくの間、的が消えにくくなる</p>
-        </div>
-      </div>
-    </HowToPlayModal>
-
-  <!-- コンフィグモーダル -->
-  <div id="modal-overlay" class="modal-overlay"></div>
-  <div id="config-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
-      <h3>コンフィグ</h3>
-    <div class="config-item">
-      <label for="bgm-volume">BGM音量</label>
-      <input type="range" id="bgm-volume" min="0" max="100" value="50">
-    </div>
-    <div class="config-item">
-      <label for="se-volume">SE音量</label>
-      <input type="range" id="se-volume" min="0" max="100" value="50">
-    </div>
-    <button id="credits-btn" class="btn btn-secondary global-style-9glr4x" >クレジット・使用素材</button>
-    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto" style="margin-top: 1rem;">遊び方を見る</button>
-          
-  </div>
-
-  <!-- リタイアモーダル -->
-  <div id="retire-modal" class="config-modal">
-    <h3>リタイアしますか？</h3>
-    <div class="result-actions global-style-ghqh0e" >
-      <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
-      <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
-      <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
-    </div>
-  </div>
-  <!-- クレジットモーダル -->
-  <div id="credits-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
-      <h3>クレジット・使用素材</h3>
-    <div class="howto-content"
-      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-      <ul class="global-style-vd2h16">
-        {materialCategories.map((mat) => (
-        <li>{mat.category}: {mat.items.map((item, index) => (
-          <span key={item.name}>
-            <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-            {index < mat.items.length - 1 ? " / " : "" } </span>
-              ))}
-        </li>
-        ))}
-      </ul>
-    </div>
-    
-  </div>
 </div>
-</GameLayout>
 
 <style>
   .game-hud {
@@ -154,19 +90,10 @@ const { materialCategories, gameTitle } = Astro.props;
     font-weight: bold;
   }
 
-  .game-container {
-    position: relative;
-    width: 640px;
-    max-width: 640px;
-    margin: 0 auto;
-    height: 400px;
-    background: var(--bg-color);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+
+  /* ゲームの高さ設定 */
+  #game-container {
+    --game-height: 400px;
   }
 
   .start-screen,
@@ -355,6 +282,21 @@ const { materialCategories, gameTitle } = Astro.props;
   .btn-share {
     background-color: #1DA1F2;
     border-color: #1DA1F2;
+  }
+
+  /* コンフィグ内ボタン間のマージン */
+  .btn-config-howto {
+    margin-bottom: 0.5rem;
+  }
+
+  /* 遊び方モーダル内テキスト */
+  .howto-page {
+    text-align: left;
+    line-height: 1.8;
+  }
+  .howto-text {
+    color: var(--text-muted);
+    margin: 0 0 0.5rem;
   }
 
   .btn-danger {

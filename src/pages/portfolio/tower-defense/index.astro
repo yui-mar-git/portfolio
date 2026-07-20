@@ -10,7 +10,7 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 
   const techStack = [
   { category: "フロントエンド", items: "HTML, CSS, JavaScript, TypeScript, Astro, Phaser 3" },
-  { category: "バックエンド・CMS", items: "Node.js, microCMS" },
+  { category: "バックエンド", items: "Node.js, microCMS" },
   { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
   { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
   ];
@@ -24,16 +24,32 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
   const materialCategories = [
   { category: "画像・イラスト", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
   { category: "フォント", items: [{ name: "Google Fonts（SIL Open Font License 1.1）", url: "https://fonts.google.com/" }] },
-  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url: "http://pansound.com/panicpumpkin/" }] },
+  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url:
+  "http://pansound.com/panicpumpkin/" }] },
   { category: "アイコン", items: [{ name: "Simple Icons（CC0 1.0 Universal）", url: "https://simpleicons.org/" }] }
   ];
   ---
 
   <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : '横スクロールタワーディフェンス - My Portfolio' }
     pageId="tower-defense" pageLabel="DEFENSE GAME" projectData={projectData} descriptionFallback=""
-    techStack={techStack} learningThemes={learningThemes} materialCategories={materialCategories}>
+    techStack={techStack} learningThemes={learningThemes} materialCategories={materialCategories} hasConfig={true}
+    hasHowToPlay={true}>
     <div class="game-container" id="game-container">
       <TowerDefenseUI gameTitle={projectData?.title} />
+    </div>
+    <div slot="howto-content">
+      <div class="howto-content"
+        style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・時間経過で「コスト」がたまります。</p>
+      </div>
+      <div class="howto-content"
+        style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・コストを払ってユニットを召喚し、迫りくる敵から拠点を防衛してください。</p>
+      </div>
+      <div class="howto-content"
+        style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+        <p>・「ベースキャンプ」でゴールドを使ってユニットを強化できます。</p>
+      </div>
     </div>
   </GameLayout>
 

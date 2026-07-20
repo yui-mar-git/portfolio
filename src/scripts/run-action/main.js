@@ -40,10 +40,10 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   const titleBtn = document.getElementById('title-btn');
   const shareBtn = document.getElementById('share-btn');
   const howtoBtn = document.getElementById('howto-btn');
-  const closeHowtoBtn = document.getElementById('close-howto-btn');
+  const closeHowtoBtn = document.getElementById('close-howto-btn-x'); // ✕ボタンのID
   const howtoModal = document.getElementById('howto-modal');
   const configBtn = document.getElementById('config-btn');
-  const closeConfigBtn = document.getElementById('close-config-btn');
+  const closeConfigBtn = document.getElementById('close-config-btn-x'); // ✕ボタンのID
   const configModal = document.getElementById('config-modal');
 
   const creditsBtn = document.getElementById('credits-btn');
@@ -504,7 +504,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
-  const _closeCredBtn = document.getElementById('close-credits-btn');
+  const _closeCredBtn = document.getElementById('close-credits-btn-x'); // ✕ボタンのID
   if (_closeCredBtn) {
     _closeCredBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -517,6 +517,21 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     });
     _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+  }
+
+  // コンフィグモーダル内「遊び方を見る」ボタン
+  const _howtoInConfigBtn = document.getElementById('howto-btn-in-config');
+  if (_howtoInConfigBtn) {
+    _howtoInConfigBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('cursor');
+      // コンフィグを閉じて遊び方モーダルを開く
+      document.getElementById('config-modal')?.classList.remove('active');
+      document.getElementById('howto-modal')?.classList.add('active');
+      document.getElementById('modal-overlay')?.classList.add('active');
+    });
+    _howtoInConfigBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+    _howtoInConfigBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
 
   // グローバルなボタンクリック音

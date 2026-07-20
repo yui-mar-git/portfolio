@@ -34,14 +34,14 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
   const titleBtn = document.getElementById('title-btn');
   const shareBtn = document.getElementById('share-btn');
   const howtoBtn = document.getElementById('howto-btn');
-  const closeHowtoBtn = document.getElementById('close-howto-btn');
+  const closeHowtoBtn = document.getElementById('close-howto-btn-x'); // ✕ボタンのID
   const howtoModal = document.getElementById('howto-modal');
   const configBtn = document.getElementById('config-btn');
-  const closeConfigBtn = document.getElementById('close-config-btn');
+  const closeConfigBtn = document.getElementById('close-config-btn-x'); // ✕ボタンのID
   const configModal = document.getElementById('config-modal');
   
   const creditsBtn = document.getElementById('credits-btn');
-  const closeCreditsBtn = document.getElementById('close-credits-btn');
+  const closeCreditsBtn = document.getElementById('close-credits-btn-x'); // ✕ボタンのID
   const creditsModal = document.getElementById('credits-modal');
   const modalOverlay = document.getElementById('modal-overlay');
   const scoreElement = document.getElementById('score');
@@ -486,7 +486,7 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     _cfgBtn2.addEventListener('mousedown', (e) => e.stopPropagation());
     _cfgBtn2.addEventListener('touchstart', (e) => e.stopPropagation());
   }
-  const _closeCfgBtn = document.getElementById('close-config-btn');
+  const _closeCfgBtn = document.getElementById('close-config-btn-x'); // ✕ボタンのID
   if (_closeCfgBtn) {
     _closeCfgBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -513,7 +513,7 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
-  const _closeCredBtn = document.getElementById('close-credits-btn');
+  const _closeCredBtn = document.getElementById('close-credits-btn-x'); // ✕ボタンのID
   if (_closeCredBtn) {
     _closeCredBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -526,6 +526,21 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     });
     _closeCredBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
+  }
+
+  // コンフィグ内「遊び方を見る」ボタン
+  const _howtoInConfigBtn = document.getElementById('howto-btn-in-config');
+  if (_howtoInConfigBtn) {
+    _howtoInConfigBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('cursor');
+      // コンフィグを閉じて遊び方モーダルを開く
+      document.getElementById('config-modal')?.classList.remove('active');
+      document.getElementById('howto-modal')?.classList.add('active');
+      document.getElementById('modal-overlay')?.classList.add('active');
+    });
+    _howtoInConfigBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+    _howtoInConfigBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
 
   // Retire logic

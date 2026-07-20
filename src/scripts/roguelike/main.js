@@ -2569,10 +2569,10 @@ if (btnInnRest) {
     const closeHowtoBtn = document.getElementById('close-howto-btn');
     const howtoModal = document.getElementById('howto-modal');
     const configBtn = document.getElementById('config-btn');
-    const closeConfigBtn = document.getElementById('close-config-btn');
+    const closeConfigBtn = document.getElementById('close-config-btn-x');
     const configModal = document.getElementById('config-modal');
     const creditsBtn = document.getElementById('credits-btn');
-    const closeCreditsBtn = document.getElementById('close-credits-btn');
+    const closeCreditsBtn = document.getElementById('close-credits-btn-x');
     const creditsModal = document.getElementById('credits-modal');
     const modalOverlay = document.getElementById('modal-overlay');
 

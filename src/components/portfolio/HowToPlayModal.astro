@@ -21,7 +21,7 @@
     if (!howtoModal) return;
     
     const pagesContainer = document.getElementById('howto-pages');
-    const pages = Array.from(pagesContainer.children);
+    const pages = Array.from(pagesContainer.querySelectorAll('.howto-content'));
     if (pages.length === 0) return;
     
     pages.forEach((p, i) => {

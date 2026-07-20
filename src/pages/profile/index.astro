@@ -13,154 +13,238 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
 
     // 資格以外のアイテムは静的にハードコードするため、ここではフェッチしたデータからフィルタリングしません。
 
-      // 資格のグルーピング
-      const certs = allProfileItems.filter(item => {
-      const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-      return cat && (cat.includes('資格') || cat.includes('検定'));
+    // 資格のグルーピング
+    const certs = allProfileItems.filter(item => {
+    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+    return cat && (cat.includes('資格') || cat.includes('検定'));
+    });
+
+    const rankDefinitions = [
+    { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
+    { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
+    { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
+    { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
+    { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
+    ];
+
+    const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
+
+      certs.forEach(cert => {
+      let systemName = '';
+      let rank = 99;
+
+      const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
+
+      if (def) {
+      systemName = def.system;
+      if (def.gradeBased) {
+      const gradeMatch = cert.name.match(/([123])級/);
+      rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+      } else {
+      rank = def.rank as number;
+      }
+      } else {
+      const gradeMatch = cert.name.match(/([123])級/);
+      rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+      systemName = cert.name.replace(/[123]級/, '').trim();
+      }
+
+      if (!systems[systemName]) {
+      systems[systemName] = [];
+      }
+      systems[systemName].push({ ...cert, rank });
       });
 
-      const rankDefinitions = [
-      { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
-      { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
-      { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
-      { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
-      { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
-      ];
+      // 各系統をランク順にソート
+      Object.keys(systems).forEach(name => {
+      systems[name].sort((a, b) => b.rank - a.rank);
+      });
+      ---
 
-      const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
+      <BaseLayout title="Profile" pageId="profile">
+        <Header activeId="profile" />
 
-        certs.forEach(cert => {
-        let systemName = '';
-        let rank = 99;
+        <main class="container">
+          <article>
+            <span class="page-label">PROFILE</span>
+            <h1>自己紹介</h1>
 
-        const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
+            <section class="profile-intro">
+              <p>{settings.title}</p>
+              <h2>{settings.name}</h2>
+              <p set:html={settings.bio.replace(/\n/g, '<br>' )} />
+            </section>
 
-        if (def) {
-        systemName = def.system;
-        if (def.gradeBased) {
-        const gradeMatch = cert.name.match(/([123])級/);
-        rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-        } else {
-        rank = def.rank as number;
-        }
-        } else {
-        const gradeMatch = cert.name.match(/([123])級/);
-        rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-        systemName = cert.name.replace(/[123]級/, '').trim();
-        }
+            <section>
+              <h2>スキルセット</h2>
+              <div class="skill-grid">
+                <div class="profile-card skill-card">
+                  <h3>フロントエンド</h3>
+                  <ul>
+                    <li>マークアップ / スタイル
+                      <ul>
+                        <li>
+                          <span class="skill-active">HTML</span> / <span class="skill-active">CSS</span>
+                          <ul>
+                            <li>Pug</li>
+                            <li>Stylus</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>プログラミング
+                      <ul>
+                        <li>
+                          <span class="skill-active">JavaScript</span>
+                          <ul>
+                            <li class="skill-active">TypeScript</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>フレームワーク / ライブラリ
+                      <ul>
+                        <li class="skill-inactive">jQuery</li>
+                        <li class="skill-inactive">Vue.js</li>
+                        <li class="skill-active">Astro [独学]</li>
+                        <li class="skill-active">Phaser 3 [独学]</li>
+                      </ul>
+                    </li>
+                  </ul>
 
-        if (!systems[systemName]) {
-        systems[systemName] = [];
-        }
-        systems[systemName].push({ ...cert, rank });
-        });
+                  <h3 class="skill-category">バックエンド</h3>
+                  <ul>
+                    <li class="skill-active">Node.js</li>
+                    <li>PHP</li>
+                    <li>CMS
+                      <ul>
+                        <li class="skill-active">microCMS [独学]</li>
+                        <li>WordPress</li>
+                        <li>RCMS</li>
+                      </ul>
+                    </li>
+                  </ul>
 
-        // 各系統をランク順にソート
-        Object.keys(systems).forEach(name => {
-        systems[name].sort((a, b) => b.rank - a.rank);
-        });
-        ---
+                  <h3 class="skill-category">データベース・コンテナ</h3>
+                  <ul>
+                    <li>MySQL [独学]</li>
+                    <li>PostgreSQL</li>
+                    <li>Docker [独学]</li>
+                    <li>Kubernetes</li>
+                  </ul>
 
-        <BaseLayout title="Profile" pageId="profile">
-          <Header activeId="profile" />
+                  <h3 class="skill-category">インフラ・ホスティング</h3>
+                  <ul>
+                    <li class="skill-active">Cloudflare (Pages / Turnstile)</li>
+                    <li>Kinsta</li>
+                  </ul>
 
-          <main class="container">
-            <article>
-              <span class="page-label">PROFILE</span>
-              <h1>自己紹介</h1>
+                  <h3 class="skill-category">開発環境・ツール</h3>
+                  <ul>
+                    <li>バージョン管理 / CI・CD
+                      <ul>
+                        <li class="skill-active">Git / GitHub</li>
+                      </ul>
+                    </li>
+                    <li>エディタ
+                      <ul>
+                        <li class="skill-active">Google Antigravity</li>
+                        <li>Cursor [独学]</li>
+                        <li>Visual Studio Code</li>
+                        <li>Adobe Brackets</li>
+                      </ul>
+                    </li>
+                    <li>デザイン
+                      <ul>
+                        <li>Figma</li>
+                        <li>Adobe Photoshop</li>
+                      </ul>
+                    </li>
+                  </ul>
 
-              <section class="profile-intro">
-                <p id="profile-title" class="profile-title-text">{settings.title}</p>
-                <h2 id="profile-name-display" class="profile-name-text">{settings.name}</h2>
-                <p id="profile-bio" class="profile-bio-text" set:html={settings.bio.replace(/\n/g, '<br>' )} />
-              </section>
-
-              <section>
-                <h2>使用技術・ツール</h2>
-                <div class="skill-grid">
-                  <div class="profile-card skill-card">
-                    <h3>フロントエンド</h3>
-                    <ul>
-                      <li><strong>HTML</strong></li>
-                      <li><strong>CSS</strong></li>
-                      <li><strong>JavaScript</strong></li>
-                      <li><strong>TypeScript</strong></li>
-                      <li><strong>Astro</strong></li>
-                      <li><strong>Phaser 3</strong></li>
-                    </ul>
-                    
-                    <h3 class="skill-category">バックエンド・CMS</h3>
-                    <ul>
-                      <li><strong>Node.js</strong></li>
-                      <li class="skill-inactive">PHP</li>
-                      <li><strong>microCMS</strong></li>
-                      <li class="skill-inactive">WordPress</li>
-                    </ul>
-                    
-                    <h3 class="skill-category">インフラ・ホスティング</h3>
-                    <ul>
-                      <li><strong>Cloudflare (Pages / Turnstile)</strong></li>
-                      <li class="skill-inactive">Kinsta</li>
-                    </ul>
-                    
-                    <h3 class="skill-category">開発環境・ツール</h3>
-                    <ul>
-                      <li><strong>GitHub</strong></li>
-                      <li><strong>Google Antigravity</strong></li>
-                      <li class="skill-inactive">Cursor</li>
-                    </ul>
-                    
-                    <h3 class="skill-category">デザイン</h3>
-                    <ul>
-                      <li class="skill-inactive">Figma</li>
-                      <li class="skill-inactive">Photoshop</li>
-                    </ul>
-                    
-                    <p class="skill-note">※本ページで使用していないものは薄文字</p>
-                  </div>
+                  <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
                 </div>
-              </section>
+              </div>
+            </section>
 
-              <section>
-                <h2>保有資格・検定</h2>
-                <div class="cert-tree-container">
-                  <div class="cert-tree" id="cert-tree-root">
-                    <ul>
-                      <li>
-                        <div class="cert-node root">資格</div>
-                        <ul>
-                          {Object.keys(systems).map(sysName => (
-                          <CertTree items={systems[sysName]} />
-                          ))}
-                        </ul>
-                      </li>
-                    </ul>
-                  </div>
+            <section>
+              <h2>保有資格・検定</h2>
+              <div class="cert-tree-container">
+                <div class="cert-tree" id="cert-tree-root">
+                  <ul>
+                    <li>
+                      <div class="cert-node root">資格</div>
+                      <ul>
+                        {Object.keys(systems).map(sysName => (
+                        <CertTree items={systems[sysName]} />
+                        ))}
+                      </ul>
+                    </li>
+                  </ul>
                 </div>
-              </section>
-            </article>
-          </main>
+              </div>
+            </section>
+          </article>
+        </main>
 
-          <Footer />
-        </BaseLayout>
+        <Footer />
+      </BaseLayout>
 
-<style>
-  .skill-card {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    box-sizing: border-box;
-  }
-  .skill-category {
-    margin-top: 1.5rem;
-  }
-  .skill-inactive {
-    opacity: 0.5;
-  }
-  .skill-note {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 2rem;
-    text-align: right;
-  }
-</style>
+      <style>
+        .profile-intro {
+          text-align: center;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+
+        .profile-intro h2 {
+          margin-bottom: 0.5rem;
+        }
+
+        .profile-intro p:first-of-type {
+          display: block;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--primary);
+          opacity: 0.6;
+          text-transform: uppercase;
+          letter-spacing: 0.25em;
+          margin-bottom: 0.5rem;
+        }
+
+        .profile-intro p:last-of-type {
+          line-height: 1.8;
+          color: var(--text-muted);
+          font-weight: 600;
+          font-size: 1.1rem;
+          text-align: left;
+          display: inline-block;
+          margin-top: 1rem;
+        }
+
+        .skill-card {
+          width: 100%;
+          max-width: 800px;
+          margin: 0 auto;
+          box-sizing: border-box;
+        }
+
+        .skill-category {
+          margin-top: 1.5rem;
+        }
+
+        .skill-active {
+          font-weight: bold;
+        }
+
+        .skill-card li:not(.skill-active):not(:has(.skill-active)) {
+          opacity: 0.5;
+        }
+
+        .skill-note {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          margin-top: 2rem;
+          text-align: right;
+        }
+      </style>
