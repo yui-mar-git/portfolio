@@ -78,26 +78,26 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     <p class="class-select-desc">あなたの戦闘スタイルを選んで旅立ちましょう。</p>
     <div class="class-select-body">
       <div class="class-grid">
-        <div data- class="class-card yuusya">
+        <div class="class-card" data-class="yuusya">
           <img src={imgYuusya.src} class="rl-char-img" />
           <div class="rl-char-name">勇者</div>
           <div class="rl-char-desc">HP10 /
             MP5<br>初期レリックが+1個</div>
         </div>
-        <div data- class="class-card kenshi">
+        <div class="class-card" data-class="kenshi">
           <img src={imgKenshi.src} class="rl-char-img" />
           <div class="rl-char-name">戦士</div>
           <div class="rl-char-desc">HP15 /
             MP4<br>毎ターンHP+1回復</div>
         </div>
-        <div data- class="class-card mahoutsukai">
+        <div class="class-card" data-class="mahoutsukai">
           <img src={imgMahoutsukai.src}
             class="rl-char-img" />
           <div class="rl-char-name">魔法使い</div>
           <div class="rl-char-desc">HP7 /
             MP7<br>毎ターンMP+1回復</div>
         </div>
-        <div data- class="class-card butouka">
+        <div class="class-card" data-class="butouka">
           <img src={imgButouka.src} class="rl-char-img" />
           <div class="rl-char-name">格闘家</div>
           <div class="rl-char-desc">HP8 /
@@ -417,59 +417,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   </div><!-- /.battle-layout -->
 
 
-  <!-- 遊び方モーダル -->
-  <HowToPlayModal>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
-        <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
-        <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください。</p>
-      </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>毒や火傷などの状態異常はターン終了時にダメージを受けます。</p>
-        <p>回復カードを使って素早く対処しましょう。</p>
-      </div>
-      <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-        <p>「町」や「妖精」でカードを強化できます。</p>
-        <p>自分だけの最強のデッキを作り上げましょう。</p>
-      </div></HowToPlayModal>
-
-  <!-- コンフィグモーダル -->
-  <div id="modal-overlay" class="modal-overlay"></div>
-  <div id="config-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
-      <h3>コンフィグ</h3>
-    <div class="config-item">
-      <label for="bgm-volume">BGM音量</label>
-      <input type="range" id="bgm-volume" min="0" max="100" value="50">
-    </div>
-    <div class="config-item">
-      <label for="se-volume">SE音量</label>
-      <input type="range" id="se-volume" min="0" max="100" value="50">
-    </div>
-    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-    <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-howto rl-mt-1rem">遊び方を見る</button>
-          
-  </div>
-
-  <!-- クレジットモーダル -->
-  <div id="credits-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
-      <h3>クレジット・使用素材</h3>
-    <div class="howto-content"
-      style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-      <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-      <ul style="padding-left: 1.2rem; margin-top: 0.5rem;">
-        <li><strong>画像素材:</strong> いらすとや 様</li>
-        <li><strong>BGM・SE:</strong> 魔王魂 様, 効果音ラボ 様</li>
-        <li><strong>フォント:</strong> Google Fonts</li>
-      </ul>
-    </div>
-    
-  </div>
-
-</div><!-- /.game-container -->
-
-<!-- ゲーム概要・使用技術セクション -->
+  <!-- ゲーム概要・使用技術セクション -->
 </div>
 </GameLayout>
 
@@ -1740,7 +1688,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   
   .rl-hand-container { display: flex; justify-content: center; gap: 8px; width: 100%; max-width: 600px; padding: 0 10px; box-sizing: border-box; overflow-x: auto; }
 </style>
-\n
+
 <style>
   /* ====== RoguelikeUI Extracted Inline Styles Part 2 ====== */
   .rl-cutscene-overlay { display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem; }
@@ -1815,7 +1763,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   .rl-howto-list { padding-left: 1.2rem; margin-top: 0.5rem; }
   .rl-mt-1rem { margin-top: 1rem; }
 </style>
-\n
+
 <style>
   /* ====== RoguelikeUI Extracted Inline Styles Part 3 ====== */
   .rl-king-choices { display: flex; gap: 10px; margin-bottom: 1.5rem; }
@@ -1823,5 +1771,5 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   .rl-dialog-btn-choice { display:none; flex:1; padding: 0.3rem 0; }
   .rl-mp-value { font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0; }
 </style>
-\n</style>
+</style>
   

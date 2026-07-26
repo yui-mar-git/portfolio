@@ -358,7 +358,8 @@ let enemy = null;
 let isGameOver = false;
 let isPlayerTurn = true;
 
-// 進行スチE�EチE    let currentArea = 1;
+// 進行スチE�EチE
+    let currentArea = 1;
 
 let currentFloor = 0;
 let currentRow = 0;
@@ -542,8 +543,8 @@ function showKingEvent() {
 
     el.addEventListener('click', () => {
       showGameConfirm(
-        'レリチE��選抁E,
-          `レリチE��、E{relic.name}」を選択しますか�E�Ebr><br><span style="font-size:0.75rem; color:var(--text-muted);">${relic.desc}</span>`,
+        'レリック��選抁E',
+          `レリック��、E{relic.name}」を選択しますか�E�Ebr><br><span style="font-size:0.75rem; color:var(--text-muted);">${relic.desc}</span>`,
         () => {
           playSE('relic');
           player.relics.push(relicId);
@@ -574,9 +575,9 @@ function showKingEvent() {
 
 let selectedClass = 'yuusya';
 const CLASS_NAMES = {
-  yuusya: '勁E��E,
+  yuusya: '勁E��E',
       kenshi: '戦士',
-  mahoutsukai: '魔法使ぁE,
+  mahoutsukai: '魔法使ぁE',
       butouka: '格闘家'
 };
 
@@ -599,7 +600,7 @@ function setupClassSelection() {
   if (defaultCard) defaultCard.classList.add('selected');
 
   const preview = document.getElementById('class-select-preview');
-  if (preview) preview.textContent = '勁E��E��選択されてぁE��ぁE;
+  if (preview) preview.textContent = '勁E��E��選択されてぁE��ぁE';
 
   classCards.forEach(card => {
     card.addEventListener('click', () => {
@@ -610,7 +611,7 @@ function setupClassSelection() {
 
       card.classList.add('selected');
       selectedClass = card.dataset.class;
-      if (preview) preview.textContent = `${CLASS_NAMES[selectedClass] || selectedClass}が選択されてぁE��す`;
+      if (preview) preview.textContent = `${CLASS_NAMES[selectedClass] || selectedClass}が選択されています��す`;
     });
   });
 }
@@ -662,7 +663,7 @@ const NODE_TYPES = {
   inn: { label: '宿屁E⛺', class: 'inn' },
   fairy: { label: '神秘的な森', class: 'fairy' },
   event: {
-    label: '�E�？！E, class: 'event' },
+    label: '�E�？！E', class: 'event' },
       town: { label: '町', class: 'town' },
   midboss: { label: '威圧皁E��気�E', class: 'midboss' },
   boss: { label: '威圧皁E��気�E', class: 'boss' },
@@ -772,11 +773,11 @@ function renderBoardMap(container, isBattleModal = false) {
         btn.addEventListener('click', () => {
           if (!canMove) {
             playSE('invalid');
-            showGameAlert('移動不可', '現在のルートから外れることはできません、Ebr>直進するマス�E�現在地と同じ行�Eマス�E�を選んでください、E);
+            showGameAlert('移動不可', '現在のルートから外れることはできません、Ebr>直進するマス�E�現在地と同じ行�Eマス�E�を選んでください、E');
                 return;
           }
           showGameConfirm(
-            '移動�E確誁E,
+            '移動�E確誁E',
               `、E{NODE_TYPES[node.type].label}」へ移動しますか�E�`,
             () => {
               currentFloor = fIndex;
@@ -895,9 +896,9 @@ const CUTSCENE_PRE = {
       portraits: [{ src: '/portfolio/roguelike/assets/monsters/character_sanzoku.png', size: '140px' }],
       speaker: 'バンチE��チE��',
       lines: [
-        'ほぉ……よくここまで来たな、E,
-            'オレが誰なのか、知らずにめE��てきた不運な奴か、知ってめE��てきた馬鹿な奴ぁE,
-            'へっへっへ、どちらにしても同じことさ、Enオレ様�Eアジトまで来て、生きて帰れると思うなよ！E
+        'ほぉ……よくここまで来たな、E',
+            'オレが誰なのか、知らずにめE��てきた不運な奴か、知ってめE��てきた馬鹿な奴ぁE',
+            'へっへっへ、どちらにしても同じことさ、Enオレ様�Eアジトまで来て、生きて帰れると思うなよ！E'
       ]
     }
   ],
@@ -905,10 +906,10 @@ const CUTSCENE_PRE = {
     {
       bg: BASE_MAP + 'yama_kiri.png',
       portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '130px' }],
-      speaker: 'ダークエルチE,
+      speaker: 'ダークエルチE',
           lines: [
-        'オマエ…\nコノ森ヲ\u30fb\u30fb\u30fb荒ラス老Eu30fb\u30fb\u30fb�E�E,
-            'タチサレ\u30fb\u30fb\u30fb\nタチサレ\u30fb\u30fb\u30fb�E�\n�E�正気を失った目でこちらを睨みつけてくる�E�E
+        'オマエ…\nコノ森ヲ\u30fb\u30fb\u30fb荒ラス老Eu30fb\u30fb\u30fb�E�E',
+            'タチサレ\u30fb\u30fb\u30fb\nタチサレ\u30fb\u30fb\u30fb�E�\n�E�正気を失った目でこちらを睨みつけてくる�E�E'
       ]
     }
   ],
@@ -918,8 +919,8 @@ const CUTSCENE_PRE = {
       portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_golem.png', size: '130px' }],
       speaker: '─── 状況E───',
       lines: [
-        '町の入口前に、石造り�E巨体が立ち塞がってぁE��、E,
-            'なんと、ゴーレムが突然こちらに向かって動き出した�E�\n…戦ぁE��かなぁE��ぁE��、E
+        '町の入口前に、石造り�E巨体が立ち塞がってぁE��、E',
+            'なんと、ゴーレムが突然こちらに向かって動き出した�E�\n…戦ぁE��かなぁE��ぁE��、E'
       ]
     }
   ],
@@ -929,9 +930,9 @@ const CUTSCENE_PRE = {
       portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dracula2.png', size: '130px' }],
       speaker: 'ヴァンパイア',
       lines: [
-        'おやおや…\nこんな辺鄙な城までご足労ぁE��だけるとは、E,
-            'まさか単身で姫を取り返しにきたのかな�E�\n感忁E�Eするが、そぁE�EぁE��なぁE��E,
-            '招かざる客人には\u2015\u2015\nお引き取り願おぁE��、E
+        'おやおや…\nこんな辺鄙な城までご足労ぁE��だけるとは、E',
+            'まさか単身で姫を取り返しにきたのかな�E�\n感忁E�Eするが、そぁE�EぁE��なぁE��E',
+            '招かざる客人には\u2015\u2015\nお引き取り願おぁE��、E'
       ]
     }
   ],
@@ -941,8 +942,8 @@ const CUTSCENE_PRE = {
       portraits: [],
       speaker: '─── 状況E───',
       lines: [
-        '荒れ狂う波の間から、巨大な影が近づぁE��くる\u30fb\u30fb\u30fb、E,
-            '海底から湧き上がるよぁE��咁E��が、空気を霁E��せた�E�E
+        '荒れ狂う波の間から、巨大な影が近づぁE��くる\u30fb\u30fb\u30fb、E',
+            '海底から湧き上がるよぁE��咁E��が、空気を霁E��せた�E�E'
       ]
     }
   ]
@@ -1008,12 +1009,12 @@ if (btnInnRest) {
         player.hp = player.maxHp;
         player.poison = 0;
         player.paralyze = 0;
-        showGameAlert('休�E完亁E, '体力が完�Eに回復しました�E�E, () => {
+        showGameAlert('休�E完亁E', '体力が完�Eに回復しました�E�E', () => {
               proceedNextFloor();
             });
           });
         } else {
-          showGameAlert('宿での休�E', 'ゴールドが足りません�E�E);
+          showGameAlert('宿での休�E', 'ゴールドが足りません�E�E');
         }
       });
     }
@@ -1033,7 +1034,7 @@ if (btnInnRest) {
       playBGM('darkelf_pre');
       showScreen(fairyScreen);
       const desc = document.getElementById('fairy-desc');
-      if (desc) desc.textContent = '20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化！E�E�」します、E;
+      if (desc) desc.textContent = '20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化！E�E�」します、E';
 
       if (fairyCardList) {
         fairyCardList.innerHTML = '';
@@ -1051,7 +1052,7 @@ if (btnInnRest) {
             const btn = makeCardEl(cardInstance, () => {
               if (isUpgraded) return;
               if (player.gold >= 20) {
-                showGameConfirm('カード�E強匁E, `、E{cardInstance.name}」を 20ゴールドで強化しますか�E�`, () => {
+                showGameConfirm('カード�E強匁E', `、E{cardInstance.name}」を 20ゴールドで強化しますか�E�`, () => {
                   player.gold -= 20;
                   let index = player.deck.findIndex(c => c.id === id && !c.upgraded);
                   if (index !== -1) {
@@ -1065,7 +1066,7 @@ if (btnInnRest) {
                       if (index !== -1) player.hand[index] = upgradeCard(player.hand[index]);
                     }
                   }
-                  showGameAlert('強化�E劁E, `、E{cardInstance.name}」が強化され、E{cardInstance.name}+」になりました�E�`, () => {
+                  showGameAlert('強化�E劁E', `、E{cardInstance.name}」が強化され、E{cardInstance.name}+」になりました�E�`, () => {
                     proceedNextFloor();
                   });
                 });
@@ -1131,7 +1132,7 @@ if (btnInnRest) {
             el.style.cursor = 'not-allowed';
             const boughtText = document.createElement('span');
             boughtText.style.cssText = 'font-size: 0.65rem; color: #ffb84d; margin-top: 2px;';
-            boughtText.textContent = '売紁E��E;
+            boughtText.textContent = '売紁E��E';
             div.appendChild(el);
             div.appendChild(boughtText);
           } else {
@@ -1142,13 +1143,13 @@ if (btnInnRest) {
                   playSE('reward_select');
                   player.discard.push({ ...CARD_DB[item.id] });
                   item.bought = true;
-                  showGameAlert('購入完亁E, `、E{card.name}」を購入し、デチE��に追加しました�E�`, () => {
+                  showGameAlert('購入完亁E', `、E{card.name}」を購入し、デチE��に追加しました�E�`, () => {
                     renderShop();
                     updateHeaderBar();
                   });
                 });
               } else {
-                showGameAlert('ショチE�E', 'ゴールドが足りません�E�E);
+                showGameAlert('ショチE�E', 'ゴールドが足りません�E�E');
               }
             });
             const priceText = document.createElement('span');
@@ -1179,7 +1180,7 @@ if (btnInnRest) {
             btn.style.cursor = 'not-allowed';
             const boughtText = document.createElement('span');
             boughtText.style.cssText = 'font-size: 0.65rem; color: #ffb84d; margin-top: 2px;';
-            boughtText.textContent = '売紁E��E;
+            boughtText.textContent = '売紁E��E';
             div.appendChild(btn);
             div.appendChild(boughtText);
           } else {
@@ -1188,21 +1189,21 @@ if (btnInnRest) {
                 const target = player.items.find(i => i.id === shopItem.id);
                 if (target) {
                   if (!target.used) {
-                    showGameAlert('ショチE�E', '同じアイチE��をすでに所持してぁE��す！E);
+                    showGameAlert('ショチE�E', '同じアイチE��をすでに所持してぁE��す！E');
                     return;
                   }
                   showGameConfirm('啁E��の購入', `、E{item.name}」を20ゴールドで購入・補�Eしますか�E�`, () => {
                     player.gold -= 20;
                     target.used = false;
                     shopItem.bought = true;
-                    showGameAlert('購入完亁E, `、E{item.name}」を補�Eしました�E�`, () => {
+                    showGameAlert('購入完亁E', `、E{item.name}」を補�Eしました�E�`, () => {
                       renderShop();
                       updateHeaderBar();
                     });
                   });
                 }
               } else {
-                showGameAlert('ショチE�E', 'ゴールドが足りません�E�E);
+                showGameAlert('ショチE�E', 'ゴールドが足りません�E�E');
               }
             });
             const priceText = document.createElement('span');
@@ -1226,41 +1227,41 @@ if (btnInnRest) {
 
     const eventsList = [
       {
-        title: '怪しい況E,
+        title: '怪しい況E',
         image: '/portfolio/roguelike/assets/icons/water_shizuku.png',
-        text: '暗く澱んだ泉を見つけました。泉�E底でなにかがきらりと光ってぁE��す。手を伸ばしますか�E�E,
+        text: '暗く澱んだ泉を見つけました。泉�E底でなにかがきらりと光ってぁE��す。手を伸ばしますか�E�E',
         options: [
           {
             text: '手を突っ込んでみめE(HPめE3 失ぁE��💰30 獲征E',
             action: () => {
               player.hp = Math.max(1, player.hp - 3);
               player.gold += 30;
-              showGameAlert('泉�E怪戁E, '冷たい泉に手を突っ込み、E0ゴールドを掴み出しました�E�が、E��ぁE��で腕を怪我しました、E);
+              showGameAlert('泉�E怪戁E', '冷たい泉に手を突っ込み、E0ゴールドを掴み出しました�E�が、E��ぁE��で腕を怪我しました、E');
             }
           },
           {
             text: 'なにもせず離れる',
             action: () => {
-              showGameAlert('平和な選抁E, 'あなた�E慎重に泉を通り過ぎました、E);
+              showGameAlert('平和な選抁E', 'あなた�E慎重に泉を通り過ぎました、E');
             }
           }
         ]
       },
       {
-        title: '金細工師のチェスチE,
+        title: '金細工師のチェスチE',
         image: '/portfolio/roguelike/assets/characters/job_nihontou_katanakaji.png',
-        text: '打ち捨てられた台座の上に、豪華な金�Eチェストが置かれてぁE��す。罠でしょぁE���E�E,
+        text: '打ち捨てられた台座の上に、豪華な金�Eチェストが置かれてぁE��す。罠でしょぁE���E�E',
         options: [
           {
             text: 'こじ開けてみめE(50%の確玁E�� 💰40 獲征E/ 50%の確玁E��ミミチE��に襲われる！E',
             action: () => {
               if (Math.random() < 0.5) {
                 player.gold += 40;
-                showGameAlert('チェスト発要E, 'チェスト�Eただの古びた箱でした�E�中から40ゴールドを発見しました、E, () => {
+                showGameAlert('チェスト発要E', 'チェスト�Eただの古びた箱でした�E�中から40ゴールドを発見しました、E', () => {
                   proceedNextFloor();
                 });
               } else {
-                showGameAlert('トラチE�E発動！E, '箱がいきなり牙を剥きました�E�ミミックとの戦闘が開始されます！E, () => {
+                showGameAlert('トラチE�E発動！E', '箱がいきなり牙を剥きました�E�ミミックとの戦闘が開始されます！E', () => {
                   currentPathType = 'mimic';
                   enterFloorNode();
                 });
@@ -1271,7 +1272,7 @@ if (btnInnRest) {
           {
             text: '無視して進む',
             action: () => {
-              showGameAlert('用忁E��ぁE, 'あなた�E用忁E��くその場を離れました、E, () => {
+              showGameAlert('用忁E��ぁE', 'あなた�E用忁E��くその場を離れました、E', () => {
                 proceedNextFloor();
               });
             },
@@ -1282,7 +1283,7 @@ if (btnInnRest) {
       {
         title: '妖精の悪戯',
         image: '/portfolio/roguelike/assets/characters/fantasy_pixy2.png',
-        text: '空中を浮遊する小さな悪戯妖精が現れました。「力と引き換えに、何かを貰ぁE���E�、E,
+        text: '空中を浮遊する小さな悪戯妖精が現れました。「力と引き換えに、何かを貰ぁE���E�、E',
         options: [
           {
             text: '妖精に呪斁E��唱えてもらぁE(手札のランダムなカーチE枚強匁E➁E最大HP -1)',
@@ -1296,17 +1297,17 @@ if (btnInnRest) {
                 const index = player.deck.findIndex(c => c === target);
                 if (index !== -1) {
                   player.deck[index] = upgradeCard(player.deck[index]);
-                  showGameAlert('妖精の祝福と代儁E, `最大HPぁE減少しましたが、カード、E{target.name}」が、E{target.name}+」に強化されました�E�`);
+                  showGameAlert('妖精の祝福と代儁E', `最大HPぁE減少しましたが、カード、E{target.name}」が、E{target.name}+」に強化されました�E�`);
                 }
               } else {
-                showGameAlert('代償�Eみ', '最大HPぁE減少しましたが、強化できるカードがありませんでした�E�E);
+                showGameAlert('代償�Eみ', '最大HPぁE減少しましたが、強化できるカードがありませんでした�E�E');
               }
             }
           },
           {
-            text: '断って追ぁE��ぁE,
+            text: '断って追ぁE��ぁE',
             action: () => {
-              showGameAlert('拒絶', '妖精はつまらなそうに去ってぁE��ました、E);
+              showGameAlert('拒絶', '妖精はつまらなそうに去ってぁE��ました、E');
             }
           }
         ]
@@ -1355,10 +1356,10 @@ if (btnInnRest) {
               portraits: [{ src: BASE_CH + 'royal_daijin.png', size: '130px' }],
               speaker: '大臣',
               lines: [
-                '聖剣に選ばれし老E��、お耳を拝借いたします、E,
-                'ヴァンパイアにさらわれたこの国の姫を、どぁE��お救ぁE��ただけませぬでしょぁE��、E,
-                'ヴァンパイアの城へ向かった�Eが国の兵どころか、\n途中の街に駐在しております�Eからの連絡すら途絶えております、E,
-                '気丈に振る�Eっておられる王�E忁E��E��思うと、\n臣下として屁E��も立ってもいられぬのです、EnどぁE��、よろしくお願い申し上げます、E
+                '聖剣に選ばれし老E��、お耳を拝借いたします、E',
+                'ヴァンパイアにさらわれたこの国の姫を、どぁE��お救ぁE��ただけませぬでしょぁE��、E',
+                'ヴァンパイアの城へ向かった�Eが国の兵どころか、\n途中の街に駐在しております�Eからの連絡すら途絶えております、E',
+                '気丈に振る�Eっておられる王�E忁E��E��思うと、\n臣下として屁E��も立ってもいられぬのです、EnどぁE��、よろしくお願い申し上げます、E'
               ]
             }];
             showMapScreen();
@@ -1373,17 +1374,17 @@ if (btnInnRest) {
                   { src: BASE_CH + 'royal_princess.png', size: '130px' },
                   { src: BASE_CH + 'royal_daijin.png', size: '130px' }
                 ],
-                speaker: '玁E,
+                speaker: '玁E',
                 lines: [
-                  '姫を救ぁE�Eしてくれたこと、誠に感謝するぞ、E,
-                  '残るは魔王のみ。余�Eお前の力を信じておる、EnどぁE��、ご無事で、E
+                  '姫を救ぁE�Eしてくれたこと、誠に感謝するぞ、E',
+                  '残るは魔王のみ。余�Eお前の力を信じておる、EnどぁE��、ご無事で、E'
                 ]
               },
               {
                 portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
                 speaker: '姫',
                 lines: [
-                  'どぁE��ご無事に帰ってきてくださいまし、EnわたくしたちはぁE��もあなた�Eことを祈っております、E
+                  'どぁE��ご無事に帰ってきてくださいまし、EnわたくしたちはぁE��もあなた�Eことを祈っております、E'
                 ]
               }
             ];
@@ -1393,7 +1394,7 @@ if (btnInnRest) {
             });
           } else {
             showMapScreen();
-            showGameAlert('エリアクリア�E�E, `次のエリア ${currentArea} に到達しました�E�Ebr>HPが最大値の半�E回復しました。`);
+            showGameAlert('エリアクリア�E�E', `次のエリア ${currentArea} に到達しました�E�Ebr>HPが最大値の半�E回復しました。`);
           }
         }
       } else {
@@ -1475,21 +1476,21 @@ if (btnInnRest) {
 
       if (itemId === 'sandwich') {
         player.hp = Math.min(player.maxHp, player.hp + 3);
-        logMessage('アイチE��「サンドイチE��」を使用し、HPぁE3 回復した�E�E, 'log-heal');
+        logMessage('アイチE��「サンドイチE��」を使用し、HPぁE3 回復した�E�E', 'log-heal');
       } else if (itemId === 'elixir') {
         player.poison = 0;
         player.paralyze = 0;
         player.hp = Math.min(player.maxHp, player.hp + 1);
-        logMessage('アイチE��「丁E�E薬」を使用し、状態異常を解除してHPぁE1 回復した�E�E, 'log-heal');
+        logMessage('アイチE��「丁E�E薬」を使用し、状態異常を解除してHPぁE1 回復した�E�E', 'log-heal');
       } else if (itemId === 'perfume') {
         if (enemy) {
           if (enemy.isGolem || enemy.isVampire) {
             logMessage(`${enemy.name} は毒を無効化した！`, 'log-system');
           } else if (enemy.isMaou && Math.random() < 0.5) {
-            logMessage('魔王は状態異常を防ぁE���E�E, 'log-system');
+            logMessage('魔王は状態異常を防ぁE���E�E', 'log-system');
           } else {
             enemy.poison = (enemy.poison || 0) + 1;
-            logMessage('アイチE��「香水」を使用し、敵に毁Eを付与した！E, 'log-poison');
+            logMessage('アイチE��「香水」を使用し、敵に毁Eを付与した！E', 'log-poison');
           }
         }
       }
@@ -1526,7 +1527,8 @@ if (btnInnRest) {
       yellow: 'dot-yellow', purple: 'dot-purple'
     };
 
-    // カード要素を生成する関数�E�新チE��イン�E�E    function makeCardEl(card, onClick) {
+    // カード要素を生成する関数�E�新チE��イン�E�E
+    function makeCardEl(card, onClick) {
 
       const div = document.createElement('div');
       div.className = `battle-card reward-card color-${card.color} card-type-${card.type}`;
@@ -1600,20 +1602,20 @@ if (btnInnRest) {
       // 属性
 
       if (card.element && card.element !== 'none') {
-        const elemMap = { fire: '炁E, ice: '氷', thunder: '雷', wind: '風', stone: '圁E };
+        const elemMap = { fire: '炎', ice: '氷', thunder: '雷', wind: '風', stone: '圁E' };
         if (elemMap[card.element]) addTag(elemMap[card.element], card.element);
       }
       // 状態異常�E�毒、E��痺�E�E
-      if (card.poison) addTag('毁E, 'poison');
+      if (card.poison) addTag('毁E', 'poison');
       if (card.paralyze) addTag('麻痺', 'paralyze');
       // バフ/チE��チE
-      if (card.buffUp) addTag('能昁E, 'buff-up');
-      if (card.buffDown) addTag('能陁E, 'buff-down');
+      if (card.buffUp) addTag('能昁E', 'buff-up');
+      if (card.buffDown) addTag('能陁E', 'buff-down');
       // 回復
 
       if (card.healSelf) addTag('回復', 'white');
       // 特殁E
-      if (card.color === 'purple') addTag('特殁E, 'purple');
+      if (card.color === 'purple') addTag('特殁E', 'purple');
 
       if (tags.children.length > 0) div.appendChild(tags);
 
@@ -1623,19 +1625,17 @@ if (btnInnRest) {
 
     function buildCardMainText(card) {
       if (card.type === 'attack') {
-        const hits = card.hits ? `×${card.hits}` : '';
+        const hits = card.hits ? `ÁE{card.hits}` : '';
         const elem = card.element && card.element !== 'none' ? ` [${getElemLabel(card.element)}]` : '';
-        return `⚔ ${card.value}${hits}ダメージ${elem}`;
+        return `⚔︁E${card.value}${hits}ダメージ${elem}`;
       } else if (card.healSelf) {
         return `HP +${card.healSelf} 回復`;
       } else if (card.draw) {
-        return `カードを${card.draw}枚引く`;
-      } else if (card.id === 'kakusei' || card.id === 'kakusei+') {
-        return `能昇＆能降 ${card.buffUp}ターン`;
+        return `カードを${card.draw}枚引き、行動回数+1`;
       } else if (card.buffUp) {
-        return `${card.buffUp}ターン 能昇`;
+        return `能昁E${card.buffUp}ターン付与`;
       } else if (card.buffDown) {
-        return `${card.buffDown}ターン 能降`;
+        return `敵に能陁E${card.buffDown}ターン`;
       }
       return card.desc || '';
     }
@@ -1643,13 +1643,13 @@ if (btnInnRest) {
     function buildCardSubTexts(card) {
       const lines = [];
       if (card.poison) lines.push(`毁E{card.poison}付与`);
-      if (card.paralyze) lines.push('30%で麻痺付丁E);
+      if (card.paralyze) lines.push('30%で麻痺付丁E');
       if (card.oncePerBattle) lines.push('1戦闁E回�Eみ');
       return lines;
     }
 
     function getElemLabel(elem) {
-      const map = { fire: '炁E, ice: '氷', thunder: '雷', wind: '風', earth: '圁E, stone: '圁E };
+      const map = { fire: '炎', ice: '氷', thunder: '雷', wind: '風', earth: '圁E', stone: '圁E' };
       return map[elem] || elem;
     }
 
@@ -1671,7 +1671,7 @@ if (btnInnRest) {
       } else if (chosen === 'ice_attack') {
         enemy.intent = { type: 'ice_attack', damage: dmg + 1, desc: '絶対零度' };
       } else if (chosen === 'rush') {
-        enemy.intent = { type: 'rush', damage: Math.max(1, Math.floor(dmg / 2)), hits: 2, desc: '突E��連撁E };
+        enemy.intent = { type: 'rush', damage: Math.max(1, Math.floor(dmg / 2)), hits: 2, desc: '突E��連撁E' };
       } else if (chosen === 'paralyze') {
         enemy.intent = { type: 'paralyze', damage: 0, desc: '痺れ粁E(麻痺付丁E' };
       } else if (chosen === 'poison') {
@@ -1683,7 +1683,7 @@ if (btnInnRest) {
       } else if (chosen === 'buff_down') {
         enemy.intent = { type: 'buff_down', damage: 0, desc: '重力波 (能陁E' };
       } else {
-        enemy.intent = { type: 'attack', damage: dmg, desc: '通常攻撁E };
+        enemy.intent = { type: 'attack', damage: dmg, desc: '通常攻撁E' };
       }
     }
 
@@ -1726,19 +1726,19 @@ if (btnInnRest) {
         } else {
           if (enemy.weaknesses.includes(element)) {
             dmg = Math.floor(dmg * 1.5);
-            logMessage('弱点属性�E�ダメージ1.5倍！E, 'log-heal');
+            logMessage('弱点属性�E�ダメージ1.5倍！E', 'log-heal');
           } else if (enemy.resistances.includes(element)) {
             dmg = Math.floor(dmg * 0.5);
-            logMessage('耐性あり。ダメージ半渁E, 'log-poison');
+            logMessage('耐性あり。ダメージ半渁E', 'log-poison');
           } else if (enemy.immunities.includes(element)) {
             dmg = 0;
-            logMessage('無効化されました�E�E, 'log-poison');
+            logMessage('無効化されました�E�E', 'log-poison');
           }
         }
 
         if (enemy.isGolem) {
           dmg = Math.floor(dmg / 2);
-          logMessage('ゴーレムの鉁E��E��被ダメージ半減、E, 'log-poison');
+          logMessage('ゴーレムの鉁E��E��被ダメージ半減、E', 'log-poison');
         }
 
         return Math.max(0, dmg);
@@ -1773,27 +1773,27 @@ if (btnInnRest) {
 
       if (player.paralyze > 0) {
         player.paralyze -= 1;
-        logMessage('あなた�E麻痺で動けなぁE��ターンが強制終亁E��ます、E, 'log-poison');
+        logMessage('あなた�E麻痺で動けなぁE��ターンが強制終亁E��ます、E', 'log-poison');
         setTimeout(() => { if (!isGameOver) endTurn(); }, 1000);
         return;
       }
 
       if (player.class === 'kenshi') {
         player.hp = Math.min(player.maxHp, player.hp + 1);
-        logMessage('戦士のパッシブ効果でHPぁE1 回復した、E, 'log-heal');
+        logMessage('戦士のパッシブ効果でHPぁE1 回復した、E', 'log-heal');
       }
       if (player.class === 'mahoutsukai') {
         player.mp = Math.min(player.maxMp, player.mp + 1);
-        logMessage('魔法使ぁE�Eパッシブ効果でMPぁE1 回復した、E, 'log-heal');
+        logMessage('魔法使ぁE�Eパッシブ効果でMPぁE1 回復した、E', 'log-heal');
       }
       if (player.relics.includes('mermaid_necklace')) {
         player.mp = Math.min(player.maxMp, player.mp + 1);
-        logMessage('人魚�Eネックレス�E�ターン開始時にMPぁE1 回復した、E, 'log-heal');
+        logMessage('人魚�Eネックレス�E�ターン開始時にMPぁE1 回復した、E', 'log-heal');
       }
 
       if (player.poison > 0) {
         player.hp = Math.max(0, player.hp - player.poison);
-        logMessage('プレイヤーが毒で ' + player.poison + ' ダメージ�E�E, 'log-poison');
+        logMessage('プレイヤーが毒で ' + player.poison + ' ダメージ�E�E', 'log-poison');
         player.poison = Math.max(0, player.poison - 1);
         if (player.hp <= 0) { handleGameOver(); return; }
       }
@@ -1804,7 +1804,7 @@ if (btnInnRest) {
       const drawCount = player.relics.includes('book_madousyo') ? 5 : 4;
       drawCards(drawCount);
       updateUI();
-      logMessage('【あなた�Eターン、E, 'log-system');
+      logMessage('【あなた�Eターン、E', 'log-system');
       if (btnEndTurn) btnEndTurn.disabled = false;
     }
 
@@ -1815,7 +1815,7 @@ if (btnInnRest) {
 
       if (player.actions > 0) {
         player.mp = Math.min(player.maxMp, player.mp + player.actions);
-        logMessage('様子見を行い、MPぁE' + player.actions + ' 回復した�E�E, 'log-heal');
+        logMessage('様子見を行い、MPぁE' + player.actions + ' 回復した�E�E', 'log-heal');
       }
 
       player.discard.push(...player.hand);
@@ -1826,7 +1826,7 @@ if (btnInnRest) {
 
     function enemyTurn() {
       if (isGameOver || !enemy || enemy.hp <= 0) return;
-      logMessage('【敵のターン、E);
+      logMessage('【敵のターン、E');
 
       if (enemy.paralyze > 0) {
         enemy.paralyze -= 1;
@@ -1837,7 +1837,7 @@ if (btnInnRest) {
 
       if (enemy.poison && enemy.poison > 0) {
         enemy.hp = Math.max(0, enemy.hp - enemy.poison);
-        logMessage(enemy.name + 'が毒で ' + enemy.poison + ' ダメージ�E�E, 'log-poison');
+        logMessage(enemy.name + 'が毒で ' + enemy.poison + ' ダメージ�E�E', 'log-poison');
         enemy.poison = Math.max(0, enemy.poison - 1);
         if (enemy.hp <= 0) { enemy.hp = 0; updateUI(); handleVictory(); return; }
       }
@@ -1860,11 +1860,11 @@ if (btnInnRest) {
           } else if (enemy.intent.type === 'paralyze') {
             playSE('thunder');
             player.paralyze = 1;
-            logMessage('プレイヤーは麻痺状態になった！E, 'log-poison');
+            logMessage('プレイヤーは麻痺状態になった！E', 'log-poison');
           } else if (enemy.intent.type === 'poison') {
             playSE('poison');
             player.poison = (player.poison || 0) + 2;
-            logMessage('プレイヤーは毁Eを付与された�E�E, 'log-poison');
+            logMessage('プレイヤーは毁Eを付与された�E�E', 'log-poison');
           } else if (enemy.intent.type === 'buff_up') {
             playSE('buff_up');
             enemy.buffUp = 3;
@@ -1872,7 +1872,7 @@ if (btnInnRest) {
           } else if (enemy.intent.type === 'buff_down') {
             playSE('buff_down');
             player.buffDown = 3;
-            logMessage('プレイヤーは能降状態になった！E, 'log-poison');
+            logMessage('プレイヤーは能降状態になった！E', 'log-poison');
           } else {
             const isBoss = (currentPathType === 'boss' || currentPathType === 'midboss' || currentPathType === 'lastboss');
             if (enemy.intent.type === 'fire_attack') playSE('fire');
@@ -1885,7 +1885,7 @@ if (btnInnRest) {
             const calculatedDmg = calculateDamage(dmg, element, false);
             if (calculatedDmg > 0) {
               player.hp = Math.max(0, player.hp - calculatedDmg);
-              logMessage('プレイヤーに ' + calculatedDmg + ' のダメージ�E�E, 'log-damage');
+              logMessage('プレイヤーに ' + calculatedDmg + ' のダメージ�E�E', 'log-damage');
             }
           }
           if (player.hp <= 0) { handleGameOver(); }
@@ -1899,8 +1899,8 @@ if (btnInnRest) {
       if (!isPlayerTurn || isGameOver) return;
       const card = player.hand[index];
       const cardCost = getCardCost(card);
-      if (player.mp < cardCost) { logMessage('MPが足りません�E�E, 'log-system'); return; }
-      if (player.actions <= 0) { logMessage('行動回数が残ってぁE��せん�E�E, 'log-system'); return; }
+      if (player.mp < cardCost) { logMessage('MPが足りません�E�E', 'log-system'); return; }
+      if (player.actions <= 0) { logMessage('行動回数が残ってぁE��せん�E�E', 'log-system'); return; }
 
       player.mp -= cardCost;
       player.actions -= 1;
@@ -1933,22 +1933,22 @@ if (btnInnRest) {
           enemy.hp = Math.max(0, enemy.hp - d);
           total += d;
         }
-        logMessage(card.name + '�E�E' + enemy.name + ' に ' + (hits > 1 ? total + '(' + (total / hits) + 'ÁE + hits + '�E�E : '' + total) + ' ダメージ�E�E, 'log-damage');
+        logMessage(card.name + '�E�E' + enemy.name + ' に ' + (hits > 1 ? total + '(' + (total / hits) + 'ÁE' + hits + '�E�E' : '' + total) + ' ダメージ�E�E', 'log-damage');
         if (card.poison && card.poison > 0) {
           if (enemy.isGolem || enemy.isVampire) {
             logMessage(`${enemy.name} は毒を無効化した。`, 'log-system');
           } else if (enemy.isMaou && Math.random() < 0.5) {
-            logMessage('魔王は状態異常を防ぁE��、E, 'log-system');
+            logMessage('魔王は状態異常を防ぁE��、E', 'log-system');
           } else {
             enemy.poison = (enemy.poison || 0) + card.poison;
-            logMessage(enemy.name + 'に毁E + card.poison + 'を付与！E, 'log-poison');
+            logMessage(enemy.name + 'に毁E' + card.poison + 'を付与！E', 'log-poison');
           }
         }
       } else if (card.type === 'skill') {
-        if (card.draw) { drawCards(card.draw); player.actions++; logMessage(card.name + '�E�Eカードを' + card.draw + '枚引き、行動回数+1�E�E); }
+        if (card.draw) { drawCards(card.draw); player.actions++; logMessage(card.name + '�E�Eカードを' + card.draw + '枚引き、行動回数+1�E�E'); }
         if (card.healSelf) { player.hp = Math.min(player.maxHp, player.hp + card.healSelf); logMessage(card.name + '�E�EHP +' + card.healSelf, 'log-heal'); }
-        if (card.buffUp) { player.buffUp = card.buffUp; logMessage('能昁E���E昁E��与ダメ+1/被ダメ-1�E�を3ターン得た�E�E, 'log-heal'); }
-        if (card.buffDown) { enemy.buffDown = card.buffDown; logMessage('能降！敵に能降（与ダメ-1/被ダメ+1�E�を3ターン付与！E, 'log-poison'); }
+        if (card.buffUp) { player.buffUp = card.buffUp; logMessage('能昁E���E昁E��与ダメ+1/被ダメ-1�E�を3ターン得た�E�E', 'log-heal'); }
+        if (card.buffDown) { enemy.buffDown = card.buffDown; logMessage('能降！敵に能降（与ダメ-1/被ダメ+1�E�を3ターン付与！E', 'log-poison'); }
       }
       updateUI();
       if (enemy.hp <= 0) {
@@ -1957,7 +1957,7 @@ if (btnInnRest) {
         handleVictory();
       } else {
         if (player.actions <= 0) {
-          logMessage('行動回数がなくなったため、�E動的にターンを終亁E��ます、E, 'log-system');
+          logMessage('行動回数がなくなったため、�E動的にターンを終亁E��ます、E', 'log-system');
           setTimeout(() => { if (!isGameOver) endTurn(); }, 800);
         }
       }
@@ -1965,7 +1965,7 @@ if (btnInnRest) {
 
     // --- 16. 勝敗・報酬 ---
 
-    /** 固定レリチE��をカチE��シーン後に付与するユーチE��リチE�� */
+    /** 固定レリック��をカチE��シーン後に付与するユーチE��リチE�� */
     function giveFixedRelic(relicId, cutsceneScenes, onDone) {
       const relic = RELIC_DB[relicId];
       if (!relic) { onDone?.(); return; }
@@ -1975,11 +1975,11 @@ if (btnInnRest) {
           player.relics.push(relicId);
         }
         logMessage(`、E{relic.name}」を手に入れた�E�`, 'log-system');
-        // レリチE��即時効果�E適用
+        // レリック��即時効果�E適用
 
         if (relicId === 'yubiwa_gold') { player.maxHp += 1; player.hp = Math.min(player.hp, player.maxHp); }
         if (relicId === 'yubiwa_silver') { player.maxMp += 1; }
-        showGameAlert('レリチE��入扁E, `、E{relic.name}」を入手しました�E�Ebr><span style="font-size:0.7rem; color:var(--text-muted);">${relic.desc}</span>`, () => {
+        showGameAlert('レリック��入扁E', `、E{relic.name}」を入手しました�E�Ebr><span style="font-size:0.7rem; color:var(--text-muted);">${relic.desc}</span>`, () => {
           onDone?.();
         });
       });
@@ -1989,7 +1989,7 @@ if (btnInnRest) {
       isGameOver = true;
       if (btnEndTurn) btnEndTurn.disabled = true;
       playSE('victory');
-      logMessage(enemy.name + ' を倒した！E, 'log-system');
+      logMessage(enemy.name + ' を倒した！E', 'log-system');
 
       let goldReward = 10 + Math.floor(Math.random() * 6);
       if (currentPathType === 'elite' || currentPathType === 'mimic') {
@@ -2005,7 +2005,7 @@ if (btnInnRest) {
           shuffle(unownedRelics);
           playSE('relic');
           player.relics.push(unownedRelics[0]);
-          logMessage(`ミミチE��からレリチE��、E{RELIC_DB[unownedRelics[0]].name}」を手に入れた�E�`, 'log-system');
+          logMessage(`ミミチE��からレリック��、E{RELIC_DB[unownedRelics[0]].name}」を手に入れた�E�`, 'log-system');
         }
         const unupgraded = player.deck.filter(c => !c.upgraded);
         if (unupgraded.length > 0) {
@@ -2031,8 +2031,8 @@ if (btnInnRest) {
               portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
               speaker: '見回り�E兵士',
               lines: [
-                'ありがとぁE��町を守るゴーレムが故障で暴走してしまぁE��誰も近づけなくなってぁE��んだ、E,
-                'おかげで出入りができるようになった。あとで修琁E��てめE��なぁE��な。これ�Eお礼だ、E
+                'ありがとぁE��町を守るゴーレムが故障で暴走してしまぁE��誰も近づけなくなってぁE��んだ、E',
+                'おかげで出入りができるようになった。あとで修琁E��てめE��なぁE��な。これ�Eお礼だ、E'
               ]
             }];
             const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
@@ -2050,15 +2050,15 @@ if (btnInnRest) {
                 bg: BASE_MAP + 'arashi.png',
                 portraits: [],
                 speaker: '─── 状況E───',
-                lines: ['ふと、嵐が止んだ、Enリヴァイアサンはあなた�E実力を認めてくれたよぁE��、E]
+                lines: ['ふと、嵐が止んだ、Enリヴァイアサンはあなた�E実力を認めてくれたよぁE��、E']
               },
               {
                 bg: BASE_MAP + 'arashi.png',
                 portraits: [{ src: BASE_CH + 'ningyohime.png', size: '130px' }],
-                speaker: '人魁E,
+                speaker: '人魁E',
                 lines: [
-                  '海神様に認められるなんて、本当に勁E��な人間�E�E�E,
-                  '魔王と戦ぁE��ら、これを持ってぁE��て、Enこ�E海に伝わる力が、きっとあなたを守ってくれる�Eずよ、E
+                  '海神様に認められるなんて、本当に勁E��な人間�E�E�E',
+                  '魔王と戦ぁE��ら、これを持ってぁE��て、Enこ�E海に伝わる力が、きっとあなたを守ってくれる�Eずよ、E'
                 ]
               }
             ];
@@ -2071,8 +2071,8 @@ if (btnInnRest) {
               portraits: [{ src: BASE_CH + 'knight.png', size: '120px' }],
               speaker: '城�E兵士',
               lines: [
-                'ご助力感謝します。この山賊�E我、E��連行します、E,
-                '山賊が持ってぁE��も�Eです。あなたにお役立てぁE��だければ幸ぁE��す、E
+                'ご助力感謝します。この山賊�E我、E��連行します、E',
+                '山賊が持ってぁE��も�Eです。あなたにお役立てぁE��だければ幸ぁE��す、E'
               ]
             }];
             const unownedNonFixed = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
@@ -2097,16 +2097,16 @@ if (btnInnRest) {
               {
                 bg: BASE_MAP + 'mori.png',
                 portraits: [{ src: '/portfolio/roguelike/assets/monsters/fantasy_dark_elf.png', size: '120px' }],
-                speaker: 'ダークエルチE,
+                speaker: 'ダークエルチE',
                 lines: ['きゅ�E�……']
               },
               {
                 bg: BASE_MAP + 'mori.png',
                 portraits: [{ src: BASE_CH + 'fantasy_elf2.png', size: '130px' }],
-                speaker: 'エルチE,
+                speaker: 'エルチE',
                 lines: [
-                  '闁E��囚われた仲間を正気に戻してくれて、ありがとぁE��ざいます、E,
-                  'あなた�E勁E��に感謝を込めて、この森に古くから伝わる妖精の剣を授けましょぁE��En大刁E��してください、E
+                  '闁E��囚われた仲間を正気に戻してくれて、ありがとぁE��ざいます、E',
+                  'あなた�E勁E��に感謝を込めて、この森に古くから伝わる妖精の剣を授けましょぁE��En大刁E��してください、E'
                 ]
               }
             ];
@@ -2120,8 +2120,8 @@ if (btnInnRest) {
               portraits: [{ src: BASE_CH + 'royal_princess.png', size: '130px' }],
               speaker: '姫',
               lines: [
-                '助けてくださいまして、誠にありがとぁE��ざいます、Enあなた�Eような勁E��な方が来てくださるとは夢にも思いませんでした、E,
-                'これはわたくしの形見�E品でござぁE��す、EnどぁE��お力になれますよぁE��、E
+                '助けてくださいまして、誠にありがとぁE��ざいます、Enあなた�Eような勁E��な方が来てくださるとは夢にも思いませんでした、E',
+                'これはわたくしの形見�E品でござぁE��す、EnどぁE��お力になれますよぁE��、E'
               ]
             }];
             showMapScreen();
@@ -2154,7 +2154,7 @@ if (btnInnRest) {
         const el = makeCardEl(card, () => {
           playSE('reward_select');
           player.discard.push({ ...CARD_DB[id] });
-          logMessage(CARD_DB[id].name + ' をデチE��に追加�E�E, 'log-system');
+          logMessage(CARD_DB[id].name + ' をデチE��に追加�E�E', 'log-system');
           if (rewardOverlay) rewardOverlay.style.display = 'none';
           proceedNextFloor();
         });
@@ -2197,7 +2197,7 @@ if (btnInnRest) {
                   player.discard[index] = upgradeCard(player.discard[index]);
                 }
               }
-              showGameAlert('強化�E劁E, `、E{card.name}」が強化され、E{card.name}+」になりました�E�`, () => {
+              showGameAlert('強化�E劁E', `、E{card.name}」が強化され、E{card.name}+」になりました�E�`, () => {
                 proceedNextFloor();
               });
             });
@@ -2209,7 +2209,7 @@ if (btnInnRest) {
 
     function showBossRelicReward() {
       if (rewardCards) rewardCards.innerHTML = '';
-      if (rewardSubtitleText) rewardSubtitleText.textContent = 'エリアボス撁E���E�レリチE��めEつ選択してください';
+      if (rewardSubtitleText) rewardSubtitleText.textContent = 'エリアボス撁E���E�レリック��めEつ選択してください';
       const unownedRelics = Object.keys(RELIC_DB).filter(r => !player.relics.includes(r) && !RELIC_DB[r].isFixed);
       shuffle(unownedRelics);
       const picks = unownedRelics.slice(0, 3);
@@ -2227,7 +2227,7 @@ if (btnInnRest) {
         el.addEventListener('click', () => {
           playSE('relic');
           player.relics.push(relicId);
-          logMessage(`ボス報酬�E�レリチE��、E{relic.name}」を獲得！`, 'log-system');
+          logMessage(`ボス報酬�E�レリック��、E{relic.name}」を獲得！`, 'log-system');
           if (rewardOverlay) rewardOverlay.style.display = 'none';
           proceedNextFloor();
         });
@@ -2241,7 +2241,7 @@ if (btnInnRest) {
       else playSE('defeat');
 
       if (resultTitle) {
-        resultTitle.textContent = isWin ? '戦闘勝利�E�E : 'ゲームオーバ�E';
+        resultTitle.textContent = isWin ? '戦闘勝利�E�E' : 'ゲームオーバ�E';
         resultTitle.style.color = isWin ? '#28a745' : '#dc3545';
       }
       if (resultDetails) {
@@ -2249,7 +2249,7 @@ if (btnInnRest) {
           ? `第${battleCount}戦を見事に勝ち抜きました�E�引き続き次の階層を選択してください。`
           : `魔王の軍勢に倒れました�E�到達階層: エリア ${currentArea} - ${currentFloor}層�E�。もぁE��度挑戦しますか�E�`;
       }
-      if (btnNext) btnNext.textContent = isWin ? 'マップへ戻めE : 'リトライ';
+      if (btnNext) btnNext.textContent = isWin ? 'マップへ戻めE' : 'リトライ';
       if (overlay) overlay.style.display = 'flex';
     }
 
@@ -2258,17 +2258,17 @@ if (btnInnRest) {
       stopBGM();
       playSE('victory');
       if (resultTitle) {
-        resultTitle.textContent = '🎉 全面クリア�E�E;
+        resultTitle.textContent = '🎉 全面クリア�E�E';
         resultTitle.style.color = '#ffd700';
       }
       if (resultDetails) {
-        const clsName = player.class === 'yuusya' ? '勁E��E : (player.class === 'kenshi' ? '戦士' : (player.class === 'mahoutsukai' ? '魔法使ぁE : '格闘家'));
+        const clsName = player.class === 'yuusya' ? '勁E��E' : (player.class === 'kenshi' ? '戦士' : (player.class === 'mahoutsukai' ? '魔法使ぁE' : '格闘家'));
         resultDetails.innerHTML = `
           <strong>おめでとぁE��ざいます！E/strong><br>
           あなた�E魔王を撃破し、世界に平和を取り戻しました�E�Ebr><br>
           【�E険の記録、Ebr>
           選択した�E業: ${clsName}<br>
-          最終所持E��: 💰${player.gold} / 獲得レリチE��: ${player.relics.length}倁E        `;
+          最終所持E��: 💰${player.gold} / 獲得レリック��: ${player.relics.length}倁E        `;
       }
       if (btnNext) btnNext.style.display = 'none';
       if (overlay) overlay.style.display = 'flex';
@@ -2387,7 +2387,7 @@ if (btnInnRest) {
 
       renderHand();
 
-      // レリチE��とアイチE��
+      // レリック��とアイチE��
 
       renderRelicsAndItems();
 
@@ -2511,7 +2511,8 @@ if (btnInnRest) {
       });
     }
 
-    // 戦闘中マップ確誁E    if (btnBattleViewMap) {
+    // 戦闘中マップ確誁E
+    if (btnBattleViewMap) {
 
       btnBattleViewMap.addEventListener('click', () => {
         if (battleMapOverlay) {
@@ -2533,7 +2534,8 @@ if (btnInnRest) {
       });
     }
 
-    // チE��キビュアーのタチE    document.querySelectorAll('.deck-tab').forEach(btn => {
+    // チE��キビュアーのタチE
+    document.querySelectorAll('.deck-tab').forEach(btn => {
 
       btn.addEventListener('click', () => {
         document.querySelectorAll('.deck-tab').forEach(b => b.classList.remove('active'));
