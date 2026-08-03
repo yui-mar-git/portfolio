@@ -1,0 +1,224 @@
+---
+// src/components/common/ConfigPanel.astro
+interface Props {
+  hasHowToPlay?: boolean;
+  materialCategories?: Array<{
+    category: string;
+    items: Array<{ name: string; url: string }>;
+  }>;
+}
+
+const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
+---
+<div id="modal-overlay" class="modal-overlay"></div>
+
+<!-- コンフィグモーダル -->
+<div id="config-modal" class="config-modal" role="dialog" aria-hidden="true">
+  <button class="modal-close-x-btn" id="close-config-btn-x" aria-label="閉じる">&times;</button>
+  <h3>コンフィグ</h3>
+
+  <!-- サウンドトグル & スライダー -->
+  <div class="config-item">
+    <div class="config-item-header">
+      <label for="bgm-volume">BGM音量</label>
+      <button type="button" id="bgm-mute-toggle" class="sound-toggle-btn" aria-label="BGMミュート切り替え">
+        🔊 ON
+      </button>
+    </div>
+    <input type="range" id="bgm-volume" min="0" max="100" value="50" />
+  </div>
+
+  <div class="config-item">
+    <div class="config-item-header">
+      <label for="se-volume">SE音量</label>
+      <button type="button" id="se-mute-toggle" class="sound-toggle-btn" aria-label="SEミュート切り替え">
+        🔊 ON
+      </button>
+    </div>
+    <input type="range" id="se-volume" min="0" max="100" value="50" />
+  </div>
+
+  <!-- ゲーム固有の設定拡張スロット -->
+  <slot name="config-extra" />
+
+  <div class="config-actions">
+    {hasHowToPlay && (
+      <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-config-howto">遊び方を見る</button>
+    )}
+    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
+  </div>
+</div>
+
+<!-- クレジットモーダル -->
+<div id="credits-modal" class="config-modal" role="dialog" aria-hidden="true">
+  <button class="modal-close-x-btn" id="close-credits-btn-x" aria-label="閉じる">&times;</button>
+  <h3>クレジット・使用素材</h3>
+  <div class="howto-content credits-content">
+    <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
+    <ul class="credits-list">
+      {materialCategories.map((mat) => (
+        <li>
+          <strong>{mat.category}:</strong>{' '}
+          {mat.items.map((item, index) => (
+            <span key={item.name}>
+              <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
+              {index < mat.items.length - 1 ? ' / ' : ''}
+            </span>
+          ))}
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<script>
+  (() => {
+    document.addEventListener('DOMContentLoaded', () => {
+      const bgmInput = document.getElementById('bgm-volume') as HTMLInputElement | null;
+      const seInput = document.getElementById('se-volume') as HTMLInputElement | null;
+      const bgmToggle = document.getElementById('bgm-mute-toggle');
+      const seToggle = document.getElementById('se-mute-toggle');
+
+      let isBgmMuted = false;
+      let isSeMuted = false;
+      let prevBgmVal = 50;
+      let prevSeVal = 50;
+
+      function safePlaySE(seName: string) {
+        if (typeof (window as any).playSE === 'function') {
+          (window as any).playSE(seName);
+        }
+      }
+
+      // Audio volume handling
+      function updateBGM(val: number) {
+        const vol = val / 100;
+        if (typeof (window as any).setBGMVolume === 'function') {
+          (window as any).setBGMVolume(vol);
+        } else if ((window as any).bgm) {
+          (window as any).bgm.volume = vol;
+        }
+      }
+
+      function updateSE(val: number) {
+        const vol = val / 100;
+        if (typeof (window as any).setSEVolume === 'function') {
+          (window as any).setSEVolume(vol);
+        } else if ((window as any).seVolume !== undefined) {
+          (window as any).seVolume = vol;
+        }
+      }
+
+      if (bgmInput) {
+        bgmInput.addEventListener('input', (e) => {
+          const val = parseInt((e.target as HTMLInputElement).value, 10);
+          updateBGM(val);
+          if (val > 0 && isBgmMuted) {
+            isBgmMuted = false;
+            if (bgmToggle) bgmToggle.textContent = '🔊 ON';
+          }
+        });
+      }
+
+      if (seInput) {
+        seInput.addEventListener('input', (e) => {
+          const val = parseInt((e.target as HTMLInputElement).value, 10);
+          updateSE(val);
+          if (val > 0 && isSeMuted) {
+            isSeMuted = false;
+            if (seToggle) seToggle.textContent = '🔊 ON';
+          }
+        });
+      }
+
+      if (bgmToggle && bgmInput) {
+        bgmToggle.addEventListener('click', () => {
+          safePlaySE('cursor');
+          isBgmMuted = !isBgmMuted;
+          if (isBgmMuted) {
+            prevBgmVal = parseInt(bgmInput.value, 10) || 50;
+            bgmInput.value = '0';
+            updateBGM(0);
+            bgmToggle.textContent = '🔇 OFF';
+          } else {
+            bgmInput.value = prevBgmVal.toString();
+            updateBGM(prevBgmVal);
+            bgmToggle.textContent = '🔊 ON';
+          }
+        });
+      }
+
+      if (seToggle && seInput) {
+        seToggle.addEventListener('click', () => {
+          safePlaySE('cursor');
+          isSeMuted = !isSeMuted;
+          if (isSeMuted) {
+            prevSeVal = parseInt(seInput.value, 10) || 50;
+            seInput.value = '0';
+            updateSE(0);
+            seToggle.textContent = '🔇 OFF';
+          } else {
+            seInput.value = prevSeVal.toString();
+            updateSE(prevSeVal);
+            seToggle.textContent = '🔊 ON';
+          }
+        });
+      }
+
+      // Modal navigation: Credits button
+      const creditsBtn = document.getElementById('credits-btn');
+      const creditsModal = document.getElementById('credits-modal');
+      const closeCreditsX = document.getElementById('close-credits-btn-x');
+      const configModal = document.getElementById('config-modal');
+      const overlay = document.getElementById('modal-overlay');
+
+      if (creditsBtn && creditsModal) {
+        creditsBtn.addEventListener('click', () => {
+          safePlaySE('cursor');
+          if (configModal) configModal.classList.remove('active');
+          creditsModal.classList.add('active');
+          if (overlay) overlay.classList.add('active');
+        });
+      }
+
+      if (closeCreditsX && creditsModal) {
+        closeCreditsX.addEventListener('click', () => {
+          safePlaySE('cancel');
+          creditsModal.classList.remove('active');
+          if (overlay) overlay.classList.remove('active');
+        });
+      }
+    });
+  })();
+</script>
+
+<style is:global>
+  .config-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .sound-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--text-color, #ffffff);
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .sound-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .config-actions {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+</style>

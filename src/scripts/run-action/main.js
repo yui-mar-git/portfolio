@@ -23,6 +23,14 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     se.play().catch(e => console.log('SE play failed:', e));
   }
 
+  window.playSE = playSE;
+  window.setSEVolume = function(vol) {
+    configSeVolume = vol;
+  };
+  window.setBGMVolume = function(vol) {
+    configBgmVolume = vol;
+  };
+
   const canvas = document.getElementById('game-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');

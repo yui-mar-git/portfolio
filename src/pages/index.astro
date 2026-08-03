@@ -270,13 +270,26 @@ const tree = [rootNode];
         .law-sentence {
           line-height: 1.5;
         }
-        .dashboard-card, .law-card {
+        .dashboard-card, .law-card, .toc-card {
           margin: 0 auto;
-          max-width: 600px;
+          max-width: 640px;
           text-align: left;
+          background: rgba(var(--card-bg-rgb), 0.7);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-radius: var(--radius-bento);
+          border: 1px solid var(--glass-border);
+          box-shadow: var(--shadow-bento);
+          transition: transform 0.35s var(--ease-out-back), box-shadow 0.35s ease;
+        }
+        .dashboard-card:hover, .law-card:hover, .toc-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-bento), var(--shadow-glow);
         }
         .section-title {
-          font-size: 1.5rem;
+          font-size: clamp(1.4rem, 3vw, 1.8rem);
+          font-weight: 800;
+          letter-spacing: -0.03em;
           margin-bottom: 1.5rem;
           display: inline-block;
           color: var(--heading-color, var(--text-main));

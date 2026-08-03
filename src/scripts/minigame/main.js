@@ -29,6 +29,14 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     se.play().catch(e => console.log('SE play failed:', e));
   }
 
+  window.playSE = playSE;
+  window.setSEVolume = function(vol) {
+    configSeVolume = vol;
+  };
+  window.setBGMVolume = function(vol) {
+    configBgmVolume = vol;
+  };
+
   const startBtn = document.getElementById('start-btn');
   const retryBtn = document.getElementById('retry-btn');
   const titleBtn = document.getElementById('title-btn');

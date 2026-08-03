@@ -1,0 +1,36 @@
+---
+// src/components/common/GameContainer.astro
+interface Props {
+  aspectRatio?: string; // e.g. "16 / 9", "4 / 3"
+  maxWidth?: string; // e.g. "900px"
+}
+
+const { aspectRatio = '16 / 9', maxWidth = '960px' } = Astro.props;
+---
+<div id="global-game-scaler" class="game-container-scaler" style={`max-width: ${maxWidth};`}>
+  <div id="global-game-scaler-inner" class="game-container-inner" style={`aspect-ratio: ${aspectRatio};`}>
+    <!-- メインゲーム画面エリア -->
+    <slot />
+    
+    <!-- オーバーレイ領域（タイトル・モーダル・コンフィグ等） -->
+    <slot name="overlay" />
+  </div>
+</div>
+
+<style is:global>
+  .game-container-scaler {
+    width: 100%;
+    margin: 2rem auto;
+    position: relative;
+    overflow: clip;
+  }
+
+  .game-container-inner {
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+    transform-origin: top left;
+    transition: transform 0.1s linear;
+    box-sizing: border-box;
+  }
+</style>

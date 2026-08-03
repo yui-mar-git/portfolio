@@ -39,3 +39,19 @@ pnpm-debug.log*
 .backups/
 *.suo
 *.sw?
+
+# Temporary & Backup Scratch Files (Ignore local diffs, scratch scripts, and backups)
+temp_logs/
+*.diff
+*.txt
+*.cjs
+original_*.astro
+original_*_utf8.astro
+pristine_*.js
+head_main.js
+temp_*
+test.js
+test_bc.js
+search.cjs
+bad_lines.json
+

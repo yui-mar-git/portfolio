@@ -7,12 +7,11 @@
   <div id="howto-pages" class="howto-pages-container">
     <slot />
   </div>
-  <div class="howto-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <button id="howto-prev-btn" class="btn btn-primary pagination-btn" style="padding: 0.3rem 1rem;">◀</button>
-    <span id="howto-page-indicator" style="font-size: 0.9rem;">1 / 1</span>
-    <button id="howto-next-btn" class="btn btn-primary pagination-btn" style="padding: 0.3rem 1rem;">▶</button>
+  <div class="howto-pagination">
+    <button id="howto-prev-btn" class="btn btn-primary pagination-btn">◀</button>
+    <span id="howto-page-indicator">1 / 1</span>
+    <button id="howto-next-btn" class="btn btn-primary pagination-btn">▶</button>
   </div>
-  
 </div>
 
 <script>
@@ -110,6 +109,18 @@
 </script>
 
 <style is:global>
+  .howto-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .pagination-btn {
+    padding: 0.3rem 1rem;
+  }
+  #howto-page-indicator {
+    font-size: 0.9rem;
+  }
   .howto-pages-container {
     min-height: 150px;
     margin-bottom: 20px;

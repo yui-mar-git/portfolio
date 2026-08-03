@@ -1,0 +1,180 @@
+---
+// src/components/common/HowToPlayModal.astro
+---
+<div id="howto-modal" class="config-modal" role="dialog" aria-hidden="true">
+  <button class="modal-close-x-btn" id="close-howto-btn-x" aria-label="閉じる">&times;</button>
+  <h3>遊び方</h3>
+  
+  <div id="howto-pages" class="howto-pages-container">
+    <slot />
+  </div>
+
+  <div class="howto-pagination">
+    <button id="howto-prev-btn" class="btn btn-primary pagination-btn" aria-label="前へ">◀</button>
+    <span id="howto-page-indicator">1 / 1</span>
+    <button id="howto-next-btn" class="btn btn-primary pagination-btn" aria-label="次へ">▶</button>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const howtoModal = document.getElementById('howto-modal');
+    if (!howtoModal) return;
+
+    const pagesContainer = document.getElementById('howto-pages');
+    if (!pagesContainer) return;
+
+    // Support both .howto-content and .howto-page items
+    const pages = Array.from(pagesContainer.querySelectorAll('.howto-content, .howto-page')) as HTMLElement[];
+    if (pages.length === 0) return;
+
+    pages.forEach((p) => {
+      p.classList.add('howto-page-item');
+    });
+
+    let currentPage = 0;
+    const prevBtn = document.getElementById('howto-prev-btn');
+    const nextBtn = document.getElementById('howto-next-btn');
+    const indicator = document.getElementById('howto-page-indicator');
+    const paginationEl = document.querySelector('.howto-pagination') as HTMLElement | null;
+
+    const closeBtns = [
+      document.getElementById('close-howto-btn-x'),
+      document.getElementById('close-howto-btn')
+    ];
+
+    const howtoBtns = document.querySelectorAll('#howto-btn, #howto-btn-in-config, .btn-howto, .btn-config-howto');
+
+    function safePlaySE(seName: string) {
+      if (typeof (window as any).playSE === 'function') {
+        (window as any).playSE(seName);
+      }
+    }
+
+    function updatePage() {
+      pages.forEach((p, i) => {
+        p.style.display = i === currentPage ? 'block' : 'none';
+      });
+
+      if (indicator) {
+        indicator.textContent = `${currentPage + 1} / ${pages.length}`;
+      }
+
+      if (paginationEl) {
+        paginationEl.style.display = pages.length <= 1 ? 'none' : 'flex';
+      }
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        safePlaySE('cursor');
+        currentPage = currentPage > 0 ? currentPage - 1 : pages.length - 1;
+        updatePage();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        safePlaySE('cursor');
+        currentPage = currentPage < pages.length - 1 ? currentPage + 1 : 0;
+        updatePage();
+      });
+    }
+
+    closeBtns.forEach((btn) => {
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          safePlaySE('cursor');
+          howtoModal.classList.remove('active');
+          howtoModal.setAttribute('aria-hidden', 'true');
+          const mainOverlay = document.getElementById('modal-overlay');
+          if (mainOverlay) mainOverlay.classList.remove('active');
+        });
+      }
+    });
+
+    howtoBtns.forEach((btn) => {
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          safePlaySE('cursor');
+
+          currentPage = 0;
+          updatePage();
+
+          const configModal = document.getElementById('config-modal');
+          if (configModal) configModal.classList.remove('active');
+
+          howtoModal.classList.add('active');
+          howtoModal.setAttribute('aria-hidden', 'false');
+
+          const mainOverlay = document.getElementById('modal-overlay');
+          if (mainOverlay) mainOverlay.classList.add('active');
+        });
+      }
+    });
+
+    updatePage();
+  })();
+</script>
+
+<style is:global>
+  .howto-pages-container {
+    min-height: 160px;
+    margin-bottom: 1rem;
+  }
+
+  .howto-page-item {
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  .howto-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .pagination-btn {
+    padding: 0.3rem 0.8rem;
+  }
+
+  #howto-page-indicator {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted, #a0aec0);
+  }
+
+  /* Image Insert Support Class */
+  .howto-image,
+  .howto-media {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0.75rem auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    object-fit: contain;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

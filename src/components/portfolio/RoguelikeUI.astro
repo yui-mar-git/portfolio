@@ -1,57 +1,66 @@
 ---
-import HowToPlayModal from './HowToPlayModal.astro';
-import imgYuusya from '../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
-import imgKenshi from '../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
-import imgMahoutsukai from '../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png';
-import imgButouka from '../../assets/games/roguelike/images/characters/figure_rpg_character_butouka.png';
-import imgHotelPet from '../../assets/games/roguelike/images/map/building_hotel_pet.png';
-import imgPixy from '../../assets/games/roguelike/images/characters/fantasy_pixy2.png';
-import imgShop from '../../assets/games/roguelike/images/map/omise_shop_tatemono.png';
-import imgNoImage from '../../assets/games/roguelike/images/icons/no_image_square.jpg';
-import imgKing from '../../assets/games/roguelike/images/characters/royal_king.png';
+import yuusyaImg from '../../assets/games/roguelike/images/characters/figure_rpg_character_yuusya.png';
+import kenshiImg from '../../assets/games/roguelike/images/characters/figure_rpg_character_kenshi.png';
+import mahoutsukaiImg from '../../assets/games/roguelike/images/characters/figure_rpg_character_mahoutsukai.png';
+import butoukaImg from '../../assets/games/roguelike/images/characters/figure_rpg_character_butouka.png';
+import hotelImg from '../../assets/games/roguelike/images/map/building_hotel_pet.png';
+import pixyImg from '../../assets/games/roguelike/images/characters/fantasy_pixy2.png';
+import shopImg from '../../assets/games/roguelike/images/map/omise_shop_tatemono.png';
+import noImageImg from '../../assets/games/roguelike/images/icons/no_image_square.jpg';
+import kingImg from '../../assets/games/roguelike/images/characters/royal_king.png';
+
+const { projectData } = Astro.props;
 ---
-<!-- game-container: CSSで position:relative / height:580px / overflow:hidden を定義済み -->
+
 <div class="game-container" id="game-container">
-  <!-- icon-config: CSSで position/top/right/z-index を定義 -->
   <span id="config-btn" class="icon-config" title="コンフィグ">⚙️</span>
 
   <!-- ゲームヘッダーバー（ステータス常時表示） -->
-  <!-- game-header-bar: CSSで定義。初期 display:none はCSS側で管理 -->
-  <div id="game-header" class="game-header-bar">
+  <div id="game-header" class="game-header-bar game-header-custom">
     <div class="header-status">
-      <span id="header-floor" class="header-floor">エリア 1 - 0層</span>
-      <span class="gold-badge">💰<span id="header-gold">50</span></span>
-      <span class="hp-badge">❤️<span id="header-hp">10/10</span></span>
-      <span class="mp-badge">💧<span id="header-mp">5/5</span></span>
+      <span id="header-floor" class="header-floor-text">エリア 1 - 0層</span>
+      <span class="gold-badge"><span id="header-gold">50</span> G</span>
+      <span class="hp-badge">HP: <span id="header-hp">10/10</span></span>
+      <span class="mp-badge">MP: <span id="header-mp">5/5</span></span>
       <div class="header-relics">
         <span class="header-relics-label">レリック:</span>
-        <div id="header-relics-list" class="header-relics-list"></div>
+        <div id="header-relics-list" class="header-relics-list-container"></div>
       </div>
     </div>
   </div>
 
+  <!-- ゲームフッターバー（アイテム・デッキ常時表示） -->
+  <div id="game-footer" class="game-footer-bar game-footer-custom">
+    <div class="btn-shop-service-leave-custom">
+      <span class="town-items-custom">アイテム:</span>
+      <div id="footer-player-items" class="footer-player-items-custom"></div>
+    </div>
+    <button class="btn btn-secondary btn-sm btn-footer-view-deck-custom" id="btn-footer-view-deck">デッキ確認
+      (<span id="footer-deck-count">0</span>)</button>
+  </div>
   <!-- ゲームオーバー/クリア画面 -->
-  <div class="overlay result-overlay" id="result-overlay">
+  <div id="result-overlay" class="rl-overlay result-overlay-custom">
     <h2 id="result-title">戦闘終了</h2>
-    <p id="result-details" class="result-details"></p>
+    <p id="result-details" class="result-details-custom">
+    </p>
     <div class="result-actions">
       <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
       <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
-      <button class="btn btn-share" id="btn-share">Xでシェア</button>
+      <button class="btn btn-share-custom" id="btn-share">Xでシェア</button>
     </div>
   </div>
 
   <!-- カード選択報酬画面 -->
-  <div class="overlay reward-overlay" id="reward-overlay">
+  <div id="reward-overlay" class="rl-overlay reward-overlay-custom">
     <h2>🎉 戦闘勝利！</h2>
     <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
     <div id="reward-cards" class="reward-cards"></div>
-    <button class="btn btn-secondary btn-skip-reward" id="btn-skip-reward">スキップ</button>
+    <button class="btn btn-secondary btn-skip-reward-custom" id="btn-skip-reward">スキップ</button>
   </div>
 
   <!-- デッキ閲覧モーダル -->
-  <div class="overlay deck-viewer-overlay" id="deck-viewer-overlay">
-    <h2 class="deck-viewer-title">デッキ確認</h2>
+  <div id="deck-viewer-overlay" class="rl-overlay deck-viewer-overlay-custom">
+    <h2 class="deck-view-title">デッキ確認</h2>
     <div class="deck-viewer-tabs">
       <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
       <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
@@ -60,221 +69,201 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     <div id="deck-list" class="dv-card-list active"></div>
     <div id="discard-list" class="dv-card-list"></div>
     <div id="hand-list" class="dv-card-list"></div>
-    <button class="btn btn-secondary btn-full btn-mt" id="close-deck-viewer">閉じる</button>
+    <button class="btn btn-secondary close-deck-viewer-custom" id="close-deck-viewer">閉じる</button>
   </div>
 
   <!-- スタート画面 -->
-  <!-- start-screen: CSS で position/background/z-index 定義 -->
-  <div id="start-screen" class="game-screen start-screen">
-    <h2 class="screen-title">ローグライクカードゲーム</h2>
-    <p class="screen-desc">職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
+  <div id="start-screen" class="start-screen-custom">
+    <h2 class="game-main-title">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
+    <p class="game-main-desc">
+      職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
     <button id="start-btn" class="btn btn-full">冒険を始める</button>
-    <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
+    <button id="howto-btn" class="btn btn-secondary btn-full howto-btn-custom">遊び方</button>
   </div>
 
   <!-- 職業選択画面 -->
-  <div id="class-select-screen" class="game-screen class-select-screen">
-    <h2 class="class-select-title">冒険者の選択</h2>
-    <p class="class-select-desc">あなたの戦闘スタイルを選んで旅立ちましょう。</p>
-    <div class="class-select-body">
-      <div class="class-grid">
+  <div id="class-select-screen" class="class-select-screen-custom">
+    <h2 class="hero-select-title">冒険者の選択</h2>
+    <p class="hero-select-desc">
+      あなたの戦闘スタイルを選んで旅立ちましょう。</p>
+    <div class="hero-stats-wrapper">
+      <div class="class-grid class-grid-custom">
         <div class="class-card" data-class="yuusya">
-          <img src={imgYuusya.src} class="rl-char-img" />
-          <div class="rl-char-name">勇者</div>
-          <div class="rl-char-desc">HP10 /
+          <img src={yuusyaImg.src} class="hero-icon-img" />
+          <div class="hero-name-label">勇者</div>
+          <div class="hero-hp-label">HP10 /
             MP5<br>初期レリックが+1個</div>
         </div>
         <div class="class-card" data-class="kenshi">
-          <img src={imgKenshi.src} class="rl-char-img" />
-          <div class="rl-char-name">戦士</div>
-          <div class="rl-char-desc">HP15 /
+          <img src={kenshiImg.src} class="hero-icon-img" />
+          <div class="hero-name-label">戦士</div>
+          <div class="hero-hp-label">HP15 /
             MP4<br>毎ターンHP+1回復</div>
         </div>
         <div class="class-card" data-class="mahoutsukai">
-          <img src={imgMahoutsukai.src}
-            class="rl-char-img" />
-          <div class="rl-char-name">魔法使い</div>
-          <div class="rl-char-desc">HP7 /
+          <img src={mahoutsukaiImg.src} class="hero-icon-img" />
+          <div class="hero-name-label">魔法使い</div>
+          <div class="hero-hp-label">HP7 /
             MP7<br>毎ターンMP+1回復</div>
         </div>
         <div class="class-card" data-class="butouka">
-          <img src={imgButouka.src} class="rl-char-img" />
-          <div class="rl-char-name">格闘家</div>
-          <div class="rl-char-desc">HP8 /
+          <img src={butoukaImg.src} class="hero-icon-img" />
+          <div class="hero-name-label">格闘家</div>
+          <div class="hero-hp-label">HP8 /
             MP4<br>毎ターン行動回数+1</div>
         </div>
       </div>
-      <p id="class-select-preview"
-        class="rl-char-preview">
+      <p id="class-select-preview" class="class-select-preview-custom">
         勇者が選択されています</p>
     </div>
 
-    <button id="btn-game-start" class="btn btn-full btn-mt">冒険の旅へ出る</button>
+    <button id="btn-back-to-title" class="btn btn-secondary btn-full btn-back-to-title-custom">戻る</button>
   </div>
 
   <!-- マップ進行画面（横スクロール双六マップ） -->
-  <div id="map-screen" class="game-screen game-screen-offset">
-    <div class="map-header">
-      <h3 class="map-title">マップ</h3>
-    </div>
+  <div id="map-screen" class="map-screen-custom">
+    <button id="btn-retire-map" class="btn btn-secondary btn-sm btn-retire-map-custom">リタイア</button>
 
     <!-- 横スクロールすごろく本体 -->
-    <div id="map-scroll-wrapper" class="map-scroll-wrapper">
-      <div id="map-board" class="map-board">
+    <div id="map-scroll-wrapper" class="map-scroll-wrapper-custom">
+      <div id="map-board" class="map-board-custom">
         <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
       </div>
     </div>
 
-    <div class="map-footer">
-      <button class="btn btn-secondary btn-deck-view" id="btn-map-view-deck">デッキ確認</button>
-      <span class="map-hint">接続された次のマスへ進めます</span>
-    </div>
+
   </div>
 
   <!-- 宿（回復）画面 -->
-  <div id="inn-screen" class="game-screen game-screen-offset inn-screen">
-    <div class="screen-box-image-wrap">
-      <img src={imgHotelPet.src} class="rl-event-img" />
-    </div>
-    <h3 class="rl-event-title rl-event-hotel">旅人の宿</h3>
-    <p class="rl-event-desc">
-      15ゴールドを支払って、宿屋でぐっすり休むことができます。<br>
-      <strong>効果: HP全回復 ＋ 毒/麻痺の全治</strong>
+  <div id="inn-screen" class="inn-screen-custom">
+    <img src={hotelImg.src} class="town-icon-img" />
+    <h3 class="town-title">旅人の宿</h3>
+    <p class="town-desc">
+      お金を払って、宿屋で休むことができます。
     </p>
-    <div class="screen-actions">
-      <button id="btn-inn-rest" class="btn btn-primary btn-full">休む (💰15)</button>
-      <button id="btn-inn-leave" class="btn btn-secondary btn-full">立ち去る</button>
+    <div class="town-btn-group">
+      <button id="btn-inn-rest-half" class="btn btn-primary btn-inn-rest-half-custom">小休憩 (💰15) <br><span
+          class="town-btn-text">HP/MP 50%回復</span></button>
+      <button id="btn-inn-rest-full" class="btn btn-primary btn-inn-rest-full-custom">宿泊 (💰30) <br><span
+          class="town-btn-text">HP/MP全快 ＋ 状態異常全治</span></button>
+      <button id="btn-inn-leave" class="btn btn-secondary btn-inn-leave-custom">立ち去る</button>
     </div>
   </div>
 
-  <!-- 妖精（強化）画面 -->
-  <div id="fairy-screen" class="game-screen game-screen-offset fairy-screen">
-    <div class="rl-text-center">
-      <div class="screen-box-image-wrap">
-        <img src={imgPixy.src} class="rl-event-img" />
-      </div>
-      <h3 class="rl-event-title rl-event-fairy">祝福の妖精</h3>
-      <p id="fairy-desc" class="rl-event-desc-small">
-        20ゴールドを支払い、妖精の魔力で手札のカードを1枚「強化（+）」します。</p>
+  <!-- ショップサービス（強化・削除）画面 -->
+  <div id="shop-service-screen" class="shop-service-screen-custom">
+    <div class="town-status-wrap">
+      <h3 id="shop-service-title" class="shop-service-title-custom">ショップサービス</h3>
+      <p id="shop-service-desc" class="shop-service-desc-custom"></p>
     </div>
 
-    <!-- 強化対象カード選択リスト -->
-    <div id="fairy-card-list"
-      class="rl-fairy-options">
-      <!-- 所持カードがボタンとして並びます -->
+    <!-- 対象カード選択リスト -->
+    <div id="shop-service-card-list" class="shop-service-card-list-custom">
     </div>
 
-    <div class="screen-actions">
-      <button id="btn-fairy-leave" class="btn btn-secondary btn-flex">立ち去る</button>
+    <div class="town-shop-wrap">
+      <button id="btn-shop-service-leave" class="btn btn-secondary btn-sm btn-shop-service-leave-custom">キャンセル</button>
     </div>
   </div>
 
   <!-- 街（ショップ）画面 -->
-  <div id="town-screen" class="game-screen game-screen-offset town-screen">
-    <div class="rl-text-center">
-      <div class="screen-box-image-wrap">
-        <img src={imgShop.src} class="rl-event-img" />
-      </div>
-      <h3 class="rl-event-title rl-event-shop">よろず街の商い</h3>
-      <p class="rl-event-desc-small">ゴールドを支払い、アイテムやカードを仕入れることができます。</p>
+  <div id="town-screen" class="town-screen-custom">
+    <div class="shop-header">
+      <h3 class="shop-title">よろず街の商い</h3>
+      <button id="btn-town-leave" class="btn btn-secondary btn-sm btn-town-leave-custom">街を出る</button>
     </div>
 
-    <div
-      class="rl-shop-container">
+    <div class="shop-card-list">
       <div>
-        <p
-          class="rl-shop-subtitle rl-text-orange">
-          販売カード (各 💰15)</p>
-        <div id="town-cards" class="rl-shop-row"></div>
+        <p class="shop-card-category">
+          販売カード</p>
+        <div id="town-cards" class="town-cards-custom">
+        </div>
       </div>
       <div>
-        <p
-          class="rl-shop-subtitle rl-text-lightorange">
-          販売アイテム (各 💰20)</p>
-        <div id="town-items" class="rl-shop-row"></div>
+        <p class="shop-card-category">
+          販売アイテム</p>
+        <div id="town-items" class="town-items-custom"></div>
       </div>
-    </div>
+      <div class="shop-relic-wrap">
+        <p class="shop-relic-title">
+          特別サービス</p>
+        <div class="shop-relic-list">
+          <button id="btn-town-upgrade" class="btn btn-primary btn-sm btn-town-upgrade-custom">カード強化 (20
+            G)</button>
+          <button id="btn-town-remove" class="btn btn-primary btn-sm btn-town-remove-custom">カード削除 (20
+            G)</button>
+        </div>
+      </div>
 
-    <button id="btn-town-leave" class="btn btn-secondary btn-full">街を出る</button>
+
+    </div>
   </div>
 
+
   <!-- イベント画面 -->
-  <div id="event-screen" class="game-screen game-screen-offset event-screen">
+  <div id="event-screen" class="event-screen-custom">
     <div>
-      <div class="screen-box-image-wrap">
-        <img id="event-image" src={imgNoImage.src}
-          class="rl-event-img-rounded" />
-      </div>
-      <h3 id="event-title" class="rl-event-title rl-text-warning">未知のイベント</h3>
-      <p id="event-text"
-        class="rl-event-desc-large">
+      <img id="event-image" src={noImageImg.src} class="event-image-custom" />
+      <h3 id="event-title" class="event-title-custom">未知のイベント</h3>
+      <p id="event-text" class="event-text-custom">
       </p>
     </div>
 
-    <div id="event-options" class="rl-event-options">
+    <div id="event-options" class="event-options-custom">
       <!-- イベントの選択肢ボタンがJSで動的に追加されます -->
     </div>
   </div>
 
   <!-- アイテム使用確認モーダル -->
-  <div id="item-confirm-modal"
-    class="rl-overlay-full">
-    <div
-      class="rl-modal-box">
-      <h4 class="rl-modal-title">アイテムの使用確認</h4>
-      <p id="item-confirm-text"
-        class="rl-modal-desc"></p>
-      <div class="rl-modal-actions">
-        <button id="btn-item-confirm-yes" class="btn btn-primary rl-modal-btn">はい</button>
-        <button id="btn-item-confirm-no" class="btn btn-secondary rl-modal-btn">いいえ</button>
+  <div id="item-confirm-modal" class="item-confirm-modal-custom">
+    <div class="item-modal-inner">
+      <h4 id="item-confirm-title" class="item-confirm-title-custom">アイテムの使用確認</h4>
+      <img id="item-confirm-image" src="" alt=""
+        style="display:none; width:80px; height:80px; object-fit:contain; margin:0 auto 0.5rem auto;">
+      <p id="item-confirm-text" class="item-confirm-text-custom"></p>
+      <div class="item-modal-btn-group">
+        <button id="btn-item-confirm-yes" class="btn btn-primary btn-item-confirm-yes-custom">はい</button>
+        <button id="btn-item-confirm-no" class="btn btn-secondary btn-item-confirm-no-custom">いいえ</button>
       </div>
     </div>
   </div>
 
   <!-- 戦闘中マップ確認モーダル -->
-  <div id="battle-map-overlay" class="overlay rl-battle-map-overlay">
-    <h3 class="rl-battle-map-title">現在地確認</h3>
-    <div id="battle-map-scroll-wrapper"
-      class="rl-battle-map-container">
-      <div id="battle-map-board"
-        class="rl-battle-map-inner"></div>
+  <div id="battle-map-overlay" class="overlay battle-map-overlay-custom">
+    <h3 class="battle-map-title">現在地確認</h3>
+    <div id="battle-map-scroll-wrapper" class="battle-map-scroll-wrapper-custom">
+      <div id="battle-map-board" class="battle-map-board-custom"></div>
     </div>
-    <button id="btn-close-battle-map" class="btn btn-secondary rl-battle-map-close-btn">閉じる</button>
+    <button class="btn btn-secondary btn-close-battle-map-custom" id="btn-close-battle-map">閉じる</button>
   </div>
 
   <!-- 王様遭遇イベントモーダル -->
-  <div id="king-event-modal" class="overlay rl-king-overlay">
-    <div class="screen-box-image-wrap">
-      <img src={imgKing.src} class="rl-event-img" />
-    </div>
-    <h3 class="rl-king-title">謁見の間：王からの餞別</h3>
-    <p class="rl-king-desc">
+  <div id="king-event-modal" class="overlay king-event-modal-custom">
+    <img src={kingImg.src} class="king-icon-img" />
+    <h3 class="king-title">謁見の間：王からの餞別</h3>
+    <p class="king-desc">
       「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
     </p>
-    <div id="king-relic-choices" style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
+    <div id="king-relic-choices" class="king-relic-choices-custom">
       <!-- 3つのレリック選択カードがJSで挿入されます -->
     </div>
   </div>
 
   <!-- 汎用カットシーンモーダル -->
-  <div id="cutscene-modal" class="overlay"
-    style="display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem;">
+  <div id="cutscene-modal" class="overlay cutscene-modal-custom">
     <!-- 背景イメージ -->
-    <div id="cutscene-bg"
-      style="position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none;">
+    <div id="cutscene-bg" class="cutscene-bg-custom">
     </div>
     <!-- キャラクターポートレート群 -->
-    <div id="cutscene-portraits"
-      class="rl-cutscene-chars">
+    <div id="cutscene-portraits" class="cutscene-portraits-custom">
     </div>
     <!-- セリフウィンドウ -->
-    <div
-      style="position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4);">
-      <div id="cutscene-speaker"
-        style="font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em;"></div>
-      <div id="cutscene-text" style="font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em;"></div>
-      <div style="text-align:right; margin-top:0.5rem;">
-        <button id="btn-cutscene-next" class="btn btn-primary" style="font-size:0.7rem; padding:0.25rem 1rem;">次へ
+    <div class="king-modal-inner">
+      <div id="cutscene-speaker" class="cutscene-speaker-custom"></div>
+      <div id="cutscene-text" class="cutscene-text-custom"></div>
+      <div class="king-btn-wrap">
+        <button id="btn-cutscene-next" class="btn btn-primary btn-cutscene-next-custom">次へ
           ▶</button>
       </div>
     </div>
@@ -282,93 +271,87 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
 
   <!-- ゲーム内汎用メッセージダイアログ -->
 
-  <div id="game-dialog-modal" class="overlay"
-    style="display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem;">
-    <div
-      style="background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-      <h4 id="dialog-title" style="font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold;">通知
+  <div id="game-dialog-modal" class="overlay game-dialog-modal-custom">
+    <div class="deck-card-list-wrap">
+      <h4 id="dialog-title" class="dialog-title-custom">通知
       </h4>
-      <p id="dialog-message" style="font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem;">
+      <p id="dialog-message" class="dialog-message-custom">
       </p>
-      <div id="dialog-buttons" class="rl-dialog-actions">
-        <button id="btn-dialog-ok" class="btn btn-primary" style="padding: 0.3rem 1.5rem;">OK</button>
-        <button id="btn-dialog-yes" class="btn btn-primary" style="display:none; flex:1; padding: 0.3rem 0;">はい</button>
-        <button id="btn-dialog-no" class="btn btn-secondary"
-          style="display:none; flex:1; padding: 0.3rem 0;">いいえ</button>
+      <div id="dialog-buttons" class="dialog-buttons-custom">
+        <button id="btn-dialog-ok" class="btn btn-primary btn-dialog-ok-custom">OK</button>
+        <button id="btn-dialog-yes" class="btn btn-primary btn-dialog-yes-custom">はい</button>
+        <button id="btn-dialog-no" class="btn btn-secondary btn-dialog-no-custom">いいえ</button>
+      </div>
+      <div id="dialog-extra" class="dialog-extra-custom"></div>
+    </div>
+  </div>
+
+  <!-- カード詳細モーダル -->
+  <div id="card-detail-modal" class="overlay card-detail-modal card-detail-modal-custom">
+    <div class="card-detail-container">
+      <button id="btn-close-card-detail" class="btn-close-card-detail">&times;</button>
+      <div id="card-detail-content" class="card-detail-content">
+        <!-- カードが入る -->
+      </div>
+      <div id="card-detail-desc" class="card-detail-desc">
       </div>
     </div>
   </div>
 
+
   <!-- バトル画面本体 -->
-  <div class="battle-layout"
-    style="top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem;">
+  <div class="battle-layout battle-layout-custom">
+
+    <button class="btn btn-secondary btn-sm btn-battle-retire-custom" id="btn-battle-retire">リタイア</button>
 
     <!--バトルフィールド -->
-    <div class="battle-field"
-      style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333;">
+    <div class="battle-field">
 
       <!-- ① 左上：敵ステータス -->
-      <div class="enemy-status-panel"
-        style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
-        <div
-          style="font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
+      <div class="enemy-status-panel">
+        <div class="status-header enemy-header">
           <span id="enemy-name">敵</span>
-          <span id="enemy-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+          <span id="enemy-poison-badge" class="poison-badge enemy-poison-badge-custom"></span>
         </div>
-        <div class="rl-stat-row">
-          <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
-          <div
-            class="rl-stat-bar-bg">
-            <div id="enemy-hp-bar"
-              style="height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s;">
-            </div>
+        <div class="status-row">
+          <span class="status-label">HP</span>
+          <div class="hp-bar-bg enemy-hp-bg">
+            <div id="enemy-hp-bar" class="hp-bar-fill enemy-hp-fill"></div>
           </div>
-          <span id="enemy-hp-text"
-            style="font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0;">40/40</span>
+          <span id="enemy-hp-text" class="status-text enemy-text">40/40</span>
         </div>
-        <div id="enemy-intent"
-          style="font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666;">
-          ⚔️ 5</div>
+        <div id="enemy-intent" class="enemy-intent-badge">⚔️ 5</div>
       </div>
 
       <!-- ② 右上：敵画像 -->
-      <div class="rl-battle-sprite-wrap">
-        <img id="enemy-image" src="" alt="敵"
-          style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8));" />
+      <div class="battle-image-container">
+        <img id="enemy-image" src="" alt="敵" class="battle-image enemy-image" />
       </div>
 
       <!-- ③ 左下：自分画像 -->
-      <div
-        style="display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative;">
-        <img id="player-battle-image" src="" alt="自分"
-          style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8));" />
+      <div class="battle-image-container player-image-container">
+        <img id="player-battle-image" src="" alt="自分" class="battle-image player-image" />
       </div>
 
       <!-- ④ 右下：自分ステータス -->
-      <div class="player-status-panel"
-        style="padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6);">
-        <div
-          style="font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem;">
-          <span id="player-poison-badge" style="font-size: 0.65rem; display: none;"></span>
+      <div class="player-status-panel">
+        <div class="status-header player-header">
+          <span id="player-poison-badge" class="poison-badge player-poison-badge-custom"></span>
           <span id="player-class-name">あなた</span>
         </div>
-        <div class="rl-stat-row">
-          <span style="font-size: 0.62rem; color: #ccc; flex-shrink: 0;">HP</span>
-          <div
-            class="rl-stat-bar-bg-player">
-            <div id="player-hp-bar"
-              style="height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s;">
-            </div>
+        <div class="status-row">
+          <span class="status-label">HP</span>
+          <div class="hp-bar-bg player-hp-bg">
+            <div id="player-hp-bar" class="hp-bar-fill player-hp-fill"></div>
           </div>
-          <span id="player-hp-text"
-            style="font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0;">10/10</span>
+          <span id="player-hp-text" class="status-text player-text">10/10</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem;">
-          <span style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">MP</span>
-          <div id="player-mp-orbs" class="rl-mp-orbs"></div>
-          <span id="player-mp-text" style="font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0;">5/5</span>
+        <div class="status-row player-mp-row">
+          <span class="status-label mp-label">MP</span>
+          <div id="player-mp-orbs" class="player-mp-orbs"></div>
+          <span id="player-mp-text" class="status-text mp-text">5/5</span>
         </div>
-        <div style="font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem;">
+        <div class="player-actions-text">
           行動: <span id="player-actions">1</span>回
         </div>
       </div>
@@ -376,86 +359,306 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     </div><!-- /.battle-field -->
 
     <!-- バトルログ (コンパクト) -->
-    <div class="battle-log-panel" id="battle-log"
-      style="height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box;">
+    <div class="battle-log-panel battle-log-custom" id="battle-log">
       <p class="log-system">戦闘開始！</p>
     </div>
 
-    <!-- レリック・アイテムエリア -->
-    <div
-      style="display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%;">
-      <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
-        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">レリック:</span>
-        <div id="player-relics" class="rl-inventory-items"></div>
+    <!-- 手札エリア -->
+    <div class="town-upgrade-wrap">
+      <div class="town-upgrade-header">
+        <button class="btn btn-secondary btn-sm btn-battle-view-map-custom" id="btn-battle-view-map">マップ</button>
+        <button class="btn btn-end-turn btn-sm btn-end-turn-custom" id="btn-end-turn">様子見</button>
       </div>
-      <div style="flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
-        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap;">アイテム:</span>
-        <div id="player-items" class="rl-inventory-items-fixed"></div>
+      <div id="hand-area" class="hand-area hand-area-custom">
+        <!-- カードがJSで挿入されます -->
       </div>
     </div>
 
-    <!-- 手札エリア -->
-    <div style="display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box;">
-      <div class="rl-action-header">
-        <button class="btn btn-secondary" id="btn-view-deck"
-          style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem;">
-          山札 (<span id="deck-count">0</span>)
-        </button>
-        <button class="btn btn-secondary" id="btn-battle-view-map"
-          style="padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d;">
-          マップ
-        </button>
-      </div>
-      <div id="hand-area" class="hand-area rl-hand-cards">
-        <!-- カードがJSで挿入されます -->
-      </div>
-      <div style="margin-top: 0.1rem; width: 100%;">
-        <button class="btn btn-end-turn" id="btn-end-turn" style="width: 100%; padding: 0.4rem;">様子見</button>
-      </div>
-    </div>
+
 
   </div><!-- /.battle-layout -->
 
 
-  <!-- ゲーム概要・使用技術セクション -->
+</div><!-- /.game-container -->
+
+<div slot="howto-content">
+  <div class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+    <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
+    <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
+    <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+  </div>
+  <div class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+    <p>毒や火傷などの状態異常はターン終了時にダメージを受けます。</p>
+    <p>回復カードを使って素早く対処しましょう。</p>
+  </div>
+  <div class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+    <p>「町」や「妖精」でカードを強化できます。</p>
+    <p>自分だけの最強のデッキを作り上げましょう！</p>
+  </div>
 </div>
 </GameLayout>
 
 <style>
-  /* =============================
-       インラインスタイルから移行したクラス群
-       ============================= */
-
-  /* ゲームの高さ・最大幅の設定 */
-  .game-container {
-    --game-height: 580px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-  }
-
-  /* config ボタン（コンフィグアイコン）の位置 */
-  .icon-config {
+  .rl-overlay {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.95);
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    text-align: center;
   }
 
-  /* ゲームヘッダーバー: 初期は非表示・JSで flex に切り替え */
+  @keyframes slow-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      opacity: 1;
+    }
+
+    50% {
+      box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.2);
+      opacity: 0.7;
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      opacity: 1;
+    }
+  }
+
+  .btn-pulse {
+    animation: slow-pulse 2s infinite ease-in-out;
+    border-color: #fff !important;
+    color: #fff !important;
+  }
+
+  /* =============================
+       バトルフィールド
+       ============================= */
+  .battle-field {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    /* 1fr 1fr instead of 85px auto avoids cutoff */
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 0.3rem;
+    position: relative;
+    background: linear-gradient(180deg, rgba(30, 15, 5, 0.6) 0%, rgba(5, 15, 30, 0.6) 100%);
+    border-radius: 8px;
+    border: 1px solid #333;
+    flex-shrink: 0;
+    min-height: 180px;
+  }
+
+  .enemy-status-panel,
+  .player-status-panel {
+    padding: 0.4rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 8px;
+    z-index: 2;
+    align-self: center;
+  }
+
+  .enemy-status-panel {
+    align-items: flex-start;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid #666;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+    transform: translateX(10px);
+    /* Adjust inward slightly */
+  }
+
+  .player-status-panel {
+    /*align-items: flex-end;*/
+    background: rgba(0, 0, 50, 0.75);
+    border: 1px solid #007bff;
+    box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.6);
+    transform: translateX(-10px);
+    /* Adjust inward slightly */
+  }
+
+  .status-header {
+    font-size: 0.78rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 0.15rem;
+  }
+
+  .enemy-header {
+    color: #e8d5b7;
+  }
+
+  .player-header {
+    color: #b7d5e8;
+  }
+
+  .poison-badge {
+    font-size: 0.65rem;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .status-label {
+    font-size: 0.62rem;
+    color: #ccc;
+    flex-shrink: 0;
+  }
+
+  .hp-bar-bg {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #555;
+  }
+
+  .enemy-hp-bg {
+    background: #2a1a1a;
+  }
+
+  .player-hp-bg {
+    background: #1a1a2a;
+  }
+
+  .hp-bar-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s;
+  }
+
+  .enemy-hp-fill {
+    background: linear-gradient(90deg, #e74c3c, #e67e22);
+  }
+
+  .player-hp-fill {
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+  }
+
+  .status-text {
+    font-size: 0.62rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .enemy-text {
+    color: #e8d5b7;
+  }
+
+  .player-text {
+    color: #b7d5e8;
+  }
+
+  .enemy-intent-badge {
+    font-size: 0.6rem;
+    color: #ffb84d;
+    margin-top: 0.15rem;
+    display: none;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 3px;
+    padding: 1px 4px;
+    border: 1px solid #666;
+  }
+
+  .player-mp-row {
+    margin-top: 0.1rem;
+  }
+
+  .mp-label {
+    color: #7cc5ff;
+  }
+
+  .mp-text {
+    color: #7cc5ff;
+  }
+
+  .player-mp-orbs {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+  }
+
+  .player-actions-text {
+    font-size: 0.58rem;
+    color: #ffb84d;
+    margin-top: 0.1rem;
+  }
+
+  .battle-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .player-image-container {
+    /*justify-content: flex-start;*/
+    padding-left: 0.5rem;
+  }
+
+  .battle-image {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+
+  .enemy-image {
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
+  }
+
+  .player-image {
+    filter: drop-shadow(-2px 2px 4px rgba(0, 0, 50, 0.8));
+  }
+
+  /* =============================
+       ゲームヘッダー
+       ============================= */
   .game-header-bar {
     display: none;
     justify-content: space-between;
     align-items: center;
     background: rgba(15, 15, 26, 0.95);
     border-bottom: 1px solid #333;
-    padding: 0.4rem 2.5rem 0.4rem 0.8rem;
-    font-size: 0.78rem;
+    padding: 0.5rem 3rem 0.5rem 0.8rem;
+    font-size: 0.9rem;
     z-index: 100;
+    min-height: 44px;
   }
+
+  .game-footer-bar {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 15, 26, 0.95);
+    border-top: 1px solid #333;
+    padding: 0.4rem 0.8rem;
+    z-index: 100;
+    height: 44px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
 
   .header-status {
     display: flex;
@@ -463,7 +666,7 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     align-items: center;
   }
 
-  .header-floor {
+  .header-floor-text {
     font-weight: bold;
     color: #ffb84d;
   }
@@ -491,249 +694,50 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   }
 
   .header-relics-label {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
   }
 
-  .header-relics-list {
+  .header-relics-list-container {
     display: flex;
     gap: 4px;
   }
 
-  /* 共通オーバーレイ画面 */
-  .result-overlay {
-    display: none;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 200;
-  }
-
-  .result-details {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .reward-overlay {
-    display: none;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 180;
-  }
-
-  .btn-skip-reward {
-    margin-top: 1rem;
-  }
-
-  .deck-viewer-overlay {
-    display: none;
-    background-color: rgba(0, 0, 0, 0.95);
-    justify-content: flex-start;
-    padding-top: 2.5rem;
-    z-index: 190;
-  }
-
-  .deck-viewer-title {
-    color: white;
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-  }
-
-  /* 汎用ボタンユーティリティ */
-  .btn-full {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .btn-mt {
-    margin-top: 1rem;
-  }
-
-  .btn-flex {
-    flex: 1;
-  }
-
-  .btn-credits {
-    margin-bottom: 0.5rem;
-  }
-
-  .btn-share {
-    background-color: #1DA1F2;
-    border-color: #1DA1F2;
-    color: white;
-  }
-
-  /* 共通ゲーム画面（全画面絶対配置） */
-  .game-screen {
+  .icon-config {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    flex-direction: column;
-    padding: 1.5rem;
-    box-sizing: border-box;
+    top: 22px;
+    transform: translateY(-50%);
+    right: 0.8rem;
+    z-index: 999;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
   }
 
-  /* スタート画面: 初期表示はflexで表示・中央揃え */
-  .start-screen {
-    background: #0f0f1a;
-    z-index: 99;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .screen-title {
-    font-size: 1.8rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .screen-desc {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-    font-size: 0.85rem;
-  }
-
-  /* 職業選択画面 */
-  .class-select-screen {
-    background: #0f0f1a;
-    z-index: 98;
-    padding: 1.2rem;
-    overflow-y: auto;
-  }
-
-  .class-select-title {
-    font-size: 1.2rem;
-    text-align: center;
-    margin-bottom: 0.4rem;
-    color: #ffb84d;
-  }
-
-  .class-select-desc {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-align: center;
-    margin-bottom: 0.8rem;
-  }
-
-  .class-select-body {
-    flex: 1;
-  }
-
-  /* ゲームヘッダー分のオフセット（top:40px / height:calc(100% - 40px)）*/
-  .game-screen-offset {
-    top: 40px;
-    height: calc(100% - 40px);
-  }
-
-  /* マップ画面 */
-  .game-screen.game-screen-offset#map-screen {
-    background: #0f0f1a;
-    z-index: 80;
-    padding: 1rem;
-    justify-content: space-between;
-  }
-
-  .map-header {
-    text-align: center;
-    margin-bottom: 0.3rem;
-  }
-
-  .map-title {
-    font-size: 1.1rem;
-    color: #ffb84d;
-    margin-bottom: 0.1rem;
-  }
-
-  .map-scroll-wrapper {
-    flex: 1;
-    overflow-x: auto;
-    overflow-y: hidden;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 1.5rem 1rem;
-    margin-bottom: 0.8rem;
-    position: relative;
-  }
-
-  .map-board {
-    display: flex;
-    gap: 40px;
-    align-items: center;
-    position: relative;
-    min-width: max-content;
-  }
-
-  .map-footer {
-    border-top: 1px solid #333;
-    padding-top: 0.4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .btn-deck-view {
-    font-size: 0.72rem;
-    padding: 0.3rem 0.8rem;
-  }
-
-  .map-hint {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-  }
-
-  /* 宿・妖精・街・イベント画面 */
-  .inn-screen {
-    background: #0c1513;
-    z-index: 81;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .fairy-screen {
-    background: #150f1a;
-    z-index: 82;
-    padding: 1.2rem;
-    justify-content: space-between;
-  }
-
-  .town-screen {
-    background: #1a150f;
-    z-index: 83;
-    padding: 1.2rem;
-    justify-content: space-between;
-  }
-
-  .event-screen {
-    background: #11111a;
-    z-index: 84;
-    justify-content: space-between;
-    text-align: center;
-  }
-
-  /* 共通アクションボタン群 */
-  .screen-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
+  .icon-config:hover {
+    transform: translateY(-50%) scale(1.1) rotate(15deg);
+    opacity: 0.8;
   }
 
   /* =============================
        ゲームコンテナ
        ============================= */
+  .btn-full {
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+    box-sizing: border-box;
+  }
+
   .game-container {
-    margin-top: 2rem;
+    margin-top: 0;
     background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-    max-width: 640px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     height: 580px;
@@ -846,8 +850,6 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
   /* =============================
        オーバーレイ共通
        ============================= */
-  /* overlay基底クラス: 初期は非表示。各オーバーレイをJSで .active などでflexにする。
-       ただし start-screen は別扱い（初期表示が必要）なため game-screen で管理 */
   .overlay {
     position: absolute;
     top: 0;
@@ -858,13 +860,71 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     height: 100%;
     background-color: var(--bg-secondary);
     z-index: 99;
-    display: none;
-    /* デフォルト非表示。JSで display:flex に切り替える */
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
     box-sizing: border-box;
+  }
+
+  .card-detail-modal {
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 600;
+  }
+
+  .card-detail-container {
+    background: #151522;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+  }
+
+  .btn-close-card-detail {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: #fff;
+    border: 2px solid #555;
+    border-radius: 50%;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .card-detail-content {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    margin-bottom: 4rem;
+    min-height: 145px;
+  }
+
+  .card-detail-desc {
+    color: #eee;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.8rem;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
   }
 
   .overlay h2 {
@@ -925,19 +985,28 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     border-color: var(--primary-color);
   }
 
-  .dv-card-list {
+  :global(.dv-card-list) {
     display: none;
-    flex-wrap: wrap;
-    gap: 8px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
     max-height: 320px;
     overflow-y: auto;
     justify-content: center;
     width: 100%;
-    padding-bottom: 0.5rem;
+    padding: 0 8% 0.5rem 8%;
   }
 
-  .dv-card-list.active {
-    display: flex;
+  :global(.dv-card-list.active) {
+    display: grid;
+  }
+
+  :global(.dv-card-list) :global(.battle-card),
+  .shop-service-card-list-custom :global(.battle-card),
+  #fairy-card-list :global(.battle-card) {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 90 / 145;
   }
 
   /* =============================
@@ -1318,12 +1387,46 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     justify-content: center;
     overflow: hidden;
     background: rgba(0, 0, 0, 0.2);
+    position: relative;
   }
 
   :global(.card-image-wrap img) {
     width: 48px;
     height: 48px;
     object-fit: contain;
+  }
+
+  /* カテゴリバッジ（画像右上オーバーレイ） */
+  :global(.card-category-badge) {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: 0.52rem;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 3px;
+    line-height: 1.4;
+    z-index: 3;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+  }
+
+  :global(.cat-physical) {
+    background: rgba(200, 40, 40, 0.82);
+    color: #ffe0e0;
+    border: 1px solid rgba(255, 120, 120, 0.6);
+  }
+
+  :global(.cat-spell) {
+    background: rgba(100, 40, 180, 0.82);
+    color: #e8d0ff;
+    border: 1px solid rgba(160, 100, 255, 0.6);
+  }
+
+  :global(.cat-special-cat) {
+    background: rgba(160, 120, 0, 0.82);
+    color: #fff5cc;
+    border: 1px solid rgba(255, 210, 60, 0.6);
   }
 
   /* カード名帯（画像の下半分に重なるように） */
@@ -1453,6 +1556,28 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     border-color: #ffaa66;
   }
 
+  /* カテゴリバッジ（物理/呪文/特殊） */
+  :global(.tag-physical) {
+    color: #ff8888;
+    border-color: #ff6666;
+    background: rgba(255, 80, 80, 0.12);
+    font-weight: bold;
+  }
+
+  :global(.tag-spell) {
+    color: #cc88ff;
+    border-color: #aa55ff;
+    background: rgba(150, 60, 255, 0.12);
+    font-weight: bold;
+  }
+
+  :global(.tag-special-cat) {
+    color: #ffd966;
+    border-color: #ffcc00;
+    background: rgba(255, 200, 0, 0.12);
+    font-weight: bold;
+  }
+
   /* 紫カード特殊背景 */
   :global(.color-purple) {
     background: linear-gradient(160deg, #1a0a25 0%, #2d0a4a 100%) !important;
@@ -1559,217 +1684,1373 @@ import imgKing from '../../assets/games/roguelike/images/characters/royal_king.p
     pointer-events: none;
   }
 
-  /* アクティブな接続線は !important なしで詳細度を上げて上書き */
   :global(.map-connection-line.active) {
-    background: #ffd700;
-    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6);
+    background: #ffd700 !important;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.6) !important;
   }
-</style>
-  <!-- Upgrade Confirm Modal -->
-  <div id="upgrade-confirm-modal" class="config-modal">
-    <button class="modal-close-x-btn" id="close-upgrade-confirm-btn-x">&times;</button>
-    <h3>カード強化</h3>
-    <div style="margin-bottom: 1.5rem; text-align: center;">
-      <div id="upgrade-confirm-card" class="rl-upgrade-card"></div>
-      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem;">このカードを強化しますか？</p>
-      <p id="upgrade-cost-text" class="rl-upgrade-cost"></p>
-    </div>
-    <div class="rl-modal-actions">
-      <button id="btn-upgrade-yes" class="btn btn-primary rl-flex-1">強化する</button>
-      <button id="btn-upgrade-no" class="btn btn-secondary rl-flex-1">キャンセル</button>
-    </div>
-  </div>
-  <!-- Tooltip Element -->
-  <div id="card-tooltip" class="card-tooltip rl-hidden-default">
-    <div class="tooltip-header">
-      <span id="tooltip-name" class="tooltip-name"></span>
-      <span id="tooltip-cost" class="tooltip-cost"></span>
-    </div>
-    <div id="tooltip-category" class="tooltip-category"></div>
-    <div id="tooltip-desc" class="tooltip-desc"></div>
-  </div>
-  
-  <style>
-  .card-tooltip {
-    position: fixed;
-    background: rgba(10, 10, 20, 0.95);
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 10px;
-    width: 220px;
-    z-index: 10000;
-    pointer-events: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
-    color: #fff;
-    font-size: 0.85rem;
-    line-height: 1.4;
+
+  .project-details {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
   }
-  .tooltip-header {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 5px;
-    margin-bottom: 5px;
+
+  .project-details h2 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
   }
-  .tooltip-name {
+
+  .project-details h2:first-of-type {
+    margin-top: 0;
+  }
+
+  .description {
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+
+  .tech-table th,
+  .tech-table td {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    text-align: left;
+  }
+
+  .tech-table th {
+    background-color: var(--bg-secondary);
+    width: 30%;
     font-weight: bold;
-    color: var(--primary-color);
   }
-  .tooltip-cost {
+
+  .materials-list ul {
+    padding-left: 1.5rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .materials-list li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Auto-extracted styles */
+  .global-game-scaler-custom {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-top: 2rem;
+  }
+
+  .global-game-scaler-inner-custom {
+    transform-origin: top left;
+    transition: transform 0.2s ease-out;
+  }
+
+
+  .game-header-custom {
+    display: none;
+  }
+
+  .game-footer-custom {
+    display: none;
+  }
+
+  .btn-shop-service-leave-custom {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #333;
+    box-sizing: border-box;
+  }
+
+  .town-items-custom {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .footer-player-items-custom {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .btn-footer-view-deck-custom {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.8rem;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    border-color: #ffb84d;
     color: #ffb84d;
   }
-  .tooltip-category {
+
+  .result-overlay-custom {
+    z-index: 200;
+  }
+
+  .result-details-custom {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .btn-share-custom {
+    background-color: #1DA1F2;
+    border-color: #1DA1F2;
+    color: white;
+  }
+
+  .reward-overlay-custom {
+    z-index: 180;
+  }
+
+  .btn-skip-reward-custom {
+    margin-top: 1rem;
+  }
+
+  .deck-viewer-overlay-custom {
+    justify-content: flex-start;
+    padding-top: 2.5rem;
+    z-index: 190;
+  }
+
+  .deck-view-title {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+
+  .close-deck-viewer-custom {
+    margin-top: 0.8rem;
+    width: 100%;
+  }
+
+  .start-screen-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0f0f1a;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .game-main-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .game-main-desc {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 0.85rem;
+  }
+
+  .howto-btn-custom {
+    margin-top: 1rem;
+  }
+
+  .class-select-screen-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0f0f1a;
+    z-index: 98;
+    display: none;
+    flex-direction: column;
+    padding: 1.2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .hero-select-title {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 0.4rem;
+    color: #ffb84d;
+  }
+
+  .hero-select-desc {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 0.8rem;
+  }
+
+  .hero-stats-wrapper {
+    flex: 1;
+  }
+
+  .class-grid-custom {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .hero-icon-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-name-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .hero-hp-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+    margin-top: 0.25rem;
+  }
+
+  .hero-icon-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-name-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .hero-hp-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+    margin-top: 0.25rem;
+  }
+
+  .hero-icon-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-name-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .hero-hp-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+    margin-top: 0.25rem;
+  }
+
+  .hero-icon-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0.3rem;
+  }
+
+  .hero-name-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .hero-hp-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+    margin-top: 0.25rem;
+  }
+
+  .class-select-preview-custom {
+    font-size: 0.7rem;
+    color: #ffb84d;
+    text-align: center;
+    margin-top: 0.8rem;
+    min-height: 1.2rem;
+  }
+
+  .btn-back-to-title-custom {
+    margin-top: 0.5rem;
+  }
+
+  .map-screen-custom {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 84px);
+    background: #0f0f1a;
+    z-index: 80;
+    display: none;
+    flex-direction: column;
+    padding: 1rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+
+  .btn-retire-map-custom {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .map-scroll-wrapper-custom {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    margin-bottom: 0.8rem;
+    position: relative;
+  }
+
+  .map-board-custom {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    min-width: max-content;
+  }
+
+  .inn-screen-custom {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 84px);
+    background: #0c1513;
+    z-index: 81;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .town-icon-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+
+  .town-title {
+    color: #51cf66;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .town-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    max-width: 80%;
+  }
+
+  .town-btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .btn-inn-rest-half-custom {
+    width: 100%;
+  }
+
+  .town-btn-text {
+    font-size: 0.65rem;
+  }
+
+  .btn-inn-rest-full-custom {
+    width: 100%;
+  }
+
+  .town-btn-text {
+    font-size: 0.65rem;
+  }
+
+  .btn-inn-leave-custom {
+    width: 100%;
+  }
+
+  .shop-service-screen-custom {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 84px);
+    background: #150f1a;
+    z-index: 85;
+    display: none;
+    flex-direction: column;
+    padding: 1.2rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+
+  .town-status-wrap {
+    text-align: center;
+  }
+
+  .shop-service-title-custom {
+    color: #ffb84d;
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .shop-service-desc-custom {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .shop-service-card-list-custom {
+    flex: 1;
+    overflow-y: auto;
+    margin: 1rem 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px 10px;
+    padding: 1rem 8%;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    max-height: 400px;
+    justify-items: center;
+    align-items: start;
+    grid-auto-rows: max-content;
+  }
+
+  .town-shop-wrap {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .btn-shop-service-leave-custom {
+    flex: 1;
+  }
+
+  .town-screen-custom {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 84px);
+    background: #1a150f;
+    z-index: 83;
+    display: none;
+    flex-direction: column;
+    padding: 1.2rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+
+  .shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .shop-title {
+    color: #ff922b;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+
+  .btn-town-leave-custom {
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+    width: auto;
+    font-weight: bold;
+  }
+
+  .shop-card-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    overflow-y: auto;
+  }
+
+  .shop-card-category {
+    font-size: 0.72rem;
+    color: #ff922b;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    border-bottom: 1px solid #444;
+  }
+
+  .town-cards-custom {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 4px 0;
+    overflow-y: auto;
+    max-height: 260px;
+  }
+
+  .shop-card-category {
+    font-size: 0.72rem;
+    color: #ffd8a8;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    border-bottom: 1px solid #444;
+  }
+
+  .town-items-custom {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+
+  .shop-relic-wrap {
+    margin-top: 4px;
+  }
+
+  .shop-relic-title {
+    font-size: 0.72rem;
+    color: #cc5de8;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    border-bottom: 1px solid #444;
+  }
+
+  .shop-relic-list {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .btn-town-upgrade-custom {
+    flex: 1;
+    font-size: 0.75rem;
+    background-color: #1976d2;
+    border-color: #1565c0;
+  }
+
+  .btn-town-remove-custom {
+    flex: 1;
+    font-size: 0.75rem;
+    background-color: #c0392b;
+    border-color: #922b21;
+  }
+
+  .event-screen-custom {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 84px);
+    background: #11111a;
+    z-index: 84;
+    display: none;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .event-image-custom {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #444;
+  }
+
+  .event-title-custom {
+    color: #ffb84d;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .event-text-custom {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 90%;
+    margin: 1rem auto;
+  }
+
+  .event-options-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .item-confirm-modal-custom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .item-modal-inner {
+    background: #151522;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 1.2rem;
+    width: 85%;
+    max-width: 320px;
+    text-align: center;
+  }
+
+  .item-confirm-title-custom {
+    font-size: 1rem;
+    color: #ffb84d;
+    margin-bottom: 0.4rem;
+  }
+
+  .item-confirm-text-custom {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+
+  .item-modal-btn-group {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-item-confirm-yes-custom {
+    flex: 1;
+    padding: 0.4rem 0;
+  }
+
+  .btn-item-confirm-no-custom {
+    flex: 1;
+    padding: 0.4rem 0;
+  }
+
+  .battle-map-overlay-custom {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 250;
+    padding: 1rem;
+    flex-direction: column;
+  }
+
+  .battle-map-title {
+    color: #ffb84d;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .battle-map-scroll-wrapper-custom {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+  }
+
+  .battle-map-board-custom {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    position: relative;
+    min-width: max-content;
+  }
+
+  .btn-close-battle-map-custom {
+    margin-top: 0.8rem;
+    width: 100%;
+  }
+
+  .king-event-modal-custom {
+    display: none;
+    background-color: rgba(15, 15, 26, 0.98);
+    z-index: 210;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .king-icon-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+
+  .king-title {
+    color: #ffd700;
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .king-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    max-width: 80%;
+  }
+
+  .king-relic-choices-custom {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .cutscene-modal-custom {
+    display: none;
+    background: rgba(5, 5, 20, 0.97);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 2rem;
+  }
+
+  .cutscene-bg-custom {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .cutscene-portraits-custom {
+    position: absolute;
+    bottom: 120px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 20px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .king-modal-inner {
+    position: relative;
+    z-index: 3;
+    width: 92%;
+    max-width: 420px;
+    background: rgba(10, 8, 25, 0.92);
+    border: 2px solid #6a5acd;
+    border-radius: 12px;
+    padding: 1rem 1.2rem 0.8rem;
+    box-shadow: 0 0 30px rgba(106, 90, 205, 0.4);
+  }
+
+  .cutscene-speaker-custom {
+    font-size: 0.72rem;
+    font-weight: bold;
+    color: #c9b8ff;
+    margin-bottom: 0.3rem;
+    min-height: 1em;
+  }
+
+  .cutscene-text-custom {
+    font-size: 0.78rem;
+    color: #e8e0ff;
+    line-height: 1.7;
+    min-height: 3.2em;
+  }
+
+  .king-btn-wrap {
+    text-align: right;
+    margin-top: 0.5rem;
+  }
+
+  .btn-cutscene-next-custom {
+    font-size: 0.7rem;
+    padding: 0.25rem 1rem;
+  }
+
+  .game-dialog-modal-custom {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .deck-card-list-wrap {
+    background: #151522;
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 1.2rem;
+    width: 85%;
+    max-width: 530px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+
+  .deck-card-list-wrap :global(.dv-card-list) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .dialog-title-custom {
+    font-size: 1rem;
+    color: #ffb84d;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  .dialog-message-custom {
+    font-size: 0.78rem;
+    color: #eee;
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+
+  .dialog-buttons-custom {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .btn-dialog-ok-custom {
+    padding: 0.3rem 1.5rem;
+  }
+
+  .btn-dialog-yes-custom {
+    display: none;
+    flex: 1;
+    padding: 0.3rem 0;
+  }
+
+  .btn-dialog-no-custom {
+    display: none;
+    flex: 1;
+    padding: 0.3rem 0;
+  }
+
+  .dialog-extra-custom {
+    display: none;
+    width: 100%;
+  }
+
+  .card-detail-modal-custom {
+    display: none;
+  }
+
+  .battle-layout-custom {
+    top: 40px;
+    height: calc(100% - 84px);
+    position: absolute;
+    width: 100%;
+    display: none;
+    box-sizing: border-box;
+    padding: 0.4rem 0.5rem 0.3rem;
+  }
+
+  .btn-battle-retire-custom {
+    position: absolute;
+    top: 12px;
+    right: 0.5rem;
+    z-index: 100;
+    font-size: 0.7rem;
+    width: 65px;
+    padding: 0.2rem 0;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 20px;
+    border-color: #ffb84d;
+    color: #ffb84d;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .enemy-poison-badge-custom {
+    display: none;
+  }
+
+  .player-poison-badge-custom {
+    display: none;
+  }
+
+  .battle-log-custom {
+    height: 80px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.68rem;
+    overflow-y: auto;
+    margin-bottom: 0.3rem;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .town-upgrade-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .town-upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .btn-battle-view-map-custom {
+    width: 65px;
+    padding: 0.2rem 0;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    border-color: #ffb84d;
+    color: #ffb84d;
+    flex-shrink: 0;
+  }
+
+  .btn-end-turn-custom {
+    width: 65px;
+    padding: 0.2rem 0;
+    text-align: center;
+    box-sizing: border-box;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+
+  .hand-area-custom {
+    height: 148px;
+    gap: 6px;
+    padding: 2px 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    overflow-x: auto;
+    align-items: flex-start;
+  }
+
+  .howto-content-custom {
+    text-align: left;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .close-howto-btn-custom {
+    width: 100%;
+  }
+
+  .credits-btn-custom {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .close-config-btn-custom {
+    width: 100%;
+  }
+
+  .howto-content-custom {
+    text-align: left;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .skillset-list {
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+  }
+
+  .close-credits-btn-custom {
+    width: 100%;
+  }
+
+  :global(.card-flavor-text) {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  :global(.card-desc-container) {
+    margin-bottom: 0.5rem;
+  }
+
+  :global(.card-flavor-text) {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  :global(.card-type-label) {
+    /*text-align: center;*/
+    color: #888;
+  }
+
+  :global(.relic-desc-text) {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  :global(.hero-effect-text) {
+    color: #ffb84d;
+  }
+
+  :global(.shop-empty-msg) {
+    grid-column: span 3;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 1rem;
+  }
+
+  :global(.shop-price-label) {
+    color: #fff;
+  }
+
+  :global(.item-desc-text) {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  :global(.item-detail-text) {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  :global(.item-reason-text) {
+    font-size: 0.65rem;
+    color: #ffb84d;
+  }
+
+  :global(.card-cost-val) {
+    color: #4ade80;
+  }
+
+  :global(.card-dmg-val) {
+    color: #4ade80;
+    font-weight: bold;
+  }
+
+  :global(.card-heal-val) {
+    color: #4ade80;
+    font-weight: bold;
+  }
+
+  :global(.relic-get-desc) {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  .card-cost-custom {
+    background: #ffd700;
+    color: #1a1a2e;
+    font-size: 0.65rem;
+  }
+
+  .card-name-custom {
+    color: #ffd700;
+    font-size: 0.55rem;
+    line-height: 1.2;
+    margin-top: 0.6rem;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    width: 100%;
+    text-align: center;
+  }
+
+  .card-desc-custom {
+    font-size: 0.55rem;
+    line-height: 1.2;
+    padding: 2px;
+  }
+
+  :global(.deck-empty-msg) {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  :global(.rl-js-style-1) {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border: 1px solid #444;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+  }
+
+  :global(.rl-js-style-2) {
+    border: 2px solid #ffd700;
+    width: 96px;
+    min-width: 96px;
+    height: 128px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem;
+    position: relative;
+    background: rgba(15, 12, 5, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+
+  :global(.rl-js-style-3) {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    margin-top: 0.3rem;
+    margin-bottom: 0.2rem;
+  }
+
+  :global(.rl-js-style-4) {
+    font-size: 0.55rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 0.15rem;
+  }
+
+  :global(.rl-js-style-5) {
+    font-size: 0.52rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.2;
+    padding: 0 2px;
+  }
+
+  :global(.rl-js-style-6) {
+    margin-top: 1rem;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    border-radius: 6px;
+  }
+
+  :global(.rl-js-style-7) {
     font-size: 0.75rem;
     color: #aaa;
-    margin-bottom: 5px;
+    margin-bottom: 0.4rem;
   }
-  .tooltip-desc {
-    color: #ddd;
+
+  :global(.rl-js-style-8) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    max-height: 245px;
+    overflow-y: auto;
+    padding: 4px 0;
+    width: 100%;
   }
-  
-<style>
-  /* ====== RoguelikeUI Extracted Inline Styles ====== */
-  .rl-char-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 0.3rem; }
-  .rl-char-name { font-size: 0.85rem; font-weight: bold; }
-  .rl-char-desc { font-size: 0.62rem; color: var(--text-muted); line-height: 1.3; margin-top: 0.25rem; }
-  .rl-char-preview { font-size: 0.7rem; color: #ffb84d; text-align: center; margin-top: 0.8rem; min-height: 1.2rem; }
-  
-  .rl-event-img { width: 100px; height: 100px; object-fit: contain; }
-  .rl-event-title { font-size: 1.2rem; margin-bottom: 0.5rem; }
-  .rl-event-hotel { color: #51cf66; }
-  .rl-event-fairy { color: #cc5de8; margin-bottom: 0.2rem; }
-  .rl-event-shop { color: #ff922b; margin-bottom: 0.2rem; }
-  .rl-event-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 80%; }
-  .rl-text-center { text-align: center; }
-  .rl-event-desc-small { font-size: 0.75rem; color: var(--text-muted); }
-  .rl-fairy-options { flex: 1; overflow-y: auto; margin: 1rem 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 4px; border: 1px solid #333; border-radius: 6px; background: rgba(0,0,0,0.3); max-height: 250px; }
-  .rl-shop-container { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0.8rem 0; overflow-y: auto; max-height: 280px; }
-  .rl-shop-subtitle { font-size: 0.72rem; font-weight: bold; margin-bottom: 0.3rem; border-bottom: 1px solid #444; }
-  .rl-text-orange { color: #ff922b; }
-  .rl-text-lightorange { color: #ffd8a8; }
-  .rl-shop-row { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0; }
-  
-  .rl-event-img-rounded { width: 100px; height: 100px; object-fit: contain; border-radius: 4px; }
-  .rl-text-warning { color: #ffb84d; margin-bottom: 0.5rem; }
-  .rl-event-desc-large { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; max-width: 90%; margin: 1rem auto; }
-  .rl-event-options { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-  
-  .rl-overlay-full { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; box-sizing:border-box; }
-  .rl-modal-box { background: #151522; border: 1px solid #444; border-radius: 8px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; }
-  .rl-modal-title { font-size: 1rem; color: #ffb84d; margin-bottom: 0.4rem; }
-  .rl-modal-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.2rem; }
-  .rl-modal-actions { display: flex; gap: 10px; }
-  .rl-modal-btn { flex: 1; padding: 0.4rem 0; }
-  
-  .rl-battle-map-overlay { display: none; background-color: rgba(0,0,0,0.9); z-index: 250; padding: 1rem; flex-direction: column; }
-  .rl-battle-map-title { color: #ffb84d; font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem; }
-  .rl-battle-map-container { flex: 1; overflow-x: auto; overflow-y: hidden; display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; border-radius: 8px; padding: 1.5rem 1rem; }
-  .rl-battle-map-inner { display: flex; gap: 40px; align-items: center; position: relative; min-width: max-content; }
-  .rl-battle-map-close-btn { margin-top: 0.8rem; width: 100%; }
-  
-  .rl-king-overlay { display: none; background-color: rgba(15,15,26,0.98); z-index: 210; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center; }
-  .rl-king-title { color: #ffd700; font-size: 1.2rem; margin-bottom: 0.4rem; }
-  .rl-king-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; max-width: 80%; }
-  
-  .rl-deck-overlay { display: none; background-color: rgba(15,15,26,0.95); z-index: 200; flex-direction: column; padding: 1rem; }
-  .rl-deck-title { color: #fff; font-size: 1.2rem; text-align: center; margin-bottom: 0.2rem; }
-  .rl-deck-subtitle { color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-bottom: 1rem; }
-  .rl-deck-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
-  .rl-deck-close-btn { margin-top: 1rem; width: 100%; }
-  .rl-relic-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 60vh; }
-  .rl-log-list { width: 100%; max-height: 70vh; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 5px; }
-  
-  .rl-battle-enemy-name { color: #ff8888; text-shadow: 1px 1px 2px #000; margin-bottom: 0.2rem; }
-  .rl-battle-hp-text { color: #ff6b6b; font-weight: bold; }
-  .rl-hp-bar-bg { display: inline-block; width: 100%; max-width: 150px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; border: 1px solid #555; vertical-align: middle; margin-left: 5px; }
-  .rl-hp-bar-fill { height: 100%; background: #ff4444; width: 100%; transition: width 0.3s; }
-  .rl-enemy-img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); }
-  .rl-enemy-buffs { display: flex; gap: 5px; min-height: 20px; justify-content: center; margin-top: 0.5rem; }
-  
-  .rl-hand-container { display: flex; justify-content: center; gap: 8px; width: 100%; max-width: 600px; padding: 0 10px; box-sizing: border-box; overflow-x: auto; }
+
+  :global(.rl-js-style-9) {
+    width: 58px;
+    height: 94px;
+  }
+
+  :global(.rl-js-style-10) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  :global(.rl-js-style-11) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 30px;
+    height: 100%;
+    position: relative;
+  }
+
+  :global(.rl-js-style-12) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10;
+    border-radius: 4px;
+  }
+
+  :global(.rl-js-style-13) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  :global(.rl-js-style-14) {
+    width: 80px;
+    height: 110px;
+    cursor: pointer;
+    margin: 0;
+    border-width: 2px;
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+
+  :global(.rl-js-style-15) {
+    font-size: 0.65rem;
+    color: #ffb84d;
+    margin-top: 2px;
+  }
+
+  :global(.rl-js-style-16) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  :global(.rl-js-style-17) {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+  }
+
+  :global(.rl-js-style-18) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  :global(.rl-js-style-19) {
+    font-size: 0.65rem;
+    color: #ffb84d;
+    margin-top: 2px;
+  }
+
+  :global(.rl-js-style-20) {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 60px;
+    height: auto;
+    border-radius: 8px;
+    background-color: #1976d2;
+    color: #fff;
+    border: 1px solid #1565c0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.rl-js-style-21) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  :global(.item-detail-container) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 240px;
+    color: #fff;
+    box-sizing: border-box;
+  }
+
+  :global(.item-detail-image) {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+
+  :global(.item-detail-title) {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
 </style>
 
-<style>
-  /* ====== RoguelikeUI Extracted Inline Styles Part 2 ====== */
-  .rl-cutscene-overlay { display: none; background: rgba(5,5,20,0.97); z-index: 300; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2rem; }
-  .rl-cutscene-bg { position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.25; pointer-events:none; }
-  .rl-cutscene-chars { position:absolute; bottom:120px; left:0; right:0; display:flex; align-items:flex-end; justify-content:center; gap:20px; pointer-events:none; z-index:2; }
-  .rl-cutscene-dialog { position:relative; z-index:3; width:92%; max-width:420px; background:rgba(10,8,25,0.92); border:2px solid #6a5acd; border-radius:12px; padding:1rem 1.2rem 0.8rem; box-shadow:0 0 30px rgba(106,90,205,0.4); }
-  .rl-cutscene-speaker { font-size:0.72rem; font-weight:bold; color:#c9b8ff; margin-bottom:0.3rem; min-height:1em; }
-  .rl-cutscene-text { font-size:0.78rem; color:#e8e0ff; line-height:1.7; min-height:3.2em; }
-  .rl-cutscene-actions { text-align:right; margin-top:0.5rem; }
-  .rl-cutscene-btn { font-size:0.7rem; padding:0.25rem 1rem; }
-  
-  .rl-dialog-overlay { display: none; background-color: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; padding: 1.5rem; }
-  .rl-dialog-box { background: #151522; border: 2px solid #555; border-radius: 10px; padding: 1.2rem; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-  .rl-dialog-title { font-size: 1rem; color: #ffb84d; margin-bottom: 0.5rem; font-weight: bold; }
-  .rl-dialog-msg { font-size: 0.78rem; color: #eee; line-height: 1.5; margin-bottom: 1.2rem; }
-  .rl-dialog-actions { display: flex; gap: 10px; justify-content: center; }
-  .rl-dialog-btn { padding: 0.3rem 1.5rem; }
-  .rl-dialog-btn-flex { display:none; flex:1; padding: 0.3rem 0; }
-  
-  .rl-battle-area-wrapper { top: 40px; height: calc(100% - 40px); position: absolute; width: 100%; display: none; box-sizing: border-box; padding: 0.4rem 0.5rem 0.3rem; }
-  .rl-battle-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 85px 85px; gap: 20px; padding: 10px; margin-bottom: 0.3rem; position: relative; background: linear-gradient(180deg, rgba(30,15,5,0.6) 0%, rgba(5,15,30,0.6) 100%); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
-  
-  .rl-battle-enemy-stats { padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; background: rgba(0,0,0,0.75); border: 1px solid #666; border-radius: 8px; z-index: 2; transform: translateX(20px); align-self: center; box-shadow: 2px 2px 8px rgba(0,0,0,0.6); }
-  .rl-battle-stat-name { font-size: 0.78rem; font-weight: bold; color: #e8d5b7; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem; }
-  .rl-poison-badge { font-size: 0.65rem; display: none; }
-  .rl-stat-row { display: flex; align-items: center; gap: 4px; width: 100%; }
-  .rl-stat-label { font-size: 0.62rem; color: #ccc; flex-shrink: 0; }
-  .rl-stat-bar-bg { flex: 1; height: 8px; background: #2a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #555; }
-  .rl-enemy-hp-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #e67e22); width: 100%; transition: width 0.3s; }
-  .rl-stat-value { font-size: 0.62rem; color: #e8d5b7; white-space: nowrap; flex-shrink: 0; }
-  .rl-action-intent { font-size: 0.6rem; color: #ffb84d; margin-top: 0.15rem; display: none; background: rgba(0,0,0,0.5); border-radius: 3px; padding: 1px 4px; border: 1px solid #666; }
-  
-  .rl-battle-sprite-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
-  .rl-enemy-sprite { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.8)); }
-  .rl-battle-player-wrap { display: flex; align-items: center; justify-content: flex-start; padding-left: 0.5rem; position: relative; }
-  .rl-player-sprite { width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(-2px 2px 4px rgba(0,0,50,0.8)); }
-  
-  .rl-battle-player-stats { padding: 0.4rem 0.5rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; background: rgba(0,0,50,0.75); border: 1px solid #007bff; border-radius: 8px; z-index: 2; transform: translateX(-20px); align-self: center; box-shadow: -2px 2px 8px rgba(0,0,0,0.6); }
-  .rl-battle-stat-name-player { font-size: 0.78rem; font-weight: bold; color: #b7d5e8; display: flex; align-items: center; gap: 4px; margin-bottom: 0.15rem; }
-  .rl-stat-bar-bg-player { flex: 1; height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden; border: 1px solid #555; }
-  .rl-player-hp-fill { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); width: 100%; transition: width 0.3s; }
-  .rl-stat-value-player { font-size: 0.62rem; color: #b7d5e8; white-space: nowrap; flex-shrink: 0; }
-  
-  .rl-stat-row-mp { display: flex; align-items: center; gap: 4px; width: 100%; margin-top: 0.1rem; }
-  .rl-stat-label-mp { font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0; }
-  .rl-mp-orbs { display: flex; gap: 2px; flex: 1; }
-  .rl-relic-buffs { font-size: 0.58rem; color: #ffb84d; margin-top: 0.1rem; }
-  
-  .rl-battle-log { height: 46px; background: rgba(0,0,0,0.25); border: 1px solid #333; border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.68rem; overflow-y: auto; margin-bottom: 0.3rem; text-align: left; width: 100%; box-sizing: border-box; }
-  .rl-inventory-bar { display: flex; gap: 0.8rem; margin-bottom: 0.3rem; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; width: 100%; }
-  .rl-inventory-section { flex: 1; display: flex; align-items: center; gap: 0.4rem; overflow: hidden; }
-  .rl-inventory-label { font-size: 0.65rem; color: var(--text-muted); font-weight: bold; white-space: nowrap; }
-  .rl-inventory-items { display: flex; gap: 4px; overflow-x: auto; }
-  .rl-inventory-items-fixed { display: flex; gap: 4px; }
-  
-  .rl-action-area { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; box-sizing: border-box; }
-  .rl-action-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-  .rl-deck-btn { padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; }
-  .rl-item-btn { padding: 0.15rem 0.8rem; border-radius: 20px; font-size: 0.7rem; border-color: #ffb84d; color: #ffb84d; }
-  .rl-hand-cards { height: 148px; gap: 6px; padding: 2px 0; width: 100%; box-sizing: border-box; display: flex; overflow-x: auto; align-items: flex-start; }
-  .rl-end-turn-wrap { margin-top: 0.1rem; width: 100%; }
-  .rl-end-turn-btn { width: 100%; padding: 0.4rem; }
-  
-  .rl-upgrade-box { margin-bottom: 1.5rem; text-align: center; }
-  .rl-upgrade-card { display: inline-block; margin-bottom: 1rem; }
-  .rl-upgrade-msg { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.5rem; }
-  .rl-upgrade-cost { color: #ffb84d; font-weight: bold; }
-  .rl-flex-1 { flex: 1; }
-  .rl-hidden-default { display: none; }
-  
-  .rl-howto-content { text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-  .rl-howto-list { padding-left: 1.2rem; margin-top: 0.5rem; }
-  .rl-mt-1rem { margin-top: 1rem; }
-</style>
-
-<style>
-  /* ====== RoguelikeUI Extracted Inline Styles Part 3 ====== */
-  .rl-king-choices { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-  .rl-dialog-btn-ok { padding: 0.3rem 1.5rem; }
-  .rl-dialog-btn-choice { display:none; flex:1; padding: 0.3rem 0; }
-  .rl-mp-value { font-size: 0.62rem; color: #7cc5ff; flex-shrink: 0; }
-</style>
-</style>
-  
+<script src="../../scripts/roguelike/main.js"></script>

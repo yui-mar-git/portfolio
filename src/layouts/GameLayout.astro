@@ -2,7 +2,9 @@
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import HowToPlayModal from '../components/portfolio/HowToPlayModal.astro';
+import HowToPlayModal from '../components/common/HowToPlayModal.astro';
+import ConfigPanel from '../components/common/ConfigPanel.astro';
+import GameContainer from '../components/common/GameContainer.astro';
 import type { MicroCMSPortfolio } from '../types/microcms';
 
 export interface TechItem {
@@ -53,12 +55,12 @@ const {
 
   <main class="container">
     <article>
-      <div id="global-game-scaler">
-        <div id="global-game-scaler-inner" style="position: relative; margin: 0 auto;">
-          <!-- ゲーム本体用スロット -->
-          <slot />
-          
-          <!-- モーダル・オーバーレイ（ゲーム枠内に重なる） -->
+      <GameContainer>
+        <!-- ゲーム本体用スロット -->
+        <slot />
+        
+        <!-- モーダル・オーバーレイ（ゲーム枠内に重なる） -->
+        <div slot="overlay">
           <!-- 遊び方モーダル -->
           {hasHowToPlay && (
             <HowToPlayModal>
@@ -68,53 +70,14 @@ const {
 
           <!-- コンフィグ/クレジット モーダル -->
           {hasConfig && (
-            <>
-              <div id="modal-overlay" class="modal-overlay"></div>
-              <div id="config-modal" class="config-modal">
-                <button class="modal-close-x-btn" id="close-config-btn-x">&times;</button>
-                <h3>コンフィグ</h3>
-                <div class="config-item">
-                  <label for="bgm-volume">BGM音量</label>
-                  <input type="range" id="bgm-volume" min="0" max="100" value="50" />
-                </div>
-                <div class="config-item">
-                  <label for="se-volume">SE音量</label>
-                  <input type="range" id="se-volume" min="0" max="100" value="50" />
-                </div>
-
-                <slot name="config-extra" />
-
-                {hasHowToPlay && (
-                  <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-config-howto" style="margin-bottom: 0.5rem;">遊び方を見る</button>
-                )}
-                <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
-              </div>
-
-              <!-- クレジットモーダル -->
-              <div id="credits-modal" class="config-modal">
-                <button class="modal-close-x-btn" id="close-credits-btn-x">&times;</button>
-                <h3>クレジット・使用素材</h3>
-                <div class="howto-content" style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
-                  <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
-                  <ul style="margin-top: 1rem; padding-left: 1.5rem;">
-                    {materialCategories.map((mat) => (
-                    <li>{mat.category}: {mat.items.map((item, index) => (
-                      <span key={item.name}>
-                        <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-                        {index < mat.items.length - 1 ? " / " : ""}
-                      </span>
-                    ))}
-                    </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </>
+            <ConfigPanel hasHowToPlay={hasHowToPlay} materialCategories={materialCategories}>
+              <slot name="config-extra" slot="config-extra" />
+            </ConfigPanel>
           )}
 
           <!-- リタイアモーダル -->
           {hasRetire && (
-            <div id="retire-modal" class="config-modal">
+            <div id="retire-modal" class="config-modal" role="dialog" aria-hidden="true">
               <h3>リタイアしますか？</h3>
               <div class="result-actions" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; width: 80%; max-width: 300px; margin-left: auto; margin-right: auto;">
                 <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
@@ -124,7 +87,7 @@ const {
             </div>
           )}
         </div>
-      </div>
+      </GameContainer>
 
       <script is:inline>
         (function () {
@@ -137,9 +100,9 @@ const {
             const container = inner.querySelector('.game-container') || inner.firstElementChild;
             if (!container) return;
 
-            // コンテナの実際のサイズを論理サイズとして取得
-            const logicalWidth = container.clientWidth || 800;
-            const logicalHeight = container.clientHeight || 600;
+            // コンテナの外寸（ボーダー含む）を論理サイズとして取得
+            const logicalWidth = container.offsetWidth || 800;
+            const logicalHeight = container.offsetHeight || 600;
 
             // DOMContentLoaded時に一度だけモーダルをgame-container内に移動する（完全な中央揃えのため）
             if (!container.dataset.modalsMoved) {
@@ -159,7 +122,8 @@ const {
               const scale = parentWidth / logicalWidth;
               inner.style.width = `${logicalWidth}px`;
               inner.style.transform = `scale(${scale})`;
-              scaler.style.height = `${logicalHeight * scale}px`;
+              // 丸め誤差およびボーダー表示用補正（1〜2px）
+              scaler.style.height = `${Math.ceil(logicalHeight * scale) + 2}px`;
             } else {
               inner.style.width = `${logicalWidth}px`;
               inner.style.transform = 'none';
@@ -284,9 +248,6 @@ const {
   <style>
     #global-game-scaler {
       width: 100%;
-      /* overflow:clip は視覚的クリッピングを行うが、
-         position:fixed の containing block にはならないため
-         モーダルが正しく viewport 基準で表示される */
       overflow: clip;
       position: relative;
       margin-top: 2rem;
@@ -296,6 +257,22 @@ const {
     #global-game-scaler-inner {
       transform-origin: top left;
       transition: transform 0.2s ease-out;
+    }
+
+    .btn-config-howto {
+      margin-bottom: 0.5rem;
+    }
+
+    .credits-content {
+      text-align: left;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.65;
+    }
+
+    .credits-list {
+      margin-top: 1rem;
+      padding-left: 1.5rem;
     }
   </style>
 

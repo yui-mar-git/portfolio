@@ -251,6 +251,15 @@ function stopBGM() {
   if (currentBgmAudio) currentBgmAudio.pause();
 }
 
+window.playSE = playSE;
+window.setSEVolume = function(vol) {
+  configSeVolume = vol;
+};
+window.setBGMVolume = function(vol) {
+  configBgmVolume = vol;
+  if (currentBgmAudio) currentBgmAudio.volume = vol;
+};
+
 let activeStage = 1;
 
 import imgUnitSword from '../../assets/games/tower-defense/images/unit/figure_rpg_character_yuusya.png';
