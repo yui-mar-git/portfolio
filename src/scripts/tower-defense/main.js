@@ -8,20 +8,22 @@ const STORAGE_KEY = 'td_save_data';
 let saveData = {
   gold: 0,
   clearedStage: 0,
-  levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 }
+  levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 },
 };
 
 function loadSaveData() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
-    try { saveData = { ...saveData, ...JSON.parse(saved) }; } catch (e) { }
+    try {
+      saveData = { ...saveData, ...JSON.parse(saved) };
+    } catch (e) {}
   }
   if (!saveData.levels) saveData.levels = { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 };
   const legacyBase = saveData.levels.base || 1;
-  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+  ['sword', 'shield', 'mage', 'butouka'].forEach((type) => {
     if (!saveData.levels[type]) saveData.levels[type] = 1;
   });
-  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach(type => {
+  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach((type) => {
     if (!saveData.levels[type]) saveData.levels[type] = legacyBase;
   });
   updateMapUI();
@@ -37,10 +39,50 @@ function saveGame() {
 }
 
 const BASE_UNIT_DB = {
-  'sword': { cost: 130, hp: 100, attack: 20, cooldown: 666, speed: 50, range: 80, texture: 'unit_sword', height: 80, attackSE: 'strike' },
-  'shield': { cost: 50, hp: 200, attack: 20, cooldown: 1000, speed: 30, range: 60, texture: 'unit_shield', height: 90, attackSE: 'smite' },
-  'mage': { cost: 90, hp: 30, attack: 15, cooldown: 3000, speed: 25, range: 200, texture: 'unit_mage', height: 80, attackSE: 'energyball' },
-  'butouka': { cost: 20, hp: 50, attack: 15, cooldown: 333, speed: 80, range: 60, texture: 'unit_butouka', height: 70, attackSE: 'strike' }
+  sword: {
+    cost: 130,
+    hp: 100,
+    attack: 20,
+    cooldown: 666,
+    speed: 50,
+    range: 80,
+    texture: 'unit_sword',
+    height: 80,
+    attackSE: 'strike',
+  },
+  shield: {
+    cost: 50,
+    hp: 200,
+    attack: 20,
+    cooldown: 1000,
+    speed: 30,
+    range: 60,
+    texture: 'unit_shield',
+    height: 90,
+    attackSE: 'smite',
+  },
+  mage: {
+    cost: 90,
+    hp: 30,
+    attack: 15,
+    cooldown: 3000,
+    speed: 25,
+    range: 200,
+    texture: 'unit_mage',
+    height: 80,
+    attackSE: 'energyball',
+  },
+  butouka: {
+    cost: 20,
+    hp: 50,
+    attack: 15,
+    cooldown: 333,
+    speed: 80,
+    range: 60,
+    texture: 'unit_butouka',
+    height: 70,
+    attackSE: 'strike',
+  },
 };
 
 function getUnitData(type) {
@@ -52,7 +94,7 @@ function getUnitData(type) {
     ...base,
     originalType: type,
     hp: Math.floor(base.hp * (1 + (lv - 1) * 0.2) * globalBuff),
-    attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2) * globalBuff)
+    attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2) * globalBuff),
   };
 }
 
@@ -66,7 +108,7 @@ const btnSpawnMage = document.getElementById('btn-spawn-mage');
 const btnSpawnButouka = document.getElementById('btn-spawn-butouka');
 
 function updateDeckUI() {
-  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+  ['sword', 'shield', 'mage', 'butouka'].forEach((type) => {
     const data = getUnitData(type);
     const hpEl = document.getElementById(`stat-${type}-hp`);
     const atkEl = document.getElementById(`stat-${type}-atk`);
@@ -118,7 +160,7 @@ function updateUpgradeUI() {
   const upgGold = document.getElementById('upgrade-gold-display');
   if (upgGold) upgGold.textContent = saveData.gold;
 
-  ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+  ['sword', 'shield', 'mage', 'butouka'].forEach((type) => {
     const lv = saveData.levels[type];
     const cost = lv * 100;
     const data = getUnitData(type);
@@ -149,10 +191,10 @@ function updateUpgradeUI() {
   });
 
   // Base Upgrade
-  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach(type => {
+  ['baseHp', 'baseStats', 'baseCost', 'baseGold'].forEach((type) => {
     const baseLv = saveData.levels[type] || 1;
     const baseCost = Math.floor(500 * Math.pow(1.05, baseLv - 1));
-    const kebab = type.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
+    const kebab = type.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
     const upgLv = document.getElementById(`upg-lv-${kebab}`);
     const upgCost = document.getElementById(`cost-${kebab}`);
     const btnUpg = document.getElementById(`btn-upg-${kebab}`);
@@ -203,24 +245,24 @@ import bgmWave2 from '../../assets/games/tower-defense/audio/bgm/maou_game_field
 import bgmWave3 from '../../assets/games/tower-defense/audio/bgm/maou_game_boss02.mp3';
 
 const SE_DB = {
-  'cursor': seCursor,
-  'confirm': seConfirm,
-  'cancel': seCancel,
-  'invalid': seInvalid,
-  'strike': seStrike,
-  'smite': seSmite,
-  'punch': sePunch,
-  'magic': seMagic,
-  'energyball': seEnergyBall,
-  'victory': seVictory,
-  'defeat': seDefeat,
-  'wave_next': seWaveNext
+  cursor: seCursor,
+  confirm: seConfirm,
+  cancel: seCancel,
+  invalid: seInvalid,
+  strike: seStrike,
+  smite: seSmite,
+  punch: sePunch,
+  magic: seMagic,
+  energyball: seEnergyBall,
+  victory: seVictory,
+  defeat: seDefeat,
+  wave_next: seWaveNext,
 };
 
 const BGM_DB = {
-  'wave1': bgmWave1,
-  'wave2': bgmWave2,
-  'wave3': bgmWave3
+  wave1: bgmWave1,
+  wave2: bgmWave2,
+  wave3: bgmWave3,
 };
 
 function playSE(key) {
@@ -234,7 +276,7 @@ function playSE(key) {
     }
     currentJingleAudio = audio;
   }
-  audio.play().catch(e => console.log('SE play failed:', e));
+  audio.play().catch((e) => console.log('SE play failed:', e));
   return audio;
 }
 
@@ -244,7 +286,7 @@ function playBGM(bgmId) {
   currentBgmAudio = new Audio(BGM_DB[bgmId]);
   currentBgmAudio.volume = configBgmVolume;
   currentBgmAudio.loop = true;
-  currentBgmAudio.play().catch(e => console.log('BGM Play blocked:', e));
+  currentBgmAudio.play().catch((e) => console.log('BGM Play blocked:', e));
 }
 
 function stopBGM() {
@@ -252,10 +294,10 @@ function stopBGM() {
 }
 
 window.playSE = playSE;
-window.setSEVolume = function(vol) {
+window.setSEVolume = function (vol) {
   configSeVolume = vol;
 };
-window.setBGMVolume = function(vol) {
+window.setBGMVolume = function (vol) {
   configBgmVolume = vol;
   if (currentBgmAudio) currentBgmAudio.volume = vol;
 };
@@ -300,24 +342,24 @@ class MainScene extends Phaser.Scene {
 
   create() {
     let skyColor = '#87CEEB';
-    let groundColor = 0x228B22;
+    let groundColor = 0x228b22;
 
     if (activeStage === 2) {
       skyColor = '#FF7F50'; // 夕方（コーラル）
-      groundColor = 0x6B5E2F; // 夕日に照らされた地面
+      groundColor = 0x6b5e2f; // 夕日に照らされた地面
     } else if (activeStage === 3) {
       skyColor = '#191970'; // 夜（ミッドナイトブルー）
-      groundColor = 0x1A2A1A; // 暗い地面
+      groundColor = 0x1a2a1a; // 暗い地面
     }
 
     this.cameras.main.setBackgroundColor(skyColor);
-    
+
     // Y shifted up by 50px (515 -> 465). Height increased so the ground still hits the bottom edge (600+).
     const ground = this.add.rectangle(400, 465, 800, 270, groundColor);
 
     // 簡易的な拠点のグラフィック（塔と入り口）
-    const towerColor = 0x8B4513; // 茶色
-    const towerLineColor = 0x4A2511;
+    const towerColor = 0x8b4513; // 茶色
+    const towerLineColor = 0x4a2511;
 
     // 塔本体 (Y: 430 -> 380)
     const baseTower = this.add.rectangle(0, 380, 90, 240, towerColor);
@@ -341,23 +383,33 @@ class MainScene extends Phaser.Scene {
     // Generate projectile texture if not exists
     if (!this.textures.exists('magic_orb')) {
       const g = this.make.graphics({ x: 0, y: 0, add: false });
-      g.fillStyle(0x88ccff, 1); g.fillCircle(10, 10, 10);
-      g.fillStyle(0xffffff, 0.8); g.fillCircle(10, 10, 5);
+      g.fillStyle(0x88ccff, 1);
+      g.fillCircle(10, 10, 10);
+      g.fillStyle(0xffffff, 0.8);
+      g.fillCircle(10, 10, 5);
       g.generateTexture('magic_orb', 20, 20);
-      
+
       const gSlashD = this.make.graphics({ x: 0, y: 0, add: false });
       gSlashD.lineStyle(4, 0xffffff, 1);
-      gSlashD.beginPath(); gSlashD.moveTo(0,0); gSlashD.lineTo(30,30); gSlashD.strokePath();
+      gSlashD.beginPath();
+      gSlashD.moveTo(0, 0);
+      gSlashD.lineTo(30, 30);
+      gSlashD.strokePath();
       gSlashD.generateTexture('fx_slash', 30, 30);
-      
+
       const gBurst = this.make.graphics({ x: 0, y: 0, add: false });
-      gBurst.fillStyle(0xffaa00, 1); gBurst.fillCircle(10, 10, 10);
-      gBurst.fillStyle(0xffffff, 0.9); gBurst.fillCircle(10, 10, 5);
+      gBurst.fillStyle(0xffaa00, 1);
+      gBurst.fillCircle(10, 10, 10);
+      gBurst.fillStyle(0xffffff, 0.9);
+      gBurst.fillCircle(10, 10, 5);
       gBurst.generateTexture('fx_burst', 20, 20);
-      
+
       const gSlashL = this.make.graphics({ x: 0, y: 0, add: false });
       gSlashL.lineStyle(8, 0x00ffff, 1);
-      gSlashL.beginPath(); gSlashL.moveTo(0, 10); gSlashL.lineTo(100, 10); gSlashL.strokePath();
+      gSlashL.beginPath();
+      gSlashL.moveTo(0, 10);
+      gSlashL.lineTo(100, 10);
+      gSlashL.strokePath();
       gSlashL.generateTexture('fx_slash_long', 100, 20);
     }
 
@@ -372,7 +424,7 @@ class MainScene extends Phaser.Scene {
     const baseHpLv = saveData.levels?.baseHp || 1;
 
     this.currentWave = 1;
-    this.maxWaves = activeStage === 3 ? 3 : (activeStage === 2 ? 2 : 1);
+    this.maxWaves = activeStage === 3 ? 3 : activeStage === 2 ? 2 : 1;
     this.enemiesSpawned = 0;
     this.enemiesToSpawn = 10;
     コスト = Math.floor(100 * costBuff);
@@ -388,14 +440,14 @@ class MainScene extends Phaser.Scene {
         コスト += Math.floor(10 * costBuff);
         this.updateUI();
       },
-      loop: true
+      loop: true,
     });
 
     this.spawnTimer = this.time.addEvent({
       delay: 3000,
       callback: this.spawnEnemy,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
 
     const spawnAlly = (type) => {
@@ -431,7 +483,7 @@ class MainScene extends Phaser.Scene {
     if (activeStage === 2) {
       bgm = wave === 1 ? 'wave1' : 'wave2';
     } else if (activeStage === 3) {
-      bgm = wave === 1 ? 'wave1' : (wave === 2 ? 'wave2' : 'wave3');
+      bgm = wave === 1 ? 'wave1' : wave === 2 ? 'wave2' : 'wave3';
     }
 
     if (activeStage === 1) {
@@ -441,9 +493,16 @@ class MainScene extends Phaser.Scene {
       this.enemiesToSpawn = wave === 1 ? 15 : 25;
       this.spawnTimer.delay = wave === 1 ? 2000 : 1500;
     } else if (activeStage === 3) {
-      if (wave === 1) { this.enemiesToSpawn = 15; this.spawnTimer.delay = 2000; }
-      else if (wave === 2) { this.enemiesToSpawn = 25; this.spawnTimer.delay = 1500; }
-      else { this.enemiesToSpawn = 1; this.spawnTimer.delay = 5000; } // Boss
+      if (wave === 1) {
+        this.enemiesToSpawn = 15;
+        this.spawnTimer.delay = 2000;
+      } else if (wave === 2) {
+        this.enemiesToSpawn = 25;
+        this.spawnTimer.delay = 1500;
+      } else {
+        this.enemiesToSpawn = 1;
+        this.spawnTimer.delay = 5000;
+      } // Boss
     }
 
     if (waveDisplay) waveDisplay.textContent = `${this.currentWave} / ${this.maxWaves}`;
@@ -470,12 +529,12 @@ class MainScene extends Phaser.Scene {
   update(time, delta) {
     if (this.isGameOver) return;
 
-    this.allies.getChildren().forEach(ally => {
+    this.allies.getChildren().forEach((ally) => {
       let targets = [];
       let minDistance = Infinity;
       let targetEnemy = null;
-      
-      this.enemies.getChildren().forEach(enemy => {
+
+      this.enemies.getChildren().forEach((enemy) => {
         if (!enemy.active) return;
         const dist = enemy.x - ally.x;
         if (dist > 0 && dist <= ally.unitData.range) {
@@ -496,7 +555,7 @@ class MainScene extends Phaser.Scene {
           this.performAttack(ally, targetEnemy, time, 'ally');
         }
       } else {
-        const stopX = (ally.unitData.texture === 'unit_mage') ? 450 : 600;
+        const stopX = ally.unitData.texture === 'unit_mage' ? 450 : 600;
         if (ally.x >= stopX) {
           ally.state = 'idle';
           ally.body.setVelocityX(0);
@@ -507,11 +566,11 @@ class MainScene extends Phaser.Scene {
       }
     });
 
-    this.enemies.getChildren().forEach(enemy => {
+    this.enemies.getChildren().forEach((enemy) => {
       let targetAlly = null;
       let minDistance = Infinity;
       let targets = [];
-      this.allies.getChildren().forEach(ally => {
+      this.allies.getChildren().forEach((ally) => {
         if (!ally.active) return;
         const dist = enemy.x - ally.x;
         if (dist > 0 && dist <= 60) {
@@ -537,15 +596,15 @@ class MainScene extends Phaser.Scene {
       }
     });
 
-    this.allies.getChildren().forEach(ally => {
+    this.allies.getChildren().forEach((ally) => {
       if (ally.x > 850) ally.destroy();
     });
 
-    this.projectiles.getChildren().forEach(proj => {
+    this.projectiles.getChildren().forEach((proj) => {
       if (proj.x > 850) proj.destroy();
     });
 
-    this.enemies.getChildren().forEach(enemy => {
+    this.enemies.getChildren().forEach((enemy) => {
       if (enemy.x < 0) {
         enemy.destroy();
         this.currentBaseHp -= 1;
@@ -565,13 +624,13 @@ class MainScene extends Phaser.Scene {
     const baseHpDisplay = document.getElementById('base-hp-display');
     if (baseHpDisplay) baseHpDisplay.textContent = `${this.currentBaseHp} / ${this.maxBaseHp}`;
     if (goldDisplay) goldDisplay.textContent = saveData.gold;
-    
-    ['sword', 'shield', 'mage', 'butouka'].forEach(type => {
+
+    ['sword', 'shield', 'mage', 'butouka'].forEach((type) => {
       const btnEl = document.getElementById(`btn-spawn-${type}`);
       const costEl = document.getElementById(`deck-cost-${type}`);
       const currentCost = this.getCurrentUnitCost(type);
       if (costEl) costEl.textContent = currentCost;
-      if (btnEl) btnEl.disabled = (コスト < currentCost);
+      if (btnEl) btnEl.disabled = コスト < currentCost;
     });
   }
 
@@ -579,13 +638,13 @@ class MainScene extends Phaser.Scene {
     const baseUnit = getUnitData(type);
     let activeCount = 0;
     if (this.allies) {
-      this.allies.getChildren().forEach(ally => {
+      this.allies.getChildren().forEach((ally) => {
         if (ally.active && ally.unitData && ally.unitData.originalType === type) {
           activeCount++;
         }
       });
     }
-    const multiplier = 1 + (activeCount * 0.2); // +20% cost per active unit
+    const multiplier = 1 + activeCount * 0.2; // +20% cost per active unit
     return Math.floor(baseUnit.cost * multiplier);
   }
 
@@ -615,24 +674,46 @@ class MainScene extends Phaser.Scene {
     let attackSE = 'punch';
     let isBoss = false;
 
-    const isFinalWave = (this.currentWave === this.maxWaves);
-    const spawnBossNow = (isFinalWave && this.enemiesSpawned === this.enemiesToSpawn - 1);
+    const isFinalWave = this.currentWave === this.maxWaves;
+    const spawnBossNow = isFinalWave && this.enemiesSpawned === this.enemiesToSpawn - 1;
 
     if (activeStage === 2) {
       if (spawnBossNow) {
-        hp = 1000; attack = 40; speed = 20; height = 160; textureKey = 'enemy_ogre'; attackSE = 'smite'; cooldown = 2000;
+        hp = 1000;
+        attack = 40;
+        speed = 20;
+        height = 160;
+        textureKey = 'enemy_ogre';
+        attackSE = 'smite';
+        cooldown = 2000;
         isBoss = true;
       } else {
         if (Math.random() < 0.5) {
-          hp = 40; attack = 15; textureKey = 'enemy_goblin'; speed = 40; cooldown = 1000; height = 80;
+          hp = 40;
+          attack = 15;
+          textureKey = 'enemy_goblin';
+          speed = 40;
+          cooldown = 1000;
+          height = 80;
         }
       }
     } else if (activeStage === 3) {
       if (spawnBossNow) {
-        hp = 3500; attack = 60; speed = 20; height = 160; textureKey = 'enemy_orc'; attackSE = 'smite'; cooldown = 2000;
+        hp = 3500;
+        attack = 60;
+        speed = 20;
+        height = 160;
+        textureKey = 'enemy_orc';
+        attackSE = 'smite';
+        cooldown = 2000;
         isBoss = true;
       } else {
-        hp = 40; attack = 15; textureKey = 'enemy_goblin'; speed = 40; cooldown = 1000; height = 80;
+        hp = 40;
+        attack = 15;
+        textureKey = 'enemy_goblin';
+        speed = 40;
+        cooldown = 1000;
+        height = 80;
       }
     }
 
@@ -661,14 +742,16 @@ class MainScene extends Phaser.Scene {
   }
 
   performAttack(attacker, defenderOrDefenders, time, type) {
-    const cooldown = type === 'ally' ? attacker.unitData.cooldown : (attacker.cooldown || 1500);
+    const cooldown = type === 'ally' ? attacker.unitData.cooldown : attacker.cooldown || 1500;
     const attackPower = type === 'ally' ? attacker.unitData.attack : attacker.attackPower;
-    
+
     if (time - attacker.lastAttackTime > cooldown) {
       attacker.lastAttackTime = time;
       playSE(attacker.attackSE || (attacker.unitData && attacker.unitData.attackSE) || 'punch');
 
-      let targets = Array.isArray(defenderOrDefenders) ? defenderOrDefenders : [defenderOrDefenders];
+      let targets = Array.isArray(defenderOrDefenders)
+        ? defenderOrDefenders
+        : [defenderOrDefenders];
 
       if (type === 'ally') {
         const tex = attacker.unitData.texture;
@@ -681,32 +764,54 @@ class MainScene extends Phaser.Scene {
           return;
         } else if (tex === 'unit_sword') {
           const fx = this.add.image(attacker.x + 50, attacker.y - 40, 'fx_slash_long');
-          this.tweens.add({ targets: fx, alpha: 0, scaleX: 1.5, duration: 200, onComplete: () => fx.destroy() });
+          this.tweens.add({
+            targets: fx,
+            alpha: 0,
+            scaleX: 1.5,
+            duration: 200,
+            onComplete: () => fx.destroy(),
+          });
         } else if (tex === 'unit_shield') {
           const fx = this.add.image(attacker.x + 30, attacker.y - 40, 'fx_slash');
-          this.tweens.add({ targets: fx, alpha: 0, scale: 1.2, duration: 150, onComplete: () => fx.destroy() });
+          this.tweens.add({
+            targets: fx,
+            alpha: 0,
+            scale: 1.2,
+            duration: 150,
+            onComplete: () => fx.destroy(),
+          });
         } else if (tex === 'unit_butouka') {
-          for(let i=0; i<3; i++) {
+          for (let i = 0; i < 3; i++) {
             this.time.delayedCall(i * 50, () => {
               if (!attacker.active) return;
-              const fx = this.add.image(attacker.x + 20 + Math.random()*20, attacker.y - 20 - Math.random()*30, 'fx_burst');
-              this.tweens.add({ targets: fx, alpha: 0, scale: 1.5, duration: 100, onComplete: () => fx.destroy() });
+              const fx = this.add.image(
+                attacker.x + 20 + Math.random() * 20,
+                attacker.y - 20 - Math.random() * 30,
+                'fx_burst',
+              );
+              this.tweens.add({
+                targets: fx,
+                alpha: 0,
+                scale: 1.5,
+                duration: 100,
+                onComplete: () => fx.destroy(),
+              });
             });
           }
         }
       }
 
-      targets.forEach(defender => {
+      targets.forEach((defender) => {
         if (!defender || !defender.active) return;
         defender.hp -= attackPower;
 
         if (type === 'ally') {
-          defender.setTintFill(0xFFFFFF); // Enemy flashes white
+          defender.setTintFill(0xffffff); // Enemy flashes white
         } else {
-          defender.setTintFill(0xFF0000); // Ally flashes red
+          defender.setTintFill(0xff0000); // Ally flashes red
         }
-        
-        this.time.delayedCall(100, () => { 
+
+        this.time.delayedCall(100, () => {
           if (defender.active) defender.clearTint();
         });
 
@@ -735,10 +840,10 @@ class MainScene extends Phaser.Scene {
 
     projectile.hitEnemies.add(enemy);
     enemy.hp -= projectile.attackPower;
-    
-    enemy.setTintFill(0xFFFFFF);
-    this.time.delayedCall(100, () => { 
-       if (enemy.active) enemy.clearTint();
+
+    enemy.setTintFill(0xffffff);
+    this.time.delayedCall(100, () => {
+      if (enemy.active) enemy.clearTint();
     });
 
     if (enemy.hp <= 0) {
@@ -805,7 +910,7 @@ const config = {
   height: 600,
   parent: 'game-container',
   physics: { default: 'arcade', arcade: { debug: false } },
-  scene: [BootScene, MainScene]
+  scene: [BootScene, MainScene],
 };
 
 if (window.tdGameInstance) {
@@ -813,7 +918,6 @@ if (window.tdGameInstance) {
 }
 window.tdGameInstance = new Phaser.Game(config);
 const game = window.tdGameInstance;
-
 
 // Initial Load
 loadSaveData();
@@ -885,7 +989,7 @@ document.getElementById('btn-reset-execute').addEventListener('click', () => {
   saveData = {
     gold: 0,
     clearedStage: 0,
-    levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 }
+    levels: { sword: 1, shield: 1, mage: 1, butouka: 1, base: 1 },
   };
   location.reload();
 });
@@ -907,7 +1011,7 @@ function startGame(stageNumber) {
   currentScreen = 'game';
   updateGlobalBackButton();
   mapScreen.style.display = 'none';
-  
+
   game.scene.start('MainScene');
   setTimeout(() => {
     const scene = game.scene.getScene('MainScene');
@@ -921,43 +1025,45 @@ document.getElementById('btn-stage2').addEventListener('click', () => startGame(
 document.getElementById('btn-stage3').addEventListener('click', () => startGame(3));
 
 const bry = document.getElementById('btn-retire-yes');
-if (bry) bry.addEventListener('click', () => {
-  playSE('confirm');
-  document.getElementById('retire-modal').style.display = 'none';
-  document.getElementById('modal-overlay')?.classList.remove('active');
-  returnToMapFromGame();
-});
+if (bry)
+  bry.addEventListener('click', () => {
+    playSE('confirm');
+    document.getElementById('retire-modal').style.display = 'none';
+    document.getElementById('modal-overlay')?.classList.remove('active');
+    returnToMapFromGame();
+  });
 
 const brn = document.getElementById('btn-retire-no');
-if (brn) brn.addEventListener('click', () => {
-  playSE('cursor');
-  document.getElementById('retire-modal').style.display = 'none';
-  document.getElementById('modal-overlay')?.classList.remove('active');
-  const scene = game.scene.getScene('MainScene');
-  if (scene) scene.scene.resume();
-});
+if (brn)
+  brn.addEventListener('click', () => {
+    playSE('cursor');
+    document.getElementById('retire-modal').style.display = 'none';
+    document.getElementById('modal-overlay')?.classList.remove('active');
+    const scene = game.scene.getScene('MainScene');
+    if (scene) scene.scene.resume();
+  });
 
-    const btnWaveOk = document.getElementById('btn-wave-ok');
-    if (btnWaveOk) {
-      btnWaveOk.addEventListener('click', () => {
-        playSE('confirm');
-        const cutinContainer = document.getElementById('wave-cutin');
-        if (cutinContainer) {
-          cutinContainer.classList.add('slide-out');
-          setTimeout(() => {
-            cutinContainer.classList.remove('active');
-            cutinContainer.classList.remove('slide-out');
-            cutinContainer.style.display = 'none';
+const btnWaveOk = document.getElementById('btn-wave-ok');
+if (btnWaveOk) {
+  btnWaveOk.addEventListener('click', () => {
+    playSE('confirm');
+    const cutinContainer = document.getElementById('wave-cutin');
+    if (cutinContainer) {
+      cutinContainer.classList.add('slide-out');
+      setTimeout(() => {
+        cutinContainer.classList.remove('active');
+        cutinContainer.classList.remove('slide-out');
+        cutinContainer.style.display = 'none';
 
-            const scene = game.scene.getScene('MainScene');
-            if (scene) {
-              if (scene.nextBgm) playBGM(scene.nextBgm);
-              scene.scene.resume();
-            }
-          }, 400); // Wait for transition
+        const scene = game.scene.getScene('MainScene');
+        if (scene) {
+          if (scene.nextBgm) playBGM(scene.nextBgm);
+          scene.scene.resume();
         }
-      });
+      }, 400); // Wait for transition
     }
+  });
+}
 
 function returnToMapFromGame() {
   document.getElementById('result-screen').style.display = 'none';
@@ -1000,7 +1106,7 @@ document.getElementById('btn-share').addEventListener('click', () => {
 
 // Modals config
 const _cfgBtns = document.querySelectorAll('.icon-config');
-_cfgBtns.forEach(btn => {
+_cfgBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     playSE('cursor');
@@ -1098,7 +1204,7 @@ if (closeHowtoBtn) {
 document.addEventListener('click', (e) => {
   const tabBtnUnit = e.target.closest('#tab-btn-unit');
   const tabBtnBase = e.target.closest('#tab-btn-base');
-  
+
   if (tabBtnUnit) {
     playSE('cursor');
     tabBtnUnit.classList.add('btn-primary');
@@ -1124,7 +1230,15 @@ document.addEventListener('click', (e) => {
   const btn = e.target.closest('.btn, .icon-config, .unit-card');
   if (btn) {
     const id = btn.id;
-    if (id && id !== 'start-btn' && id !== 'btn-retry' && id !== 'btn-title' && id !== 'btn-back-map' && !id.startsWith('btn-stage') && !id.startsWith('btn-to-upgrade')) {
+    if (
+      id &&
+      id !== 'start-btn' &&
+      id !== 'btn-retry' &&
+      id !== 'btn-title' &&
+      id !== 'btn-back-map' &&
+      !id.startsWith('btn-stage') &&
+      !id.startsWith('btn-to-upgrade')
+    ) {
       playSE('cursor');
     }
   }

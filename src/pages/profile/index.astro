@@ -1,5 +1,5 @@
 ---
-export const pageTitle = "自己紹介";
+export const pageTitle = '自己紹介';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
@@ -8,348 +8,364 @@ import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSSettings, MicroCMSProfile, MicroCMSListResponse } from '@/types/microcms';
 
 const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
-  const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', { limit: '100' });
-    const allProfileItems = profileResponse.contents;
+const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', {
+  limit: '100',
+});
+const allProfileItems = profileResponse.contents;
 
-    // 資格以外のアイテムは静的にハードコードするため、ここではフェッチしたデータからフィルタリングしません。
+// 資格以外のアイテムは静的にハードコードするため、ここではフェッチしたデータからフィルタリングしません。
 
-    // 資格のグルーピング
-    const certs = allProfileItems.filter(item => {
-    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-    return cat && (cat.includes('資格') || cat.includes('検定'));
-    });
+// 資格のグルーピング
+const certs = allProfileItems.filter((item) => {
+  const cat = Array.isArray(item.category) ? item.category[0] : item.category;
+  return cat && (cat.includes('資格') || cat.includes('検定'));
+});
 
-    const rankDefinitions = [
-    { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
-    { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
-    { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
-    { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
-    { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' }
-    ];
+const rankDefinitions = [
+  { keywords: ['ITパスポート'], rank: 3, system: '情報処理技術者' },
+  { keywords: ['基本情報技術者'], rank: 2, system: '情報処理技術者' },
+  { keywords: ['応用情報技術者'], rank: 1, system: '情報処理技術者' },
+  { keywords: ['FP技能士'], gradeBased: true, system: 'FP技能士' },
+  { keywords: ['ウェブデザイン技能士'], gradeBased: true, system: 'ウェブデザイン技能士' },
+];
 
-    const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
+const systems: Record<string, (MicroCMSProfile & { rank: number })[]> = {};
 
-      certs.forEach(cert => {
-      let systemName = '';
-      let rank = 99;
+certs.forEach((cert) => {
+  let systemName = '';
+  let rank = 99;
 
-      const def = rankDefinitions.find(d => d.keywords.some(k => cert.name.includes(k)));
+  const def = rankDefinitions.find((d) => d.keywords.some((k) => cert.name.includes(k)));
 
-      if (def) {
-      systemName = def.system;
-      if (def.gradeBased) {
+  if (def) {
+    systemName = def.system;
+    if (def.gradeBased) {
       const gradeMatch = cert.name.match(/([123])級/);
       rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-      } else {
+    } else {
       rank = def.rank as number;
-      }
-      } else {
-      const gradeMatch = cert.name.match(/([123])級/);
-      rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
-      systemName = cert.name.replace(/[123]級/, '').trim();
-      }
+    }
+  } else {
+    const gradeMatch = cert.name.match(/([123])級/);
+    rank = gradeMatch ? parseInt(gradeMatch[1]) : 99;
+    systemName = cert.name.replace(/[123]級/, '').trim();
+  }
 
-      if (!systems[systemName]) {
-      systems[systemName] = [];
-      }
-      systems[systemName].push({ ...cert, rank });
-      });
+  if (!systems[systemName]) {
+    systems[systemName] = [];
+  }
+  systems[systemName].push({ ...cert, rank });
+});
 
-      // 各系統をランク順にソート
-      Object.keys(systems).forEach(name => {
-      systems[name].sort((a, b) => b.rank - a.rank);
-      });
-      ---
+// 各系統をランク順にソート
+Object.keys(systems).forEach((name) => {
+  systems[name].sort((a, b) => b.rank - a.rank);
+});
+---
 
-      <BaseLayout title="Profile" pageId="profile">
-        <Header activeId="profile" />
+<BaseLayout title="Profile" pageId="profile">
+  <Header activeId="profile" />
 
-        <main class="container">
-          <article>
-            <span class="page-label">PROFILE</span>
-            <h1>自己紹介</h1>
+  <main class="container">
+    <article>
+      <span class="page-label">PROFILE</span>
+      <h1>自己紹介</h1>
 
-            <section id="intro-section" class="profile-intro">
-              <p>{settings.title}</p>
-              <h2>{settings.name}</h2>
-              <p set:html={settings.bio.replace(/\n/g, '<br>' )} />
-            </section>
+      <section id="intro-section" class="profile-intro">
+        <p>{settings.title}</p>
+        <h2>{settings.name}</h2>
+        <p set:html={settings.bio.replace(/\n/g, '<br>')} />
+      </section>
 
-            <!-- 保有資格 -->
-            <section id="certification-section">
-              <h2>保有資格</h2>
-              <div class="cert-tree-container">
-                <div class="cert-tree" id="cert-tree-root">
-                  <ul>
-                    <li>
-                      <div class="cert-node root">資格</div>
-                      <ul>
-                        {Object.keys(systems).map(sysName => (
-                        <CertTree items={systems[sysName]} />
-                        ))}
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </section>
+      <!-- 保有資格 -->
+      <section id="certification-section">
+        <h2>保有資格</h2>
+        <div class="cert-tree-container">
+          <div class="cert-tree" id="cert-tree-root">
+            <ul>
+              <li>
+                <div class="cert-node root">資格</div>
+                <ul>
+                  {Object.keys(systems).map((sysName) => <CertTree items={systems[sysName]} />)}
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-            <!-- スキルセット -->
-            <section id="skill-section" class="skill-section">
-              <h2>スキルセット</h2>
-              <div class="skill-bento-grid">
+      <!-- スキルセット -->
+      <section id="skill-section" class="skill-section">
+        <h2>スキルセット</h2>
+        <div class="skill-bento-grid">
+          <!-- 1. フロントエンド -->
+          <div class="profile-card skill-bento-card">
+            <h3>フロントエンド</h3>
+            <ul>
+              <li>
+                クライアントサイド言語
+                <ul>
+                  <li>
+                    <span class="skill-active">HTML</span>
+                    <ul>
+                      <li>Pug</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="skill-active">CSS</span>
+                    <ul>
+                      <li>Stylus</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="skill-active">JavaScript</span>
+                    <ul>
+                      <li class="skill-active">TypeScript</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                フレームワーク・ライブラリ
+                <ul>
+                  <li class="skill-inactive">jQuery</li>
+                  <li class="skill-inactive">Vue.js</li>
+                  <li class="skill-active">Astro [独学]</li>
+                  <li class="skill-active">Phaser 3 [独学]</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
 
-                <!-- 1. フロントエンド -->
-                <div class="profile-card skill-bento-card">
-                  <h3>フロントエンド</h3>
-                  <ul>
-                    <li>クライアントサイド言語
-                      <ul>
-                        <li><span class="skill-active">HTML</span>
-                          <ul>
-                            <li>Pug</li>
-                          </ul>
-                        </li>
-                        <li><span class="skill-active">CSS</span>
-                          <ul>
-                            <li>Stylus</li>
-                          </ul>
-                        </li>
-                        <li><span class="skill-active">JavaScript</span>
-                          <ul>
-                            <li class="skill-active">TypeScript</li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>フレームワーク・ライブラリ
-                      <ul>
-                        <li class="skill-inactive">jQuery</li>
-                        <li class="skill-inactive">Vue.js</li>
-                        <li class="skill-active">Astro [独学]</li>
-                        <li class="skill-active">Phaser 3 [独学]</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+          <!-- 2. バックエンド -->
+          <div class="profile-card skill-bento-card">
+            <h3>バックエンド</h3>
+            <ul>
+              <li>
+                サーバーサイド言語
+                <ul>
+                  <li class="skill-active">Node.js</li>
+                  <li>PHP</li>
+                </ul>
+              </li>
+              <li>
+                CMS
+                <ul>
+                  <li class="skill-active">microCMS [独学]</li>
+                  <li>WordPress</li>
+                  <li>RCMS</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
 
-                <!-- 2. バックエンド -->
-                <div class="profile-card skill-bento-card">
-                  <h3>バックエンド</h3>
-                  <ul>
-                    <li>サーバーサイド言語
-                      <ul>
-                        <li class="skill-active">Node.js</li>
-                        <li>PHP</li>
-                      </ul>
-                    </li>
-                    <li>CMS
-                      <ul>
-                        <li class="skill-active">microCMS [独学]</li>
-                        <li>WordPress</li>
-                        <li>RCMS</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+          <!-- 3. ホスティング・ネットワーク -->
+          <div class="profile-card skill-bento-card">
+            <h3>ホスティング・ネットワーク</h3>
+            <ul>
+              <li>
+                CDN・ホスティング
+                <ul>
+                  <li class="skill-active">Cloudflare (Pages / Workers)</li>
+                  <li>Kinsta</li>
+                </ul>
+              </li>
+              <li>
+                ドメイン・DNS管理
+                <ul>
+                  <li>お名前.com</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
 
-                <!-- 3. ホスティング・ネットワーク -->
-                <div class="profile-card skill-bento-card">
-                  <h3>ホスティング・ネットワーク</h3>
-                  <ul>
-                    <li>CDN・ホスティング
-                      <ul>
-                        <li class="skill-active">Cloudflare (Pages / Workers)</li>
-                        <li>Kinsta</li>
-                      </ul>
-                    </li>
-                    <li>ドメイン・DNS管理
-                      <ul>
-                        <li>お名前.com</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+          <!-- 4. インフラ運用・セキュリティ -->
+          <div class="profile-card skill-bento-card">
+            <h3>インフラ運用・セキュリティ</h3>
+            <ul>
+              <li>
+                コンテナ・運用環境
+                <ul>
+                  <li>MySQL [独学]</li>
+                  <li>PostgreSQL</li>
+                  <li>Docker [独学]</li>
+                  <li>Kubernetes (GKE等)</li>
+                </ul>
+              </li>
+              <li>
+                セキュリティ対策
+                <ul>
+                  <li class="skill-active">Cloudflare Turnstile</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
 
-                <!-- 4. インフラ運用・セキュリティ -->
-                <div class="profile-card skill-bento-card">
-                  <h3>インフラ運用・セキュリティ</h3>
-                  <ul>
-                    <li>コンテナ・運用環境
-                      <ul>
-                        <li>MySQL [独学]</li>
-                        <li>PostgreSQL</li>
-                        <li>Docker [独学]</li>
-                        <li>Kubernetes (GKE等)</li>
-                      </ul>
-                    </li>
-                    <li>セキュリティ対策
-                      <ul>
-                        <li class="skill-active">Cloudflare Turnstile</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+          <!-- 5. UI/UX・デザイン -->
+          <div class="profile-card skill-bento-card">
+            <h3>UI/UX・デザイン</h3>
+            <ul>
+              <li>
+                プロトタイピング・UI設計
+                <ul>
+                  <li>Figma</li>
+                </ul>
+              </li>
+              <li>
+                画像編集・グラフィック
+                <ul>
+                  <li>Adobe Photoshop</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
 
-                <!-- 5. UI/UX・デザイン -->
-                <div class="profile-card skill-bento-card">
-                  <h3>UI/UX・デザイン</h3>
-                  <ul>
-                    <li>プロトタイピング・UI設計
-                      <ul>
-                        <li>Figma</li>
-                      </ul>
-                    </li>
-                    <li>画像編集・グラフィック
-                      <ul>
-                        <li>Adobe Photoshop</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+          <!-- 6. 開発環境・ワークフロー -->
+          <div class="profile-card skill-bento-card">
+            <h3>開発環境・ワークフロー</h3>
+            <ul>
+              <li>
+                バージョン管理 / CI・CD
+                <ul>
+                  <li class="skill-active">
+                    Git
+                    <ul>
+                      <li class="skill-active">GitHub</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                AIエディタ・開発支援
+                <ul>
+                  <li class="skill-active">Google Antigravity</li>
+                  <li class="skill-active">Cursor [独学]</li>
+                  <li>Visual Studio Code</li>
+                  <li>Adobe Brackets [独学]</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
+      </section>
+    </article>
+  </main>
 
-                <!-- 6. 開発環境・ワークフロー -->
-                <div class="profile-card skill-bento-card">
-                  <h3>開発環境・ワークフロー</h3>
-                  <ul>
-                    <li>バージョン管理 / CI・CD
-                      <ul>
-                        <li class="skill-active">Git
-                          <ul>
-                            <li class="skill-active">GitHub</li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>AIエディタ・開発支援
-                      <ul>
-                        <li class="skill-active">Google Antigravity</li>
-                        <li class="skill-active">Cursor [独学]</li>
-                        <li>Visual Studio Code</li>
-                        <li>Adobe Brackets [独学]</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
+  <Footer />
+</BaseLayout>
 
-              </div>
-              <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
-            </section>
-          </article>
-        </main>
+<style>
+  .profile-intro {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
 
-        <Footer />
-      </BaseLayout>
+  .profile-intro h2 {
+    margin-bottom: 0.5rem;
+  }
 
-      <style>
-        .profile-intro {
-          text-align: center;
-          max-width: 700px;
-          margin: 0 auto;
-        }
+  .profile-intro p:first-of-type {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    margin-bottom: 0.5rem;
+  }
 
-        .profile-intro h2 {
-          margin-bottom: 0.5rem;
-        }
+  .profile-intro p:last-of-type {
+    line-height: 1.8;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-align: left;
+    display: inline-block;
+    margin-top: 1rem;
+  }
 
-        .profile-intro p:first-of-type {
-          display: block;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: var(--primary);
-          opacity: 0.6;
-          text-transform: uppercase;
-          letter-spacing: 0.25em;
-          margin-bottom: 0.5rem;
-        }
+  .skill-section {
+    margin-top: 2.5rem;
+  }
 
-        .profile-intro p:last-of-type {
-          line-height: 1.8;
-          color: var(--text-muted);
-          font-weight: 600;
-          font-size: 1.1rem;
-          text-align: left;
-          display: inline-block;
-          margin-top: 1rem;
-        }
+  .skill-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
 
-        .skill-section {
-          margin-top: 2.5rem;
-        }
+  @media (min-width: 1024px) {
+    .skill-bento-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
 
-        .skill-bento-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
-          margin-top: 1rem;
-        }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .skill-bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 
-        @media (min-width: 1024px) {
-          .skill-bento-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
+  @media (max-width: 639px) {
+    .skill-bento-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 
-        @media (min-width: 640px) and (max-width: 1023px) {
-          .skill-bento-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
+  .skill-bento-card {
+    box-sizing: border-box;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: var(--surface-bg, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition:
+      transform 0.25s var(--ease-out-back, ease),
+      box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+  }
 
-        @media (max-width: 639px) {
-          .skill-bento-grid {
-            grid-template-columns: 1fr;
-          }
-        }
+  .skill-bento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
 
-        .skill-bento-card {
-          box-sizing: border-box;
-          padding: 1.5rem;
-          border-radius: 1rem;
-          background: var(--surface-bg, rgba(255, 255, 255, 0.03));
-          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-          transition: transform 0.25s var(--ease-out-back, ease), box-shadow 0.25s ease;
-          display: flex;
-          flex-direction: column;
-        }
+  .skill-bento-card h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    color: var(--text-main, #ffffff);
+  }
 
-        .skill-bento-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        }
+  .skill-bento-card ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
 
-        .skill-bento-card h3 {
-          font-size: 1.15rem;
-          font-weight: 800;
-          margin-bottom: 0.75rem;
-          padding-bottom: 0.5rem;
-          border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-          color: var(--text-main, #ffffff);
-        }
+  .skill-bento-card li {
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+  }
 
-        .skill-bento-card ul {
-          margin: 0;
-          padding-left: 1.25rem;
-        }
+  .skill-active {
+    font-weight: bold;
+  }
 
-        .skill-bento-card li {
-          line-height: 1.6;
-          margin-bottom: 0.25rem;
-        }
+  .skill-bento-card li:not(.skill-active):not(:has(.skill-active)) {
+    opacity: 0.5;
+  }
 
-        .skill-active {
-          font-weight: bold;
-        }
-
-        .skill-bento-card li:not(.skill-active):not(:has(.skill-active)) {
-          opacity: 0.5;
-        }
-
-        .skill-note {
-          font-size: 0.85rem;
-          color: var(--text-muted);
-          margin-top: 1.5rem;
-          text-align: right;
-        }
-      </style>
+  .skill-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    text-align: right;
+  }
+</style>

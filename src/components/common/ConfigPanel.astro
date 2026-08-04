@@ -10,6 +10,7 @@ interface Props {
 
 const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
 ---
+
 <div id="modal-overlay" class="modal-overlay"></div>
 
 <!-- コンフィグモーダル -->
@@ -21,7 +22,12 @@ const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
   <div class="config-item">
     <div class="config-item-header">
       <label for="bgm-volume">BGM音量</label>
-      <button type="button" id="bgm-mute-toggle" class="sound-toggle-btn" aria-label="BGMミュート切り替え">
+      <button
+        type="button"
+        id="bgm-mute-toggle"
+        class="sound-toggle-btn"
+        aria-label="BGMミュート切り替え"
+      >
         🔊 ON
       </button>
     </div>
@@ -31,7 +37,12 @@ const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
   <div class="config-item">
     <div class="config-item-header">
       <label for="se-volume">SE音量</label>
-      <button type="button" id="se-mute-toggle" class="sound-toggle-btn" aria-label="SEミュート切り替え">
+      <button
+        type="button"
+        id="se-mute-toggle"
+        class="sound-toggle-btn"
+        aria-label="SEミュート切り替え"
+      >
         🔊 ON
       </button>
     </div>
@@ -42,10 +53,16 @@ const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
   <slot name="config-extra" />
 
   <div class="config-actions">
-    {hasHowToPlay && (
-      <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-config-howto">遊び方を見る</button>
-    )}
-    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits">クレジット・使用素材</button>
+    {
+      hasHowToPlay && (
+        <button id="howto-btn-in-config" class="btn btn-secondary btn-full btn-config-howto">
+          遊び方を見る
+        </button>
+      )
+    }
+    <button id="credits-btn" class="btn btn-secondary btn-full btn-credits"
+      >クレジット・使用素材</button
+    >
   </div>
 </div>
 
@@ -56,17 +73,21 @@ const { hasHowToPlay = true, materialCategories = [] } = Astro.props;
   <div class="howto-content credits-content">
     <p>本ゲームは以下の素晴らしい素材を使用・お借りして制作されています。</p>
     <ul class="credits-list">
-      {materialCategories.map((mat) => (
-        <li>
-          <strong>{mat.category}:</strong>{' '}
-          {mat.items.map((item, index) => (
-            <span key={item.name}>
-              <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-              {index < mat.items.length - 1 ? ' / ' : ''}
-            </span>
-          ))}
-        </li>
-      ))}
+      {
+        materialCategories.map((mat) => (
+          <li>
+            <strong>{mat.category}:</strong>{' '}
+            {mat.items.map((item, index) => (
+              <span key={item.name}>
+                <a href={item.url} target="_blank" rel="noopener noreferrer">
+                  {item.name}
+                </a>
+                {index < mat.items.length - 1 ? ' / ' : ''}
+              </span>
+            ))}
+          </li>
+        ))
+      }
     </ul>
   </div>
 </div>

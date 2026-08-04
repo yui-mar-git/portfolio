@@ -7,11 +7,16 @@ interface Props {
 
 const { aspectRatio = '16 / 9', maxWidth = '960px' } = Astro.props;
 ---
+
 <div id="global-game-scaler" class="game-container-scaler" style={`max-width: ${maxWidth};`}>
-  <div id="global-game-scaler-inner" class="game-container-inner" style={`aspect-ratio: ${aspectRatio};`}>
+  <div
+    id="global-game-scaler-inner"
+    class="game-container-inner"
+    style={`aspect-ratio: ${aspectRatio};`}
+  >
     <!-- メインゲーム画面エリア -->
     <slot />
-    
+
     <!-- オーバーレイ領域（タイトル・モーダル・コンフィグ等） -->
     <slot name="overlay" />
   </div>

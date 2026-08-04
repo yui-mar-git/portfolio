@@ -13,38 +13,41 @@ const { weather, air, sunset, moonStr, law } = dashboardData;
 
 let portfolioData: MicroCMSPortfolio[] = [];
 try {
-  const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+  const portfolioResponse =
+    await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
   portfolioData = portfolioResponse.contents;
 } catch (e) {
-  console.error("Failed to fetch microCMS portfolio for TOC", e);
+  console.error('Failed to fetch microCMS portfolio for TOC', e);
 }
 
 const allPages = await Astro.glob('./**/*.astro');
-const nodes = allPages.filter(page => {
-  if (page.url === '' || page.url === '/') return false;
-  if (page.url?.includes('/contact/thanks')) return false;
-  return !!page.url;
-}).map(page => {
-  // Better CMS match: either CMS url includes page url or page url includes CMS url
-  const pageUrlRaw = page.url || '';
-  const cmsEntry = portfolioData.find(c => {
-    if (!c.url) return false;
-    const cleanCms = c.url.replace(/^\/|\/$/g, '');
-    const cleanPage = pageUrlRaw.replace(/^\/|\/$/g, '');
-    return cleanCms === cleanPage || cleanCms.endsWith(cleanPage) || cleanPage.endsWith(cleanCms);
+const nodes = allPages
+  .filter((page) => {
+    if (page.url === '' || page.url === '/') return false;
+    if (page.url?.includes('/contact/thanks')) return false;
+    return !!page.url;
+  })
+  .map((page) => {
+    // Better CMS match: either CMS url includes page url or page url includes CMS url
+    const pageUrlRaw = page.url || '';
+    const cmsEntry = portfolioData.find((c) => {
+      if (!c.url) return false;
+      const cleanCms = c.url.replace(/^\/|\/$/g, '');
+      const cleanPage = pageUrlRaw.replace(/^\/|\/$/g, '');
+      return cleanCms === cleanPage || cleanCms.endsWith(cleanPage) || cleanPage.endsWith(cleanCms);
+    });
+
+    const title = cmsEntry ? cmsEntry.title : page.pageTitle || page.url;
+    const cleanUrl = pageUrlRaw.replace(/^\/|\/$/g, '');
+    const parts = cleanUrl.split('/').filter(Boolean);
+    return {
+      url: page.url,
+      title,
+      parts,
+      depth: parts.length,
+      children: [] as any[],
+    };
   });
-  
-  const title = cmsEntry ? cmsEntry.title : (page.pageTitle || page.url);
-  const cleanUrl = pageUrlRaw.replace(/^\/|\/$/g, '');
-  const parts = cleanUrl.split('/').filter(Boolean);
-  return {
-    url: page.url,
-    title,
-    parts,
-    depth: parts.length,
-    children: [] as any[]
-  };
-});
 
 nodes.sort((a, b) => a.depth - b.depth);
 const rawTree: any[] = [];
@@ -55,7 +58,7 @@ for (const node of nodes) {
     const parentParts = node.parts.slice(0, -1);
     const parentUrlMatch1 = '/' + parentParts.join('/') + '/';
     const parentUrlMatch2 = '/' + parentParts.join('/');
-    const parentNode = nodes.find(n => n.url === parentUrlMatch1 || n.url === parentUrlMatch2);
+    const parentNode = nodes.find((n) => n.url === parentUrlMatch1 || n.url === parentUrlMatch2);
     if (parentNode) {
       parentNode.children.push(node);
     } else {
@@ -81,7 +84,7 @@ function sortNodes(nodesArray: any[], orderList: string[]) {
 }
 
 sortNodes(rawTree, rootOrder);
-rawTree.forEach(node => {
+rawTree.forEach((node) => {
   if (node.children && node.children.length > 0) {
     sortNodes(node.children, childOrder);
   }
@@ -91,7 +94,7 @@ const rootNode = {
   url: '/',
   title: 'ルート',
   parts: ['root'],
-  children: rawTree
+  children: rawTree,
 };
 const tree = [rootNode];
 ---
@@ -104,7 +107,7 @@ const tree = [rootNode];
       <span class="page-label">HOME</span>
       <h1>こんにちは。</h1>
       <section class="hero">
-        <p>ここは私のポートフォリオのページです。<br>コンテンツは随時追加していきます。</p>
+        <p>ここは私のポートフォリオのページです。<br />コンテンツは随時追加していきます。</p>
       </section>
 
       <!-- ダッシュボード (本日) -->
@@ -170,10 +173,14 @@ const tree = [rootNode];
                 <h3 class="tree-node tree-title">警報・注意報:</h3>
                 <ul class="tree-list tree-children">
                   <li class="tree-item">
-                    <div class="tree-node fw-normal">紫外線: {weather.uvIndex} / {weather.uvLabel}</div>
+                    <div class="tree-node fw-normal">
+                      紫外線: {weather.uvIndex} / {weather.uvLabel}
+                    </div>
                   </li>
                   <li class="tree-item">
-                    <div class="tree-node fw-normal">大気: PM2.5 {air.pm25}μg/m³ {air.pm25Label}</div>
+                    <div class="tree-node fw-normal">
+                      大気: PM2.5 {air.pm25}μg/m³ {air.pm25Label}
+                    </div>
                   </li>
                   <li class="tree-item">
                     <div class="tree-node fw-normal">花粉: {air.pollenLabel}</div>
@@ -184,7 +191,8 @@ const tree = [rootNode];
           </div>
 
           <p class="api-note">
-            ※ このセクションは、Open-Meteo API および Sunrise-Sunset API を使用し、毎時定期バッチにて最新の気象・日没データを取得して表示するデモ実装です。
+            ※ このセクションは、Open-Meteo API および Sunrise-Sunset API
+            を使用し、毎時定期バッチにて最新の気象・日没データを取得して表示するデモ実装です。
           </p>
         </div>
       </section>
@@ -207,7 +215,8 @@ const tree = [rootNode];
           </ul>
 
           <p class="api-note">
-            ※ このセクションは、e-Gov法令API を使用し、毎時定期バッチにて指定の法令（憲法、個人情報保護法など）からランダムな条文を抽出して表示するデモ実装です。
+            ※ このセクションは、e-Gov法令API
+            を使用し、毎時定期バッチにて指定の法令（憲法、個人情報保護法など）からランダムな条文を抽出して表示するデモ実装です。
           </p>
         </div>
       </section>
@@ -216,38 +225,54 @@ const tree = [rootNode];
         <h2 class="section-title">サイトマップ</h2>
         <div class="profile-card toc-card">
           <ul class="tree-list root-tree">
-            {tree.map(node => (
-              <li class="tree-item">
-                <div class="tree-node parent-node">
-                  <a href={node.url} class="tree-link">{node.title}</a>
-                </div>
-                {node.children.length > 0 && (
-                  <ul id="children-root" class="tree-list tree-children">
-                    {node.children.map(child => (
-                      <li class="tree-item">
-                        <div class="tree-node parent-node">
-                          <a href={child.url} class="tree-link">{child.title}</a>
+            {
+              tree.map((node) => (
+                <li class="tree-item">
+                  <div class="tree-node parent-node">
+                    <a href={node.url} class="tree-link">
+                      {node.title}
+                    </a>
+                  </div>
+                  {node.children.length > 0 && (
+                    <ul id="children-root" class="tree-list tree-children">
+                      {node.children.map((child) => (
+                        <li class="tree-item">
+                          <div class="tree-node parent-node">
+                            <a href={child.url} class="tree-link">
+                              {child.title}
+                            </a>
+                            {child.children.length > 0 && (
+                              <button
+                                class="toggle-btn"
+                                onclick={`toggleChildren('${child.parts.join('-')}')`}
+                              >
+                                −
+                              </button>
+                            )}
+                          </div>
                           {child.children.length > 0 && (
-                            <button class="toggle-btn" onclick={`toggleChildren('${child.parts.join('-')}')`}>−</button>
+                            <ul
+                              id={`children-${child.parts.join('-')}`}
+                              class="tree-list tree-children"
+                            >
+                              {child.children.map((subChild) => (
+                                <li class="tree-item">
+                                  <div class="tree-node child-node">
+                                    <a href={subChild.url} class="tree-link">
+                                      {subChild.title}
+                                    </a>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
                           )}
-                        </div>
-                        {child.children.length > 0 && (
-                          <ul id={`children-${child.parts.join('-')}`} class="tree-list tree-children">
-                            {child.children.map(subChild => (
-                              <li class="tree-item">
-                                <div class="tree-node child-node">
-                                  <a href={subChild.url} class="tree-link">{subChild.title}</a>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))
+            }
           </ul>
         </div>
       </section>
@@ -270,7 +295,9 @@ const tree = [rootNode];
         .law-sentence {
           line-height: 1.5;
         }
-        .dashboard-card, .law-card, .toc-card {
+        .dashboard-card,
+        .law-card,
+        .toc-card {
           margin: 0 auto;
           max-width: 640px;
           text-align: left;
@@ -280,9 +307,13 @@ const tree = [rootNode];
           border-radius: var(--radius-bento);
           border: 1px solid var(--glass-border);
           box-shadow: var(--shadow-bento);
-          transition: transform 0.35s var(--ease-out-back), box-shadow 0.35s ease;
+          transition:
+            transform 0.35s var(--ease-out-back),
+            box-shadow 0.35s ease;
         }
-        .dashboard-card:hover, .law-card:hover, .toc-card:hover {
+        .dashboard-card:hover,
+        .law-card:hover,
+        .toc-card:hover {
           transform: translateY(-4px);
           box-shadow: var(--shadow-bento), var(--shadow-glow);
         }
@@ -341,7 +372,7 @@ const tree = [rootNode];
             margin: 0;
           }
         }
-        
+
         .toc-section {
           margin-top: 3rem;
           text-align: center;
@@ -361,7 +392,7 @@ const tree = [rootNode];
           padding-left: 1.5rem;
         }
         .tree-list li::before {
-          content: "";
+          content: '';
           position: absolute;
           left: 0;
           top: 0;
@@ -370,7 +401,7 @@ const tree = [rootNode];
           background-color: var(--border-color);
         }
         .tree-list li::after {
-          content: "";
+          content: '';
           position: absolute;
           left: 0;
           top: 1.2rem; /* Adjust if line is not vertically centered */

@@ -35,14 +35,14 @@ const { projectData } = Astro.props;
       <span class="town-items-custom">アイテム:</span>
       <div id="footer-player-items" class="footer-player-items-custom"></div>
     </div>
-    <button class="btn btn-secondary btn-sm btn-footer-view-deck-custom" id="btn-footer-view-deck">デッキ確認
-      (<span id="footer-deck-count">0</span>)</button>
+    <button class="btn btn-secondary btn-sm btn-footer-view-deck-custom" id="btn-footer-view-deck"
+      >デッキ確認 (<span id="footer-deck-count">0</span>)</button
+    >
   </div>
   <!-- ゲームオーバー/クリア画面 -->
   <div id="result-overlay" class="rl-overlay result-overlay-custom">
     <h2 id="result-title">戦闘終了</h2>
-    <p id="result-details" class="result-details-custom">
-    </p>
+    <p id="result-details" class="result-details-custom"></p>
     <div class="result-actions">
       <button class="btn btn-primary" id="btn-next">次の戦闘へ</button>
       <button class="btn btn-secondary" id="btn-title">タイトルへ</button>
@@ -62,21 +62,29 @@ const { projectData } = Astro.props;
   <div id="deck-viewer-overlay" class="rl-overlay deck-viewer-overlay-custom">
     <h2 class="deck-view-title">デッキ確認</h2>
     <div class="deck-viewer-tabs">
-      <button class="deck-tab active" data-target="deck-list">山札 (<span id="dv-deck-count">0</span>)</button>
-      <button class="deck-tab" data-target="discard-list">捨て札 (<span id="dv-discard-count">0</span>)</button>
-      <button class="deck-tab" data-target="hand-list">手札 (<span id="dv-hand-count">0</span>)</button>
+      <button class="deck-tab active" data-target="deck-list"
+        >山札 (<span id="dv-deck-count">0</span>)</button
+      >
+      <button class="deck-tab" data-target="discard-list"
+        >捨て札 (<span id="dv-discard-count">0</span>)</button
+      >
+      <button class="deck-tab" data-target="hand-list"
+        >手札 (<span id="dv-hand-count">0</span>)</button
+      >
     </div>
     <div id="deck-list" class="dv-card-list active"></div>
     <div id="discard-list" class="dv-card-list"></div>
     <div id="hand-list" class="dv-card-list"></div>
-    <button class="btn btn-secondary close-deck-viewer-custom" id="close-deck-viewer">閉じる</button>
+    <button class="btn btn-secondary close-deck-viewer-custom" id="close-deck-viewer">閉じる</button
+    >
   </div>
 
   <!-- スタート画面 -->
   <div id="start-screen" class="start-screen-custom">
     <h2 class="game-main-title">{projectData ? projectData.title : 'ローグライクカードゲーム'}</h2>
     <p class="game-main-desc">
-      職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br>※スタートするとBGMが鳴ります</p>
+      職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br />※スタートするとBGMが鳴ります
+    </p>
     <button id="start-btn" class="btn btn-full">冒険を始める</button>
     <button id="howto-btn" class="btn btn-secondary btn-full howto-btn-custom">遊び方</button>
   </div>
@@ -84,45 +92,43 @@ const { projectData } = Astro.props;
   <!-- 職業選択画面 -->
   <div id="class-select-screen" class="class-select-screen-custom">
     <h2 class="hero-select-title">冒険者の選択</h2>
-    <p class="hero-select-desc">
-      あなたの戦闘スタイルを選んで旅立ちましょう。</p>
+    <p class="hero-select-desc">あなたの戦闘スタイルを選んで旅立ちましょう。</p>
     <div class="hero-stats-wrapper">
       <div class="class-grid class-grid-custom">
         <div class="class-card" data-class="yuusya">
           <img src={yuusyaImg.src} class="hero-icon-img" />
           <div class="hero-name-label">勇者</div>
-          <div class="hero-hp-label">HP10 /
-            MP5<br>初期レリックが+1個</div>
+          <div class="hero-hp-label">HP10 / MP5<br />初期レリックが+1個</div>
         </div>
         <div class="class-card" data-class="kenshi">
           <img src={kenshiImg.src} class="hero-icon-img" />
           <div class="hero-name-label">戦士</div>
-          <div class="hero-hp-label">HP15 /
-            MP4<br>毎ターンHP+1回復</div>
+          <div class="hero-hp-label">HP15 / MP4<br />毎ターンHP+1回復</div>
         </div>
         <div class="class-card" data-class="mahoutsukai">
           <img src={mahoutsukaiImg.src} class="hero-icon-img" />
           <div class="hero-name-label">魔法使い</div>
-          <div class="hero-hp-label">HP7 /
-            MP7<br>毎ターンMP+1回復</div>
+          <div class="hero-hp-label">HP7 / MP7<br />毎ターンMP+1回復</div>
         </div>
         <div class="class-card" data-class="butouka">
           <img src={butoukaImg.src} class="hero-icon-img" />
           <div class="hero-name-label">格闘家</div>
-          <div class="hero-hp-label">HP8 /
-            MP4<br>毎ターン行動回数+1</div>
+          <div class="hero-hp-label">HP8 / MP4<br />毎ターン行動回数+1</div>
         </div>
       </div>
-      <p id="class-select-preview" class="class-select-preview-custom">
-        勇者が選択されています</p>
+      <p id="class-select-preview" class="class-select-preview-custom">勇者が選択されています</p>
     </div>
 
-    <button id="btn-back-to-title" class="btn btn-secondary btn-full btn-back-to-title-custom">戻る</button>
+    <button id="btn-back-to-title" class="btn btn-secondary btn-full btn-back-to-title-custom"
+      >戻る</button
+    >
   </div>
 
   <!-- マップ進行画面（横スクロール双六マップ） -->
   <div id="map-screen" class="map-screen-custom">
-    <button id="btn-retire-map" class="btn btn-secondary btn-sm btn-retire-map-custom">リタイア</button>
+    <button id="btn-retire-map" class="btn btn-secondary btn-sm btn-retire-map-custom"
+      >リタイア</button
+    >
 
     <!-- 横スクロールすごろく本体 -->
     <div id="map-scroll-wrapper" class="map-scroll-wrapper-custom">
@@ -130,22 +136,20 @@ const { projectData } = Astro.props;
         <!-- JSですごろくノードが左から右に動的描画されます。接続線はCSSまたはSVG -->
       </div>
     </div>
-
-
   </div>
 
   <!-- 宿（回復）画面 -->
   <div id="inn-screen" class="inn-screen-custom">
     <img src={hotelImg.src} class="town-icon-img" />
     <h3 class="town-title">旅人の宿</h3>
-    <p class="town-desc">
-      お金を払って、宿屋で休むことができます。
-    </p>
+    <p class="town-desc">お金を払って、宿屋で休むことができます。</p>
     <div class="town-btn-group">
-      <button id="btn-inn-rest-half" class="btn btn-primary btn-inn-rest-half-custom">小休憩 (💰15) <br><span
-          class="town-btn-text">HP/MP 50%回復</span></button>
-      <button id="btn-inn-rest-full" class="btn btn-primary btn-inn-rest-full-custom">宿泊 (💰30) <br><span
-          class="town-btn-text">HP/MP全快 ＋ 状態異常全治</span></button>
+      <button id="btn-inn-rest-half" class="btn btn-primary btn-inn-rest-half-custom"
+        >小休憩 (💰15) <br /><span class="town-btn-text">HP/MP 50%回復</span></button
+      >
+      <button id="btn-inn-rest-full" class="btn btn-primary btn-inn-rest-full-custom"
+        >宿泊 (💰30) <br /><span class="town-btn-text">HP/MP全快 ＋ 状態異常全治</span></button
+      >
       <button id="btn-inn-leave" class="btn btn-secondary btn-inn-leave-custom">立ち去る</button>
     </div>
   </div>
@@ -158,11 +162,13 @@ const { projectData } = Astro.props;
     </div>
 
     <!-- 対象カード選択リスト -->
-    <div id="shop-service-card-list" class="shop-service-card-list-custom">
-    </div>
+    <div id="shop-service-card-list" class="shop-service-card-list-custom"></div>
 
     <div class="town-shop-wrap">
-      <button id="btn-shop-service-leave" class="btn btn-secondary btn-sm btn-shop-service-leave-custom">キャンセル</button>
+      <button
+        id="btn-shop-service-leave"
+        class="btn btn-secondary btn-sm btn-shop-service-leave-custom">キャンセル</button
+      >
     </div>
   </div>
 
@@ -170,44 +176,40 @@ const { projectData } = Astro.props;
   <div id="town-screen" class="town-screen-custom">
     <div class="shop-header">
       <h3 class="shop-title">よろず街の商い</h3>
-      <button id="btn-town-leave" class="btn btn-secondary btn-sm btn-town-leave-custom">街を出る</button>
+      <button id="btn-town-leave" class="btn btn-secondary btn-sm btn-town-leave-custom"
+        >街を出る</button
+      >
     </div>
 
     <div class="shop-card-list">
       <div>
-        <p class="shop-card-category">
-          販売カード</p>
-        <div id="town-cards" class="town-cards-custom">
-        </div>
+        <p class="shop-card-category">販売カード</p>
+        <div id="town-cards" class="town-cards-custom"></div>
       </div>
       <div>
-        <p class="shop-card-category">
-          販売アイテム</p>
+        <p class="shop-card-category">販売アイテム</p>
         <div id="town-items" class="town-items-custom"></div>
       </div>
       <div class="shop-relic-wrap">
-        <p class="shop-relic-title">
-          特別サービス</p>
+        <p class="shop-relic-title">特別サービス</p>
         <div class="shop-relic-list">
-          <button id="btn-town-upgrade" class="btn btn-primary btn-sm btn-town-upgrade-custom">カード強化 (20
-            G)</button>
-          <button id="btn-town-remove" class="btn btn-primary btn-sm btn-town-remove-custom">カード削除 (20
-            G)</button>
+          <button id="btn-town-upgrade" class="btn btn-primary btn-sm btn-town-upgrade-custom"
+            >カード強化 (20 G)</button
+          >
+          <button id="btn-town-remove" class="btn btn-primary btn-sm btn-town-remove-custom"
+            >カード削除 (20 G)</button
+          >
         </div>
       </div>
-
-
     </div>
   </div>
-
 
   <!-- イベント画面 -->
   <div id="event-screen" class="event-screen-custom">
     <div>
       <img id="event-image" src={noImageImg.src} class="event-image-custom" />
       <h3 id="event-title" class="event-title-custom">未知のイベント</h3>
-      <p id="event-text" class="event-text-custom">
-      </p>
+      <p id="event-text" class="event-text-custom"></p>
     </div>
 
     <div id="event-options" class="event-options-custom">
@@ -219,12 +221,20 @@ const { projectData } = Astro.props;
   <div id="item-confirm-modal" class="item-confirm-modal-custom">
     <div class="item-modal-inner">
       <h4 id="item-confirm-title" class="item-confirm-title-custom">アイテムの使用確認</h4>
-      <img id="item-confirm-image" src="" alt=""
-        style="display:none; width:80px; height:80px; object-fit:contain; margin:0 auto 0.5rem auto;">
+      <img
+        id="item-confirm-image"
+        src=""
+        alt=""
+        style="display:none; width:80px; height:80px; object-fit:contain; margin:0 auto 0.5rem auto;"
+      />
       <p id="item-confirm-text" class="item-confirm-text-custom"></p>
       <div class="item-modal-btn-group">
-        <button id="btn-item-confirm-yes" class="btn btn-primary btn-item-confirm-yes-custom">はい</button>
-        <button id="btn-item-confirm-no" class="btn btn-secondary btn-item-confirm-no-custom">いいえ</button>
+        <button id="btn-item-confirm-yes" class="btn btn-primary btn-item-confirm-yes-custom"
+          >はい</button
+        >
+        <button id="btn-item-confirm-no" class="btn btn-secondary btn-item-confirm-no-custom"
+          >いいえ</button
+        >
       </div>
     </div>
   </div>
@@ -235,7 +245,9 @@ const { projectData } = Astro.props;
     <div id="battle-map-scroll-wrapper" class="battle-map-scroll-wrapper-custom">
       <div id="battle-map-board" class="battle-map-board-custom"></div>
     </div>
-    <button class="btn btn-secondary btn-close-battle-map-custom" id="btn-close-battle-map">閉じる</button>
+    <button class="btn btn-secondary btn-close-battle-map-custom" id="btn-close-battle-map"
+      >閉じる</button
+    >
   </div>
 
   <!-- 王様遭遇イベントモーダル -->
@@ -243,7 +255,8 @@ const { projectData } = Astro.props;
     <img src={kingImg.src} class="king-icon-img" />
     <h3 class="king-title">謁見の間：王からの餞別</h3>
     <p class="king-desc">
-      「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br>お前にこの伝説の遺物（レリック）から一つを授けよう…」
+      「よくぞ来た、勇猛なる旅人よ。この地に巣食う魔王を討ち果たすのだ。<br
+      />お前にこの伝説の遺物（レリック）から一つを授けよう…」
     </p>
     <div id="king-relic-choices" class="king-relic-choices-custom">
       <!-- 3つのレリック選択カードがJSで挿入されます -->
@@ -253,18 +266,17 @@ const { projectData } = Astro.props;
   <!-- 汎用カットシーンモーダル -->
   <div id="cutscene-modal" class="overlay cutscene-modal-custom">
     <!-- 背景イメージ -->
-    <div id="cutscene-bg" class="cutscene-bg-custom">
-    </div>
+    <div id="cutscene-bg" class="cutscene-bg-custom"></div>
     <!-- キャラクターポートレート群 -->
-    <div id="cutscene-portraits" class="cutscene-portraits-custom">
-    </div>
+    <div id="cutscene-portraits" class="cutscene-portraits-custom"></div>
     <!-- セリフウィンドウ -->
     <div class="king-modal-inner">
       <div id="cutscene-speaker" class="cutscene-speaker-custom"></div>
       <div id="cutscene-text" class="cutscene-text-custom"></div>
       <div class="king-btn-wrap">
-        <button id="btn-cutscene-next" class="btn btn-primary btn-cutscene-next-custom">次へ
-          ▶</button>
+        <button id="btn-cutscene-next" class="btn btn-primary btn-cutscene-next-custom"
+          >次へ ▶</button
+        >
       </div>
     </div>
   </div>
@@ -273,10 +285,8 @@ const { projectData } = Astro.props;
 
   <div id="game-dialog-modal" class="overlay game-dialog-modal-custom">
     <div class="deck-card-list-wrap">
-      <h4 id="dialog-title" class="dialog-title-custom">通知
-      </h4>
-      <p id="dialog-message" class="dialog-message-custom">
-      </p>
+      <h4 id="dialog-title" class="dialog-title-custom">通知</h4>
+      <p id="dialog-message" class="dialog-message-custom"></p>
       <div id="dialog-buttons" class="dialog-buttons-custom">
         <button id="btn-dialog-ok" class="btn btn-primary btn-dialog-ok-custom">OK</button>
         <button id="btn-dialog-yes" class="btn btn-primary btn-dialog-yes-custom">はい</button>
@@ -293,20 +303,18 @@ const { projectData } = Astro.props;
       <div id="card-detail-content" class="card-detail-content">
         <!-- カードが入る -->
       </div>
-      <div id="card-detail-desc" class="card-detail-desc">
-      </div>
+      <div id="card-detail-desc" class="card-detail-desc"></div>
     </div>
   </div>
 
-
   <!-- バトル画面本体 -->
   <div class="battle-layout battle-layout-custom">
-
-    <button class="btn btn-secondary btn-sm btn-battle-retire-custom" id="btn-battle-retire">リタイア</button>
+    <button class="btn btn-secondary btn-sm btn-battle-retire-custom" id="btn-battle-retire"
+      >リタイア</button
+    >
 
     <!--バトルフィールド -->
     <div class="battle-field">
-
       <!-- ① 左上：敵ステータス -->
       <div class="enemy-status-panel">
         <div class="status-header enemy-header">
@@ -355,7 +363,6 @@ const { projectData } = Astro.props;
           行動: <span id="player-actions">1</span>回
         </div>
       </div>
-
     </div><!-- /.battle-field -->
 
     <!-- バトルログ (コンパクト) -->
@@ -366,40 +373,43 @@ const { projectData } = Astro.props;
     <!-- 手札エリア -->
     <div class="town-upgrade-wrap">
       <div class="town-upgrade-header">
-        <button class="btn btn-secondary btn-sm btn-battle-view-map-custom" id="btn-battle-view-map">マップ</button>
-        <button class="btn btn-end-turn btn-sm btn-end-turn-custom" id="btn-end-turn">様子見</button>
+        <button class="btn btn-secondary btn-sm btn-battle-view-map-custom" id="btn-battle-view-map"
+          >マップ</button
+        >
+        <button class="btn btn-end-turn btn-sm btn-end-turn-custom" id="btn-end-turn">様子見</button
+        >
       </div>
       <div id="hand-area" class="hand-area hand-area-custom">
         <!-- カードがJSで挿入されます -->
       </div>
     </div>
-
-
-
   </div><!-- /.battle-layout -->
-
-
 </div><!-- /.game-container -->
 
 <div slot="howto-content">
-  <div class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+  <div
+    class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
+  >
     <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
     <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
     <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
   </div>
-  <div class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+  <div
+    class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
+  >
     <p>毒や火傷などの状態異常はターン終了時にダメージを受けます。</p>
     <p>回復カードを使って素早く対処しましょう。</p>
   </div>
-  <div class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+  <div
+    class="howto-content"
+    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
+  >
     <p>「町」や「妖精」でカードを強化できます。</p>
     <p>自分だけの最強のデッキを作り上げましょう！</p>
   </div>
 </div>
-</GameLayout>
 
 <style>
   .rl-overlay {
@@ -659,7 +669,6 @@ const { projectData } = Astro.props;
     box-sizing: border-box;
   }
 
-
   .header-status {
     display: flex;
     gap: 0.8rem;
@@ -711,7 +720,9 @@ const { projectData } = Astro.props;
     z-index: 999;
     font-size: 1.3rem;
     cursor: pointer;
-    transition: transform 0.2s, opacity 0.2s;
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
   }
 
   .icon-config:hover {
@@ -842,10 +853,6 @@ const { projectData } = Astro.props;
     background: linear-gradient(135deg, rgba(20, 20, 35, 0.85), rgba(50, 15, 70, 0.6)) !important;
     box-shadow: 0 0 8px rgba(204, 93, 232, 0.4) !important;
   }
-
-
-
-
 
   /* =============================
        オーバーレイ共通
@@ -1148,7 +1155,7 @@ const { projectData } = Astro.props;
     background: #28a745;
   }
 
-  :global([data-theme="dark"]) .bar-bg {
+  :global([data-theme='dark']) .bar-bg {
     background: #343a40;
   }
 
@@ -1331,7 +1338,9 @@ const { projectData } = Astro.props;
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
     position: relative;
     user-select: none;
     overflow: hidden;
@@ -1585,8 +1594,6 @@ const { projectData } = Astro.props;
     box-shadow: 0 0 10px rgba(155, 63, 191, 0.4) !important;
   }
 
-
-
   /* すごろくマップノード・接続 */
   :global(.map-node) {
     width: 54px;
@@ -1649,7 +1656,6 @@ const { projectData } = Astro.props;
   }
 
   @keyframes float-avatar {
-
     0%,
     100% {
       transform: translate(-50%, 0);
@@ -1754,7 +1760,6 @@ const { projectData } = Astro.props;
     transition: transform 0.2s ease-out;
   }
 
-
   .game-header-custom {
     display: none;
   }
@@ -1812,8 +1817,8 @@ const { projectData } = Astro.props;
   }
 
   .btn-share-custom {
-    background-color: #1DA1F2;
-    border-color: #1DA1F2;
+    background-color: #1da1f2;
+    border-color: #1da1f2;
     color: white;
   }
 

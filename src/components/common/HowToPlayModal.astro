@@ -1,10 +1,11 @@
 ---
 // src/components/common/HowToPlayModal.astro
 ---
+
 <div id="howto-modal" class="config-modal" role="dialog" aria-hidden="true">
   <button class="modal-close-x-btn" id="close-howto-btn-x" aria-label="閉じる">&times;</button>
   <h3>遊び方</h3>
-  
+
   <div id="howto-pages" class="howto-pages-container">
     <slot />
   </div>
@@ -25,7 +26,9 @@
     if (!pagesContainer) return;
 
     // Support both .howto-content and .howto-page items
-    const pages = Array.from(pagesContainer.querySelectorAll('.howto-content, .howto-page')) as HTMLElement[];
+    const pages = Array.from(
+      pagesContainer.querySelectorAll('.howto-content, .howto-page'),
+    ) as HTMLElement[];
     if (pages.length === 0) return;
 
     pages.forEach((p) => {
@@ -40,10 +43,12 @@
 
     const closeBtns = [
       document.getElementById('close-howto-btn-x'),
-      document.getElementById('close-howto-btn')
+      document.getElementById('close-howto-btn'),
     ];
 
-    const howtoBtns = document.querySelectorAll('#howto-btn, #howto-btn-in-config, .btn-howto, .btn-config-howto');
+    const howtoBtns = document.querySelectorAll(
+      '#howto-btn, #howto-btn-in-config, .btn-howto, .btn-config-howto',
+    );
 
     function safePlaySE(seName: string) {
       if (typeof (window as any).playSE === 'function') {

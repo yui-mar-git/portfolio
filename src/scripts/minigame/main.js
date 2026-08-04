@@ -11,29 +11,29 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
 (function () {
   let configBgmVolume = 0.5;
   let configSeVolume = 0.5;
-  
+
   const SE_DB = {
-    'cursor': seCursor,
-    'confirm': seConfirm,
-    'cancel': seCancel,
-    'tap_normal': seTapNormal,
-    'tap_minusScore': seTapMinusScore,
-    'tap_heal': seTapHeal,
-    'tap_minusTime': seTapMinusTime
+    cursor: seCursor,
+    confirm: seConfirm,
+    cancel: seCancel,
+    tap_normal: seTapNormal,
+    tap_minusScore: seTapMinusScore,
+    tap_heal: seTapHeal,
+    tap_minusTime: seTapMinusTime,
   };
 
   function playSE(seId) {
     if (!SE_DB[seId]) return;
     const se = new Audio(SE_DB[seId]);
     se.volume = configSeVolume;
-    se.play().catch(e => console.log('SE play failed:', e));
+    se.play().catch((e) => console.log('SE play failed:', e));
   }
 
   window.playSE = playSE;
-  window.setSEVolume = function(vol) {
+  window.setSEVolume = function (vol) {
     configSeVolume = vol;
   };
-  window.setBGMVolume = function(vol) {
+  window.setBGMVolume = function (vol) {
     configBgmVolume = vol;
   };
 
@@ -47,7 +47,7 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
   const configBtn = document.getElementById('config-btn');
   const closeConfigBtn = document.getElementById('close-config-btn-x'); // ✕ボタンのID
   const configModal = document.getElementById('config-modal');
-  
+
   const creditsBtn = document.getElementById('credits-btn');
   const closeCreditsBtn = document.getElementById('close-credits-btn-x'); // ✕ボタンのID
   const creditsModal = document.getElementById('credits-modal');
@@ -77,9 +77,9 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     clearInterval(mainTimer);
     clearInterval(spawnTimer);
     if (slowBonusActive && slowBonusTimer) clearTimeout(slowBonusTimer);
-    
+
     const now = Date.now();
-    activeTargets.forEach(t => {
+    activeTargets.forEach((t) => {
       if (t.timeout) clearTimeout(t.timeout);
       t.remainingTime = Math.max(0, t.remainingTime - (now - t.spawnTime));
     });
@@ -88,11 +88,13 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
   function resumeGame() {
     if (!isPlaying || !isPaused) return;
     isPaused = false;
-    
+
     if (slowBonusActive) {
-      slowBonusTimer = setTimeout(() => { slowBonusActive = false; }, 5000);
+      slowBonusTimer = setTimeout(() => {
+        slowBonusActive = false;
+      }, 5000);
     }
-    
+
     mainTimer = setInterval(() => {
       timeLeft--;
       if (timeLeft < 0) timeLeft = 0;
@@ -100,10 +102,12 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       if (timeLeft <= 0) endGame();
     }, 1000);
 
-    spawnTimer = setInterval(() => { spawnTarget(); }, 500);
+    spawnTimer = setInterval(() => {
+      spawnTarget();
+    }, 500);
 
     const now = Date.now();
-    activeTargets.forEach(t => {
+    activeTargets.forEach((t) => {
       t.spawnTime = now;
       t.timeout = setTimeout(() => {
         if (t.element && t.element.style) t.element.style.opacity = '0';
@@ -126,29 +130,83 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
   // special: null    → 通常の得点・時間効果
   const TARGET_TYPES = [
     // 青: 通常
-    { id: 'normal', cssClass: 'target-normal', score: 10, time: 0, size: 60, baseDuration: 1200, prob: 0.50, special: null },
+    {
+      id: 'normal',
+      cssClass: 'target-normal',
+      score: 10,
+      time: 0,
+      size: 60,
+      baseDuration: 1200,
+      prob: 0.5,
+      special: null,
+    },
     // 赤: -30点
-    { id: 'minusScore', cssClass: 'target-minus-time', score: -30, time: 0, size: 60, baseDuration: 1800, prob: 0.07, special: null },
+    {
+      id: 'minusScore',
+      cssClass: 'target-minus-time',
+      score: -30,
+      time: 0,
+      size: 60,
+      baseDuration: 1800,
+      prob: 0.07,
+      special: null,
+    },
     // 橙: +5秒
-    { id: 'heal', cssClass: 'target-heal', score: 0, time: 5, size: 55, baseDuration: 1200, prob: 0.08, special: null },
+    {
+      id: 'heal',
+      cssClass: 'target-heal',
+      score: 0,
+      time: 5,
+      size: 55,
+      baseDuration: 1200,
+      prob: 0.08,
+      special: null,
+    },
     // 紫: -5秒
-    { id: 'minusTime', cssClass: 'target-minus-score', score: 0, time: -5, size: 60, baseDuration: 1500, prob: 0.10, special: null },
+    {
+      id: 'minusTime',
+      cssClass: 'target-minus-score',
+      score: 0,
+      time: -5,
+      size: 60,
+      baseDuration: 1500,
+      prob: 0.1,
+      special: null,
+    },
     // 黄: 高得点・速い
-    { id: 'high', cssClass: 'target-high', score: 50, time: 0, size: 45, baseDuration: 600, prob: 0.12, special: null },
+    {
+      id: 'high',
+      cssClass: 'target-high',
+      score: 50,
+      time: 0,
+      size: 45,
+      baseDuration: 600,
+      prob: 0.12,
+      special: null,
+    },
     // 緑: スロー効果
-    { id: 'slow', cssClass: 'target-long', score: 0, time: 0, size: 65, baseDuration: 1500, prob: 0.13, special: 'slow' }
+    {
+      id: 'slow',
+      cssClass: 'target-long',
+      score: 0,
+      time: 0,
+      size: 65,
+      baseDuration: 1500,
+      prob: 0.13,
+      special: 'slow',
+    },
   ];
 
   function getRandomTargetType() {
     // 現在画面に出ている的のidを集める
-    const activeIds = activeTargets.map(t => t.typeId);
+    const activeIds = activeTargets.map((t) => t.typeId);
 
     // 出現制限ルール:
     // ・紫（minusTime）は残り時間が10秒以下のとき出現しない
     // ・橙（heal）・緑（slow）・紫（minusTime）はすでに画面に同じ種類がいれば出現しない
     //   → 同時複数出現によるゲームバランス崩壊を防ぐ
     const uniqueTypes = ['heal', 'slow', 'minusTime'];
-    const available = TARGET_TYPES.filter(t => {
+    const available = TARGET_TYPES.filter((t) => {
       if (t.id === 'minusTime' && timeLeft <= 10) return false;
       if (uniqueTypes.includes(t.id) && activeIds.includes(t.id)) return false;
       return true;
@@ -179,7 +237,7 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       const dy = newCenterY - tCenterY;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < (newRadius + tRadius + 10)) {
+      if (distance < newRadius + tRadius + 10) {
         return true;
       }
     }
@@ -197,7 +255,8 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     const maxX = Math.max(0, areaWidth - type.size);
     const maxY = Math.max(0, areaHeight - type.size);
 
-    let randomX = 0, randomY = 0;
+    let randomX = 0,
+      randomY = 0;
     let overlap = true;
     let attempts = 0;
     while (overlap && attempts < 50) {
@@ -228,11 +287,11 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       size: type.size,
       element: targetEl,
       timeout: null,
-      typeId: type.id,          // 同時複数出現チェック用に種類のIDを保持
-      spawnTime: Date.now(),    // スロー効果でタイマー延長するために出現時刻を保持
+      typeId: type.id, // 同時複数出現チェック用に種類のIDを保持
+      spawnTime: Date.now(), // スロー効果でタイマー延長するために出現時刻を保持
       baseDuration: type.baseDuration,
       speedMultiplier: speedMultiplier,
-      remainingTime: duration
+      remainingTime: duration,
     };
 
     const handleClick = (e) => {
@@ -252,16 +311,16 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       // --- スコア処理 ---
       score += type.score;
       if (score < 0) score = 0;
-      if(scoreElement) scoreElement.textContent = score.toString();
+      if (scoreElement) scoreElement.textContent = score.toString();
 
       // --- 時間処理 ---
       if (type.time !== 0) {
         timeLeft += type.time;
         if (timeLeft < 0) timeLeft = 0;
-        if(timeElement) {
-            timeElement.classList.remove('time-heal', 'time-damage');
-            void timeElement.offsetWidth;
-            timeElement.classList.add(type.time > 0 ? 'time-heal' : 'time-damage');
+        if (timeElement) {
+          timeElement.classList.remove('time-heal', 'time-damage');
+          void timeElement.offsetWidth;
+          timeElement.classList.add(type.time > 0 ? 'time-heal' : 'time-damage');
         }
         updateTimeDisplay();
       }
@@ -271,9 +330,11 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
         slowBonusActive = true;
         if (slowBonusTimer) clearTimeout(slowBonusTimer);
         // 5秒後にスロー効果を解除
-        slowBonusTimer = setTimeout(() => { slowBonusActive = false; }, 5000);
+        slowBonusTimer = setTimeout(() => {
+          slowBonusActive = false;
+        }, 5000);
         // 現在画面にある的のタイマーを5秒延長する
-        activeTargets.forEach(t => {
+        activeTargets.forEach((t) => {
           if (t.timeout && t !== targetObj) {
             clearTimeout(t.timeout);
             const elapsed = Date.now() - t.spawnTime;
@@ -336,11 +397,11 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     if (targetObj.element && targetObj.element.parentNode) {
       targetObj.element.parentNode.removeChild(targetObj.element);
     }
-    activeTargets = activeTargets.filter(t => t !== targetObj);
+    activeTargets = activeTargets.filter((t) => t !== targetObj);
   }
 
   function clearAllTargets() {
-    activeTargets.forEach(t => {
+    activeTargets.forEach((t) => {
       if (t.timeout) clearTimeout(t.timeout);
       if (t.element && t.element.parentNode) t.element.parentNode.removeChild(t.element);
     });
@@ -375,19 +436,19 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     timeLeft = 30;
     isPlaying = true;
     isPaused = false;
-    if(scoreElement) scoreElement.textContent = score.toString();
-    if(timeElement) {
-        timeElement.className = '';
-        updateTimeDisplay();
+    if (scoreElement) scoreElement.textContent = score.toString();
+    if (timeElement) {
+      timeElement.className = '';
+      updateTimeDisplay();
     }
 
-    if(startScreen) startScreen.style.display = 'none';
-    if(resultScreen) resultScreen.style.display = 'none';
-    
+    if (startScreen) startScreen.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+
     const hud = document.querySelector('.game-hud');
-    if(hud) hud.style.display = 'flex';
+    if (hud) hud.style.display = 'flex';
     const bottomHud = document.getElementById('bottom-hud');
-    if(bottomHud) bottomHud.style.display = 'block';
+    if (bottomHud) bottomHud.style.display = 'block';
 
     clearInterval(mainTimer);
     clearInterval(spawnTimer);
@@ -422,11 +483,11 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     if (score > parseInt(highScore)) {
       highScore = score.toString();
       localStorage.setItem('minigame_highscore', highScore);
-      if(highscoreElement) highscoreElement.textContent = highScore;
-      if(startHighscoreElement) startHighscoreElement.textContent = highScore;
+      if (highscoreElement) highscoreElement.textContent = highScore;
+      if (startHighscoreElement) startHighscoreElement.textContent = highScore;
     }
 
-    if(finalScoreElement) finalScoreElement.textContent = score.toString();
+    if (finalScoreElement) finalScoreElement.textContent = score.toString();
     const shareText = `私のスコアは ${score} 点でした！(ハイスコア: ${highScore}点) #MyPortfolioMinigame`;
     const shareUrl = window.location.href;
     // ゲーム終了ごとに最新のスコアを含むシェアURLを生成してボタンに登録する
@@ -439,42 +500,44 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     }
 
     const bottomHud = document.getElementById('bottom-hud');
-    if(bottomHud) bottomHud.style.display = 'none';
+    if (bottomHud) bottomHud.style.display = 'none';
 
-    if(resultScreen) resultScreen.style.display = 'block';
+    if (resultScreen) resultScreen.style.display = 'block';
   }
 
-  if(startBtn) startBtn.addEventListener('click', startGame);
-  if(retryBtn) retryBtn.addEventListener('click', () => {
-    if(resultScreen) resultScreen.style.display = 'none';
-    startGame();
-  });
-  if(titleBtn) titleBtn.addEventListener('click', () => {
-    playSE('cancel');
-    if(resultScreen) resultScreen.style.display = 'none';
-    if(startScreen) startScreen.style.display = 'flex';
-    const hud = document.querySelector('.game-hud');
-    if(hud) hud.style.display = 'none';
-    const bottomHud = document.getElementById('bottom-hud');
-    if(bottomHud) bottomHud.style.display = 'none';
-  });
+  if (startBtn) startBtn.addEventListener('click', startGame);
+  if (retryBtn)
+    retryBtn.addEventListener('click', () => {
+      if (resultScreen) resultScreen.style.display = 'none';
+      startGame();
+    });
+  if (titleBtn)
+    titleBtn.addEventListener('click', () => {
+      playSE('cancel');
+      if (resultScreen) resultScreen.style.display = 'none';
+      if (startScreen) startScreen.style.display = 'flex';
+      const hud = document.querySelector('.game-hud');
+      if (hud) hud.style.display = 'none';
+      const bottomHud = document.getElementById('bottom-hud');
+      if (bottomHud) bottomHud.style.display = 'none';
+    });
   if (howtoBtn) {
     howtoBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      if(howtoModal) howtoModal.classList.add('active');
-      if(modalOverlay) modalOverlay.classList.add('active');
+      if (howtoModal) howtoModal.classList.add('active');
+      if (modalOverlay) modalOverlay.classList.add('active');
     });
   }
   if (closeHowtoBtn) {
     closeHowtoBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      if(howtoModal) howtoModal.classList.remove('active');
-      if(modalOverlay) modalOverlay.classList.remove('active');
+      if (howtoModal) howtoModal.classList.remove('active');
+      if (modalOverlay) modalOverlay.classList.remove('active');
     });
   }
-  
+
   const _cfgBtn1 = document.getElementById('start-config-btn');
   const _cfgBtn2 = document.getElementById('hud-config-btn');
   const openConfig = (e) => {
@@ -501,7 +564,11 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       playSE('cursor');
       document.getElementById('config-modal')?.classList.remove('active');
       document.getElementById('modal-overlay')?.classList.remove('active');
-      if (isPlaying && isPaused && !document.getElementById('credits-modal')?.classList.contains('active')) {
+      if (
+        isPlaying &&
+        isPaused &&
+        !document.getElementById('credits-modal')?.classList.contains('active')
+      ) {
         resumeGame();
       }
     });
@@ -528,7 +595,12 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       playSE('cursor');
       document.getElementById('credits-modal')?.classList.remove('active');
       document.getElementById('modal-overlay')?.classList.remove('active');
-      if (isPlaying && isPaused && !document.getElementById('config-modal')?.classList.contains('active') && !document.getElementById('retire-modal')?.classList.contains('active')) {
+      if (
+        isPlaying &&
+        isPaused &&
+        !document.getElementById('config-modal')?.classList.contains('active') &&
+        !document.getElementById('retire-modal')?.classList.contains('active')
+      ) {
         resumeGame();
       }
     });
@@ -603,12 +675,12 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
       clearInterval(mainTimer);
       clearInterval(spawnTimer);
       clearAllTargets();
-      if(resultScreen) resultScreen.style.display = 'none';
-      if(startScreen) startScreen.style.display = 'flex';
+      if (resultScreen) resultScreen.style.display = 'none';
+      if (startScreen) startScreen.style.display = 'flex';
       const hud = document.querySelector('.game-hud');
-      if(hud) hud.style.display = 'none';
+      if (hud) hud.style.display = 'none';
       const bottomHud = document.getElementById('bottom-hud');
-      if(bottomHud) bottomHud.style.display = 'none';
+      if (bottomHud) bottomHud.style.display = 'none';
     });
   }
 

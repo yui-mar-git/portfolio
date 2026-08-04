@@ -7,7 +7,9 @@
     "start": "astro dev",
     "build": "node scripts/fetch-dashboard.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "lint": "eslint . && stylelint \"**/*.{css,astro}\"",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@astrojs/cloudflare": "^10.4.2",
@@ -15,6 +17,19 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "^5.9.3"
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^1.7.0",
+    "globals": "^17.9.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "stylelint": "^17.14.1",
+    "stylelint-config-html": "^2.0.0",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.66.0"
   }
 }

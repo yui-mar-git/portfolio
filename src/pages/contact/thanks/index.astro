@@ -15,10 +15,13 @@ import Footer from '@/components/Footer.astro';
         <div>
           <div class="thanks-icon">✉️</div>
           <p class="thanks-text">
-            お問い合わせありがとうございます。<br>
+            お問い合わせありがとうございます。<br />
             （※これはデモ画面です。実際にはどこにも送信されていません）
           </p>
-          <a href={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/contact/`} class="btn btn-secondary">フォームに戻る</a>
+          <a
+            href={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/contact/`}
+            class="btn btn-secondary">フォームに戻る</a
+          >
         </div>
       </section>
     </article>

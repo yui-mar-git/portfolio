@@ -1,43 +1,67 @@
 ---
-export const pageTitle = "エンドレスラン";
+export const pageTitle = 'エンドレスラン';
 import GameLayout from '../../../layouts/GameLayout.astro';
 import RunActionUI from '../../../components/portfolio/RunActionUI.astro';
 import { fetchMicroCMS } from '../../../lib/microcms';
 import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
 
 const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
-  const projectData = portfolioResponse.contents.find((c) => c.url.includes('/run-action/'));
+const projectData = portfolioResponse.contents.find((c) => c.url.includes('/run-action/'));
 
-  const techStack = [
-  { category: "フロントエンド", items: "HTML, CSS, JavaScript, Astro" },
-  { category: "バックエンド", items: "Node.js, microCMS" },
-  { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
-  { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
-  ];
+const techStack = [
+  { category: 'フロントエンド', items: 'HTML, CSS, JavaScript, Astro' },
+  { category: 'バックエンド', items: 'Node.js, microCMS' },
+  { category: 'インフラ・ホスティング', items: 'Cloudflare (Pages)' },
+  { category: '開発環境・ツール', items: 'GitHub, Google Antigravity' },
+];
 
-  const learningThemes = ["requestAnimationFrameによるメインループ", "物理演算（重力・ジャンプ）の基礎"];
+const learningThemes = [
+  'requestAnimationFrameによるメインループ',
+  '物理演算（重力・ジャンプ）の基礎',
+];
 
-  const materialCategories = [
-  { category: "フォント", items: [{ name: "Google Fonts（SIL Open Font License 1.1）", url: "https://fonts.google.com/" }] },
-  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url:
-  "http://pansound.com/panicpumpkin/" }] },
-  { category: "アイコン", items: [{ name: "Simple Icons（CC0 1.0 Universal）", url: "https://simpleicons.org/" }] }
-  ];
-  ---
+const materialCategories = [
+  {
+    category: 'フォント',
+    items: [
+      { name: 'Google Fonts（SIL Open Font License 1.1）', url: 'https://fonts.google.com/' },
+    ],
+  },
+  {
+    category: 'SE・BGM',
+    items: [
+      { name: '効果音ラボ', url: 'https://soundeffect-lab.info/' },
+      { name: 'PANICPUMPKIN', url: 'http://pansound.com/panicpumpkin/' },
+    ],
+  },
+  {
+    category: 'アイコン',
+    items: [{ name: 'Simple Icons（CC0 1.0 Universal）', url: 'https://simpleicons.org/' }],
+  },
+];
+---
 
-  <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : 'エンドレス・ラン - My Portfolio' }
-    pageId="run-action" pageLabel="ACTION GAME" projectData={projectData} descriptionFallback="" techStack={techStack}
-    learningThemes={learningThemes} materialCategories={materialCategories} hasRetire={true}>
-    <RunActionUI gameTitle={projectData?.title} />
-    <div slot="howto-content">
-      <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-        <p>自動で走るキャラクターを操作して、障害物を避けながら進むゲームです。</p>
-        <p>画面タップ（またはスペースキー）でジャンプします。</p>
-      </div>
-      <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-        <p>障害物に当たるとゲームオーバーです。</p>
-        <p>スピードに乗ってハイスコアを目指してどこまで進めるか挑戦しましょう！</p>
-      </div>
+<GameLayout
+  title={projectData ? `${projectData.title} - My Portfolio` : 'エンドレス・ラン - My Portfolio'}
+  pageId="run-action"
+  pageLabel="ACTION GAME"
+  projectData={projectData}
+  descriptionFallback=""
+  techStack={techStack}
+  learningThemes={learningThemes}
+  materialCategories={materialCategories}
+  hasRetire={true}
+>
+  <RunActionUI gameTitle={projectData?.title} />
+  <div slot="howto-content">
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>自動で走るキャラクターを操作して、障害物を避けながら進むゲームです。</p>
+      <p>画面タップ（またはスペースキー）でジャンプします。</p>
     </div>
-    <script src="../../../scripts/run-action/main.js"></script>
-  </GameLayout>
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>障害物に当たるとゲームオーバーです。</p>
+      <p>スピードに乗ってハイスコアを目指してどこまで進めるか挑戦しましょう！</p>
+    </div>
+  </div>
+  <script src="../../../scripts/run-action/main.js"></script>
+</GameLayout>

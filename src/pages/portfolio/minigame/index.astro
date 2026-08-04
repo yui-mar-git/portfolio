@@ -1,47 +1,76 @@
 ---
-export const pageTitle = "ミニゲーム";
+export const pageTitle = 'ミニゲーム';
 import GameLayout from '@/layouts/GameLayout.astro';
 import MinigameUI from '@/components/portfolio/MinigameUI.astro';
 import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSListResponse, MicroCMSPortfolio } from '@/types/microcms';
 
 const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
-  const projectData = portfolioResponse.contents.find((c) => c.url.includes('/minigame/'));
+const projectData = portfolioResponse.contents.find((c) => c.url.includes('/minigame/'));
 
-  const techStack = [
-  { category: "フロントエンド", items: "HTML, CSS, JavaScript, Astro" },
-  { category: "バックエンド", items: "Node.js, microCMS" },
-  { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
-  { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
-  ];
+const techStack = [
+  { category: 'フロントエンド', items: 'HTML, CSS, JavaScript, Astro' },
+  { category: 'バックエンド', items: 'Node.js, microCMS' },
+  { category: 'インフラ・ホスティング', items: 'Cloudflare (Pages)' },
+  { category: '開発環境・ツール', items: 'GitHub, Google Antigravity' },
+];
 
-  const learningThemes = ["DOM操作とイベントリスナー", "setIntervalによるタイマー処理"];
+const learningThemes = ['DOM操作とイベントリスナー', 'setIntervalによるタイマー処理'];
 
-  const materialCategories = [
-  { category: "フォント", items: [{ name: "Google Fonts（SIL Open Font License 1.1）", url: "https://fonts.google.com/" }] },
-  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url:
-  "http://pansound.com/panicpumpkin/" }] },
-  { category: "アイコン", items: [{ name: "Simple Icons（CC0 1.0 Universal）", url: "https://simpleicons.org/" }] }
-  ];
-  ---
+const materialCategories = [
+  {
+    category: 'フォント',
+    items: [
+      { name: 'Google Fonts（SIL Open Font License 1.1）', url: 'https://fonts.google.com/' },
+    ],
+  },
+  {
+    category: 'SE・BGM',
+    items: [
+      { name: '効果音ラボ', url: 'https://soundeffect-lab.info/' },
+      { name: 'PANICPUMPKIN', url: 'http://pansound.com/panicpumpkin/' },
+    ],
+  },
+  {
+    category: 'アイコン',
+    items: [{ name: 'Simple Icons（CC0 1.0 Universal）', url: 'https://simpleicons.org/' }],
+  },
+];
+---
 
-  <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : 'モグラ叩き風スコアアタック！' } pageId="minigame"
-    pageLabel="MINIGAME" projectData={projectData} descriptionFallback="" techStack={techStack}
-    learningThemes={learningThemes} materialCategories={materialCategories} hasRetire={true}>
-    <MinigameUI gameTitle={projectData?.title} />
-    <div slot="howto-content">
-      <div class="howto-page" style="text-align: left; line-height: 1.8;">
-        <p style="color: var(--text-muted); margin: 0 0 0.5rem;">時間内にターゲットをタップしてスコアを稼ごう！</p>
-        <div class="legend"
-          style="margin-top: 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: left; background: rgba(0, 0, 0, 0.2); padding: 0.8rem; border-radius: 8px; font-size: 0.85rem;">
-          <p style="margin: 0; font-weight: bold;"><span style="color:#007bff">■青</span>: +10点</p>
-          <p style="margin: 0; font-weight: bold;"><span style="color:#fd7e14">■橙</span>: +50点</p>
-          <p style="margin: 0; font-weight: bold;"><span style="color:#dc3545">■赤</span>: -30点</p>
-          <p style="margin: 0; font-weight: bold;"><span style="color:#6f42c1">■紫</span>: -50点</p>
-          <p style="margin: 0; font-weight: bold;"><span style="color:#ffea00">■黄</span>: +50点 (すぐ消える)</p>
-          <p style="margin: 0; font-weight: bold;"><span style="color:#28a745">■緑</span>: ターゲット固定</p>
-        </div>
+<GameLayout
+  title={projectData ? `${projectData.title} - My Portfolio` : 'モグラ叩き風スコアアタック！'}
+  pageId="minigame"
+  pageLabel="MINIGAME"
+  projectData={projectData}
+  descriptionFallback=""
+  techStack={techStack}
+  learningThemes={learningThemes}
+  materialCategories={materialCategories}
+  hasRetire={true}
+>
+  <MinigameUI gameTitle={projectData?.title} />
+  <div slot="howto-content">
+    <div class="howto-page" style="text-align: left; line-height: 1.8;">
+      <p style="color: var(--text-muted); margin: 0 0 0.5rem;">
+        時間内にターゲットをタップしてスコアを稼ごう！
+      </p>
+      <div
+        class="legend"
+        style="margin-top: 0.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: left; background: rgba(0, 0, 0, 0.2); padding: 0.8rem; border-radius: 8px; font-size: 0.85rem;"
+      >
+        <p style="margin: 0; font-weight: bold;"><span style="color:#007bff">■青</span>: +10点</p>
+        <p style="margin: 0; font-weight: bold;"><span style="color:#fd7e14">■橙</span>: +50点</p>
+        <p style="margin: 0; font-weight: bold;"><span style="color:#dc3545">■赤</span>: -30点</p>
+        <p style="margin: 0; font-weight: bold;"><span style="color:#6f42c1">■紫</span>: -50点</p>
+        <p style="margin: 0; font-weight: bold;">
+          <span style="color:#ffea00">■黄</span>: +50点 (すぐ消える)
+        </p>
+        <p style="margin: 0; font-weight: bold;">
+          <span style="color:#28a745">■緑</span>: ターゲット固定
+        </p>
       </div>
     </div>
-    <script src="../../../scripts/minigame/main.js"></script>
-  </GameLayout>
+  </div>
+  <script src="../../../scripts/minigame/main.js"></script>
+</GameLayout>

@@ -16,7 +16,7 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
   const d = date.getDate();
   const days = ['日', '月', '火', '水', '木', '金', '土'];
   const dayStr = days[date.getDay()];
-  
+
   const dateStr = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')} (${dayStr})`;
 
   // 12星座 (Western Zodiac)
@@ -33,7 +33,7 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
     { sign: '♎', end: [10, 23] },
     { sign: '♏', end: [11, 22] },
     { sign: '♐', end: [12, 21] },
-    { sign: '♑', end: [12, 31] }
+    { sign: '♑', end: [12, 31] },
   ];
   let zodiac = zodiacs[0].sign;
   for (const z of zodiacs) {
@@ -44,7 +44,20 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
   }
 
   // 十二支 (Chinese Zodiac based on Year)
-  const animals = ['申 (さる)', '酉 (とり)', '戌 (いぬ)', '亥 (いのしし)', '子 (ね)', '丑 (うし)', '寅 (とら)', '卯 (うさぎ)', '辰 (たつ)', '巳 (へび)', '午 (うま)', '未'];
+  const animals = [
+    '申 (さる)',
+    '酉 (とり)',
+    '戌 (いぬ)',
+    '亥 (いのしし)',
+    '子 (ね)',
+    '丑 (うし)',
+    '寅 (とら)',
+    '卯 (うさぎ)',
+    '辰 (たつ)',
+    '巳 (へび)',
+    '午 (うま)',
+    '未',
+  ];
   const zodiacAnimal = animals[y % 12];
 
   // 日干支 (Daily Kanshi)
@@ -61,7 +74,7 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
 
   // 六曜 (Simplified pseudo-lunar calculation from GAS)
   // 厳密な旧暦ではない簡易計算
-  const lunarMonth = (m + 9) % 12 + 1;
+  const lunarMonth = ((m + 9) % 12) + 1;
   const lunarDay = d;
   const rokuyoIndex = (lunarMonth + lunarDay) % 6;
   const rokuyoList = ['大安', '赤口', '先勝', '友引', '先負', '仏滅'];
@@ -142,12 +155,12 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
     [12, 17, '大雪', '鱖魚群'],
     [12, 22, '冬至', '乃東生'],
     [12, 27, '冬至', '麋角解'],
-    [12, 31, '冬至', '雪下出麦']
+    [12, 31, '冬至', '雪下出麦'],
   ];
 
   let nijushisekki = seasons[seasons.length - 1][2] as string;
   let shichijuniko = seasons[seasons.length - 1][3] as string;
-  
+
   for (let i = seasons.length - 1; i >= 0; i--) {
     const sMonth = seasons[i][0] as number;
     const sDay = seasons[i][1] as number;
@@ -165,6 +178,6 @@ export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
     kanshi,
     rokuyo,
     nijushisekki,
-    shichijuniko
+    shichijuniko,
   };
 }

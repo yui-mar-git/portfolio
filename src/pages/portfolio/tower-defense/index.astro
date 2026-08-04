@@ -1,53 +1,79 @@
 ---
-export const pageTitle = "タワーディフェンス";
+export const pageTitle = 'タワーディフェンス';
 import GameLayout from '../../../layouts/GameLayout.astro';
 import TowerDefenseUI from '../../../components/portfolio/TowerDefenseUI.astro';
 import { fetchMicroCMS } from '../../../lib/microcms';
 import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
 
 const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
-  const projectData = portfolioResponse.contents.find((c) => c.url.includes('/tower-defense/'));
+const projectData = portfolioResponse.contents.find((c) => c.url.includes('/tower-defense/'));
 
-  const techStack = [
-  { category: "フロントエンド", items: "HTML, CSS, JavaScript, TypeScript, Astro, Phaser 3" },
-  { category: "バックエンド", items: "Node.js, microCMS" },
-  { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
-  { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
-  ];
+const techStack = [
+  { category: 'フロントエンド', items: 'HTML, CSS, JavaScript, TypeScript, Astro, Phaser 3' },
+  { category: 'バックエンド', items: 'Node.js, microCMS' },
+  { category: 'インフラ・ホスティング', items: 'Cloudflare (Pages)' },
+  { category: '開発環境・ツール', items: 'GitHub, Google Antigravity' },
+];
 
-  const learningThemes = [
-  "Phaser 3 を用いたゲームループの構築",
-  "物理エンジン（Arcade Physics）による衝突判定と状態管理",
-  "タワーディフェンスのWave管理とリソースシステム設計"
-  ];
+const learningThemes = [
+  'Phaser 3 を用いたゲームループの構築',
+  '物理エンジン（Arcade Physics）による衝突判定と状態管理',
+  'タワーディフェンスのWave管理とリソースシステム設計',
+];
 
-  const materialCategories = [
-  { category: "画像・イラスト", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
-  { category: "フォント", items: [{ name: "Google Fonts（SIL Open Font License 1.1）", url: "https://fonts.google.com/" }] },
-  { category: "SE・BGM", items: [{ name: "効果音ラボ", url: "https://soundeffect-lab.info/" }, { name: "PANICPUMPKIN", url:
-  "http://pansound.com/panicpumpkin/" }] },
-  { category: "アイコン", items: [{ name: "Simple Icons（CC0 1.0 Universal）", url: "https://simpleicons.org/" }] }
-  ];
-  ---
+const materialCategories = [
+  {
+    category: '画像・イラスト',
+    items: [{ name: 'いらすとや', url: 'https://www.irasutoya.com/' }],
+  },
+  {
+    category: 'フォント',
+    items: [
+      { name: 'Google Fonts（SIL Open Font License 1.1）', url: 'https://fonts.google.com/' },
+    ],
+  },
+  {
+    category: 'SE・BGM',
+    items: [
+      { name: '効果音ラボ', url: 'https://soundeffect-lab.info/' },
+      { name: 'PANICPUMPKIN', url: 'http://pansound.com/panicpumpkin/' },
+    ],
+  },
+  {
+    category: 'アイコン',
+    items: [{ name: 'Simple Icons（CC0 1.0 Universal）', url: 'https://simpleicons.org/' }],
+  },
+];
+---
 
-  <GameLayout title={projectData ? `${projectData.title} - My Portfolio` : '横スクロールタワーディフェンス - My Portfolio' }
-    pageId="tower-defense" pageLabel="DEFENSE GAME" projectData={projectData} descriptionFallback=""
-    techStack={techStack} learningThemes={learningThemes} materialCategories={materialCategories} hasConfig={true}
-    hasHowToPlay={true}>
-    <div class="game-container" id="game-container">
-      <TowerDefenseUI gameTitle={projectData?.title} />
+<GameLayout
+  title={projectData
+    ? `${projectData.title} - My Portfolio`
+    : '横スクロールタワーディフェンス - My Portfolio'}
+  pageId="tower-defense"
+  pageLabel="DEFENSE GAME"
+  projectData={projectData}
+  descriptionFallback=""
+  techStack={techStack}
+  learningThemes={learningThemes}
+  materialCategories={materialCategories}
+  hasConfig={true}
+  hasHowToPlay={true}
+>
+  <div class="game-container" id="game-container">
+    <TowerDefenseUI gameTitle={projectData?.title} />
+  </div>
+  <div slot="howto-content">
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>時間経過で「コスト」がたまります。</p>
+      <p>コストを払ってユニットを召喚し、迫りくる敵から拠点を防衛してください。</p>
     </div>
-    <div slot="howto-content">
-      <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-        <p>時間経過で「コスト」がたまります。</p>
-        <p>コストを払ってユニットを召喚し、迫りくる敵から拠点を防衛してください。</p>
-      </div>
-      <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-        <p>「ベースキャンプ」でゴールドを使ってユニットを強化できます。</p>
-        <p>ウェーブごとに現れる強力なボス敵に備えましょう！</p>
-      </div>
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>「ベースキャンプ」でゴールドを使ってユニットを強化できます。</p>
+      <p>ウェーブごとに現れる強力なボス敵に備えましょう！</p>
     </div>
-  </GameLayout>
+  </div>
+</GameLayout>
 
-  <script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-  <script src="../../../scripts/tower-defense/main.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+<script src="../../../scripts/tower-defense/main.js"></script>

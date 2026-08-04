@@ -1,12 +1,15 @@
 ---
-export const pageTitle = "制作物";
+export const pageTitle = '制作物';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSPortfolio, MicroCMSListResponse } from '@/types/microcms';
 
-const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio', { limit: '100' });
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>(
+  'portfolio',
+  { limit: '100' },
+);
 const projects = portfolioResponse.contents;
 ---
 
@@ -19,37 +22,43 @@ const projects = portfolioResponse.contents;
       <h1>制作物</h1>
       <section>
         <div class="project-grid" id="project-grid">
-          {projects.length > 0 ? (
-            projects.map((project) => {
-              const isExternal = project.url && project.url.startsWith('http');
-              const Element = project.url ? 'a' : 'div';
-              const linkProps = project.url ? {
-                href: project.url,
-                target: isExternal ? '_blank' : undefined,
-                rel: isExternal ? 'noopener noreferrer' : undefined,
-                style: 'text-decoration: none; color: inherit; display: block;'
-              } : {};
+          {
+            projects.length > 0 ? (
+              projects.map((project) => {
+                const isExternal = project.url && project.url.startsWith('http');
+                const Element = project.url ? 'a' : 'div';
+                const linkProps = project.url
+                  ? {
+                      href: project.url,
+                      target: isExternal ? '_blank' : undefined,
+                      rel: isExternal ? 'noopener noreferrer' : undefined,
+                      style: 'text-decoration: none; color: inherit; display: block;',
+                    }
+                  : {};
 
-              return (
-                <Element class="project-card" {...linkProps}>
-                  {project.thumbnail && (
-                    <img src={project.thumbnail.url} alt={project.title} class="project-thumbnail" />
-                  )}
-                  <h3>{project.title}</h3>
-                  {project.tags && (
-                    <div class="project-tags">
-                      <span>{project.tags}</span>
-                    </div>
-                  )}
-                  <p>{project.description}</p>
-                </Element>
-              );
-            })
-          ) : (
-            <p class="empty-message">
-              鋭意制作中です。
-            </p>
-          )}
+                return (
+                  <Element class="project-card" {...linkProps}>
+                    {project.thumbnail && (
+                      <img
+                        src={project.thumbnail.url}
+                        alt={project.title}
+                        class="project-thumbnail"
+                      />
+                    )}
+                    <h3>{project.title}</h3>
+                    {project.tags && (
+                      <div class="project-tags">
+                        <span>{project.tags}</span>
+                      </div>
+                    )}
+                    <p>{project.description}</p>
+                  </Element>
+                );
+              })
+            ) : (
+              <p class="empty-message">鋭意制作中です。</p>
+            )
+          }
         </div>
       </section>
     </article>

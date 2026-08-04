@@ -9,25 +9,25 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   let configSeVolume = 0.5;
 
   const SE_DB = {
-    'jump': seJump,
-    'collision': seCollision,
-    'cursor': seCursor,
-    'confirm': seConfirm,
-    'cancel': seCancel
+    jump: seJump,
+    collision: seCollision,
+    cursor: seCursor,
+    confirm: seConfirm,
+    cancel: seCancel,
   };
 
   function playSE(seId) {
     if (!SE_DB[seId]) return;
     const se = new Audio(SE_DB[seId]);
     se.volume = configSeVolume;
-    se.play().catch(e => console.log('SE play failed:', e));
+    se.play().catch((e) => console.log('SE play failed:', e));
   }
 
   window.playSE = playSE;
-  window.setSEVolume = function(vol) {
+  window.setSEVolume = function (vol) {
     configSeVolume = vol;
   };
-  window.setBGMVolume = function(vol) {
+  window.setBGMVolume = function (vol) {
     configBgmVolume = vol;
   };
 
@@ -79,7 +79,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   function resumeGame() {
     if (gameState !== 'playing' || !isPaused) return;
     isPaused = false;
-    startTime += (Date.now() - pauseStartTime);
+    startTime += Date.now() - pauseStartTime;
   }
 
   // Canvas Resize (レスポンシブ対応)
@@ -104,7 +104,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     height: 30,
     vy: 0,
     jumpCount: 0,
-    maxJumps: 2
+    maxJumps: 2,
   };
 
   let blocks = [];
@@ -129,10 +129,12 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
 
   // 当たり判定 (AABB: 四角形同士の交差判定)
   function checkCollision(r1, r2) {
-    return r1.x < r2.x + r2.width &&
+    return (
+      r1.x < r2.x + r2.width &&
       r1.x + r1.width > r2.x &&
       r1.y < r2.y + r2.height &&
-      r1.y + r1.height > r2.y;
+      r1.y + r1.height > r2.y
+    );
   }
 
   // Main Game Loop
@@ -145,7 +147,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     timeElement.textContent = survivalTime.toFixed(1);
 
     // スピードアップ（徐々に難易度を上げる）
-    scrollSpeed = 5 + (survivalTime / 10);
+    scrollSpeed = 5 + survivalTime / 10;
 
     // --- プレイヤーの物理演算 ---
     player.vy += gravity;
@@ -207,8 +209,8 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
 
     // --- メモリ最適化＆新しいブロックの生成 ---
     // 画面外に出たブロックを削除
-    blocks = blocks.filter(b => b.x + b.width > 0);
-    obstacles = obstacles.filter(o => o.x + o.width > 0);
+    blocks = blocks.filter((b) => b.x + b.width > 0);
+    obstacles = obstacles.filter((o) => o.x + o.width > 0);
 
     // 穴を正しく管理するため、nextBlockXをスクロール量に合わせて減算
     nextBlockX -= scrollSpeed;
@@ -224,16 +226,16 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
           x: nextBlockX,
           y: groundY,
           width: blockWidth,
-          height: blockHeight
+          height: blockHeight,
         });
 
         // 障害物を作る確率（10%）
-        if (Math.random() < 0.10 && nextBlockX > canvas.width) {
+        if (Math.random() < 0.1 && nextBlockX > canvas.width) {
           obstacles.push({
             x: nextBlockX + blockWidth / 2 - 15,
             y: groundY - 30, // 地面の上に乗るように配置
             width: 30,
-            height: 30
+            height: 30,
           });
         }
         nextBlockX += blockWidth;
@@ -257,7 +259,13 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       // メインとなる横長の雲
       drawRoundedRect(ctx, c.x, c.y, c.width, c.height);
       // 上に少し短めの雲をずらして重ねることで、モコモコ感（立体感）を出す
-      drawRoundedRect(ctx, c.x + c.width * 0.1, c.y - c.height * 0.4, c.width * 0.8, c.height * 0.8);
+      drawRoundedRect(
+        ctx,
+        c.x + c.width * 0.1,
+        c.y - c.height * 0.4,
+        c.width * 0.8,
+        c.height * 0.8,
+      );
     }
 
     // Draw Blocks (Ground)
@@ -286,7 +294,8 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   // Input Handling
   function handleTap(e) {
     if (e) {
-      if (e.target.tagName.toLowerCase() === 'button' || e.target.classList.contains('icon-config')) return;
+      if (e.target.tagName.toLowerCase() === 'button' || e.target.classList.contains('icon-config'))
+        return;
       e.preventDefault();
     }
 
@@ -332,10 +341,10 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     clouds = [];
     for (let i = 0; i < 4; i++) {
       clouds.push({
-        x: Math.random() * canvas.width,        // X座標はランダム
+        x: Math.random() * canvas.width, // X座標はランダム
         y: Math.random() * (canvas.height / 3), // Y座標は空の上1/3の範囲
-        width: 80 + Math.random() * 60,         // 雲の横幅（80px 〜 140px）
-        height: 25 + Math.random() * 10         // 雲の縦幅（25px 〜 35px）
+        width: 80 + Math.random() * 60, // 雲の横幅（80px 〜 140px）
+        height: 25 + Math.random() * 10, // 雲の縦幅（25px 〜 35px）
       });
     }
 
@@ -345,7 +354,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
         x: nextBlockX,
         y: canvas.height - blockHeight,
         width: blockWidth,
-        height: blockHeight
+        height: blockHeight,
       });
       nextBlockX += blockWidth;
     }
@@ -378,8 +387,18 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     });
   }
 
-  if (startBtn) startBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
-  if (retryBtn) retryBtn.addEventListener('click', (e) => { e.stopPropagation(); playSE('confirm'); startGame(); });
+  if (startBtn)
+    startBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('confirm');
+      startGame();
+    });
+  if (retryBtn)
+    retryBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('confirm');
+      startGame();
+    });
   if (titleBtn) {
     titleBtn.addEventListener('click', () => {
       playSE('cancel');
@@ -390,19 +409,25 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       if (bottomHud) bottomHud.style.display = 'none';
     });
   }
-  if (shareBtn) shareBtn.addEventListener('click', (e) => { e.stopPropagation(); shareScore(); });
-  if (howtoBtn) howtoBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    playSE('cursor');
-    howtoModal.classList.add('active');
-    modalOverlay.classList.add('active');
-  });
-  if (closeHowtoBtn) closeHowtoBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    playSE('cursor');
-    howtoModal.classList.remove('active');
-    modalOverlay.classList.remove('active');
-  });
+  if (shareBtn)
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      shareScore();
+    });
+  if (howtoBtn)
+    howtoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('cursor');
+      howtoModal.classList.add('active');
+      modalOverlay.classList.add('active');
+    });
+  if (closeHowtoBtn)
+    closeHowtoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSE('cursor');
+      howtoModal.classList.remove('active');
+      modalOverlay.classList.remove('active');
+    });
 
   const _cfgBtn1 = document.getElementById('config-btn');
   const _cfgBtn2 = document.getElementById('hud-config-btn');
@@ -431,7 +456,12 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       playSE('cursor');
       if (configModal) configModal.classList.remove('active');
       if (modalOverlay) modalOverlay.classList.remove('active');
-      if (gameState === 'playing' && isPaused && !document.getElementById('credits-modal')?.classList.contains('active') && !document.getElementById('retire-modal')?.classList.contains('active')) {
+      if (
+        gameState === 'playing' &&
+        isPaused &&
+        !document.getElementById('credits-modal')?.classList.contains('active') &&
+        !document.getElementById('retire-modal')?.classList.contains('active')
+      ) {
         resumeGame();
       }
     });
@@ -499,7 +529,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   // Start loop
   requestAnimationFrame(loop);
 
-
   const _credBtn = document.getElementById('credits-btn');
   if (_credBtn) {
     _credBtn.addEventListener('click', (e) => {
@@ -519,7 +548,12 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       playSE('cursor');
       document.getElementById('credits-modal')?.classList.remove('active');
       document.getElementById('modal-overlay')?.classList.remove('active');
-      if (gameState === 'playing' && isPaused && !document.getElementById('config-modal')?.classList.contains('active') && !document.getElementById('retire-modal')?.classList.contains('active')) {
+      if (
+        gameState === 'playing' &&
+        isPaused &&
+        !document.getElementById('config-modal')?.classList.contains('active') &&
+        !document.getElementById('retire-modal')?.classList.contains('active')
+      ) {
         resumeGame();
       }
     });

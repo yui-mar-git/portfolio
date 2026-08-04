@@ -1,26 +1,32 @@
 ---
 const { gameTitle } = Astro.props;
 ---
+
 <!-- ゲームエリア（ゲームコンテナは外側の game-containerに統一） -->
 <div class="game-container" id="game-container">
   <div class="game-hud" id="game-hud">
-    <div class="score-display">スコア: <span id="score">0</span> <span class="global-style-nz0j2p">(ハイスコア: <span id="highscore">0</span>)</span></div>
-    <div class="time-display global-style-40iz4x" >
+    <div class="score-display">
+      スコア: <span id="score">0</span>
+      <span class="global-style-nz0j2p">(ハイスコア: <span id="highscore">0</span>)</span>
+    </div>
+    <div class="time-display global-style-40iz4x">
       残り時間: <span id="time" class="">30</span>秒
-      <span id="hud-config-btn" class="icon-config global-style-kg4mnf" title="コンフィグ" >⚙️</span>
+      <span id="hud-config-btn" class="icon-config global-style-kg4mnf" title="コンフィグ">⚙️</span>
     </div>
   </div>
-  <div class="bottom-hud global-style-24gtvk" id="bottom-hud" >
-    <button id="retire-btn" class="btn btn-danger global-style-ruina0" >リタイア</button>
+  <div class="bottom-hud global-style-24gtvk" id="bottom-hud">
+    <button id="retire-btn" class="btn btn-danger global-style-ruina0">リタイア</button>
   </div>
   <div class="overlay" id="start-screen">
-    <div style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);">
+    <div
+      style="position: absolute; top: 1rem; left: 1rem; font-weight: bold; color: var(--text-muted);"
+    >
       ハイスコア: <span id="start-highscore-val">0</span>
     </div>
     <h2>{gameTitle || ''}</h2>
     <button id="start-btn" class="btn btn-full">ゲームスタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-mt">遊び方</button>
-    <span id="start-config-btn" class="icon-config global-style-dickuc" title="コンフィグ" >⚙️</span>
+    <span id="start-config-btn" class="icon-config global-style-dickuc" title="コンフィグ">⚙️</span>
   </div>
 
   <div class="result-screen overlay" id="result-screen">
@@ -31,7 +37,6 @@ const { gameTitle } = Astro.props;
       <button id="share-btn" class="btn btn-primary btn-full btn-share">Xでシェアする</button>
     </div>
   </div>
-
 </div>
 
 <style>
@@ -58,15 +63,29 @@ const { gameTitle } = Astro.props;
   }
 
   @keyframes textPopHeal {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); color: #fd7e14; }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+      color: #fd7e14;
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
   @keyframes textPopDamage {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); color: #dc3545; }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.3);
+      color: #dc3545;
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
   .legend {
@@ -81,7 +100,7 @@ const { gameTitle } = Astro.props;
     font-size: 0.9rem;
   }
 
-  [data-theme="dark"] .legend {
+  [data-theme='dark'] .legend {
     background: rgba(255, 255, 255, 0.05);
   }
 
@@ -89,7 +108,6 @@ const { gameTitle } = Astro.props;
     margin: 0;
     font-weight: bold;
   }
-
 
   /* ゲームの高さ設定 */
   #game-container {
@@ -128,7 +146,9 @@ const { gameTitle } = Astro.props;
     position: absolute;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
+    transition:
+      transform 0.1s,
+      opacity 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -267,8 +287,6 @@ const { gameTitle } = Astro.props;
     justify-content: space-between;
   }
 
-
-
   /* \u30dc\u30bf\u30f3\u30e6\u30fc\u30c6\u30a3\u30ea\u30c6\u30a3 */
   .btn-full {
     width: 100%;
@@ -280,8 +298,8 @@ const { gameTitle } = Astro.props;
   }
 
   .btn-share {
-    background-color: #1DA1F2;
-    border-color: #1DA1F2;
+    background-color: #1da1f2;
+    border-color: #1da1f2;
   }
 
   /* コンフィグ内ボタン間のマージン */
@@ -354,23 +372,73 @@ const { gameTitle } = Astro.props;
     color: #28a745;
   }
 
-/* Auto-extracted styles */
-.global-style-nz0j2p { font-size: 0.75em; font-weight: normal; color: rgba(255,255,255,0.8); margin-left: 0.5rem; }
-.global-style-40iz4x { display: flex; align-items: center; }
-.global-style-kg4mnf { position: relative; top: auto; right: auto; margin-left: 0.5rem; cursor: pointer; pointer-events: auto; }
-.global-style-24gtvk { position: absolute; bottom: 1rem; right: 1rem; z-index: 5; display: none; pointer-events: auto; }
-.global-style-ruina0 { padding: 0.5rem 1rem; font-size: 0.9rem; }
-.global-style-dickuc { cursor: pointer; }
-.global-style-2zrcut { color:#007bff }
-.global-style-huegtq { color:#fd7e14 }
-.global-style-1ayd41 { color:#dc3545 }
-.global-style-ydrkkw { color:#6f42c1 }
-.global-style-m4nj5z { color:#ffea00 }
-.global-style-jirdf8 { color:#28a745 }
-.global-style-9glr4x { width: 100%; margin-bottom: 0.5rem; }
-.global-style-m9a5iw { width: 100%; }
-.global-style-ghqh0e { margin-top: 1.5rem; }
-.global-style-vd2h16 { margin-top: 1rem; padding-left: 1.5rem; }
-.global-style-mbc3p8 { width: 100%; }
-
+  /* Auto-extracted styles */
+  .global-style-nz0j2p {
+    font-size: 0.75em;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 0.5rem;
+  }
+  .global-style-40iz4x {
+    display: flex;
+    align-items: center;
+  }
+  .global-style-kg4mnf {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .global-style-24gtvk {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 5;
+    display: none;
+    pointer-events: auto;
+  }
+  .global-style-ruina0 {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  .global-style-dickuc {
+    cursor: pointer;
+  }
+  .global-style-2zrcut {
+    color: #007bff;
+  }
+  .global-style-huegtq {
+    color: #fd7e14;
+  }
+  .global-style-1ayd41 {
+    color: #dc3545;
+  }
+  .global-style-ydrkkw {
+    color: #6f42c1;
+  }
+  .global-style-m4nj5z {
+    color: #ffea00;
+  }
+  .global-style-jirdf8 {
+    color: #28a745;
+  }
+  .global-style-9glr4x {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .global-style-m9a5iw {
+    width: 100%;
+  }
+  .global-style-ghqh0e {
+    margin-top: 1.5rem;
+  }
+  .global-style-vd2h16 {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+  }
+  .global-style-mbc3p8 {
+    width: 100%;
+  }
 </style>

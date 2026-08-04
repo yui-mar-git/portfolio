@@ -8,60 +8,66 @@ interface Props {
   ogImage?: string;
 }
 
-const { title, description = "My Portfolio", pageId, ogImage = "/og-image.png" } = Astro.props;
+const { title, description = 'My Portfolio', pageId, ogImage = '/og-image.png' } = Astro.props;
 const siteTitle = `${title} - My Portfolio`;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{siteTitle}</title>
-  <meta name="description" content={description} />
-  <meta name="robots" content="noindex, nofollow" />
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" />
-  
-  <!-- OGP / Twitter Card -->
-  <meta property="og:title" content={siteTitle} />
-  <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content={new URL(ogImage, Astro.site || Astro.url)} />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={siteTitle} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={new URL(ogImage, Astro.site || Astro.url)} />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{siteTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <slot name="head" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" />
 
-  <script is:inline>
-    const theme = (() => {
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-        return localStorage.getItem('theme');
+    <!-- OGP / Twitter Card -->
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(ogImage, Astro.site || Astro.url)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={siteTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, Astro.site || Astro.url)} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <slot name="head" />
+
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
       }
-      if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-        return 'light';
-      }
-      return 'dark';
-    })();
-    
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  </script>
-</head>
-<body id={pageId}>
-  <slot />
-  <slot name="body-end" />
-  <script is:inline src={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/script.js`}></script>
-</body>
+    </script>
+  </head>
+  <body id={pageId}>
+    <slot />
+    <slot name="body-end" />
+    <script
+      is:inline
+      src={`${import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL}/script.js`}
+    ></script>
+  </body>
 </html>
 
 <style is:global>

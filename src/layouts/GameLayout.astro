@@ -50,6 +50,7 @@ const {
   hasRetire = false,
 } = Astro.props;
 ---
+
 <BaseLayout title={title} pageId={pageId}>
   <Header activeId="portfolio" />
 
@@ -58,34 +59,49 @@ const {
       <GameContainer>
         <!-- ゲーム本体用スロット -->
         <slot />
-        
+
         <!-- モーダル・オーバーレイ（ゲーム枠内に重なる） -->
         <div slot="overlay">
           <!-- 遊び方モーダル -->
-          {hasHowToPlay && (
-            <HowToPlayModal>
-              <slot name="howto-content" />
-            </HowToPlayModal>
-          )}
+          {
+            hasHowToPlay && (
+              <HowToPlayModal>
+                <slot name="howto-content" />
+              </HowToPlayModal>
+            )
+          }
 
           <!-- コンフィグ/クレジット モーダル -->
-          {hasConfig && (
-            <ConfigPanel hasHowToPlay={hasHowToPlay} materialCategories={materialCategories}>
-              <slot name="config-extra" slot="config-extra" />
-            </ConfigPanel>
-          )}
+          {
+            hasConfig && (
+              <ConfigPanel hasHowToPlay={hasHowToPlay} materialCategories={materialCategories}>
+                <slot name="config-extra" slot="config-extra" />
+              </ConfigPanel>
+            )
+          }
 
           <!-- リタイアモーダル -->
-          {hasRetire && (
-            <div id="retire-modal" class="config-modal" role="dialog" aria-hidden="true">
-              <h3>リタイアしますか？</h3>
-              <div class="result-actions" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; width: 80%; max-width: 300px; margin-left: auto; margin-right: auto;">
-                <button id="retire-retry-btn" class="btn btn-primary btn-full">リトライ</button>
-                <button id="retire-title-btn" class="btn btn-secondary btn-full">タイトルへ</button>
-                <button id="close-retire-btn" class="btn btn-secondary btn-full">キャンセル</button>
+          {
+            hasRetire && (
+              <div id="retire-modal" class="config-modal" role="dialog" aria-hidden="true">
+                <h3>リタイアしますか？</h3>
+                <div
+                  class="result-actions"
+                  style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; width: 80%; max-width: 300px; margin-left: auto; margin-right: auto;"
+                >
+                  <button id="retire-retry-btn" class="btn btn-primary btn-full">
+                    リトライ
+                  </button>
+                  <button id="retire-title-btn" class="btn btn-secondary btn-full">
+                    タイトルへ
+                  </button>
+                  <button id="close-retire-btn" class="btn btn-secondary btn-full">
+                    キャンセル
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          }
         </div>
       </GameContainer>
 
@@ -107,8 +123,14 @@ const {
             // DOMContentLoaded時に一度だけモーダルをgame-container内に移動する（完全な中央揃えのため）
             if (!container.dataset.modalsMoved) {
               container.dataset.modalsMoved = 'true';
-              const modals = ['modal-overlay', 'config-modal', 'credits-modal', 'howto-modal', 'retire-modal'];
-              modals.forEach(id => {
+              const modals = [
+                'modal-overlay',
+                'config-modal',
+                'credits-modal',
+                'howto-modal',
+                'retire-modal',
+              ];
+              modals.forEach((id) => {
                 const m = document.getElementById(id);
                 if (m && m.parentElement !== container) {
                   container.appendChild(m);
@@ -160,26 +182,30 @@ const {
             }
 
             // Xボタンで閉じる
-            document.querySelectorAll('.modal-close-x-btn').forEach(btn => {
+            document.querySelectorAll('.modal-close-x-btn').forEach((btn) => {
               btn.addEventListener('click', closeAllModals);
             });
 
             // コンフィグを開くボタン（外から呼ばれる可能性を考慮してグローバルに委譲、stopPropagationを回避するためcaptureフェーズで実行）
-            document.addEventListener('click', (e) => {
-              if (e.target.closest('.icon-config')) {
-                if (overlay) overlay.classList.add('active');
-                if (configModal) configModal.classList.add('active');
-              }
-              if (e.target.closest('#credits-btn')) {
-                if (configModal) configModal.classList.remove('active');
-                if (creditsModal) creditsModal.classList.add('active');
-              }
-              if (e.target.closest('#howto-btn-in-config') || e.target.closest('#howto-btn')) {
-                if (configModal) configModal.classList.remove('active');
-                if (overlay) overlay.classList.add('active'); // #howto-btnからの直接起動用
-                if (howToModal) howToModal.classList.add('active');
-              }
-            }, true);
+            document.addEventListener(
+              'click',
+              (e) => {
+                if (e.target.closest('.icon-config')) {
+                  if (overlay) overlay.classList.add('active');
+                  if (configModal) configModal.classList.add('active');
+                }
+                if (e.target.closest('#credits-btn')) {
+                  if (configModal) configModal.classList.remove('active');
+                  if (creditsModal) creditsModal.classList.add('active');
+                }
+                if (e.target.closest('#howto-btn-in-config') || e.target.closest('#howto-btn')) {
+                  if (configModal) configModal.classList.remove('active');
+                  if (overlay) overlay.classList.add('active'); // #howto-btnからの直接起動用
+                  if (howToModal) howToModal.classList.add('active');
+                }
+              },
+              true,
+            );
           });
         })();
       </script>
@@ -187,18 +213,21 @@ const {
       <!-- プロジェクト概要・使用技術セクション -->
       <section class="project-details">
         <h2>概要</h2>
-        {projectData && (projectData.description || projectData.content) ? (
-        <p class="description" set:html={(projectData.description || projectData.content).replace(/\n/g, '<br>' )} />
-        ) : (
-        <p class="description">{descriptionFallback}</p>
-        )}
+        {
+          projectData && (projectData.description || projectData.content) ? (
+            <p
+              class="description"
+              set:html={(projectData.description || projectData.content).replace(/\n/g, '<br>')}
+            />
+          ) : (
+            <p class="description">{descriptionFallback}</p>
+          )
+        }
 
         <h2>学習テーマ</h2>
         <div class="materials-list">
           <ul>
-            {learningThemes.map((theme) => (
-            <li>{theme}</li>
-            ))}
+            {learningThemes.map((theme) => <li>{theme}</li>)}
           </ul>
         </div>
 
@@ -206,39 +235,46 @@ const {
         <div class="table-responsive">
           <table class="tech-table">
             <tbody>
-              {techStack.map((tech) => (
-              <tr>
-                <th>{tech.category}</th>
-                <td>{tech.items}</td>
-              </tr>
-              ))}
+              {
+                techStack.map((tech) => (
+                  <tr>
+                    <th>{tech.category}</th>
+                    <td>{tech.items}</td>
+                  </tr>
+                ))
+              }
             </tbody>
           </table>
         </div>
 
-        {materialCategories.length > 0 && (
-        <>
-          <h2>使用素材</h2>
-          <div class="table-responsive">
-            <table class="tech-table">
-              <tbody>
-                {materialCategories.map((mat) => (
-                <tr>
-                  <th>{mat.category}</th>
-                  <td>
-                    {mat.items.map((item, index) => (
-                    <span key={item.name}>
-                      <a href={item.url} target="_blank" rel="noopener noreferrer">{item.name}</a>
-                      {index < mat.items.length - 1 ? " / " : "" } </span>
-                        ))}
-                  </td>
-                </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-        )}
+        {
+          materialCategories.length > 0 && (
+            <>
+              <h2>使用素材</h2>
+              <div class="table-responsive">
+                <table class="tech-table">
+                  <tbody>
+                    {materialCategories.map((mat) => (
+                      <tr>
+                        <th>{mat.category}</th>
+                        <td>
+                          {mat.items.map((item, index) => (
+                            <span key={item.name}>
+                              <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                {item.name}
+                              </a>
+                              {index < mat.items.length - 1 ? ' / ' : ''}{' '}
+                            </span>
+                          ))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )
+        }
       </section>
     </article>
   </main>
@@ -275,5 +311,4 @@ const {
       padding-left: 1.5rem;
     }
   </style>
-
 </BaseLayout>

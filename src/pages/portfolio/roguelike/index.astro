@@ -1,5 +1,5 @@
 ---
-export const pageTitle = "ローグライク";
+export const pageTitle = 'ローグライク';
 
 import GameLayout from '../../../layouts/GameLayout.astro';
 import RoguelikeUI from '../../../components/portfolio/RoguelikeUI.astro';
@@ -10,28 +10,46 @@ const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortf
 const projectData = portfolioResponse.contents.find((c) => c.url.includes('/roguelike/'));
 
 const techStack = [
-  { category: "フロントエンド", items: "HTML, CSS, JavaScript, TypeScript, Astro" },
-  { category: "バックエンド", items: "Node.js, microCMS" },
-  { category: "インフラ・ホスティング", items: "Cloudflare (Pages)" },
-  { category: "開発環境・ツール", items: "GitHub, Google Antigravity" }
+  { category: 'フロントエンド', items: 'HTML, CSS, JavaScript, TypeScript, Astro' },
+  { category: 'バックエンド', items: 'Node.js, microCMS' },
+  { category: 'インフラ・ホスティング', items: 'Cloudflare (Pages)' },
+  { category: '開発環境・ツール', items: 'GitHub, Google Antigravity' },
 ];
 
-const learningThemes = ["状態管理", "ダメージ計算", "ターン制ロジック", "デッキ構築", "ローグライク設計"];
+const learningThemes = [
+  '状態管理',
+  'ダメージ計算',
+  'ターン制ロジック',
+  'デッキ構築',
+  'ローグライク設計',
+];
 
 const materialCategories = [
-  { category: "画像素材", items: [{ name: "いらすとや", url: "https://www.irasutoya.com/" }] },
-  { category: "フォント", items: [{ name: "Google Fonts", url: "https://fonts.google.com/" }] },
-  { category: "音楽・効果音", items: [
-    { name: "魔王魂", url: "https://maou.audio/" },
-    { name: "効果音ラボ", url: "https://soundeffect-lab.info/" }
-  ] },
-  { category: "アイコン", items: [{ name: "Simple Icons", url: "https://simpleicons.org/" }] }
+  { category: '画像素材', items: [{ name: 'いらすとや', url: 'https://www.irasutoya.com/' }] },
+  { category: 'フォント', items: [{ name: 'Google Fonts', url: 'https://fonts.google.com/' }] },
+  {
+    category: '音楽・効果音',
+    items: [
+      { name: '魔王魂', url: 'https://maou.audio/' },
+      { name: '効果音ラボ', url: 'https://soundeffect-lab.info/' },
+    ],
+  },
+  { category: 'アイコン', items: [{ name: 'Simple Icons', url: 'https://simpleicons.org/' }] },
 ];
 ---
 
-<GameLayout title="ローグライクカードゲーム - My Portfolio" pageId="roguelike" pageLabel="ROGUELIKE" projectData={projectData}
-  descriptionFallback="" techStack={techStack} learningThemes={learningThemes} materialCategories={materialCategories}
-  hasConfig={true} hasHowToPlay={true}>
+<GameLayout
+  title="ローグライクカードゲーム - My Portfolio"
+  pageId="roguelike"
+  pageLabel="ROGUELIKE"
+  projectData={projectData}
+  descriptionFallback=""
+  techStack={techStack}
+  learningThemes={learningThemes}
+  materialCategories={materialCategories}
+  hasConfig={true}
+  hasHowToPlay={true}
+>
   <div slot="howto-content">
     <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
       <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>

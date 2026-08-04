@@ -34,7 +34,8 @@ yarn-error.log*
 pnpm-debug.log*
 
 # IDE / Editor / Backups
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 .backups/
 *.suo
@@ -45,6 +46,7 @@ temp_logs/
 *.diff
 *.txt
 *.cjs
+!stylelint.config.cjs
 original_*.astro
 original_*_utf8.astro
 pristine_*.js

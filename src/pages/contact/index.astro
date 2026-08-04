@@ -1,57 +1,59 @@
 ---
-export const pageTitle = "お問い合わせ";
+export const pageTitle = 'お問い合わせ';
 export const prerender = false;
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
 let errorMsg = '';
-const siteKey = Astro.locals.runtime?.env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const siteKey =
+  Astro.locals.runtime?.env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
 if (Astro.request.method === 'POST') {
-try {
-const data = await Astro.request.formData();
-const token = data.get('cf-turnstile-response');
+  try {
+    const data = await Astro.request.formData();
+    const token = data.get('cf-turnstile-response');
 
-if (!token) {
-errorMsg = 'Turnstileトークンが見つかりません。チェックボックスをオンにしてください。';
-} else {
-// 🌟【修正箇所】Cloudflare Pagesのランタイム変数と、ローカルの変数の両方に対応させる
-const secretKey = Astro.locals.runtime?.env?.TURNSTILE_SECRET_KEY || import.meta.env.TURNSTILE_SECRET_KEY;
+    if (!token) {
+      errorMsg = 'Turnstileトークンが見つかりません。チェックボックスをオンにしてください。';
+    } else {
+      // 🌟【修正箇所】Cloudflare Pagesのランタイム変数と、ローカルの変数の両方に対応させる
+      const secretKey =
+        Astro.locals.runtime?.env?.TURNSTILE_SECRET_KEY || import.meta.env.TURNSTILE_SECRET_KEY;
 
-const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-method: 'POST',
-headers: {
-'Content-Type': 'application/x-www-form-urlencoded'
-},
-body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(token.toString())}`
-});
+      const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(token.toString())}`,
+      });
 
-const resultData = await result.json();
+      const resultData = await result.json();
 
-if (resultData.success) {
-// トークン検証成功：サンクスページへ
-const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
-return Astro.redirect(`${baseUrl}/contact/thanks/`);
-} else {
-// エラー理由をより詳細に出力（デバッグ用）
-const errorCodeStr = JSON.stringify(resultData['error-codes'] || resultData);
-const keyStatus = secretKey ? '取得成功' : '取得失敗(undefined)';
-errorMsg = `ボット判定されました。理由: ${errorCodeStr} (Secret: ${keyStatus})`;
-console.error('Turnstile verification failed:', resultData);
+      if (resultData.success) {
+        // トークン検証成功：サンクスページへ
+        const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
+        return Astro.redirect(`${baseUrl}/contact/thanks/`);
+      } else {
+        // エラー理由をより詳細に出力（デバッグ用）
+        const errorCodeStr = JSON.stringify(resultData['error-codes'] || resultData);
+        const keyStatus = secretKey ? '取得成功' : '取得失敗(undefined)';
+        errorMsg = `ボット判定されました。理由: ${errorCodeStr} (Secret: ${keyStatus})`;
+        console.error('Turnstile verification failed:', resultData);
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    errorMsg = `送信中にエラーが発生しました。理由: ${err.message || String(err)}`;
+  }
 }
-}
-} catch (err) {
-console.error(err);
-errorMsg = `送信中にエラーが発生しました。理由: ${err.message || String(err)}`;
-}
-}
-
 ---
 
 <BaseLayout title="Contact" pageId="contact">
   <Header activeId="contact" />
-  <script slot="head" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script slot="head" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer
+  ></script>
 
   <main class="container">
     <article>
@@ -60,24 +62,24 @@ errorMsg = `送信中にエラーが発生しました。理由: ${err.message |
       <section class="hero">
         <p>お仕事のご依頼やご相談は、こちらのフォームからお気軽にご連絡ください。</p>
 
-        {errorMsg && (
-        <div class="error-message">
-          {errorMsg}
-        </div>
-        )}
+        {errorMsg && <div class="error-message">{errorMsg}</div>}
 
         <form method="POST" class="contact-form-container">
           <div class="form-group">
             <label class="form-label">お名前</label>
-            <input type="text" class="form-control" name="name" placeholder="山田 太郎">
+            <input type="text" class="form-control" name="name" placeholder="山田 太郎" />
           </div>
           <div class="form-group">
             <label class="form-label">メールアドレス</label>
-            <input type="email" class="form-control" name="email" placeholder="example@email.com">
+            <input type="email" class="form-control" name="email" placeholder="example@email.com" />
           </div>
           <div class="form-group-last">
             <label class="form-label">メッセージ</label>
-            <textarea rows="5" class="form-control" name="message" placeholder="ご用件をご記入ください"></textarea>
+            <textarea
+              rows="5"
+              class="form-control"
+              name="message"
+              placeholder="ご用件をご記入ください"></textarea>
           </div>
 
           <button type="submit" class="btn btn-full submit-btn">送信する</button>
@@ -85,8 +87,8 @@ errorMsg = `送信中にエラーが発生しました。理由: ${err.message |
           <div class="cf-turnstile turnstile-container" data-sitekey={siteKey}></div>
 
           <p class="dummy-notice">
-            ※このフォームはポートフォリオ用のデモ（ダミー）です。<br>
-            実際にはどこにもメールは送信されず、データが保存されることもありません。<br>
+            ※このフォームはポートフォリオ用のデモ（ダミー）です。<br />
+            実際にはどこにもメールは送信されず、データが保存されることもありません。<br />
             送信ボタンを押すと、完了ページ（サンクスページ）のデザインサンプルに遷移します。
           </p>
         </form>
