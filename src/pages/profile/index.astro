@@ -69,106 +69,15 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
             <span class="page-label">PROFILE</span>
             <h1>自己紹介</h1>
 
-            <section class="profile-intro">
+            <section id="intro-section" class="profile-intro">
               <p>{settings.title}</p>
               <h2>{settings.name}</h2>
               <p set:html={settings.bio.replace(/\n/g, '<br>' )} />
             </section>
 
-            <section>
-              <h2>スキルセット</h2>
-              <div class="skill-grid">
-                <div class="profile-card skill-card">
-                  <h3>フロントエンド</h3>
-                  <ul>
-                    <li>マークアップ / スタイル
-                      <ul>
-                        <li>
-                          <span class="skill-active">HTML</span> / <span class="skill-active">CSS</span>
-                          <ul>
-                            <li>Pug</li>
-                            <li>Stylus</li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>プログラミング
-                      <ul>
-                        <li>
-                          <span class="skill-active">JavaScript</span>
-                          <ul>
-                            <li class="skill-active">TypeScript</li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>フレームワーク / ライブラリ
-                      <ul>
-                        <li class="skill-inactive">jQuery</li>
-                        <li class="skill-inactive">Vue.js</li>
-                        <li class="skill-active">Astro [独学]</li>
-                        <li class="skill-active">Phaser 3 [独学]</li>
-                      </ul>
-                    </li>
-                  </ul>
-
-                  <h3 class="skill-category">バックエンド</h3>
-                  <ul>
-                    <li class="skill-active">Node.js</li>
-                    <li>PHP</li>
-                    <li>CMS
-                      <ul>
-                        <li class="skill-active">microCMS [独学]</li>
-                        <li>WordPress</li>
-                        <li>RCMS</li>
-                      </ul>
-                    </li>
-                  </ul>
-
-                  <h3 class="skill-category">データベース・コンテナ</h3>
-                  <ul>
-                    <li>MySQL [独学]</li>
-                    <li>PostgreSQL</li>
-                    <li>Docker [独学]</li>
-                    <li>Kubernetes</li>
-                  </ul>
-
-                  <h3 class="skill-category">インフラ・ホスティング</h3>
-                  <ul>
-                    <li class="skill-active">Cloudflare (Pages / Turnstile)</li>
-                    <li>Kinsta</li>
-                  </ul>
-
-                  <h3 class="skill-category">開発環境・ツール</h3>
-                  <ul>
-                    <li>バージョン管理 / CI・CD
-                      <ul>
-                        <li class="skill-active">Git / GitHub</li>
-                      </ul>
-                    </li>
-                    <li>エディタ
-                      <ul>
-                        <li class="skill-active">Google Antigravity</li>
-                        <li>Cursor [独学]</li>
-                        <li>Visual Studio Code</li>
-                        <li>Adobe Brackets</li>
-                      </ul>
-                    </li>
-                    <li>デザイン
-                      <ul>
-                        <li>Figma</li>
-                        <li>Adobe Photoshop</li>
-                      </ul>
-                    </li>
-                  </ul>
-
-                  <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2>保有資格・検定</h2>
+            <!-- 保有資格 -->
+            <section id="certification-section">
+              <h2>保有資格</h2>
               <div class="cert-tree-container">
                 <div class="cert-tree" id="cert-tree-root">
                   <ul>
@@ -183,6 +92,148 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
                   </ul>
                 </div>
               </div>
+            </section>
+
+            <!-- スキルセット -->
+            <section id="skill-section" class="skill-section">
+              <h2>スキルセット</h2>
+              <div class="skill-bento-grid">
+
+                <!-- 1. フロントエンド -->
+                <div class="profile-card skill-bento-card">
+                  <h3>フロントエンド</h3>
+                  <ul>
+                    <li>クライアントサイド言語
+                      <ul>
+                        <li><span class="skill-active">HTML</span>
+                          <ul>
+                            <li>Pug</li>
+                          </ul>
+                        </li>
+                        <li><span class="skill-active">CSS</span>
+                          <ul>
+                            <li>Stylus</li>
+                          </ul>
+                        </li>
+                        <li><span class="skill-active">JavaScript</span>
+                          <ul>
+                            <li class="skill-active">TypeScript</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>フレームワーク・ライブラリ
+                      <ul>
+                        <li class="skill-inactive">jQuery</li>
+                        <li class="skill-inactive">Vue.js</li>
+                        <li class="skill-active">Astro [独学]</li>
+                        <li class="skill-active">Phaser 3 [独学]</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 2. バックエンド -->
+                <div class="profile-card skill-bento-card">
+                  <h3>バックエンド</h3>
+                  <ul>
+                    <li>サーバーサイド言語
+                      <ul>
+                        <li class="skill-active">Node.js</li>
+                        <li>PHP</li>
+                      </ul>
+                    </li>
+                    <li>CMS
+                      <ul>
+                        <li class="skill-active">microCMS [独学]</li>
+                        <li>WordPress</li>
+                        <li>RCMS</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 3. ホスティング・ネットワーク -->
+                <div class="profile-card skill-bento-card">
+                  <h3>ホスティング・ネットワーク</h3>
+                  <ul>
+                    <li>CDN・ホスティング
+                      <ul>
+                        <li class="skill-active">Cloudflare (Pages / Workers)</li>
+                        <li>Kinsta</li>
+                      </ul>
+                    </li>
+                    <li>ドメイン・DNS管理
+                      <ul>
+                        <li>お名前.com</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 4. インフラ運用・セキュリティ -->
+                <div class="profile-card skill-bento-card">
+                  <h3>インフラ運用・セキュリティ</h3>
+                  <ul>
+                    <li>コンテナ・運用環境
+                      <ul>
+                        <li>MySQL [独学]</li>
+                        <li>PostgreSQL</li>
+                        <li>Docker [独学]</li>
+                        <li>Kubernetes (GKE等)</li>
+                      </ul>
+                    </li>
+                    <li>セキュリティ対策
+                      <ul>
+                        <li class="skill-active">Cloudflare Turnstile</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 5. UI/UX・デザイン -->
+                <div class="profile-card skill-bento-card">
+                  <h3>UI/UX・デザイン</h3>
+                  <ul>
+                    <li>プロトタイピング・UI設計
+                      <ul>
+                        <li>Figma</li>
+                      </ul>
+                    </li>
+                    <li>画像編集・グラフィック
+                      <ul>
+                        <li>Adobe Photoshop</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- 6. 開発環境・ワークフロー -->
+                <div class="profile-card skill-bento-card">
+                  <h3>開発環境・ワークフロー</h3>
+                  <ul>
+                    <li>バージョン管理 / CI・CD
+                      <ul>
+                        <li class="skill-active">Git
+                          <ul>
+                            <li class="skill-active">GitHub</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>AIエディタ・開発支援
+                      <ul>
+                        <li class="skill-active">Google Antigravity</li>
+                        <li class="skill-active">Cursor [独学]</li>
+                        <li>Visual Studio Code</li>
+                        <li>Adobe Brackets [独学]</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+              </div>
+              <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
             </section>
           </article>
         </main>
@@ -222,29 +273,83 @@ const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
           margin-top: 1rem;
         }
 
-        .skill-card {
-          width: 100%;
-          max-width: 800px;
-          margin: 0 auto;
-          box-sizing: border-box;
+        .skill-section {
+          margin-top: 2.5rem;
         }
 
-        .skill-category {
-          margin-top: 1.5rem;
+        .skill-bento-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-top: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+          .skill-bento-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .skill-bento-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 639px) {
+          .skill-bento-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .skill-bento-card {
+          box-sizing: border-box;
+          padding: 1.5rem;
+          border-radius: 1rem;
+          background: var(--surface-bg, rgba(255, 255, 255, 0.03));
+          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+          transition: transform 0.25s var(--ease-out-back, ease), box-shadow 0.25s ease;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .skill-bento-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .skill-bento-card h3 {
+          font-size: 1.15rem;
+          font-weight: 800;
+          margin-bottom: 0.75rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+          color: var(--text-main, #ffffff);
+        }
+
+        .skill-bento-card ul {
+          margin: 0;
+          padding-left: 1.25rem;
+        }
+
+        .skill-bento-card li {
+          line-height: 1.6;
+          margin-bottom: 0.25rem;
         }
 
         .skill-active {
           font-weight: bold;
         }
 
-        .skill-card li:not(.skill-active):not(:has(.skill-active)) {
+        .skill-bento-card li:not(.skill-active):not(:has(.skill-active)) {
           opacity: 0.5;
         }
 
         .skill-note {
           font-size: 0.85rem;
           color: var(--text-muted);
-          margin-top: 2rem;
+          margin-top: 1.5rem;
           text-align: right;
         }
       </style>
