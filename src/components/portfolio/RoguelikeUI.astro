@@ -1438,17 +1438,20 @@ const { projectData } = Astro.props;
     border: 1px solid rgba(255, 210, 60, 0.6);
   }
 
-  /* カード名帯（画像の下半分に重なるように） */
+  /* カード名帯 */
   :global(.card-name) {
     font-weight: bold;
     font-size: 0.65rem;
-    text-align: center;
     color: #fff;
-    padding: 1px 2px;
-    line-height: 1.1;
+    padding: 2px 4px;
+    line-height: 1.2;
     background: rgba(0, 0, 0, 0.75);
     position: relative;
-    margin-top: -12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 0;
     z-index: 2;
     flex-shrink: 0;
     white-space: nowrap;
@@ -2752,8 +2755,14 @@ const { projectData } = Astro.props;
   }
 
   :global(.card-type-label) {
-    /*text-align: center;*/
-    color: #888;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #a0aec0;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    margin: 0.2rem 0;
   }
 
   :global(.relic-desc-text) {

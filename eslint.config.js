@@ -5,7 +5,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 export default [
-  { ignores: ["dist/", "node_modules/", "temp_logs/", ".astro/"] },
+  { ignores: ['dist/', 'node_modules/', 'temp_logs/', '.astro/'] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
@@ -14,9 +14,9 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
-        Phaser: "readonly",
-      }
-    }
+        Phaser: 'readonly',
+      },
+    },
   },
   eslintConfigPrettier,
 ];

@@ -126,6 +126,15 @@
       }
     });
 
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && howtoModal?.classList.contains('active')) {
+        howtoModal.classList.remove('active');
+        howtoModal.setAttribute('aria-hidden', 'true');
+        const mainOverlay = document.getElementById('modal-overlay');
+        if (mainOverlay) mainOverlay.classList.remove('active');
+      }
+    });
+
     updatePage();
   })();
 </script>

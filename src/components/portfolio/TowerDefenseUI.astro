@@ -178,7 +178,8 @@ const { gameTitle } = Astro.props;
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name">
             <span class="upgrade-unit-name">拠点耐久力</span><span class="upgrade-lv"
-              >Lv.<span id="upg-lv-base-hp">1</span></span>
+              >Lv.<span id="upg-lv-base-hp">1</span></span
+            >
           </div>
           <div class="upgrade-col-stats">
             <div class="global-style-j0ig98">拠点の最大HPが1増加する</div>
@@ -197,7 +198,8 @@ const { gameTitle } = Astro.props;
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name">
             <span class="upgrade-unit-name">ユニット能力</span><span class="upgrade-lv"
-              >Lv.<span id="upg-lv-base-stats">1</span></span>
+              >Lv.<span id="upg-lv-base-stats">1</span></span
+            >
           </div>
           <div class="upgrade-col-stats">
             <div class="global-style-42c6lo">全味方のHPと攻撃力 +5%</div>
@@ -216,7 +218,8 @@ const { gameTitle } = Astro.props;
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name">
             <span class="upgrade-unit-name">コスト効率</span><span class="upgrade-lv"
-              >Lv.<span id="upg-lv-base-cost">1</span></span>
+              >Lv.<span id="upg-lv-base-cost">1</span></span
+            >
           </div>
           <div class="upgrade-col-stats">
             <div class="global-style-a9ge7u">初期コストと回復量が +5%</div>
@@ -235,7 +238,8 @@ const { gameTitle } = Astro.props;
         <div class="upgrade-info-cols">
           <div class="upgrade-col-name">
             <span class="upgrade-unit-name">獲得ゴールド</span><span class="upgrade-lv"
-              >Lv.<span id="upg-lv-base-gold">1</span></span>
+              >Lv.<span id="upg-lv-base-gold">1</span></span
+            >
           </div>
           <div class="upgrade-col-stats">
             <div class="global-style-t5rfqh">敵撃破時の獲得Gが +2G</div>
@@ -277,6 +281,7 @@ const { gameTitle } = Astro.props;
     <div class="status-bar global-style-wtvhhc">
       <div>WAVE: <span id="wave-display">1 / 3</span></div>
       <div class="text-hp">拠点: <span id="base-hp-display">3 / 3</span></div>
+      <div class="text-unit">出撃: <span id="unit-count-display">0 / 10</span></div>
       <div class="text-コスト">コスト: <span id="コスト-display">0</span></div>
       <div class="text-gold"><span id="gold-display">0</span> G</div>
       <span id="config-btn" class="icon-config config-btn-inline" title="コンフィグ">⚙️</span>
@@ -510,6 +515,10 @@ const { gameTitle } = Astro.props;
 
     .text-hp {
       color: #32cd32;
+    }
+
+    .text-unit {
+      color: #a78bfa;
     }
 
     .text-gold {

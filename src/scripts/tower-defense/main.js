@@ -432,6 +432,7 @@ class MainScene extends Phaser.Scene {
 
     this.maxBaseHp = 3 + (baseHpLv - 1);
     this.currentBaseHp = this.maxBaseHp;
+    this.maxUnits = 10;
 
     this.time.addEvent({
       delay: 1000,
@@ -625,12 +626,19 @@ class MainScene extends Phaser.Scene {
     if (baseHpDisplay) baseHpDisplay.textContent = `${this.currentBaseHp} / ${this.maxBaseHp}`;
     if (goldDisplay) goldDisplay.textContent = saveData.gold;
 
+    const activeUnits = this.allies
+      ? this.allies.getChildren().filter((ally) => ally.active).length
+      : 0;
+    const maxUnits = this.maxUnits || 10;
+    const unitCountDisplay = document.getElementById('unit-count-display');
+    if (unitCountDisplay) unitCountDisplay.textContent = `${activeUnits} / ${maxUnits}`;
+
     ['sword', 'shield', 'mage', 'butouka'].forEach((type) => {
       const btnEl = document.getElementById(`btn-spawn-${type}`);
       const costEl = document.getElementById(`deck-cost-${type}`);
       const currentCost = this.getCurrentUnitCost(type);
       if (costEl) costEl.textContent = currentCost;
-      if (btnEl) btnEl.disabled = コスト < currentCost;
+      if (btnEl) btnEl.disabled = コスト < currentCost || activeUnits >= maxUnits;
     });
   }
 
