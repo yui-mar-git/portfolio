@@ -95,6 +95,7 @@ function getUnitData(type) {
     originalType: type,
     hp: Math.floor(base.hp * (1 + (lv - 1) * 0.2) * globalBuff),
     attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2) * globalBuff),
+    speed: Math.floor(base.speed * (1 + (lv - 1) * 0.1) * globalBuff),
   };
 }
 
@@ -239,6 +240,7 @@ import seEnergyBall from '../../assets/games/tower-defense/audio/se/気弾1.mp3'
 import seVictory from '../../assets/games/tower-defense/audio/se/maou_game_jingle01.mp3';
 import seDefeat from '../../assets/games/tower-defense/audio/se/maou_game_jingle08.mp3';
 import seWaveNext from '../../assets/games/tower-defense/audio/se/決定ボタンを押す33.mp3';
+import seHeal from '../../assets/games/tower-defense/audio/se/回復魔法1.mp3';
 
 import bgmWave1 from '../../assets/games/tower-defense/audio/bgm/maou_game_field05.mp3';
 import bgmWave2 from '../../assets/games/tower-defense/audio/bgm/maou_game_field11.mp3';
@@ -257,6 +259,7 @@ const SE_DB = {
   victory: seVictory,
   defeat: seDefeat,
   wave_next: seWaveNext,
+  heal: seHeal,
 };
 
 const BGM_DB = {
@@ -356,6 +359,7 @@ class MainScene extends Phaser.Scene {
 
     // Y shifted up by 50px (515 -> 465). Height increased so the ground still hits the bottom edge (600+).
     const ground = this.add.rectangle(400, 465, 800, 270, groundColor);
+    ground.setDepth(1);
 
     // 簡易的な拠点のグラフィック（塔と入り口）
     const towerColor = 0x8b4513; // 茶色
@@ -365,20 +369,24 @@ class MainScene extends Phaser.Scene {
     const baseTower = this.add.rectangle(0, 380, 90, 240, towerColor);
     baseTower.setOrigin(0, 1);
     baseTower.setStrokeStyle(2, towerLineColor);
+    baseTower.setDepth(3);
 
     // せり出し部分（バルコニー状） (Y: 190 -> 140)
     const baseOverhang = this.add.rectangle(0, 140, 110, 20, towerColor);
     baseOverhang.setOrigin(0, 1);
     baseOverhang.setStrokeStyle(2, towerLineColor);
+    baseOverhang.setDepth(3);
 
     // 塔頭（塔本体と同じ幅） (Y: 170 -> 120)
     const baseTop = this.add.rectangle(0, 120, 90, 40, towerColor);
     baseTop.setOrigin(0, 1);
     baseTop.setStrokeStyle(2, towerLineColor);
+    baseTop.setDepth(3);
 
     // 入り口 (Y: 430 -> 380)
     const baseEntrance = this.add.rectangle(50, 380, 50, 70, 0x111111);
     baseEntrance.setOrigin(0.5, 1);
+    baseEntrance.setDepth(3);
 
     // Generate projectile texture if not exists
     if (!this.textures.exists('magic_orb')) {
@@ -429,10 +437,36 @@ class MainScene extends Phaser.Scene {
     this.enemiesToSpawn = 10;
     コスト = Math.floor(100 * costBuff);
     this.isGameOver = false;
+    this.isFogClearing = false;
+    this.fogPulseAlpha = 0.23;
 
     this.maxBaseHp = 3 + (baseHpLv - 1);
     this.currentBaseHp = this.maxBaseHp;
-    this.maxUnits = 10;
+    this.maxUnits = 10 + (saveData.clearedStage || 0) * 2;
+
+    this.meterGraphics = this.add.graphics();
+    this.meterGraphics.setDepth(100);
+
+    this.fogGraphics = this.add.graphics();
+    this.fogGraphics.setDepth(2);
+    this.drawEnemyFog(1.0);
+
+    const btnSpeed = document.getElementById('btn-speed-toggle');
+    if (btnSpeed) {
+      btnSpeed.style.display = 'inline-flex';
+      btnSpeed.onclick = () => {
+        if (this.isFogClearing || this.isGameOver) return;
+        if (this.gameSpeedMultiplier === 1) {
+          this.setGameSpeed(2);
+        } else if (this.gameSpeedMultiplier === 2) {
+          this.setGameSpeed(4);
+        } else {
+          this.setGameSpeed(1);
+        }
+        playSE('cursor');
+      };
+    }
+    this.setGameSpeed(1);
 
     this.time.addEvent({
       delay: 1000,
@@ -548,7 +582,10 @@ class MainScene extends Phaser.Scene {
       });
 
       if (targetEnemy) {
-        ally.state = 'attack';
+        if (ally.state !== 'attack') {
+          ally.state = 'attack';
+          ally.lastAttackTime = time; // 敵を捉えた瞬間に0%からリングチャージ開始
+        }
         ally.body.setVelocityX(0);
         if (ally.unitData.texture === 'unit_sword') {
           this.performAttack(ally, targets, time, 'ally');
@@ -556,7 +593,8 @@ class MainScene extends Phaser.Scene {
           this.performAttack(ally, targetEnemy, time, 'ally');
         }
       } else {
-        const stopX = ally.unitData.texture === 'unit_mage' ? 450 : 600;
+        ally.lastAttackTime = null; // 射程外離脱でチャージリセット
+        const stopX = ally.unitData.texture === 'unit_mage' ? 425 : 555;
         if (ally.x >= stopX) {
           ally.state = 'idle';
           ally.body.setVelocityX(0);
@@ -584,7 +622,10 @@ class MainScene extends Phaser.Scene {
       });
 
       if (targetAlly) {
-        enemy.state = 'attack';
+        if (enemy.state !== 'attack') {
+          enemy.state = 'attack';
+          enemy.lastAttackTime = time; // 味方を捉えた瞬間に0%からリングチャージ開始
+        }
         enemy.body.setVelocityX(0);
         if (enemy.texture.key === 'enemy_ogre' || enemy.texture.key === 'enemy_orc') {
           this.performAttack(enemy, targets, time, 'enemy');
@@ -592,6 +633,7 @@ class MainScene extends Phaser.Scene {
           this.performAttack(enemy, targetAlly, time, 'enemy');
         }
       } else {
+        enemy.lastAttackTime = null; // 射程外離脱でチャージリセット
         enemy.state = 'walk';
         enemy.body.setVelocityX(-enemy.speed);
       }
@@ -618,6 +660,96 @@ class MainScene extends Phaser.Scene {
         }
       }
     });
+
+    if (this.meterGraphics) {
+      this.meterGraphics.clear();
+
+      // 味方の攻撃クールダウン（頭上に配置：青リング）
+      this.allies.getChildren().forEach((ally) => {
+        if (!ally.active) return;
+        if (ally.state === 'attack' && ally.lastAttackTime) {
+          const cooldown = ally.unitData ? ally.unitData.cooldown : 1000;
+          const elapsed = time - ally.lastAttackTime;
+          const progress = Math.min(1, Math.max(0, elapsed / cooldown));
+          if (progress < 1) {
+            const h = ally.unitData ? ally.unitData.height : 80;
+            const posY = ally.y - h / 2 - 20;
+            this.drawCooldownRing(ally.x, posY, progress, 0x00bfff);
+          }
+        }
+      });
+
+      // 敵の攻撃クールダウン（頭上に配置：赤リング）
+      this.enemies.getChildren().forEach((enemy) => {
+        if (!enemy.active) return;
+        if (enemy.state === 'attack' && enemy.lastAttackTime) {
+          const cooldown = enemy.cooldown || 1500;
+          const elapsed = time - enemy.lastAttackTime;
+          const progress = Math.min(1, Math.max(0, elapsed / cooldown));
+          if (progress < 1) {
+            const h = enemy.displayHeight || enemy.height || 80;
+            const posY = enemy.y - h / 2 - 20;
+            this.drawCooldownRing(enemy.x, posY, progress, 0xff4d4d);
+          }
+        }
+      });
+    }
+
+    // 地面の色変え（濃淡パルス点滅：0.24〜0.40）
+    if (!this.isFogClearing) {
+      this.fogPulseAlpha = 0.32 + Math.sin(time / 450) * 0.08;
+      this.drawEnemyFog(this.fogPulseAlpha, 0, 0);
+    }
+  }
+
+  drawEnemyFog(alphaScale = 1.0, whiteRatio = 0.0) {
+    if (!this.fogGraphics) return;
+    this.fogGraphics.clear();
+    if (alphaScale <= 0) return;
+
+    const yTop = 330;
+    const yBottom = 600;
+
+    // 敵領域境界: ユニット停止位置(555)の右側(570)、バックスラッシュ「\」型にしっかり傾斜
+    const topX = 570;
+    const bottomX = 730;
+
+    // 白色発光（浄化）と通常の暗い赤紫色の補間
+    let fillColor = 0x4a1230;
+    if (whiteRatio > 0) {
+      const r = Math.floor(0x4a + (0xff - 0x4a) * whiteRatio);
+      const g = Math.floor(0x12 + (0xff - 0x12) * whiteRatio);
+      const b = Math.floor(0x30 + (0xff - 0x30) * whiteRatio);
+      fillColor = (r << 16) | (g << 8) | b;
+    }
+
+    this.fogGraphics.fillStyle(fillColor, Math.min(0.9, alphaScale));
+    this.fogGraphics.beginPath();
+    this.fogGraphics.moveTo(topX, yTop);
+    this.fogGraphics.lineTo(800, yTop);
+    this.fogGraphics.lineTo(800, yBottom);
+    this.fogGraphics.lineTo(bottomX, yBottom);
+    this.fogGraphics.closePath();
+    this.fogGraphics.fillPath();
+  }
+
+  drawCooldownRing(x, y, progress, colorHex) {
+    if (!this.meterGraphics) return;
+    const radius = 9;
+    const startAngle = Phaser.Math.DegToRad(-90);
+    const endAngle = startAngle + Phaser.Math.DegToRad(360 * progress);
+
+    // 背景ダークリング
+    this.meterGraphics.lineStyle(3, 0x000000, 0.6);
+    this.meterGraphics.strokeCircle(x, y, radius);
+
+    // 時計回り進行アーク
+    if (progress > 0) {
+      this.meterGraphics.lineStyle(3, colorHex, 0.95);
+      this.meterGraphics.beginPath();
+      this.meterGraphics.arc(x, y, radius, startAngle, endAngle, false);
+      this.meterGraphics.strokePath();
+    }
   }
 
   updateUI() {
@@ -659,6 +791,7 @@ class MainScene extends Phaser.Scene {
   createAlly(unitData) {
     const ally = this.add.image(50, 380, unitData.texture);
     ally.setOrigin(0.5, 1);
+    ally.setDepth(20);
     ally.displayHeight = unitData.height || 80;
     ally.scaleX = ally.scaleY;
     this.physics.add.existing(ally);
@@ -733,6 +866,7 @@ class MainScene extends Phaser.Scene {
 
     const enemy = this.add.image(850, 380, textureKey);
     enemy.setOrigin(0.5, 1);
+    enemy.setDepth(20);
     if (textureKey === 'enemy_slime') enemy.y += 10;
     enemy.displayHeight = height;
     enemy.scaleX = enemy.scaleY;
@@ -753,8 +887,11 @@ class MainScene extends Phaser.Scene {
     const cooldown = type === 'ally' ? attacker.unitData.cooldown : attacker.cooldown || 1500;
     const attackPower = type === 'ally' ? attacker.unitData.attack : attacker.attackPower;
 
-    if (time - attacker.lastAttackTime > cooldown) {
-      attacker.lastAttackTime = time;
+    // リングが1周（100% / time - lastAttackTime >= cooldown）した瞬間に攻撃発動
+    if (!attacker.lastAttackTime) attacker.lastAttackTime = time;
+
+    if (time - attacker.lastAttackTime >= cooldown) {
+      attacker.lastAttackTime = time; // 次のチャージサイクルを開始
       playSE(attacker.attackSE || (attacker.unitData && attacker.unitData.attackSE) || 'punch');
 
       let targets = Array.isArray(defenderOrDefenders)
@@ -870,21 +1007,81 @@ class MainScene extends Phaser.Scene {
     if (this.isWaveTransitioning) return;
     if (this.enemiesSpawned >= this.enemiesToSpawn && this.enemies.countActive() === 0) {
       this.isWaveTransitioning = true;
-      this.time.delayedCall(3000, () => {
-        if (this.isGameOver) return;
-        this.isWaveTransitioning = false;
-        if (this.currentWave < this.maxWaves) {
+      if (this.currentWave < this.maxWaves) {
+        this.time.delayedCall(3000, () => {
+          if (this.isGameOver) return;
+          this.isWaveTransitioning = false;
           this.startWave(this.currentWave + 1, true);
-        } else {
-          this.triggerGameOver(true);
-        }
-      });
+        });
+      } else {
+        // 最終WAVE撃破時: 倍速を解除して等速(1倍)に戻す ➔ 一拍(600ms)静寂 ➔ 白く発光(600ms) ➔ 回復魔法1 SEと共にさらさら粒子消滅(1050ms) ➔ ファンファーレ ＆ リザルト
+        this.isFogClearing = true;
+        this.setGameSpeed(1); // WAVE終了後は等速(1倍)に戻す
+        this.time.delayedCall(600, () => {
+          if (this.isGameOver) return;
+
+          // フェーズ1: 徐々に白く発光 (600ms)
+          const phase1 = { white: 0.0, alpha: 0.35 };
+          this.tweens.add({
+            targets: phase1,
+            white: 1.0,
+            alpha: 0.65,
+            duration: 600,
+            onUpdate: () => {
+              this.drawEnemyFog(phase1.alpha, phase1.white);
+            },
+            onComplete: () => {
+              playSE('heal'); // 第2段階（粒子がさらさらと崩れて上へ消え去る時）に「回復魔法1.mp3」を再生！
+
+              // フェーズ2: 四角枠自体は固定したままフェードアウト＋さらさらと上へ崩れ散る光粒子の大量発生 (1050ms)
+              for (let i = 0; i < 35; i++) {
+                this.time.delayedCall(i * 30, () => {
+                  if (!this.fogGraphics) return;
+                  const px = 560 + Math.random() * 220;
+                  const py = 350 + Math.random() * 220;
+                  const spark = this.add.image(px, py, 'magic_orb');
+                  spark.setScale(0.4 + Math.random() * 0.7);
+                  spark.setAlpha(0.95);
+                  spark.setDepth(15);
+                  spark.setTint(0xffffff);
+                  this.tweens.add({
+                    targets: spark,
+                    x: px + (Math.random() * 30 - 15),
+                    y: py - 80 - Math.random() * 60,
+                    alpha: 0,
+                    scale: 0.05,
+                    duration: 500 + Math.random() * 400,
+                    onComplete: () => spark.destroy(),
+                  });
+                });
+              }
+
+              const phase2 = { alpha: 0.65 };
+              this.tweens.add({
+                targets: phase2,
+                alpha: 0,
+                duration: 1050,
+                onUpdate: () => {
+                  this.drawEnemyFog(phase2.alpha, 1.0);
+                },
+                onComplete: () => {
+                  this.drawEnemyFog(0, 0);
+                  this.triggerGameOver(true);
+                },
+              });
+            },
+          });
+        });
+      }
     }
   }
 
   triggerGameOver(isWin) {
     if (this.isGameOver) return;
     this.isGameOver = true;
+    this.setGameSpeed(1); // 戦闘終了後は1倍速に自動リセット
+    const btnSpeed = document.getElementById('btn-speed-toggle');
+    if (btnSpeed) btnSpeed.style.display = 'none';
     this.scene.pause();
     stopBGM();
 
@@ -897,11 +1094,17 @@ class MainScene extends Phaser.Scene {
       title.className = 'result-win';
       playSE('victory');
 
+      const isFirstClear = activeStage > (saveData.clearedStage || 0);
       let reward = activeStage * 200;
       saveData.gold += reward;
       saveData.clearedStage = Math.max(saveData.clearedStage, activeStage);
       saveGame();
-      msg.textContent = `${reward} G 獲得！`;
+
+      if (isFirstClear) {
+        msg.innerHTML = `${reward} G 獲得！<br><span style="color:#ffd43b;font-weight:bold;font-size:0.9rem;display:inline-block;margin-top:4px;">★初回クリア特典：最大出撃数が +2 増加！</span>`;
+      } else {
+        msg.textContent = `${reward} G 獲得！`;
+      }
     } else {
       title.textContent = 'ゲームオーバー';
       title.className = 'result-lose';
@@ -909,6 +1112,32 @@ class MainScene extends Phaser.Scene {
       msg.textContent = `防衛に失敗しました...`;
     }
     resultScreen.style.display = 'flex';
+  }
+
+  setGameSpeed(multiplier) {
+    this.gameSpeedMultiplier = multiplier;
+    this.time.timeScale = multiplier;
+    this.tweens.timeScale = multiplier;
+    this.physics.world.timeScale = 1 / multiplier;
+
+    const btnSpeed = document.getElementById('btn-speed-toggle');
+    const speedIcon = document.getElementById('speed-icon');
+    const speedText = document.getElementById('speed-text');
+    if (btnSpeed && speedIcon && speedText) {
+      btnSpeed.classList.remove('speed-2x', 'speed-4x');
+      if (multiplier === 1) {
+        speedIcon.textContent = '▶';
+        speedText.textContent = '1倍速';
+      } else if (multiplier === 2) {
+        btnSpeed.classList.add('speed-2x');
+        speedIcon.textContent = '▶▶';
+        speedText.textContent = '2倍速';
+      } else if (multiplier === 4) {
+        btnSpeed.classList.add('speed-4x');
+        speedIcon.textContent = '▶▶▶';
+        speedText.textContent = '4倍速';
+      }
+    }
   }
 }
 
@@ -934,11 +1163,12 @@ loadSaveData();
 let currentScreen = 'start'; // 'start', 'map', 'upgrade', 'game'
 function updateGlobalBackButton() {
   const backBtn = document.getElementById('global-back-btn');
-  if (!backBtn) return;
-  if (currentScreen === 'start') {
-    backBtn.style.display = 'none';
-  } else {
-    backBtn.style.display = 'flex';
+  if (backBtn) {
+    backBtn.style.display = currentScreen === 'start' ? 'none' : 'flex';
+  }
+  const btnSpeed = document.getElementById('btn-speed-toggle');
+  if (btnSpeed) {
+    btnSpeed.style.display = currentScreen === 'game' ? 'inline-flex' : 'none';
   }
 }
 

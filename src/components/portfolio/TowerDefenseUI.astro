@@ -56,9 +56,7 @@ const { gameTitle } = Astro.props;
       <button id="btn-stage2" class="btn btn-stage" disabled>ステージ2 (夕)</button>
       <button id="btn-stage3" class="btn btn-stage" disabled>ステージ3 (夜)</button>
     </div>
-    <button id="btn-to-upgrade" class="btn btn-basecamp btn-to-upgrade"
-      >ベースキャンプ (強化)</button
-    >
+    <button id="btn-to-upgrade" class="btn btn-basecamp btn-to-upgrade">ベースキャンプ</button>
   </div>
 
   <!-- Upgrade Screen -->
@@ -291,6 +289,10 @@ const { gameTitle } = Astro.props;
   <div class="game-ui">
     <div class="action-bar-inner">
       <button id="btn-retire" class="btn btn-danger btn-retire">リタイア</button>
+      <button id="btn-speed-toggle" class="btn-speed-toggle" title="戦闘速度の変更">
+        <span id="speed-icon">▶</span>
+        <span id="speed-text">1倍速</span>
+      </button>
     </div>
 
     <div class="deck-area">
@@ -536,10 +538,62 @@ const { gameTitle } = Astro.props;
 
     .action-bar-inner {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
+      right: 12px;
+      bottom: 95px;
       pointer-events: none;
-      z-index: 6;
+      z-index: 50;
+    }
+
+    .btn-speed-toggle {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition:
+        transform 0.15s,
+        background-color 0.15s,
+        border-color 0.15s;
+    }
+
+    .btn-speed-toggle:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: #00bfff;
+      transform: scale(1.05);
+    }
+
+    .btn-speed-toggle:active {
+      transform: scale(0.95);
+    }
+
+    #speed-icon {
+      color: #00bfff;
+      font-size: 0.75rem;
+    }
+
+    .btn-speed-toggle.speed-2x {
+      border-color: #ffd700;
+    }
+
+    .btn-speed-toggle.speed-2x #speed-icon {
+      color: #ffd700;
+    }
+
+    .btn-speed-toggle.speed-4x {
+      border-color: #ff4500;
+    }
+
+    .btn-speed-toggle.speed-4x #speed-icon {
+      color: #ff4500;
     }
 
     .global-back-btn {
