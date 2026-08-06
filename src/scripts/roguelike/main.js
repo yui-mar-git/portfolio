@@ -6,6 +6,7 @@ import { CARD_DB, REWARD_POOL, INITIAL_DECKS, upgradeCard } from '../../data/rog
 import { RELIC_DB } from '../../data/roguelike/relics';
 import { ITEM_DB } from '../../data/roguelike/items';
 import { enemyTemplates, getEnemyTemplate } from '../../data/roguelike/enemies';
+import { TOOLTIP_DB } from '../../data/roguelike/tooltips';
 
 // ===================================================
 // Audio コストger
@@ -555,14 +556,101 @@ function hideGameAlert() {
   }
 }
 
+let activeTooltipPopup = null;
+let activeTooltipTarget = null;
+
+function hideTooltipPopup() {
+  if (activeTooltipPopup) {
+    activeTooltipPopup.classList.remove('show');
+    const oldPopup = activeTooltipPopup;
+    setTimeout(() => {
+      if (oldPopup && oldPopup.parentNode) {
+        oldPopup.parentNode.removeChild(oldPopup);
+      }
+    }, 200);
+    activeTooltipPopup = null;
+  }
+  if (activeTooltipTarget) {
+    activeTooltipTarget.classList.remove('active');
+    activeTooltipTarget = null;
+  }
+}
+
+document.addEventListener('click', () => {
+  hideTooltipPopup();
+});
+
+function attachTooltipToElement(element, tooltipKey) {
+  if (!element || !TOOLTIP_DB[tooltipKey]) return;
+  element.classList.add('has-tooltip');
+
+  const info = TOOLTIP_DB[tooltipKey];
+
+  const showTooltip = (e) => {
+    e.stopPropagation();
+    if (activeTooltipTarget === element) {
+      hideTooltipPopup();
+      return;
+    }
+    hideTooltipPopup();
+
+    activeTooltipTarget = element;
+    element.classList.add('active');
+
+    const popup = document.createElement('div');
+    popup.className = 'rl-tooltip-popup';
+    popup.innerHTML = info.desc;
+    document.body.appendChild(popup);
+
+    const rect = element.getBoundingClientRect();
+    const popupWidth = popup.offsetWidth || 220;
+    const popupHeight = popup.offsetHeight || 60;
+
+    let left = rect.left + rect.width / 2 - popupWidth / 2;
+    let top = rect.top - popupHeight - 8;
+
+    if (top < 10) {
+      top = rect.bottom + 8;
+    }
+    if (left < 10) left = 10;
+    if (left + popupWidth > window.innerWidth - 10) {
+      left = window.innerWidth - popupWidth - 10;
+    }
+
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+
+    requestAnimationFrame(() => {
+      popup.classList.add('show');
+    });
+
+    activeTooltipPopup = popup;
+  };
+
+  element.addEventListener('mouseenter', (e) => {
+    showTooltip(e);
+  });
+
+  element.addEventListener('mouseleave', () => {
+    hideTooltipPopup();
+  });
+
+  element.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showTooltip(e);
+  });
+}
+
 if (btnCloseCardDetail) {
   btnCloseCardDetail.addEventListener('click', () => {
+    hideTooltipPopup();
     if (cardDetailModal) cardDetailModal.style.display = 'none';
   });
 }
 
 function showCardDetailModal(card) {
   if (!cardDetailModal) return;
+  hideTooltipPopup();
   cardDetailContent.innerHTML = '';
   const cardEl = makeCardEl(card, false);
   cardEl.style.transform = 'scale(1.3)';
@@ -579,6 +667,45 @@ function showCardDetailModal(card) {
     card.category && catLabelMap[card.category] ? `${catLabelMap[card.category]} ` : '';
   const flavorHtml = `<div class="card-flavor-text">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
   cardDetailDesc.innerHTML = `<div class="card-desc-container">${catPrefix}${descHtml}</div>${flavorHtml}`;
+
+  // 上部カテゴリバッジのツールチップ紐付け
+  const catBadge = cardEl.querySelector('.card-category-badge');
+  if (catBadge && card.category) {
+    attachTooltipToElement(catBadge, card.category);
+  }
+  const catBadgeDesc = cardDetailDesc.querySelector(
+    '.badge-physical, .badge-spell, .badge-special',
+  );
+  if (catBadgeDesc && card.category) {
+    attachTooltipToElement(catBadgeDesc, card.category);
+  }
+
+  // 下部タグのツールチップ紐付け
+  const tagElements = cardEl.querySelectorAll('.card-tag');
+  tagElements.forEach((tagEl) => {
+    const text = tagEl.textContent.trim();
+    const tagKeyMap = {
+      物理: 'physical',
+      呪文: 'spell',
+      特殊: 'special',
+      炎: 'fire',
+      氷: 'ice',
+      雷: 'thunder',
+      風: 'wind',
+      土: 'stone',
+      毒: 'poison',
+      麻痺: 'paralyze',
+      能昇: 'buff_up',
+      能降: 'buff_down',
+      回復: 'heal',
+      無: 'none',
+    };
+    const key = tagKeyMap[text];
+    if (key) {
+      attachTooltipToElement(tagEl, key);
+    }
+  });
+
   cardDetailModal.style.display = 'flex';
 }
 

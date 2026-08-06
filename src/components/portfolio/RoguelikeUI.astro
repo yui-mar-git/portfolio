@@ -2636,6 +2636,106 @@ const { projectData } = Astro.props;
     display: none;
   }
 
+  :global(.card-category-badge.has-tooltip) {
+    pointer-events: auto !important;
+  }
+
+  :global(.has-tooltip) {
+    cursor: help !important;
+    transition:
+      transform 0.15s ease,
+      filter 0.15s ease;
+  }
+
+  :global(.has-tooltip:hover),
+  :global(.has-tooltip.active) {
+    filter: brightness(1.3);
+  }
+
+  :global(.rl-tooltip-popup) {
+    position: absolute;
+    z-index: 9999;
+    background: rgba(18, 18, 30, 0.95);
+    border: 1px solid #ffb84d;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    color: #eee;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    max-width: 260px;
+    width: max-content;
+    text-align: left;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  :global(.rl-tooltip-popup.show) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  :global(.tooltip-title) {
+    font-weight: bold;
+    font-size: 0.78rem;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  :global(.tt-physical) {
+    color: #ff6b6b;
+  }
+  :global(.tt-spell) {
+    color: #b197fc;
+  }
+  :global(.tt-special) {
+    color: #ffd43b;
+  }
+  :global(.tt-fire) {
+    color: #ff6b6b;
+  }
+  :global(.tt-ice) {
+    color: #4dabf7;
+  }
+  :global(.tt-wind) {
+    color: #51cf66;
+  }
+  :global(.tt-stone) {
+    color: #fcc419;
+  }
+  :global(.tt-thunder) {
+    color: #ffec99;
+  }
+  :global(.tt-none) {
+    color: #e9ecef;
+  }
+  :global(.tt-poison) {
+    color: #cc5de8;
+  }
+  :global(.tt-paralyze) {
+    color: #ffd43b;
+  }
+  :global(.tt-dazzle) {
+    color: #ff922b;
+  }
+  :global(.tt-silence) {
+    color: #845ef7;
+  }
+  :global(.tt-buff-up) {
+    color: #51cf66;
+  }
+  :global(.tt-buff-down) {
+    color: #ff6b6b;
+  }
+  :global(.tt-heal) {
+    color: #51cf66;
+  }
+
   .battle-layout-custom {
     top: 40px;
     height: calc(100% - 84px);
