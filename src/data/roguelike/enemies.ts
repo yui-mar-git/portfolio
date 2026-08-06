@@ -72,6 +72,20 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
       immunities: [],
       skills: ['attack', 'rush'],
     },
+    {
+      name: 'ホーネット',
+      hp: 8,
+      maxHp: 8,
+      attackBase: 1,
+      image: new URL(
+        '../../assets/games/roguelike/images/monsters/bug_hachi_doku.png',
+        import.meta.url,
+      ).href,
+      weaknesses: ['fire', 'wind'],
+      resistances: [],
+      immunities: [],
+      skills: ['attack', 'poison'],
+    },
   ],
 
   // ===== エリア2 通常モンスター =====
@@ -209,7 +223,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
       weaknesses: [],
       resistances: [],
       immunities: [],
-      skills: ['attack', 'rush', 'buff_up'], // 能昇を使用
+      skills: ['attack', 'rush', 'buff_up', 'poison'],
     },
     // エリア1 ボス (9層)
     {
@@ -221,10 +235,10 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
         '../../assets/games/roguelike/images/monsters/fantasy_dark_elf.png',
         import.meta.url,
       ).href,
-      weaknesses: [],
+      weaknesses: ['fire'],
       resistances: [],
-      immunities: [],
-      skills: ['attack', 'heal', 'buff_down', 'paralyze'], // 快癒、能降、麻痺を使用
+      immunities: ['wind'],
+      skills: ['attack', 'heal', 'wind_attack', 'dazzle', 'silence'],
     },
     // エリア2 中ボス (4層)
     {
@@ -252,11 +266,11 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
         '../../assets/games/roguelike/images/monsters/fantasy_dracula2.png',
         import.meta.url,
       ).href,
-      weaknesses: ['fire'],
+      weaknesses: ['fire', 'thunder'],
       resistances: [],
-      immunities: [], // 毒無効(JSロジック側で処理)
-      skills: ['attack', 'poison'],
-      isVampire: true,
+      immunities: [],
+      skills: ['attack', 'poison', 'dazzle', 'buff_down'],
+      isVampire: true, // 毒無効(JSロジック側で処理)
     },
     // エリア3 中ボス (5層)
     {
@@ -268,7 +282,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
         '../../assets/games/roguelike/images/monsters/fantasy_leviathan.png',
         import.meta.url,
       ).href,
-      weaknesses: ['thunder'],
+      weaknesses: ['thunder', 'stone'],
       resistances: ['fire'],
       immunities: ['ice'], // 氷無効
       skills: ['attack', 'ice_attack'], // 氷攻撃
@@ -284,9 +298,18 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
         import.meta.url,
       ).href,
       weaknesses: ['thunder'],
-      resistances: ['stone'], // 土耐性
+      resistances: [],
       immunities: [],
-      skills: ['attack', 'rush', 'buff_up', 'buff_down', 'poison', 'paralyze'],
+      skills: [
+        'attack',
+        'rush',
+        'fire_attack',
+        'ice_attack',
+        'wind_attack',
+        'stone_attack',
+        'poison',
+        'paralyze',
+      ],
       isMaou: true, // デバフ50%防ぐ
     },
   ],
@@ -305,7 +328,7 @@ export const enemyTemplates: Record<string, EnemyTemplate[]> = {
       weaknesses: [],
       resistances: [],
       immunities: [],
-      skills: ['attack', 'rush'],
+      skills: ['attack', 'rush', 'ice_attack'],
     },
   ],
 };

@@ -2313,6 +2313,8 @@ function executeUseItem(itemId) {
   } else if (itemId === 'elixir') {
     player.poison = 0;
     player.paralyze = 0;
+    player.dazzle = 0;
+    player.silence = 0;
     logMessage('アイテム「万能薬」を使用し、すべての状態異常を解除した！', 'log-heal');
   } else if (itemId === 'dynamite') {
     if (enemy) {
@@ -2563,9 +2565,23 @@ function getColorLabel(color) {
 // 旧COLOR_TO_DOT（後方互換で残す）
 const COLOR_TO_DOT = {};
 
+let turnInCurrentBattle = 0;
+
 // --- 15. バトルシステム & ダメージ計算 ---
 function setEnemyIntent() {
   if (!enemy || enemy.hp <= 0) return;
+
+  if (enemy.isMaou) {
+    if (turnInCurrentBattle === 1) {
+      enemy.intent = { type: 'kakusei_plus', damage: 0, desc: '覚醒+' };
+      return;
+    }
+    if (enemy.hp <= Math.floor(enemy.maxHp / 2) && !enemy.usedMeteor) {
+      enemy.usedMeteor = true;
+      enemy.intent = { type: 'meteor_plus', damage: 8, hits: 4, desc: '流星群+' };
+      return;
+    }
+  }
 
   const availableSkills = enemy.skills.length > 0 ? enemy.skills : ['attack'];
   const chosen = availableSkills[Math.floor(Math.random() * availableSkills.length)];
@@ -2575,6 +2591,14 @@ function setEnemyIntent() {
     enemy.intent = { type: 'fire_attack', damage: dmg + 2, desc: '火炎ブレス' };
   } else if (chosen === 'ice_attack') {
     enemy.intent = { type: 'ice_attack', damage: dmg + 1, desc: '絶対零度' };
+  } else if (chosen === 'wind_attack') {
+    enemy.intent = { type: 'wind_attack', damage: dmg + 1, desc: 'かまいたち' };
+  } else if (chosen === 'stone_attack') {
+    enemy.intent = { type: 'stone_attack', damage: dmg + 2, desc: '落石' };
+  } else if (chosen === 'dazzle') {
+    enemy.intent = { type: 'dazzle', damage: 0, desc: '幻惑の眼光 (幻惑付与)' };
+  } else if (chosen === 'silence') {
+    enemy.intent = { type: 'silence', damage: 0, desc: '沈黙の呪言 (沈黙付与)' };
   } else if (chosen === 'rush') {
     enemy.intent = {
       type: 'rush',
@@ -2696,8 +2720,12 @@ function drawCards(count) {
 
 function startTurn() {
   isPlayerTurn = true;
+  turnInCurrentBattle += 1;
   player.actions = player.class === 'butouka' ? 2 : 1;
   if (player.relics.includes('shoes_sneaker')) player.actions += 1;
+
+  if (player.dazzle > 0) player.dazzle -= 1;
+  if (player.silence > 0) player.silence -= 1;
 
   if (player.paralyze > 0) {
     player.paralyze -= 1;
@@ -2800,6 +2828,18 @@ function enemyTurn() {
         playSE('heal');
         enemy.hp = Math.min(enemy.maxHp, enemy.hp + 5);
         logMessage(`${enemy.name} はHPを 5 回復した！`, 'log-heal');
+      } else if (enemy.intent.type === 'kakusei_plus') {
+        playSE('buff_up');
+        enemy.buffUp = 5;
+        logMessage(`${enemy.name} は【覚醒+】した！すさまじい魔力が高まる！`, 'log-heal');
+      } else if (enemy.intent.type === 'dazzle') {
+        playSE('poison');
+        player.dazzle = 2;
+        logMessage('プレイヤーは【幻惑】状態になった！', 'log-poison');
+      } else if (enemy.intent.type === 'silence') {
+        playSE('poison');
+        player.silence = 2;
+        logMessage('プレイヤーは【沈黙】状態になった！', 'log-poison');
       } else if (enemy.intent.type === 'paralyze') {
         playSE('thunder');
         player.paralyze = 1;
@@ -2816,6 +2856,24 @@ function enemyTurn() {
         playSE('buff_down');
         player.buffDown = 3;
         logMessage('プレイヤーは能降状態になった！', 'log-poison');
+      } else if (enemy.intent.type === 'meteor_plus') {
+        logMessage(`${enemy.name} の「流星群+」が発動！`, 'log-damage');
+        const meteorElements = ['fire', 'ice', 'wind', 'stone'];
+        const elemNames = { fire: '火', ice: '水', wind: '風', stone: '土' };
+        meteorElements.forEach((elem) => {
+          if (elem === 'fire') playSE('fire');
+          else if (elem === 'ice') playSE('ice');
+          else if (elem === 'wind') playSE('wind');
+          else if (elem === 'stone') playSE('stone');
+
+          const d = calculateDamage(8, elem, false);
+          if (d > 0) {
+            player.hp = Math.max(0, player.hp - d);
+            logMessage(`【${elemNames[elem]}属性】プレイヤーに ${d} ダメージ！`, 'log-damage');
+          } else {
+            logMessage(`【${elemNames[elem]}属性】無効化された！`, 'log-system');
+          }
+        });
       } else {
         const isBoss =
           currentPathType === 'boss' ||
@@ -2823,6 +2881,8 @@ function enemyTurn() {
           currentPathType === 'lastboss';
         if (enemy.intent.type === 'fire_attack') playSE('fire');
         else if (enemy.intent.type === 'ice_attack') playSE('ice');
+        else if (enemy.intent.type === 'wind_attack') playSE('wind');
+        else if (enemy.intent.type === 'stone_attack') playSE('stone');
         else if (enemy.name === 'ハーピー') playSE('harpy');
         else if (isBoss) playSE('boss_attack');
         else playSE('enemy_attack');
@@ -2832,7 +2892,11 @@ function enemyTurn() {
             ? 'fire'
             : enemy.intent.type === 'ice_attack'
               ? 'ice'
-              : 'none';
+              : enemy.intent.type === 'wind_attack'
+                ? 'wind'
+                : enemy.intent.type === 'stone_attack'
+                  ? 'stone'
+                  : 'none';
         const calculatedDmg = calculateDamage(dmg, element, false);
         if (calculatedDmg > 0) {
           player.hp = Math.max(0, player.hp - calculatedDmg);
@@ -3367,6 +3431,7 @@ function startBattle() {
   else if (currentPathType === 'boss' || currentPathType === 'midboss') playBGM('boss');
   else playBGM('battle');
 
+  turnInCurrentBattle = 0;
   enemy = { ...tpl, hp: tpl.hp, maxHp: tpl.maxHp, poison: 0, paralyze: 0, buffUp: 0, buffDown: 0 };
   if (enemyNameEl) enemyNameEl.textContent = enemy.name;
   if (enemyImageEl) enemyImageEl.src = enemy.image;
@@ -3386,6 +3451,8 @@ function startBattle() {
     player.discard = [];
     player.poison = 0;
     player.paralyze = 0;
+    player.dazzle = 0;
+    player.silence = 0;
     player.buffUp = 0;
     player.buffDown = 0;
   } else {
@@ -3395,6 +3462,8 @@ function startBattle() {
     player.exhausted = [];
     player.poison = 0;
     player.paralyze = 0;
+    player.dazzle = 0;
+    player.silence = 0;
     player.buffUp = 0;
     player.buffDown = 0;
     player.mp = Math.min(player.maxMp, player.mp);
@@ -3429,11 +3498,13 @@ function updateUI() {
   // 行動回数
   if (playerActionsText) playerActionsText.textContent = player.actions;
 
-  // 毒・麻痺・能昇・能降バッジ (プレイヤー)
+  // 毒・麻痺・幻惑・沈黙・能昇・能降バッジ (プレイヤー)
   if (playerPoisonEl) {
     let text = '';
     if (player.poison > 0) text += ` 🟢×${player.poison}`;
     if (player.paralyze > 0) text += ` ⚡×${player.paralyze}`;
+    if (player.dazzle > 0) text += ` 👁️×${player.dazzle}`;
+    if (player.silence > 0) text += ` 🔇×${player.silence}`;
     if (player.buffUp > 0) text += ` 📈×${player.buffUp}`;
     if (player.buffDown > 0) text += ` 📉×${player.buffDown}`;
 

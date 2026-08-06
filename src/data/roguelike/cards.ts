@@ -214,10 +214,11 @@ export const CARD_DB: Record<string, Card> = {
     type: 'attack',
     category: 'special',
     cost: 3,
-    value: 10,
-    desc: '敵に 10 ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能)',
+    value: 5,
+    hits: 4,
+    desc: '敵に火・水・風・土属性で各4×5ダメージ (戦闘中1回のみ使用可能)',
     color: 'purple',
-    element: 'none', // 炎として扱うが、全属性に強い(弱点)を突く特別計算をJSで行う
+    element: 'none',
     oncePerBattle: true,
     flavor: 'フレーバーテキスト準備中',
   },
@@ -398,9 +399,8 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.desc = `敵は <span class="card-val-up">${upgradedCard.buffDown}</span> ターンの間、与ダメージ -1、被ダメージ +1`;
       break;
     case 'meteor':
-      upgradedCard.cost = Math.max(0, 3 - level); // コスト減
-      upgradedCard.value = 10 + 2 * level;
-      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能)`;
+      upgradedCard.value = 5 + 3 * level;
+      upgradedCard.desc = `敵に火・水・風・土属性で各4×<span class="card-val-up">${upgradedCard.value}</span>ダメージ (戦闘中1回のみ使用可能)`;
       break;
     case 'kakusei':
       upgradedCard.buffUp = 5 + level;

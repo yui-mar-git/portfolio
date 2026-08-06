@@ -21,27 +21,27 @@ export const TOOLTIP_DB: Record<string, TooltipInfo> = {
   // 属性（カード下部）
   fire: {
     title: '火属性',
-    desc: '<span class="tooltip-title tt-fire">火属性:</span><br>火属性。水属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
+    desc: '<span class="tooltip-title tt-fire">火属性:</span><br>火属性。火属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
   },
   ice: {
-    title: '氷属性',
-    desc: '<span class="tooltip-title tt-ice">氷属性:</span><br>水・氷属性。火属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
+    title: '水属性',
+    desc: '<span class="tooltip-title tt-ice">水属性:</span><br>水属性。水属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
   },
   wind: {
     title: '風属性',
-    desc: '<span class="tooltip-title tt-wind">風属性:</span><br>風属性。土属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
+    desc: '<span class="tooltip-title tt-wind">風属性:</span><br>風属性。風属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
   },
   stone: {
     title: '土属性',
-    desc: '<span class="tooltip-title tt-stone">土属性:</span><br>土・石属性。雷属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
+    desc: '<span class="tooltip-title tt-stone">土属性:</span><br>土属性。土属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
   },
   thunder: {
     title: '雷属性',
-    desc: '<span class="tooltip-title tt-thunder">雷属性:</span><br>雷属性。風属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
+    desc: '<span class="tooltip-title tt-thunder">雷属性:</span><br>雷属性。雷属性が苦手な敵に大ダメージを与えるが、<br>耐性を持つ敵にはダメージが減る。<br>うまく相手の弱点を見抜こう！',
   },
   none: {
     title: '無属性',
-    desc: '<span class="tooltip-title tt-none">無属性:</span><br>属性を持たない攻撃。弱点や耐性の影響を受けない。',
+    desc: '<span class="tooltip-title tt-none">無属性:</span><br>属性を持たない呪文。弱点や耐性の影響を受けない。',
   },
 
   // 状態異常（カード下部）
