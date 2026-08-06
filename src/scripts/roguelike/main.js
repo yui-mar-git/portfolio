@@ -877,10 +877,10 @@ function setupClassSelection() {
       let initialCards = INITIAL_DECKS[selectedClass].map((id) => CARD_DB[id]);
 
       const classInfo = {
-        yuusya: { hp: 10, mp: 5, effect: '開始時に王様からレリックを2つ貰える' },
-        kenshi: { hp: 15, mp: 4, effect: '毎ターン開始時にHPが1回復する' },
-        mahoutsukai: { hp: 7, mp: 7, effect: '毎ターン開始時にMPが1回復する' },
-        butouka: { hp: 8, mp: 4, effect: '毎ターンの行動回数が+1' },
+        yuusya: { hp: 13, mp: 7, effect: '開始時に王様からレリックを2つ貰える' },
+        kenshi: { hp: 15, mp: 5, effect: '毎ターン開始時にHPが1回復する' },
+        mahoutsukai: { hp: 10, mp: 10, effect: '毎ターン開始時にMPが1回復する' },
+        butouka: { hp: 10, mp: 5, effect: '毎ターンの行動回数が+1' },
       };
       const info = classInfo[selectedClass];
       const confirmMessage = `初期HP: ${info.hp} / 初期MP: ${info.mp}<br><span class="hero-effect-text">【特殊効果】 ${info.effect}</span>`;
@@ -926,17 +926,17 @@ function initGame() {
   currentRow = 0;
 
   if (player.class === 'yuusya') {
-    player.maxHp = 10;
-    player.maxMp = 5;
+    player.maxHp = 13;
+    player.maxMp = 7;
   } else if (player.class === 'kenshi') {
     player.maxHp = 15;
-    player.maxMp = 4;
+    player.maxMp = 5;
   } else if (player.class === 'mahoutsukai') {
-    player.maxHp = 7;
-    player.maxMp = 7;
+    player.maxHp = 10;
+    player.maxMp = 10;
   } else if (player.class === 'butouka') {
-    player.maxHp = 8;
-    player.maxMp = 4;
+    player.maxHp = 10;
+    player.maxMp = 5;
   }
   player.hp = player.maxHp;
   player.mp = player.maxMp;
@@ -1489,7 +1489,7 @@ function showShopServiceScreen(type) {
       shopServiceCardList.innerHTML = '<div class="shop-empty-msg">カードがありません</div>';
     } else {
       targets.forEach((cardInstance) => {
-        const isFullyUpgraded = (cardInstance.upgradeCount || 0) >= 3;
+        const isFullyUpgraded = (cardInstance.upgradeCount || 0) >= 1;
         const btn = makeCardEl(cardInstance, () => {
           if (type === 'upgrade' && isFullyUpgraded) return;
           if (player.gold >= 20) {
@@ -2367,6 +2367,10 @@ const CARD_IMAGES = {
   ).href,
   meteor: new URL('../../assets/games/roguelike/images/icons/kanden_gaikotsu.png', import.meta.url)
     .href,
+  dazzle: new URL('../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url)
+    .href,
+  silence: new URL('../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url)
+    .href,
 };
 
 // 属性→ドットクラスのマッピング
@@ -2596,9 +2600,9 @@ function setEnemyIntent() {
   } else if (chosen === 'stone_attack') {
     enemy.intent = { type: 'stone_attack', damage: dmg + 2, desc: '落石' };
   } else if (chosen === 'dazzle') {
-    enemy.intent = { type: 'dazzle', damage: 0, desc: '幻惑の眼光 (幻惑付与)' };
+    enemy.intent = { type: 'dazzle', damage: 0, desc: '幻惑の眼光' };
   } else if (chosen === 'silence') {
-    enemy.intent = { type: 'silence', damage: 0, desc: '沈黙の呪言 (沈黙付与)' };
+    enemy.intent = { type: 'silence', damage: 0, desc: '沈黙の呪言' };
   } else if (chosen === 'rush') {
     enemy.intent = {
       type: 'rush',
@@ -2607,17 +2611,17 @@ function setEnemyIntent() {
       desc: '突進連撃',
     };
   } else if (chosen === 'paralyze') {
-    enemy.intent = { type: 'paralyze', damage: 0, desc: '痺れ粉 (麻痺付与)' };
+    enemy.intent = { type: 'paralyze', damage: 0, desc: '痺れ粉' };
   } else if (chosen === 'poison') {
     enemy.intent = { type: 'poison', damage: 0, desc: '毒液' };
   } else if (chosen === 'heal') {
     enemy.intent = { type: 'heal', damage: 0, desc: '自己再生' };
   } else if (chosen === 'buff_up') {
-    enemy.intent = { type: 'buff_up', damage: 0, desc: '魔力昇華 (能昇)' };
+    enemy.intent = { type: 'buff_up', damage: 0, desc: '魔力昇華' };
   } else if (chosen === 'buff_down') {
-    enemy.intent = { type: 'buff_down', damage: 0, desc: '重力波 (能降)' };
+    enemy.intent = { type: 'buff_down', damage: 0, desc: '重力波' };
   } else {
-    enemy.intent = { type: 'attack', damage: dmg, desc: '通常攻撃' };
+    enemy.intent = { type: 'attack', damage: dmg, desc: '攻撃' };
   }
 }
 
@@ -2989,7 +2993,11 @@ function playCard(index) {
       player.actions++;
       logMessage(card.name + '！ カードを' + card.draw + '枚引く！');
     }
-    if (card.healSelf) {
+    if (card.healPercent) {
+      const healAmount = Math.max(1, Math.floor(player.maxHp * card.healPercent));
+      player.hp = Math.min(player.maxHp, player.hp + healAmount);
+      logMessage(`${card.name}！ HPが ${healAmount} 回復した！`, 'log-heal');
+    } else if (card.healSelf) {
       player.hp = Math.min(player.maxHp, player.hp + card.healSelf);
       logMessage(card.name + '！ HP +' + card.healSelf, 'log-heal');
     }
@@ -3082,7 +3090,7 @@ function handleVictory() {
         'log-system',
       );
     }
-    const unupgraded = player.deck.filter((c) => (c.upgradeCount || 0) < 3);
+    const unupgraded = player.deck.filter((c) => (c.upgradeCount || 0) < 1);
     if (unupgraded.length > 0) {
       shuffle(unupgraded);
       const target = unupgraded[0];
@@ -3484,19 +3492,24 @@ function updateUI() {
   if (playerHpText) playerHpText.textContent = player.hp + '/' + player.maxHp;
   if (playerHpBar) playerHpBar.style.width = (player.hp / player.maxHp) * 100 + '%';
 
-  // MP
+  // MP バー
   if (playerMpText) playerMpText.textContent = player.mp + '/' + player.maxMp;
-  if (playerMpOrbs) {
-    playerMpOrbs.innerHTML = '';
-    for (let i = 0; i < player.maxMp; i++) {
-      const o = document.createElement('div');
-      o.className = 'ap-orb' + (i < player.mp ? ' active' : '');
-      playerMpOrbs.appendChild(o);
+  const playerMpBar = document.getElementById('player-mp-bar');
+  if (playerMpBar)
+    playerMpBar.style.width = Math.max(0, Math.min(100, (player.mp / player.maxMp) * 100)) + '%';
+
+  // 行動回数 Orbs
+  const actionOrbsEl = document.getElementById('player-action-orbs');
+  if (actionOrbsEl) {
+    actionOrbsEl.innerHTML = '';
+    const maxActions =
+      player.class === 'butouka' ? 2 : player.relics.includes('shoes_sneaker') ? 2 : 1;
+    for (let i = 0; i < maxActions; i++) {
+      const orb = document.createElement('div');
+      orb.className = 'action-orb' + (i < player.actions ? ' active' : '');
+      actionOrbsEl.appendChild(orb);
     }
   }
-
-  // 行動回数
-  if (playerActionsText) playerActionsText.textContent = player.actions;
 
   // 毒・麻痺・幻惑・沈黙・能昇・能降バッジ (プレイヤー)
   if (playerPoisonEl) {
@@ -3508,8 +3521,13 @@ function updateUI() {
     if (player.buffUp > 0) text += ` 📈×${player.buffUp}`;
     if (player.buffDown > 0) text += ` 📉×${player.buffDown}`;
 
-    playerPoisonEl.style.display = text ? 'inline' : 'none';
-    playerPoisonEl.textContent = text;
+    if (text) {
+      playerPoisonEl.classList.add('active');
+      playerPoisonEl.textContent = text;
+    } else {
+      playerPoisonEl.classList.remove('active');
+      playerPoisonEl.textContent = '';
+    }
   }
 
   // 山札
@@ -3529,11 +3547,20 @@ function updateUI() {
     if (enemyHpBar) enemyHpBar.style.width = Math.max(0, (enemy.hp / enemy.maxHp) * 100) + '%';
     if (enemyIntentEl) {
       if (enemy.intent) {
-        enemyIntentEl.style.display = 'block';
-        enemyIntentEl.textContent =
-          `${enemy.intent.desc} ` + (enemy.intent.damage > 0 ? `⚔️${enemy.intent.damage}` : '');
+        enemyIntentEl.classList.add('active');
+        enemyIntentEl.title = 'クリックで技の詳細を表示';
+        enemyIntentEl.innerHTML = `次は「<span class="enemy-intent-tag">${enemy.intent.desc}</span>」をしようとしている！`;
+
+        if (!enemyIntentEl.dataset.hasClick) {
+          enemyIntentEl.dataset.hasClick = 'true';
+          enemyIntentEl.addEventListener('click', () => {
+            if (enemy && enemy.intent) {
+              showEnemySkillCardModal(enemy.intent);
+            }
+          });
+        }
       } else {
-        enemyIntentEl.style.display = 'none';
+        enemyIntentEl.classList.remove('active');
       }
     }
 
@@ -3545,8 +3572,13 @@ function updateUI() {
       if (enemy.buffUp > 0) text += ` 📈×${enemy.buffUp}`;
       if (enemy.buffDown > 0) text += ` 📉×${enemy.buffDown}`;
 
-      enemyPoisonEl.style.display = text ? 'inline' : 'none';
-      enemyPoisonEl.textContent = text;
+      if (text) {
+        enemyPoisonEl.classList.add('active');
+        enemyPoisonEl.textContent = text;
+      } else {
+        enemyPoisonEl.classList.remove('active');
+        enemyPoisonEl.textContent = '';
+      }
     }
   }
 
@@ -3841,5 +3873,143 @@ const seVolumeInput = document.getElementById('se-volume');
 if (seVolumeInput) {
   seVolumeInput.addEventListener('input', (e) => {
     setSeVolume(e.target.value / 100);
+  });
+}
+
+function showEnemySkillCardModal(intent) {
+  const cardSkillMap = {
+    fire_attack: {
+      name: '火炎ブレス',
+      category: 'spell',
+      type: 'attack',
+      element: 'fire',
+      desc: `プレイヤーに火属性ダメージを ${intent.damage || 3} 与える`,
+      color: 'red',
+    },
+    ice_attack: {
+      name: '絶対零度',
+      category: 'spell',
+      type: 'attack',
+      element: 'ice',
+      desc: `プレイヤーに水属性ダメージを ${intent.damage || 2} 与える`,
+      color: 'blue',
+    },
+    wind_attack: {
+      name: 'かまいたち',
+      category: 'spell',
+      type: 'attack',
+      element: 'wind',
+      desc: `プレイヤーに風属性ダメージを ${intent.damage || 2} 与える`,
+      color: 'green',
+    },
+    stone_attack: {
+      name: '落石',
+      category: 'physical',
+      type: 'attack',
+      element: 'stone',
+      desc: `プレイヤーに土属性ダメージを ${intent.damage || 3} 与える`,
+      color: 'brown',
+    },
+    dazzle: {
+      name: '幻惑の眼光',
+      category: 'special',
+      type: 'skill',
+      element: 'dazzle',
+      desc: 'プレイヤーを 2 ターンの間【幻惑】状態にする',
+      color: 'purple',
+    },
+    silence: {
+      name: '沈黙の呪言',
+      category: 'special',
+      type: 'skill',
+      element: 'silence',
+      desc: 'プレイヤーを 2 ターンの間【沈黙】状態にする',
+      color: 'black',
+    },
+    kakusei_plus: {
+      name: '覚醒+',
+      category: 'special',
+      type: 'skill',
+      element: 'buff_up',
+      desc: 'すさまじい魔力を高め、能昇状態(5ターン)になる',
+      color: 'white',
+    },
+    meteor_plus: {
+      name: '流星群+',
+      category: 'special',
+      type: 'attack',
+      element: 'none',
+      desc: '火・水・風・土の4属性で各 8 ダメージ (計 4 Hit)',
+      color: 'purple',
+    },
+    rush: {
+      name: '突進連撃',
+      category: 'physical',
+      type: 'attack',
+      element: 'none',
+      desc: 'プレイヤーに 2 回連続で攻撃を行う',
+      color: 'red',
+    },
+    paralyze: {
+      name: '痺れ粉',
+      category: 'special',
+      type: 'skill',
+      element: 'paralyze',
+      desc: 'プレイヤーを麻痺状態にする',
+      color: 'yellow',
+    },
+    poison: {
+      name: '毒液',
+      category: 'special',
+      type: 'skill',
+      element: 'poison',
+      desc: 'プレイヤーに毒 2 を付与する',
+      color: 'purple',
+    },
+    heal: {
+      name: '自己再生',
+      category: 'special',
+      type: 'skill',
+      element: 'none',
+      desc: '自身の HP を 5 回復する',
+      color: 'green',
+    },
+    buff_up: {
+      name: '魔力昇華',
+      category: 'special',
+      type: 'skill',
+      element: 'buff_up',
+      desc: '自身を能昇状態にする',
+      color: 'white',
+    },
+    buff_down: {
+      name: '重力波',
+      category: 'special',
+      type: 'skill',
+      element: 'buff_down',
+      desc: 'プレイヤーを能降状態にする',
+      color: 'black',
+    },
+  };
+
+  const skillInfo = cardSkillMap[intent.type] || {
+    name: intent.desc || '攻撃',
+    category: 'physical',
+    type: 'attack',
+    element: 'none',
+    desc: `プレイヤーに ${intent.damage || 1} ダメージを与える`,
+    color: 'red',
+  };
+
+  showCardDetailModal({
+    id: intent.type,
+    name: skillInfo.name,
+    cost: 0,
+    type: skillInfo.type,
+    category: skillInfo.category,
+    element: skillInfo.element,
+    value: intent.damage || 0,
+    desc: skillInfo.desc,
+    color: skillInfo.color,
   });
 }

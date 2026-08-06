@@ -344,8 +344,8 @@ const { projectData } = Astro.props;
       <!-- ④ 右下：自分ステータス -->
       <div class="player-status-panel">
         <div class="status-header player-header">
-          <span id="player-poison-badge" class="poison-badge player-poison-badge-custom"></span>
           <span id="player-class-name">あなた</span>
+          <span id="player-poison-badge" class="poison-badge player-poison-badge-custom"></span>
         </div>
         <div class="status-row">
           <span class="status-label">HP</span>
@@ -356,11 +356,14 @@ const { projectData } = Astro.props;
         </div>
         <div class="status-row player-mp-row">
           <span class="status-label mp-label">MP</span>
-          <div id="player-mp-orbs" class="player-mp-orbs"></div>
+          <div class="hp-bar-bg player-mp-bg">
+            <div id="player-mp-bar" class="hp-bar-fill player-mp-fill"></div>
+          </div>
           <span id="player-mp-text" class="status-text mp-text">5/5</span>
         </div>
-        <div class="player-actions-text">
-          行動: <span id="player-actions">1</span>回
+        <div class="status-row player-action-row">
+          <span class="status-label action-label">回数:</span>
+          <div id="player-action-orbs" class="player-action-orbs"></div>
         </div>
       </div>
     </div><!-- /.battle-field -->
@@ -472,7 +475,7 @@ const { projectData } = Astro.props;
 
   .enemy-status-panel,
   .player-status-panel {
-    padding: 0.4rem 0.5rem;
+    padding: 0.25rem 0.4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -514,6 +517,45 @@ const { projectData } = Astro.props;
 
   .player-header {
     color: #b7d5e8;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .player-header-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .player-actions-box {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.62rem;
+    color: #ffd43b;
+  }
+
+  .player-action-orbs {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .action-orb {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #333;
+    border: 1px solid #666;
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  .action-orb.active {
+    background: #ffd43b;
+    border-color: #ffe066;
+    box-shadow: 0 0 5px #ffd43b;
   }
 
   .poison-badge {
@@ -531,6 +573,12 @@ const { projectData } = Astro.props;
     font-size: 0.62rem;
     color: #ccc;
     flex-shrink: 0;
+    width: 26px;
+    text-align: left;
+  }
+
+  .action-label {
+    width: 26px;
   }
 
   .hp-bar-bg {
@@ -549,6 +597,10 @@ const { projectData } = Astro.props;
     background: #1a1a2a;
   }
 
+  .player-mp-bg {
+    background: #0f1d2a;
+  }
+
   .hp-bar-fill {
     height: 100%;
     width: 100%;
@@ -563,10 +615,16 @@ const { projectData } = Astro.props;
     background: linear-gradient(90deg, #27ae60, #2ecc71);
   }
 
+  .player-mp-fill {
+    background: linear-gradient(90deg, #1e88e5, #42a5f5);
+  }
+
   .status-text {
     font-size: 0.62rem;
     white-space: nowrap;
     flex-shrink: 0;
+    width: 34px;
+    text-align: right;
   }
 
   .enemy-text {
@@ -578,14 +636,55 @@ const { projectData } = Astro.props;
   }
 
   .enemy-intent-badge {
-    font-size: 0.6rem;
-    color: #ffb84d;
-    margin-top: 0.15rem;
+    font-size: 0.62rem;
+    color: #e8d5b7;
+    margin-top: 0.2rem;
     display: none;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 3px;
-    padding: 1px 4px;
-    border: 1px solid #666;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .enemy-intent-badge.active {
+    display: block;
+  }
+
+  :global(.enemy-intent-tag) {
+    background: rgba(255, 184, 77, 0.2);
+    color: #ffc107;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid rgba(255, 184, 77, 0.4);
+    display: inline-block;
+    font-size: 0.68rem;
+    margin: 0 2px;
+  }
+
+  :global(.player-action-orbs) {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  :global(.action-orb) {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #333;
+    border: 1px solid #777;
+    box-sizing: border-box;
+    display: inline-block;
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  :global(.action-orb.active) {
+    background: #ffd43b;
+    border-color: #ffe066;
+    box-shadow: 0 0 5px #ffd43b;
   }
 
   .player-mp-row {
@@ -2746,17 +2845,28 @@ const { projectData } = Astro.props;
     padding: 0.4rem 0.5rem 0.3rem;
   }
 
+  @media (max-width: 600px) {
+    .battle-layout-custom {
+      padding: 0.3rem 0.3rem 0.2rem;
+    }
+
+    .btn-battle-retire-custom {
+      right: 0.35rem;
+      top: 8px;
+    }
+  }
+
   .btn-battle-retire-custom {
     position: absolute;
-    top: 12px;
+    top: 10px;
     right: 0.5rem;
     z-index: 100;
-    font-size: 0.7rem;
-    width: 65px;
-    padding: 0.2rem 0;
+    font-size: 0.65rem;
+    width: 60px;
+    padding: 0.12rem 0;
     text-align: center;
     box-sizing: border-box;
-    border-radius: 20px;
+    border-radius: 16px;
     border-color: #ffb84d;
     color: #ffb84d;
     background: rgba(0, 0, 0, 0.6);
@@ -2766,19 +2876,27 @@ const { projectData } = Astro.props;
     display: none;
   }
 
+  .enemy-poison-badge-custom.active {
+    display: inline;
+  }
+
   .player-poison-badge-custom {
     display: none;
   }
 
+  .player-poison-badge-custom.active {
+    display: inline;
+  }
+
   .battle-log-custom {
-    height: 80px;
+    height: 60px;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid #333;
     border-radius: 6px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.68rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.65rem;
     overflow-y: auto;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
     text-align: left;
     width: 100%;
     box-sizing: border-box;
@@ -2787,7 +2905,7 @@ const { projectData } = Astro.props;
   .town-upgrade-wrap {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
     width: 100%;
     box-sizing: border-box;
   }
@@ -2800,24 +2918,24 @@ const { projectData } = Astro.props;
   }
 
   .btn-battle-view-map-custom {
-    width: 65px;
-    padding: 0.2rem 0;
+    width: 60px;
+    padding: 0.12rem 0;
     text-align: center;
     box-sizing: border-box;
-    border-radius: 20px;
-    font-size: 0.7rem;
+    border-radius: 16px;
+    font-size: 0.65rem;
     border-color: #ffb84d;
     color: #ffb84d;
     flex-shrink: 0;
   }
 
   .btn-end-turn-custom {
-    width: 65px;
-    padding: 0.2rem 0;
+    width: 60px;
+    padding: 0.12rem 0;
     text-align: center;
     box-sizing: border-box;
-    border-radius: 20px;
-    font-size: 0.7rem;
+    border-radius: 16px;
+    font-size: 0.65rem;
   }
 
   .hand-area-custom {

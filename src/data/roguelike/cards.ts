@@ -40,12 +40,12 @@ export const CARD_DB: Record<string, Card> = {
     name: '快癒',
     type: 'skill',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 0,
-    desc: 'HP +3 回復',
+    desc: 'HP+30%回復',
     color: 'white',
     element: 'none',
-    healSelf: 3,
+    healPercent: 0.3,
     flavor: 'フレーバーテキスト準備中',
   },
   smite: {
@@ -80,7 +80,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '火炎',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 3,
     desc: '敵に 3 ダメージ',
     color: 'red',
@@ -92,7 +92,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '冷気',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 3,
     desc: '敵に 3 ダメージ',
     color: 'blue',
@@ -104,7 +104,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '迅風',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 3,
     desc: '敵に 3 ダメージ',
     color: 'green',
@@ -116,7 +116,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '礫石',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 3,
     desc: '敵に 3 ダメージ',
     color: 'orange',
@@ -128,7 +128,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '雷撃',
     type: 'attack',
     category: 'spell',
-    cost: 2,
+    cost: 3,
     value: 2,
     desc: '敵に 2 ダメージ <br> 30%で麻痺付与',
     color: 'yellow',
@@ -143,7 +143,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '毒計',
     type: 'attack',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 1,
     desc: '敵に 1 ダメージ <br> 毒1 を付与',
     color: 'black',
@@ -153,18 +153,15 @@ export const CARD_DB: Record<string, Card> = {
   },
   fortify: {
     id: 'fortify',
-    name: '治療',
+    name: '回復',
     type: 'skill',
     category: 'spell',
-    cost: 2,
+    cost: 3,
     value: 0,
-    category: 'spell',
-    cost: 2,
-    value: 0,
-    desc: 'HP +6 回復',
+    desc: 'HP+30%回復',
     color: 'white',
     element: 'none',
-    healSelf: 6,
+    healPercent: 0.3,
     flavor: 'フレーバーテキスト準備中',
   },
   draw_card: {
@@ -185,7 +182,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '能昇',
     type: 'skill',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 0,
     desc: '自分は 3 ターンの間、<br>与ダメージ +1、被ダメージ -1',
     color: 'white',
@@ -198,7 +195,7 @@ export const CARD_DB: Record<string, Card> = {
     name: '能降',
     type: 'skill',
     category: 'spell',
-    cost: 1,
+    cost: 2,
     value: 0,
     desc: '敵は 3 ターンの間、<br>与ダメージ -1、被ダメージ +1',
     color: 'black',
@@ -337,7 +334,7 @@ export function upgradeCard(card: Card): Card {
 
   switch (card.id) {
     case 'strike':
-      upgradedCard.value = 2 + 2 * level;
+      upgradedCard.value = 2;
       upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'heal':
@@ -372,31 +369,35 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'thunder':
       upgradedCard.value = 2 + 1 * level;
-      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ ＋ 30%で麻痺付与`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ <br> 30%で麻痺付与`;
       break;
     case 'venom':
       upgradedCard.value = 1 + 1 * level;
       upgradedCard.poison = 1 + 1 * level;
-      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ ＋ 毒<span class="card-val-up">${upgradedCard.poison}</span> を付与`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ <br> 毒<span class="card-val-up">${upgradedCard.poison}</span> を付与`;
+      break;
+    case 'heal':
+      upgradedCard.healPercent = 0.5;
+      upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
       break;
     case 'fortify':
-      upgradedCard.cost = 1;
-      upgradedCard.healSelf = 6 + 2 * level;
-      upgradedCard.desc = `HP +<span class="card-val-up">${upgradedCard.healSelf}</span> 回復`;
+      upgradedCard.healPercent = 0.5;
+      upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
       break;
     case 'draw_card':
+      upgradedCard.cost = Math.max(0, upgradedCard.cost - 1);
       upgradedCard.draw = 2 + 1 * level;
-      upgradedCard.desc = `行動回数を消費せず、カードを <span class="card-val-up">${upgradedCard.draw}</span> 枚引く`;
+      upgradedCard.desc = `行動回数を消費せず、<br>カードを <span class="card-val-up">${upgradedCard.draw}</span> 枚引く`;
       break;
     case 'buff_up':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffUp = 3 + 1 * (level - 1); // 2回目以降で効果ターン増
-      upgradedCard.desc = `自分は <span class="card-val-up">${upgradedCard.buffUp}</span> ターンの間、与ダメージ +1、被ダメージ -1`;
+      upgradedCard.desc = `自分は <span class="card-val-up">${upgradedCard.buffUp}</span> ターンの間、<br>与ダメージ +1、被ダメージ -1`;
       break;
     case 'buff_down':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffDown = 3 + 1 * (level - 1);
-      upgradedCard.desc = `敵は <span class="card-val-up">${upgradedCard.buffDown}</span> ターンの間、与ダメージ -1、被ダメージ +1`;
+      upgradedCard.desc = `敵は <span class="card-val-up">${upgradedCard.buffDown}</span> ターンの間、<br>与ダメージ -1、被ダメージ +1`;
       break;
     case 'meteor':
       upgradedCard.value = 5 + 3 * level;
