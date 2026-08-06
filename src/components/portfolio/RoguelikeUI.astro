@@ -287,12 +287,12 @@ const { projectData } = Astro.props;
     <div class="deck-card-list-wrap">
       <h4 id="dialog-title" class="dialog-title-custom">通知</h4>
       <p id="dialog-message" class="dialog-message-custom"></p>
+      <div id="dialog-extra" class="dialog-extra-custom"></div>
       <div id="dialog-buttons" class="dialog-buttons-custom">
         <button id="btn-dialog-ok" class="btn btn-primary btn-dialog-ok-custom">OK</button>
         <button id="btn-dialog-yes" class="btn btn-primary btn-dialog-yes-custom">はい</button>
         <button id="btn-dialog-no" class="btn btn-secondary btn-dialog-no-custom">いいえ</button>
       </div>
-      <div id="dialog-extra" class="dialog-extra-custom"></div>
     </div>
   </div>
 
@@ -2599,6 +2599,39 @@ const { projectData } = Astro.props;
     width: 100%;
   }
 
+  :global(.upgrade-compare-wrap) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0.8rem 0;
+    width: 100%;
+  }
+
+  :global(.upgrade-compare-col) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  :global(.upgrade-compare-label) {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #aaa;
+    margin-bottom: 4px;
+  }
+
+  :global(.upgrade-compare-label.is-upgraded) {
+    color: #4ade80;
+  }
+
+  :global(.upgrade-compare-arrow) {
+    font-size: 1.4rem;
+    color: #4ade80;
+    font-weight: bold;
+    user-select: none;
+  }
+
   .card-detail-modal-custom {
     display: none;
   }
@@ -2810,9 +2843,15 @@ const { projectData } = Astro.props;
     font-weight: bold;
   }
 
-  :global(.card-heal-val) {
+  :global(.card-val-up) {
     color: #4ade80;
     font-weight: bold;
+  }
+
+  :global(.card-plus-mark) {
+    color: #4ade80;
+    font-weight: bold;
+    margin-left: 1px;
   }
 
   :global(.relic-get-desc) {

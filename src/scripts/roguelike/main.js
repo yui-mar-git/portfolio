@@ -433,10 +433,19 @@ function showGameAlert(title, message, onOk = null) {
   if (gameDialogModal) gameDialogModal.style.display = 'flex';
 }
 
-function showGameConfirm(title, message, onYes, onNo = null) {
+function showGameConfirm(title, message, onYes, onNo = null, extraElement = null) {
   if (dialogExtra) {
     dialogExtra.innerHTML = '';
-    dialogExtra.style.display = 'none';
+    if (extraElement) {
+      if (typeof extraElement === 'string') {
+        dialogExtra.innerHTML = extraElement;
+      } else {
+        dialogExtra.appendChild(extraElement);
+      }
+      dialogExtra.style.display = 'flex';
+    } else {
+      dialogExtra.style.display = 'none';
+    }
   }
   if (dialogTitle) dialogTitle.innerHTML = title;
   if (dialogMessage) dialogMessage.innerHTML = message;
@@ -1357,6 +1366,41 @@ function showShopServiceScreen(type) {
         const btn = makeCardEl(cardInstance, () => {
           if (type === 'upgrade' && isFullyUpgraded) return;
           if (player.gold >= 20) {
+            let compareWrap = null;
+            if (type === 'upgrade') {
+              compareWrap = document.createElement('div');
+              compareWrap.className = 'upgrade-compare-wrap';
+
+              const colBefore = document.createElement('div');
+              colBefore.className = 'upgrade-compare-col';
+              const labelBefore = document.createElement('span');
+              labelBefore.className = 'upgrade-compare-label';
+              labelBefore.textContent = '現在';
+              const cardBeforeEl = makeCardEl(cardInstance, null);
+              cardBeforeEl.style.cursor = 'default';
+              colBefore.appendChild(labelBefore);
+              colBefore.appendChild(cardBeforeEl);
+
+              const arrowEl = document.createElement('div');
+              arrowEl.className = 'upgrade-compare-arrow';
+              arrowEl.textContent = '➔';
+
+              const upgradedObj = upgradeCard({ ...cardInstance });
+              const colAfter = document.createElement('div');
+              colAfter.className = 'upgrade-compare-col';
+              const labelAfter = document.createElement('span');
+              labelAfter.className = 'upgrade-compare-label is-upgraded';
+              labelAfter.textContent = '強化後';
+              const cardAfterEl = makeCardEl(upgradedObj, null);
+              cardAfterEl.style.cursor = 'default';
+              colAfter.appendChild(labelAfter);
+              colAfter.appendChild(cardAfterEl);
+
+              compareWrap.appendChild(colBefore);
+              compareWrap.appendChild(arrowEl);
+              compareWrap.appendChild(colAfter);
+            }
+
             showGameConfirm(
               type === 'upgrade' ? 'カードの強化' : 'カードの削除',
               `「${cardInstance.name}」を 20ゴールドで${type === 'upgrade' ? '強化' : '削除'}しますか？`,
@@ -1403,6 +1447,8 @@ function showShopServiceScreen(type) {
                   },
                 );
               },
+              null,
+              compareWrap,
             );
           } else {
             showGameAlert('ショップ', 'ゴールドが足りません！');
@@ -2262,7 +2308,13 @@ function makeCardEl(card, onClick) {
   // カード名帯
   const name = document.createElement('div');
   name.className = 'card-name';
-  name.textContent = card.name;
+  if (card.upgraded) {
+    const baseName = card.name.replace(/\++$/, '');
+    const plusCount = (card.name.match(/\+/g) || []).length || 1;
+    name.innerHTML = `${baseName}<span class="card-plus-mark">${'+'.repeat(plusCount)}</span>`;
+  } else {
+    name.textContent = card.name;
+  }
   div.appendChild(name);
 
   // 効果テキスト（主効果 + 追加効果）

@@ -337,75 +337,75 @@ export function upgradeCard(card: Card): Card {
   switch (card.id) {
     case 'strike':
       upgradedCard.value = 2 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'heal':
       upgradedCard.healSelf = 3 + 2 * level;
-      upgradedCard.desc = `HP +<span style="color:#4ade80;font-weight:bold;">${upgradedCard.healSelf}</span> 回復`;
+      upgradedCard.desc = `HP +<span class="card-val-up">${upgradedCard.healSelf}</span> 回復`;
       break;
     case 'smite':
       upgradedCard.cost = 1;
       upgradedCard.value = 4 + 1 * level;
-      upgradedCard.desc = `敵に ${upgradedCard.value} ダメージ (<span style="color:#4ade80;font-weight:bold;">コスト1</span>)`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'rush':
       upgradedCard.cost = 1;
       upgradedCard.hits = 2 + level;
-      upgradedCard.desc = `敵に 1×<span style="color:#4ade80;font-weight:bold;">${upgradedCard.hits}</span> ダメージ (<span style="color:#4ade80;font-weight:bold;">コスト1</span>)`;
+      upgradedCard.desc = `敵に 1×<span class="card-val-up">${upgradedCard.hits}</span> ダメージ`;
       break;
     case 'fire':
       upgradedCard.value = 3 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'ice':
       upgradedCard.value = 3 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'wind':
       upgradedCard.value = 3 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'stone':
       upgradedCard.value = 3 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'thunder':
       upgradedCard.value = 2 + 1 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ ＋ 30%で麻痺付与`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ ＋ 30%で麻痺付与`;
       break;
     case 'venom':
       upgradedCard.value = 1 + 1 * level;
       upgradedCard.poison = 1 + 1 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ ＋ 毒<span style="color:#4ade80;font-weight:bold;">${upgradedCard.poison}</span> を付与`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ ＋ 毒<span class="card-val-up">${upgradedCard.poison}</span> を付与`;
       break;
     case 'fortify':
       upgradedCard.cost = 1;
       upgradedCard.healSelf = 6 + 2 * level;
-      upgradedCard.desc = `HP +${upgradedCard.healSelf} 回復 (<span style="color:#4ade80;font-weight:bold;">コスト1</span>)`;
+      upgradedCard.desc = `HP +<span class="card-val-up">${upgradedCard.healSelf}</span> 回復`;
       break;
     case 'draw_card':
       upgradedCard.draw = 2 + 1 * level;
-      upgradedCard.desc = `行動回数を消費せず、<br>カードを <span style="color:#4ade80;font-weight:bold;">${upgradedCard.draw}</span> 枚引く`;
+      upgradedCard.desc = `行動回数を消費せず、カードを <span class="card-val-up">${upgradedCard.draw}</span> 枚引く`;
       break;
     case 'buff_up':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffUp = 3 + 1 * (level - 1); // 2回目以降で効果ターン増
-      upgradedCard.desc = `自分は <span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffUp}</span> ターンの間、<br>与ダメージ +1、被ダメージ -1 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
+      upgradedCard.desc = `自分は <span class="card-val-up">${upgradedCard.buffUp}</span> ターンの間、与ダメージ +1、被ダメージ -1`;
       break;
     case 'buff_down':
       upgradedCard.cost = 0; // コストが0に減少
       upgradedCard.buffDown = 3 + 1 * (level - 1);
-      upgradedCard.desc = `敵は <span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffDown}</span> ターンの間、<br>与ダメージ -1、被ダメージ +1 (<span style="color:#4ade80;font-weight:bold;">コスト0</span>)`;
+      upgradedCard.desc = `敵は <span class="card-val-up">${upgradedCard.buffDown}</span> ターンの間、与ダメージ -1、被ダメージ +1`;
       break;
     case 'meteor':
       upgradedCard.cost = Math.max(0, 3 - level); // コスト減
       upgradedCard.value = 10 + 2 * level;
-      upgradedCard.desc = `敵に <span style="color:#4ade80;font-weight:bold;">${upgradedCard.value}</span> ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能) (<span style="color:#4ade80;font-weight:bold;">コスト${upgradedCard.cost}</span>)`;
+      upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ (全属性から弱点の属性で攻撃) (戦闘中1回のみ使用可能)`;
       break;
     case 'kakusei':
       upgradedCard.buffUp = 5 + level;
       upgradedCard.buffDown = 5 + level;
-      upgradedCard.desc = `自分に能昇を<span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffUp}</span>ターン、敵に能降を<span style="color:#4ade80;font-weight:bold;">${upgradedCard.buffDown}</span>ターン付与する (戦闘中1回のみ使用可能)`;
+      upgradedCard.desc = `自分に能昇を <span class="card-val-up">${upgradedCard.buffUp}</span> ターン、敵に能降を <span class="card-val-up">${upgradedCard.buffDown}</span> ターン付与する (戦闘中1回のみ使用可能)`;
       break;
   }
   return upgradedCard;
