@@ -1,0 +1,155 @@
+---
+export const pageTitle = '備忘録';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { getArticles } from '@/lib/notes';
+
+const articles = await getArticles();
+---
+
+<BaseLayout title="Notes | Portfolio" pageId="notes">
+  <Header activeId="notes" />
+
+  <main class="container">
+    <article>
+      <span class="page-label">NOTES</span>
+      <h1>備忘録</h1>
+      <section>
+        <div class="article-list-wrap">
+          {
+            articles.length > 0 ? (
+              <div class="article-grid">
+                {articles.map((item) => (
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="article-card"
+                  >
+                    <div class="article-header">
+                      <div class="article-tags">
+                        <span class={`article-tag tag-${item.source.toLowerCase()}`}>
+                          {item.source}
+                        </span>
+                      </div>
+                      <time class="pub-date">{item.pubDate}</time>
+                    </div>
+                    <h3 class="article-title">{item.title}</h3>
+                    {item.description && <p class="article-desc">{item.description}</p>}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p class="empty-message">現在表示できる記事はありません。</p>
+            )
+          }
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .article-list-wrap {
+    margin-top: 1.5rem;
+  }
+
+  .article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: var(--card-bg, rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-md, 12px);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .article-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary, #6366f1);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  }
+
+  .article-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .article-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .article-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .tag-zenn {
+    background: rgba(60, 161, 255, 0.12);
+    color: #3ca1ff;
+    border: 1px solid rgba(60, 161, 255, 0.3);
+  }
+
+  .tag-qiita {
+    background: rgba(85, 197, 0, 0.12);
+    color: #55c500;
+    border: 1px solid rgba(85, 197, 0, 0.3);
+  }
+
+  .tag-note {
+    background: rgba(44, 182, 150, 0.12);
+    color: #2cb696;
+    border: 1px solid rgba(44, 182, 150, 0.3);
+  }
+
+  .tag-microcms,
+  .tag-blog {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary, #818cf8);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  .pub-date {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted, #94a3b8);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
