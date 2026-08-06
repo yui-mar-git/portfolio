@@ -27,16 +27,30 @@ const articles = await getArticles();
                     rel="noopener noreferrer"
                     class="article-card"
                   >
-                    <div class="article-header">
-                      <div class="article-tags">
-                        <span class={`article-tag tag-${item.source.toLowerCase()}`}>
-                          {item.source}
-                        </span>
-                      </div>
-                      <time class="pub-date">{item.pubDate}</time>
+                    <div class="article-eyecatch">
+                      {item.thumbnail ? (
+                        <img src={item.thumbnail} alt={item.title} class="eyecatch-img" />
+                      ) : (
+                        <div class={`eyecatch-placeholder tag-bg-${item.source.toLowerCase()}`}>
+                          <span class="placeholder-tag">{item.source}</span>
+                        </div>
+                      )}
                     </div>
-                    <h3 class="article-title">{item.title}</h3>
-                    {item.description && <p class="article-desc">{item.description}</p>}
+
+                    <div class="article-body">
+                      <div class="article-header">
+                        <div class="article-tags">
+                          <span class={`article-tag tag-${item.source.toLowerCase()}`}>
+                            {item.source}
+                          </span>
+                        </div>
+                        <time class="pub-date">{item.pubDate}</time>
+                      </div>
+                      <h3 class="article-title" title={item.title}>
+                        {item.title}
+                      </h3>
+                      {item.description && <p class="article-desc">{item.description}</p>}
+                    </div>
                   </a>
                 ))}
               </div>
@@ -57,19 +71,35 @@ const articles = await getArticles();
     margin-top: 1.5rem;
   }
 
+  /* Grid Layout: PC = 3 columns, TB = 2 columns, SP = 1 column */
   .article-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
 
+  @media (max-width: 1024px) {
+    .article-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .article-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  /* PC Card Style */
   .article-card {
     display: flex;
     flex-direction: column;
-    padding: 1.5rem;
     background: var(--card-bg, rgba(255, 255, 255, 0.03));
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     border-radius: var(--radius-md, 12px);
+    overflow: hidden;
     text-decoration: none;
     color: inherit;
     transition:
@@ -84,11 +114,57 @@ const articles = await getArticles();
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
   }
 
+  /* Eyecatch Image & Placeholder */
+  .article-eyecatch {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .eyecatch-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .article-card:hover .eyecatch-img {
+    transform: scale(1.03);
+  }
+
+  .eyecatch-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  }
+
+  .placeholder-tag {
+    font-size: 1.25rem;
+    font-weight: 800;
+    opacity: 0.7;
+    letter-spacing: 0.05em;
+  }
+
+  .article-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    /* Prevent text elements from breaking grid/flex layout */
+    min-width: 0;
+  }
+
   .article-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .article-tags {
@@ -100,56 +176,105 @@ const articles = await getArticles();
   .article-tag {
     font-size: 0.75rem;
     font-weight: 600;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.65rem;
     border-radius: 1rem;
     letter-spacing: 0.02em;
     display: inline-flex;
     align-items: center;
   }
 
-  .tag-zenn {
+  /* Platform tag & placeholder colors */
+  .tag-zenn,
+  .tag-bg-zenn .placeholder-tag {
     background: rgba(60, 161, 255, 0.12);
     color: #3ca1ff;
     border: 1px solid rgba(60, 161, 255, 0.3);
   }
 
-  .tag-qiita {
+  .tag-qiita,
+  .tag-bg-qiita .placeholder-tag {
     background: rgba(85, 197, 0, 0.12);
     color: #55c500;
     border: 1px solid rgba(85, 197, 0, 0.3);
   }
 
-  .tag-note {
+  .tag-note,
+  .tag-bg-note .placeholder-tag {
     background: rgba(44, 182, 150, 0.12);
     color: #2cb696;
     border: 1px solid rgba(44, 182, 150, 0.3);
   }
 
+  .tag-hatena,
+  .tag-bg-hatena .placeholder-tag {
+    background: rgba(0, 164, 222, 0.12);
+    color: #00a4de;
+    border: 1px solid rgba(0, 164, 222, 0.3);
+  }
+
+  .tag-ameba,
+  .tag-bg-ameba .placeholder-tag {
+    background: rgba(45, 140, 60, 0.12);
+    color: #2d8c3c;
+    border: 1px solid rgba(45, 140, 60, 0.3);
+  }
+
   .tag-microcms,
-  .tag-blog {
+  .tag-blog,
+  .tag-bg-microcms .placeholder-tag,
+  .tag-bg-blog .placeholder-tag {
     background: rgba(99, 102, 241, 0.12);
     color: var(--primary, #818cf8);
     border: 1px solid rgba(99, 102, 241, 0.3);
   }
 
   .pub-date {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-muted, #94a3b8);
   }
 
+  /* Single line title with ellipsis (...) */
   .article-title {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.4;
-    margin-bottom: 0.5rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .article-desc {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     color: var(--text-muted, #94a3b8);
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* SP Card Layout: Horizontal Thumbnail + Text */
+  @media (max-width: 640px) {
+    .article-card {
+      flex-direction: row;
+      align-items: center;
+      padding: 0.85rem;
+    }
+
+    .article-eyecatch {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .placeholder-tag {
+      font-size: 0.8rem;
+    }
+
+    .article-body {
+      padding: 0 0 0 0.85rem;
+    }
   }
 </style>
