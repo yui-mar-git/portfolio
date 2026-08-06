@@ -1,0 +1,74 @@
+---
+export const pageTitle = 'レトロシューティング';
+import GameLayout from '../../../layouts/GameLayout.astro';
+import RetroShootingUI from '../../../components/portfolio/RetroShootingUI.astro';
+import { fetchMicroCMS } from '../../../lib/microcms';
+import type { MicroCMSListResponse, MicroCMSPortfolio } from '../../../types/microcms';
+
+const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
+const projectData = portfolioResponse.contents.find((c) => c.url?.includes('/retro-shooting/'));
+
+const techStack = [
+  { category: 'フロントエンド', items: 'HTML, CSS, JavaScript, TypeScript, Astro, Phaser 3' },
+  { category: 'バックエンド', items: 'Node.js, microCMS' },
+  { category: 'インフラ・ホスティング', items: 'Cloudflare (Pages)' },
+  { category: '開発環境・ツール', items: 'GitHub, Google Antigravity' },
+];
+
+const learningThemes = [
+  'Phaser 3（Arcade Physics）による高速STGゲームループの構築',
+  'パーティクルエフェクトとスターフィールド背景描画の実装',
+  '敵隊列のウェイブ生成とハイスコア記録管理',
+];
+
+const materialCategories = [
+  {
+    category: 'フォント',
+    items: [
+      { name: 'Google Fonts（SIL Open Font License 1.1）', url: 'https://fonts.google.com/' },
+    ],
+  },
+  {
+    category: 'SE・BGM',
+    items: [
+      { name: '効果音ラボ', url: 'https://soundeffect-lab.info/' },
+      { name: 'PANICPUMPKIN', url: 'http://pansound.com/panicpumpkin/' },
+    ],
+  },
+];
+---
+
+<GameLayout
+  title={projectData
+    ? `${projectData.title} - My Portfolio`
+    : 'レトロシューティング - My Portfolio'}
+  pageId="retro-shooting"
+  pageLabel="RETRO SHOOTER"
+  projectData={projectData}
+  descriptionFallback=""
+  techStack={techStack}
+  learningThemes={learningThemes}
+  materialCategories={materialCategories}
+  hasConfig={true}
+  hasHowToPlay={true}
+>
+  <div class="game-container" id="game-container">
+    <RetroShootingUI gameTitle={projectData?.title} />
+  </div>
+  <div slot="howto-content">
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>【操作方法】</p>
+      <p>画面をドラッグ・スワイプ、または左右キー（← → / A D）で自機を移動します。</p>
+      <p>弾は自動で連射されます。</p>
+    </div>
+    <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
+      <p>【ルール・ボーナス】</p>
+      <p>・上空から押し寄せるインベーダー編隊を撃破してスコアを稼ぎましょう！</p>
+      <p>・たまに画面上部を横切る「赤UFO」を撃破すると高得点＆強化アイテムが確定ドロップ！</p>
+      <p>・「💚回復」で残機+1、「⚡パワー」で強力な3WAY拡散ビームへパワーアップ！</p>
+    </div>
+  </div>
+</GameLayout>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+<script src="../../../scripts/retro-shooting/main.js"></script>

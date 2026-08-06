@@ -1,0 +1,237 @@
+---
+const { gameTitle } = Astro.props;
+---
+
+<div class="stg-wrapper">
+  <!-- Global Back Button -->
+  <div id="global-back-btn" class="global-back-btn" title="戻る">◀</div>
+
+  <!-- Start Screen -->
+  <div class="overlay" id="start-screen">
+    <h2 class="title-main">{gameTitle || 'レトロシューティング'}</h2>
+    <p class="desc-sub">
+      迫りくるインベーダー隊列を撃破しよう！<br />※スタートするとBGMが鳴ります
+    </p>
+    <button id="start-btn" class="btn btn-primary start-btn-wide">スタート</button>
+    <button id="howto-btn" class="btn btn-secondary start-btn-wide howto-margin">遊び方</button>
+    <span id="start-config-btn" class="icon-config" title="コンフィグ">⚙️</span>
+  </div>
+
+  <!-- Result Screen -->
+  <div class="overlay" id="result-screen">
+    <h2 class="result-win">GAME OVER</h2>
+    <div id="result-message" class="result-message-box">
+      <div>スコア: <span id="final-score" class="score-highlight">0</span></div>
+      <div>ハイスコア: <span id="final-high-score" class="score-highlight">0</span></div>
+      <div id="new-record-tag" class="new-record-tag">NEW RECORD!</div>
+    </div>
+    <div class="stage-buttons">
+      <button id="btn-retry" class="btn btn-primary">もう一度挑戦</button>
+      <button id="btn-to-start" class="btn btn-secondary">タイトルへ</button>
+    </div>
+  </div>
+
+  <!-- Game UI Header (HUD) -->
+  <div class="game-ui-header">
+    <div class="status-bar">
+      <div>SCORE: <span id="score-display">0</span></div>
+      <div class="text-hi">BEST: <span id="high-score-display">0</span></div>
+      <div class="text-wave">WAVE: <span id="wave-display">1</span></div>
+      <div class="text-lives">LIFE: <span id="lives-display">❤️❤️❤️</span></div>
+      <span id="config-btn" class="icon-config config-btn-inline" title="コンフィグ">⚙️</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  :global(#game-container) {
+    --game-height: 600px;
+    position: relative;
+    height: 600px;
+  }
+
+  .stg-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    z-index: 10;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.92);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    color: white;
+    padding: 2rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+  }
+
+  #result-screen {
+    display: none;
+  }
+
+  .title-main {
+    margin-bottom: 0.5rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 12px rgba(0, 242, 254, 0.3);
+  }
+
+  .desc-sub {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .start-btn-wide {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .howto-margin {
+    margin-top: 1rem;
+  }
+
+  .global-back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    z-index: 50;
+    transition: background 0.2s;
+    pointer-events: auto;
+  }
+
+  .global-back-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .game-ui-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.85);
+    padding: 0.8rem 1rem 0.8rem 3.5rem;
+    color: white;
+    font-weight: bold;
+    font-size: 1.05rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: auto;
+    box-sizing: border-box;
+  }
+
+  .text-hi {
+    color: #ffd700;
+  }
+
+  .text-wave {
+    color: #00bfff;
+  }
+
+  .text-lives {
+    color: #ff4d4d;
+    letter-spacing: 2px;
+  }
+
+  .config-btn-inline {
+    cursor: pointer;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    font-size: 1.4rem;
+  }
+
+  .icon-config {
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s;
+  }
+
+  .icon-config:hover {
+    transform: rotate(45deg);
+  }
+
+  .result-win {
+    font-size: 2.5rem;
+    color: #00f2fe;
+    text-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
+    margin-bottom: 1.5rem;
+  }
+
+  .result-message-box {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1.2rem 2rem;
+    margin-bottom: 1.8rem;
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .score-highlight {
+    font-weight: 800;
+    color: #ffd700;
+    font-size: 1.4rem;
+  }
+
+  .new-record-tag {
+    display: none;
+    color: #ff4500;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 0.4rem;
+    animation: blink 0.8s infinite alternate;
+  }
+
+  @keyframes blink {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  .stage-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+</style>
