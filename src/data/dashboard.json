@@ -1,25 +1,25 @@
 {
   "weather": {
-    "currentTemp": 24.2,
-    "currentCond": "曇り☁️",
-    "max": 25.8,
-    "min": 22.2,
-    "uvIndex": 3,
-    "uvLabel": "中程度",
+    "currentTemp": 24.7,
+    "currentCond": "晴れ🌤️",
+    "max": 30.3,
+    "min": 24.4,
+    "uvIndex": 8,
+    "uvLabel": "非常に強い",
     "mornCond": "曇り☁️",
-    "noonCond": "一部曇り⛅",
-    "eveCond": "一部曇り⛅"
+    "noonCond": "雨🌧️",
+    "eveCond": "晴れ🌤️"
   },
   "air": {
-    "pm25": 12,
-    "pm25Label": "普通",
+    "pm25": 6.8,
+    "pm25Label": "良い",
     "pollenLabel": "なし"
   },
-  "sunset": "18:45",
-  "moonStr": "🌖 十六夜月",
+  "sunset": "18:41",
+  "moonStr": "🌗 下弦の月",
   "law": {
-    "name": "日本国憲法",
-    "title": "第九十八条",
-    "sentence": "この憲法は、国の最高法規であつて、その条規に反する法律、命令、詔勅及び国務に関するその他の行為の全部又は一部は、その効力を有しない。"
+    "name": "個人情報保護法",
+    "title": "第二条",
+    "sentence": "この法律において「個人情報」とは、生存する個人に関する情報であって、次の各号のいずれかに該当するものをいう。"
   }
 }

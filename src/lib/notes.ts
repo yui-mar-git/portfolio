@@ -1,4 +1,3 @@
-import Parser from 'rss-parser';
 import { fetchMicroCMS } from './microcms';
 import type { MicroCMSListResponse } from '@/types/microcms';
 
@@ -30,30 +29,57 @@ interface MicroCMSNote {
   createdAt: string;
 }
 
-const parser = new Parser();
+async function fetchRssFeed(feedUrl: string, source: Article['source']): Promise<Article[]> {
+  const items: Article[] = [];
+  try {
+    const res = await fetch(feedUrl);
+    if (!res.ok) return items;
+    const text = await res.text();
+    const matches = text.matchAll(/<item>([\s\S]*?)<\/item>|<entry>([\s\S]*?)<\/entry>/gi);
+    for (const match of matches) {
+      const block = match[1] || match[2];
+      const titleMatch = block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i);
+      const linkMatch = block.match(
+        /<link[^>]*href="([^"]+)"|<link>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/i,
+      );
+      const dateMatch = block.match(
+        /<pubDate>([\s\S]*?)<\/pubDate>|<published>([\s\S]*?)<\/published>|<updated>([\s\S]*?)<\/updated>/i,
+      );
+      const descMatch = block.match(
+        /<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>|<summary>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/summary>/i,
+      );
+
+      const title = titleMatch ? titleMatch[1].trim() : '';
+      const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : '';
+      const dateRaw = dateMatch
+        ? (dateMatch[1] || dateMatch[2] || dateMatch[3] || '').trim()
+        : '';
+      const description = descMatch ? descMatch[1].replace(/<[^>]+>/g, '').trim() : '';
+
+      if (title && link) {
+        items.push({
+          id: link,
+          title,
+          link,
+          pubDate: dateRaw ? new Date(dateRaw).toISOString().split('T')[0] : '',
+          source,
+          description: description.slice(0, 120),
+        });
+      }
+    }
+  } catch (e) {
+    console.warn(`Failed to fetch RSS feed from ${feedUrl}:`, e);
+  }
+  return items;
+}
 
 export async function getArticles(): Promise<Article[]> {
   const articles: Article[] = [];
 
   // 1. 外部RSSの取得
   for (const feed of RSS_FEED_URLS) {
-    try {
-      const parsed = await parser.parseURL(feed.url);
-      parsed.items.forEach((item) => {
-        if (item.title && item.link) {
-          articles.push({
-            id: item.guid || item.link,
-            title: item.title,
-            link: item.link,
-            pubDate: item.pubDate ? new Date(item.pubDate).toISOString().split('T')[0] : '',
-            source: feed.source,
-            description: item.contentSnippet || item.summary || '',
-          });
-        }
-      });
-    } catch (e) {
-      console.warn(`Failed to fetch RSS feed from ${feed.url}:`, e);
-    }
+    const fetched = await fetchRssFeed(feed.url, feed.source);
+    articles.push(...fetched);
   }
 
   // 2. microCMS からの取得 (notes エンドポイントが存在する場合)
