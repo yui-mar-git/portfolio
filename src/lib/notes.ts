@@ -7,18 +7,17 @@ export interface Article {
   title: string;
   link: string;
   pubDate: string;
-  source: 'Zenn' | 'Qiita' | 'note' | 'Hatena' | 'Ameba' | 'microCMS' | 'Blog';
+  source: 'Zenn' | 'Qiita' | 'note' | 'Hatena' | 'microCMS' | 'Blog';
   description?: string;
   thumbnail?: string;
 }
 
-// 登録したい外部RSSフィードのURLリスト（将来的にZenn/Qiita/note/Hatena/Ameba等を開設した際にURLを追加）
+// 登録したい外部RSSフィードのURLリスト（将来的にZenn/Qiita/note/Hatena等を開設した際にURLを追加）
 export const RSS_FEED_URLS: { url: string; source: Article['source'] }[] = [
   // 例: { url: 'https://zenn.dev/your_username/feed', source: 'Zenn' },
   // 例: { url: 'https://qiita.com/your_username/feed.atom', source: 'Qiita' },
   // 例: { url: 'https://note.com/your_username/rss', source: 'note' },
   // 例: { url: 'https://your_blog.hatenablog.com/rss', source: 'Hatena' },
-  // 例: { url: 'https://rssblog.ameba.jp/your_username/rss20.xml', source: 'Ameba' },
 ];
 
 interface MicroCMSNote {

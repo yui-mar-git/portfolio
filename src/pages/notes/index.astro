@@ -4,6 +4,17 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { getArticles } from '@/lib/notes';
+import zennIcon from '@/assets/icons/brands/zenn.svg';
+import qiitaIcon from '@/assets/icons/brands/qiita.png';
+import noteIcon from '@/assets/icons/brands/note.svg';
+import hatenaIcon from '@/assets/icons/brands/hatena.svg';
+
+const brandIconMap: Record<string, ImageMetadata> = {
+  Zenn: zennIcon,
+  Qiita: qiitaIcon,
+  note: noteIcon,
+  Hatena: hatenaIcon,
+};
 
 const articles = await getArticles();
 ---
@@ -41,6 +52,14 @@ const articles = await getArticles();
                       <div class="article-header">
                         <div class="article-tags">
                           <span class={`article-tag tag-${item.source.toLowerCase()}`}>
+                            {brandIconMap[item.source] && (
+                              <img
+                                src={brandIconMap[item.source].src}
+                                alt=""
+                                aria-hidden="true"
+                                class="tag-brand-icon"
+                              />
+                            )}
                             {item.source}
                           </span>
                         </div>
@@ -183,6 +202,15 @@ const articles = await getArticles();
     align-items: center;
   }
 
+  .tag-brand-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    margin-right: 0.35rem;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
   /* Platform tag & placeholder colors */
   .tag-zenn,
   .tag-bg-zenn .placeholder-tag {
@@ -210,13 +238,6 @@ const articles = await getArticles();
     background: rgba(0, 164, 222, 0.12);
     color: #00a4de;
     border: 1px solid rgba(0, 164, 222, 0.3);
-  }
-
-  .tag-ameba,
-  .tag-bg-ameba .placeholder-tag {
-    background: rgba(45, 140, 60, 0.12);
-    color: #2d8c3c;
-    border: 1px solid rgba(45, 140, 60, 0.3);
   }
 
   .tag-microcms,
