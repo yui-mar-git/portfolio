@@ -7,13 +7,13 @@ const { gameTitle } = Astro.props;
   <!-- HUD (Score / Highscore) -->
   <div class="game-hud" id="game-hud">
     <div class="time-display">記録: <span id="survival-time">0.0</span>秒</div>
-    <div class="highscore-display global-style-hrir4f">
+    <div class="highscore-display hud-highscore-wrap">
       ベスト: <span id="highscore">0.0</span>秒
-      <span id="hud-config-btn" class="icon-config global-style-sypb5s" title="コンフィグ">⚙️</span>
+      <span id="hud-config-btn" class="icon-config hud-config-icon" title="コンフィグ">⚙️</span>
     </div>
   </div>
-  <div class="bottom-hud global-style-736gi5" id="bottom-hud">
-    <button id="retire-btn" class="btn btn-danger global-style-5vllo3">リタイア</button>
+  <div class="bottom-hud bottom-hud-wrap" id="bottom-hud">
+    <button id="retire-btn" class="btn btn-danger btn-retire-hud">リタイア</button>
   </div>
   <canvas id="game-canvas"></canvas>
 
@@ -28,7 +28,7 @@ const { gameTitle } = Astro.props;
     <p class="start-desc">スタートで走り出します</p>
     <button id="start-btn" class="btn btn-full">スタート</button>
     <button id="howto-btn" class="btn btn-secondary btn-full btn-howto">遊び方</button>
-    <span id="config-btn" class="icon-config global-style-d5t1mq" title="コンフィグ">⚙️</span>
+    <span id="config-btn" class="icon-config start-config-icon" title="コンフィグ">⚙️</span>
   </div>
 
   <div class="overlay" id="result-screen">
@@ -199,12 +199,11 @@ const { gameTitle } = Astro.props;
       margin: 0 0.5rem;
     }
 
-    /* Auto-extracted styles */
-    .global-style-hrir4f {
+    .hud-highscore-wrap {
       display: flex;
       align-items: center;
     }
-    .global-style-sypb5s {
+    .hud-config-icon {
       position: relative;
       top: auto;
       right: auto;
@@ -212,7 +211,7 @@ const { gameTitle } = Astro.props;
       cursor: pointer;
       pointer-events: auto;
     }
-    .global-style-736gi5 {
+    .bottom-hud-wrap {
       position: absolute;
       bottom: 1rem;
       right: 1rem;
@@ -220,15 +219,12 @@ const { gameTitle } = Astro.props;
       display: none;
       pointer-events: auto;
     }
-    .global-style-5vllo3 {
+    .btn-retire-hud {
       padding: 0.5rem 1rem;
       font-size: 0.9rem;
     }
-    .global-style-d5t1mq {
+    .start-config-icon {
       cursor: pointer;
-    }
-    .global-style-c5yyf6 {
-      margin-top: 1.5rem;
     }
   </style>
 </div>

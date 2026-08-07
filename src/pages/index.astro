@@ -116,10 +116,13 @@ const tree = [rootNode];
           <div class="dashboard-block">
             <ul class="tree-list root-tree dashboard-tree">
               <li class="tree-item">
-                <h3 class="tree-node dashboard-date-title">{cal.dateStr} {cal.zodiac}</h3>
+                <h3 id="dashboard-date-title" class="tree-node dashboard-date-title">
+                  {cal.dateStr}
+                  {cal.zodiac}
+                </h3>
                 <ul class="tree-list tree-children">
                   <li class="tree-item">
-                    <div class="tree-node text-muted">
+                    <div id="dashboard-date-details" class="tree-node text-muted">
                       {cal.kanshi} / {cal.rokuyo} / {cal.nijushisekki} / {cal.shichijuniko}
                     </div>
                   </li>
@@ -307,15 +310,6 @@ const tree = [rootNode];
           border-radius: var(--radius-bento);
           border: 1px solid var(--glass-border);
           box-shadow: var(--shadow-bento);
-          transition:
-            transform 0.35s var(--ease-out-back),
-            box-shadow 0.35s ease;
-        }
-        .dashboard-card:hover,
-        .law-card:hover,
-        .toc-card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-bento), var(--shadow-glow);
         }
         .section-title {
           font-size: clamp(1.4rem, 3vw, 1.8rem);
@@ -480,6 +474,24 @@ const tree = [rootNode];
             el.style.display = 'none';
             btn.textContent = '+';
           }
+        }
+      </script>
+
+      <script>
+        import { getCalendarInfo } from '@/lib/dashboard';
+
+        // AGENTS規約に準拠: ユーザー訪問時の端末現在日時を取得し、日付・暦情報をリアルタイム更新
+        const now = new Date();
+        const cal = getCalendarInfo(now);
+
+        const titleEl = document.getElementById('dashboard-date-title');
+        const detailsEl = document.getElementById('dashboard-date-details');
+
+        if (titleEl) {
+          titleEl.textContent = `${cal.dateStr} ${cal.zodiac}`;
+        }
+        if (detailsEl) {
+          detailsEl.textContent = `${cal.kanshi} / ${cal.rokuyo} / ${cal.nijushisekki} / ${cal.shichijuniko}`;
         }
       </script>
     </article>
