@@ -141,9 +141,9 @@ const tree = [rootNode];
                       <div class="forecast-row">
                         <span class="forecast-label">気温:</span>
                         <div class="forecast-values">
-                          <span class="forecast-item">最高: {weather.max}°C</span>
+                          <span class="forecast-item" id="weather-max">最高: {weather.max}°C</span>
                           <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item">最低: {weather.min}°C</span>
+                          <span class="forecast-item" id="weather-min">最低: {weather.min}°C</span>
                         </div>
                       </div>
                     </div>
@@ -153,11 +153,11 @@ const tree = [rootNode];
                       <div class="forecast-row">
                         <span class="forecast-label">天気:</span>
                         <div class="forecast-values">
-                          <span class="forecast-item">06時台: {weather.mornCond}</span>
+                          <span class="forecast-item" id="weather-morn">06時台: {weather.mornCond}</span>
                           <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item">12時台: {weather.noonCond}</span>
+                          <span class="forecast-item" id="weather-noon">12時台: {weather.noonCond}</span>
                           <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item">18時台: {weather.eveCond}</span>
+                          <span class="forecast-item" id="weather-eve">18時台: {weather.eveCond}</span>
                         </div>
                       </div>
                     </div>
@@ -479,6 +479,7 @@ const tree = [rootNode];
 
       <script>
         import { getCalendarInfo } from '@/lib/dashboard';
+        import { fetchWeatherData } from '@/lib/weather';
 
         // AGENTS規約に準拠: ユーザー訪問時の端末現在日時を取得し、日付・暦情報をリアルタイム更新
         const now = new Date();
@@ -493,6 +494,21 @@ const tree = [rootNode];
         if (detailsEl) {
           detailsEl.textContent = `${cal.kanshi} / ${cal.rokuyo} / ${cal.nijushisekki} / ${cal.shichijuniko}`;
         }
+
+        // Open-Meteo API から最新の気象情報を取得・表示更新
+        fetchWeatherData().then((w) => {
+          const maxEl = document.getElementById('weather-max');
+          const minEl = document.getElementById('weather-min');
+          const mornEl = document.getElementById('weather-morn');
+          const noonEl = document.getElementById('weather-noon');
+          const eveEl = document.getElementById('weather-eve');
+
+          if (maxEl) maxEl.textContent = `最高: ${w.max}°C`;
+          if (minEl) minEl.textContent = `最低: ${w.min}°C`;
+          if (mornEl) mornEl.textContent = `06時台: ${w.mornCond}`;
+          if (noonEl) noonEl.textContent = `12時台: ${w.noonCond}`;
+          if (eveEl) eveEl.textContent = `18時台: ${w.eveCond}`;
+        });
       </script>
     </article>
   </main>

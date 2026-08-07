@@ -1,0 +1,69 @@
+// src/lib/weather.ts
+import fallbackData from '@/data/dashboard.json';
+
+export interface WeatherData {
+  max: number;
+  min: number;
+  mornCond: string;
+  noonCond: string;
+  eveCond: string;
+}
+
+// WMO Weather interpretation codes (WW) を日本語表記に変換
+function parseWmoCode(code: number): string {
+  if (code === 0) return '快晴';
+  if (code === 1 || code === 2) return '晴れ';
+  if (code === 3) return '曇り';
+  if (code === 45 || code === 48) return '霧';
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '雨';
+  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return '雪';
+  if (code >= 95 && code <= 99) return '雷雨';
+  return '晴れ';
+}
+
+/**
+ * Open-Meteo API から最新の東京エリアの天気予報を取得する
+ * (完全無料・APIキー不要)
+ */
+export async function fetchWeatherData(): Promise<WeatherData> {
+  try {
+    // 東京の座標: latitude 35.6895, longitude 139.6917
+    const url =
+      'https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weathercode&timezone=Asia%2FTokyo';
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Open-Meteo API status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // 本日の最高・最低気温
+    const max = Math.round(data.daily?.temperature_2m_max?.[0] ?? fallbackData.weather.max);
+    const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? fallbackData.weather.min);
+
+    // 時間帯別天気 (06:00, 12:00, 18:00)
+    // hourly.weathercode は 0時間目〜 の配列 (06:00 は index 6, 12:00 は index 12, 18:00 は index 18)
+    const hourlyCodes: number[] = data.hourly?.weathercode || [];
+    const mornCode = hourlyCodes[6] ?? 0;
+    const noonCode = hourlyCodes[12] ?? 0;
+    const eveCode = hourlyCodes[18] ?? 0;
+
+    return {
+      max,
+      min,
+      mornCond: parseWmoCode(mornCode),
+      noonCond: parseWmoCode(noonCode),
+      eveCond: parseWmoCode(eveCode),
+    };
+  } catch (error) {
+    console.warn('Open-Meteo APIの取得に失敗しました。フォールバックデータを使用します:', error);
+    return {
+      max: fallbackData.weather.max,
+      min: fallbackData.weather.min,
+      mornCond: fallbackData.weather.mornCond,
+      noonCond: fallbackData.weather.noonCond,
+      eveCond: fallbackData.weather.eveCond,
+    };
+  }
+}
