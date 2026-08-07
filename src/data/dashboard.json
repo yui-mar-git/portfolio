@@ -1,25 +1,25 @@
 {
   "weather": {
-    "currentTemp": 24.7,
-    "currentCond": "晴れ🌤️",
-    "max": 30.3,
-    "min": 24.4,
+    "currentTemp": 30.7,
+    "currentCond": "快晴☀️",
+    "max": 31.4,
+    "min": 24.3,
     "uvIndex": 8,
     "uvLabel": "非常に強い",
     "mornCond": "曇り☁️",
-    "noonCond": "雨🌧️",
+    "noonCond": "小雨🌦️",
     "eveCond": "晴れ🌤️"
   },
   "air": {
-    "pm25": 6.8,
+    "pm25": 11.6,
     "pm25Label": "良い",
     "pollenLabel": "なし"
   },
   "sunset": "18:41",
   "moonStr": "🌗 下弦の月",
   "law": {
-    "name": "個人情報保護法",
-    "title": "第二条",
-    "sentence": "この法律において「個人情報」とは、生存する個人に関する情報であって、次の各号のいずれかに該当するものをいう。"
+    "name": "不正競争防止法",
+    "title": "第三十一条",
+    "sentence": "この法律に定めるもののほか、第二十三条から前条までの規定の実施に関し必要な事項は、最高裁判所規則で定める。"
   }
 }

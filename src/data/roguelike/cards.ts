@@ -74,7 +74,7 @@ export const CARD_DB: Record<string, Card> = {
     flavor: 'フレーバーテキスト準備中',
   },
 
-  // ===== 属性カード =====
+  // ===== 呪文カード =====
   fire: {
     id: 'fire',
     name: '火炎',

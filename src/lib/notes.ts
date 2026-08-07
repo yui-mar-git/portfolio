@@ -51,9 +51,7 @@ async function fetchRssFeed(feedUrl: string, source: Article['source']): Promise
 
       const title = titleMatch ? titleMatch[1].trim() : '';
       const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : '';
-      const dateRaw = dateMatch
-        ? (dateMatch[1] || dateMatch[2] || dateMatch[3] || '').trim()
-        : '';
+      const dateRaw = dateMatch ? (dateMatch[1] || dateMatch[2] || dateMatch[3] || '').trim() : '';
       const description = descMatch ? descMatch[1].replace(/<[^>]+>/g, '').trim() : '';
 
       if (title && link) {

@@ -86,7 +86,72 @@ const { projectData } = Astro.props;
       職業・属性・状態異常・ゴールドを駆使する本格ローグライク<br />※スタートするとBGMが鳴ります
     </p>
     <button id="start-btn" class="btn btn-full">冒険を始める</button>
+    <button id="btn-open-compendium" class="btn btn-secondary btn-full compendium-btn-custom"
+      >図鑑</button
+    >
     <button id="howto-btn" class="btn btn-secondary btn-full howto-btn-custom">遊び方</button>
+  </div>
+
+  <!-- 図鑑モーダル -->
+  <div id="compendium-modal" class="rl-overlay compendium-modal-custom">
+    <div class="compendium-header">
+      <h2>図鑑</h2>
+      <div class="compendium-progress-box">
+        <span class="compendium-progress-text"
+          >解禁率: <span id="compendium-count">0 / 0</span> (<span id="compendium-percent">0%</span
+          >)</span
+        >
+        <div class="compendium-progress-bar-bg">
+          <div id="compendium-progress-bar" class="compendium-progress-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- メインタブ（カード / アイテム / レリック / モンスター） -->
+    <div class="comp-main-tabs" id="comp-main-tabs">
+      <button class="comp-main-tab active" data-type="cards">カード</button>
+      <button class="comp-main-tab" data-type="items">アイテム</button>
+      <button class="comp-main-tab" data-type="relics">レリック</button>
+      <button class="comp-main-tab" data-type="monsters">モンスター</button>
+    </div>
+
+    <!-- カード用サブ属性タブ（カード選択時のみ表示） -->
+    <div class="compendium-tabs" id="comp-sub-tabs">
+      <button class="comp-tab active" data-cat="all">すべて</button>
+      <button class="comp-tab" data-cat="physical">物理</button>
+      <button class="comp-tab" data-cat="spell">呪文</button>
+      <button class="comp-tab" data-cat="special">特殊</button>
+    </div>
+
+    <div id="compendium-card-grid" class="compendium-card-grid"></div>
+    <button class="btn btn-secondary close-compendium-custom" id="btn-close-compendium"
+      >閉じる</button
+    >
+  </div>
+
+  <!-- モンスター詳細モーダル -->
+  <div id="monster-detail-modal" class="rl-overlay monster-detail-modal-custom">
+    <div class="monster-detail-card">
+      <div id="md-image-box" class="md-image-box">
+        <img id="md-image" src="" alt="monster" />
+      </div>
+      <h3 id="md-name" class="md-name">モンスター名</h3>
+      <div class="md-stats-row">
+        <span>HP: <strong id="md-hp">0</strong></span>
+        <span>討伐EXP: <strong id="md-exp">0</strong></span>
+      </div>
+      <div class="md-attributes">
+        <div>弱点: <span id="md-weakness">-</span></div>
+        <div>耐性: <span id="md-resistance">-</span></div>
+        <div>無効: <span id="md-immunity">-</span></div>
+      </div>
+      <div class="md-skills-box">
+        <div>使用行動:</div>
+        <div id="md-skills" class="md-skills-list"></div>
+      </div>
+      <p id="md-flavor" class="md-flavor"></p>
+      <button id="btn-close-monster-detail" class="btn btn-secondary btn-full">閉じる</button>
+    </div>
   </div>
 
   <!-- 職業選択画面 -->
@@ -98,22 +163,22 @@ const { projectData } = Astro.props;
         <div class="class-card" data-class="yuusya">
           <img src={yuusyaImg.src} class="hero-icon-img" />
           <div class="hero-name-label">勇者</div>
-          <div class="hero-hp-label">HP10 / MP5<br />初期レリックが+1個</div>
+          <div class="hero-hp-label">HP12 / MP8<br />初期レリックが+1個</div>
         </div>
         <div class="class-card" data-class="kenshi">
           <img src={kenshiImg.src} class="hero-icon-img" />
           <div class="hero-name-label">戦士</div>
-          <div class="hero-hp-label">HP15 / MP4<br />毎ターンHP+1回復</div>
+          <div class="hero-hp-label">HP14 / MP6<br />毎ターンHP+1回復</div>
         </div>
         <div class="class-card" data-class="mahoutsukai">
           <img src={mahoutsukaiImg.src} class="hero-icon-img" />
           <div class="hero-name-label">魔法使い</div>
-          <div class="hero-hp-label">HP7 / MP7<br />毎ターンMP+1回復</div>
+          <div class="hero-hp-label">HP10 / MP10<br />毎ターンMP+1回復</div>
         </div>
         <div class="class-card" data-class="butouka">
           <img src={butoukaImg.src} class="hero-icon-img" />
           <div class="hero-name-label">格闘家</div>
-          <div class="hero-hp-label">HP8 / MP4<br />毎ターン行動回数+1</div>
+          <div class="hero-hp-label">HP10 / MP6<br />毎ターン行動回数+1</div>
         </div>
       </div>
       <p id="class-select-preview" class="class-select-preview-custom">勇者が選択されています</p>
@@ -3321,6 +3386,253 @@ const { projectData } = Astro.props;
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: #fff;
+  }
+
+  .compendium-btn-custom {
+    margin-top: 0.8rem;
+  }
+
+  .compendium-modal-custom {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+  }
+
+  .compendium-header {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .compendium-progress-box {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+  }
+
+  .compendium-progress-bar-bg {
+    width: 100%;
+    max-width: 400px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.4rem auto 0;
+  }
+
+  .compendium-progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    transition: width 0.3s ease;
+  }
+
+  .comp-main-tabs {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .comp-main-tab {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #94a3b8;
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .comp-main-tab.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  }
+
+  .compendium-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .comp-tab {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.25rem 0.8rem;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .comp-tab.active {
+    background: #3b82f6;
+    border-color: #60a5fa;
+    font-weight: bold;
+  }
+
+  .compendium-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    grid-auto-rows: min-content;
+    justify-items: center;
+    align-items: start;
+    gap: 6px;
+    width: 100%;
+    max-width: 610px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    margin: 0 auto 1rem auto;
+  }
+
+  :global(.compendium-card-grid .battle-card) {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    aspect-ratio: 90 / 145 !important;
+    height: auto !important;
+    box-sizing: border-box;
+  }
+
+  :global(.compendium-card-grid .battle-card.comp-card-locked) {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+  }
+
+  :global(.compendium-card-grid .battle-card.comp-card-locked:hover) {
+    transform: none !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  :global(.comp-card-desc) {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    line-height: 1.3;
+  }
+
+  .close-compendium-custom {
+    width: 60%;
+    max-width: 250px;
+  }
+
+  .monster-detail-modal-custom {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .monster-detail-card {
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    padding: 1.2rem;
+    width: 90%;
+    max-width: 380px;
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .md-image-box {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .md-image-box img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+
+  .md-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+    color: #f8fafc;
+  }
+
+  .md-stats-row {
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 0.6rem;
+  }
+
+  .md-attributes {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    margin-bottom: 0.6rem;
+    box-sizing: border-box;
+  }
+
+  .md-skills-box {
+    width: 100%;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    margin-bottom: 0.6rem;
+  }
+
+  .md-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+
+  :global(.md-skill-tag) {
+    background: rgba(59, 130, 246, 0.25);
+    border: 1px solid #3b82f6;
+    color: #93c5fd;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .md-flavor {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.4;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-style: italic;
   }
 </style>
 

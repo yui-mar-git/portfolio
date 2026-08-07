@@ -5,7 +5,15 @@
 import { CARD_DB, REWARD_POOL, INITIAL_DECKS, upgradeCard } from '../../data/roguelike/cards';
 import { RELIC_DB } from '../../data/roguelike/relics';
 import { ITEM_DB } from '../../data/roguelike/items';
-import { enemyTemplates, getEnemyTemplate } from '../../data/roguelike/enemies';
+import { enemyTemplates, getEnemyTemplate, MONSTER_DB } from '../../data/roguelike/enemies';
+import {
+  initCompendium,
+  unlockCard,
+  unlockItem,
+  unlockRelic,
+  unlockMonster,
+  renderCompendium,
+} from './compendium';
 import { TOOLTIP_DB } from '../../data/roguelike/tooltips';
 
 // ===================================================
@@ -362,10 +370,10 @@ function showCutscene(scenes, onComplete) {
 // --- 2. ゲーム状態管理 ---
 const player = {
   class: 'yuusya',
-  maxHp: 10,
-  hp: 10,
-  maxMp: 5,
-  mp: 5,
+  maxHp: 12,
+  hp: 12,
+  maxMp: 8,
+  mp: 8,
   gold: 50,
   deck: [],
   hand: [],
@@ -738,10 +746,13 @@ function showItemDetailModal(item, type) {
 
   cardDetailContent.appendChild(container);
 
-  const typeName = type === 'relic' ? 'レリック' : 'アイテム';
+  const badgeHtml =
+    type === 'relic'
+      ? '<span class="badge-special">【レリック】</span>'
+      : '<span class="badge-spell">【アイテム】</span>';
   const descHtml = (item.desc || '').replace(/\n/g, '<br>');
   const flavorHtml = `<div class="card-flavor-text">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
-  cardDetailDesc.innerHTML = `<div class="card-desc-container"><div class="card-type-label">【${typeName}】</div>${descHtml}</div>${flavorHtml}`;
+  cardDetailDesc.innerHTML = `<div class="card-desc-container">${badgeHtml} ${descHtml}</div>${flavorHtml}`;
   cardDetailModal.style.display = 'flex';
 }
 
@@ -812,11 +823,13 @@ function showKingEvent() {
         `レリック「${relic.name}」を選択しますか？<br><br><span class="relic-desc-text">${relic.desc}</span>`,
         () => {
           playSE('relic');
+          unlockRelic(relicId);
           player.relics.push(relicId);
           if (player.class === 'yuusya') {
             const remaining = allRelicKeys.filter((r) => r !== relicId);
             const extra = remaining[0];
             playSE('relic');
+            unlockRelic(extra);
             player.relics.push(extra);
             showGameAlert(
               '王からの餞別 ',
@@ -877,10 +890,10 @@ function setupClassSelection() {
       let initialCards = INITIAL_DECKS[selectedClass].map((id) => CARD_DB[id]);
 
       const classInfo = {
-        yuusya: { hp: 13, mp: 7, effect: '開始時に王様からレリックを2つ貰える' },
-        kenshi: { hp: 15, mp: 5, effect: '毎ターン開始時にHPが1回復する' },
+        yuusya: { hp: 12, mp: 8, effect: '開始時に王様からレリックを2つ貰える' },
+        kenshi: { hp: 14, mp: 6, effect: '毎ターン開始時にHPが1回復する' },
         mahoutsukai: { hp: 10, mp: 10, effect: '毎ターン開始時にMPが1回復する' },
-        butouka: { hp: 10, mp: 5, effect: '毎ターンの行動回数が+1' },
+        butouka: { hp: 10, mp: 6, effect: '毎ターンの行動回数が+1' },
       };
       const info = classInfo[selectedClass];
       const confirmMessage = `初期HP: ${info.hp} / 初期MP: ${info.mp}<br><span class="hero-effect-text">【特殊効果】 ${info.effect}</span>`;
@@ -926,25 +939,27 @@ function initGame() {
   currentRow = 0;
 
   if (player.class === 'yuusya') {
-    player.maxHp = 13;
-    player.maxMp = 7;
+    player.maxHp = 12;
+    player.maxMp = 8;
   } else if (player.class === 'kenshi') {
-    player.maxHp = 15;
-    player.maxMp = 5;
+    player.maxHp = 14;
+    player.maxMp = 6;
   } else if (player.class === 'mahoutsukai') {
     player.maxHp = 10;
     player.maxMp = 10;
   } else if (player.class === 'butouka') {
     player.maxHp = 10;
-    player.maxMp = 5;
+    player.maxMp = 6;
   }
   player.hp = player.maxHp;
   player.mp = player.maxMp;
 
   player.deck = INITIAL_DECKS[player.class].map((id) => ({ ...CARD_DB[id] }));
+  INITIAL_DECKS[player.class].forEach((id) => unlockCard(id));
   player.discard = [];
   player.hand = [];
   player.items = [{ id: 'sandwich', used: false }];
+  player.items.forEach((item) => unlockItem(item.id));
 
   renderRelicsAndItems();
   updateHeaderBar();
@@ -1826,6 +1841,7 @@ function renderShop() {
               () => {
                 player.gold -= price;
                 playSE('reward_select');
+                unlockCard(card.id);
                 player.discard.push(card);
                 item.bought = true;
                 showGameAlert(
@@ -3069,6 +3085,9 @@ function handleVictory() {
   if (btnEndTurn) btnEndTurn.disabled = true;
   playSE('victory');
   logMessage(enemy.name + ' を倒した！', 'log-system');
+  if (enemy && enemy.name) {
+    unlockMonster(enemy.name);
+  }
 
   let goldReward = 10 + Math.floor(Math.random() * 6);
   if (currentPathType === 'elite' || currentPathType === 'mimic') {
@@ -3323,6 +3342,7 @@ function showReward() {
     const card = CARD_DB[id];
     const el = makeCardEl(card, () => {
       playSE('reward_select');
+      unlockCard(id);
       player.discard.push({ ...CARD_DB[id] });
       logMessage(CARD_DB[id].name + ' をデッキに追加！', 'log-system');
       if (rewardOverlay) rewardOverlay.style.display = 'none';
@@ -3355,6 +3375,7 @@ function showBossRelicReward() {
         `;
     el.addEventListener('click', () => {
       playSE('relic');
+      unlockRelic(relicId);
       player.relics.push(relicId);
       logMessage(`ボス報酬：レリック「${relic.name}」を獲得！`, 'log-system');
       if (rewardOverlay) rewardOverlay.style.display = 'none';
@@ -3368,6 +3389,9 @@ function showBossRelicReward() {
 function showResultOverlay(isWin) {
   if (isWin) {
     playSE('victory');
+    if (enemy && enemy.name) {
+      unlockMonster(enemy.name);
+    }
   } else {
     stopBGM();
     playSE('defeat');
@@ -3443,7 +3467,6 @@ function startBattle() {
   enemy = { ...tpl, hp: tpl.hp, maxHp: tpl.maxHp, poison: 0, paralyze: 0, buffUp: 0, buffDown: 0 };
   if (enemyNameEl) enemyNameEl.textContent = enemy.name;
   if (enemyImageEl) enemyImageEl.src = enemy.image;
-  player.maxMp = player.relics.includes('ruby_ring') ? 6 : 5;
   player.items.forEach((i) => (i.used = false));
 
   // 戦闘開始前に山札をシャッフル（初回以外はhandleVictoryで山札に全て戻っているため、シャッフルのみ行う）
@@ -4013,3 +4036,8 @@ function showEnemySkillCardModal(intent) {
     color: skillInfo.color,
   });
 }
+
+// ===================================================
+// 図鑑（カード・アイテム・レリック・モンスター）初期化
+// ===================================================
+initCompendium(makeCardEl, showCardDetailModal, showItemDetailModal);
