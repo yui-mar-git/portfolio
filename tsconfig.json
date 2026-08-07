@@ -5,5 +5,6 @@
     "paths": {
       "@/*": ["src/*"]
     }
-  }
+  },
+  "exclude": ["temp_logs", "dist", "node_modules"]
 }

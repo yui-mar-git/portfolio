@@ -5,6 +5,12 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
+// ローカル開発環境(npm run dev)でのレートリミットテスト用インメモリキャッシュ
+declare global {
+  var __DEV_RATE_LIMIT_KV__: Map<string, number> | undefined;
+}
+const devKvMap = globalThis.__DEV_RATE_LIMIT_KV__ || (globalThis.__DEV_RATE_LIMIT_KV__ = new Map());
+
 let errorMsg = '';
 const siteKey =
   Astro.locals.runtime?.env?.PUBLIC_TURNSTILE_SITE_KEY || import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
@@ -17,30 +23,68 @@ if (Astro.request.method === 'POST') {
     if (!token) {
       errorMsg = 'Turnstileトークンが見つかりません。チェックボックスをオンにしてください。';
     } else {
-      // 🌟【修正箇所】Cloudflare Pagesのランタイム変数と、ローカルの変数の両方に対応させる
       const secretKey =
         Astro.locals.runtime?.env?.TURNSTILE_SECRET_KEY || import.meta.env.TURNSTILE_SECRET_KEY;
 
-      const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(token.toString())}`,
-      });
+      let isVerified = false;
+      if (secretKey) {
+        const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `secret=${encodeURIComponent(secretKey)}&response=${encodeURIComponent(token.toString())}`,
+        });
 
-      const resultData = await result.json();
-
-      if (resultData.success) {
-        // トークン検証成功：サンクスページへ
-        const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
-        return Astro.redirect(`${baseUrl}/contact/thanks/`);
+        const resultData = await result.json();
+        isVerified = !!resultData.success;
+        if (!isVerified) {
+          const errorCodeStr = JSON.stringify(resultData['error-codes'] || resultData);
+          const keyStatus = secretKey ? '取得成功' : '取得失敗(undefined)';
+          errorMsg = `ボット判定されました。理由: ${errorCodeStr} (Secret: ${keyStatus})`;
+          console.error('Turnstile verification failed:', resultData);
+        }
       } else {
-        // エラー理由をより詳細に出力（デバッグ用）
-        const errorCodeStr = JSON.stringify(resultData['error-codes'] || resultData);
-        const keyStatus = secretKey ? '取得成功' : '取得失敗(undefined)';
-        errorMsg = `ボット判定されました。理由: ${errorCodeStr} (Secret: ${keyStatus})`;
-        console.error('Turnstile verification failed:', resultData);
+        isVerified = true;
+      }
+
+      if (isVerified) {
+        const ip =
+          Astro.request.headers.get('cf-connecting-ip') ||
+          Astro.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          (Astro.clientAddress && Astro.clientAddress !== '::1' ? Astro.clientAddress : '127.0.0.1');
+
+        const rateLimitKv = Astro.locals.runtime?.env?.RATE_LIMIT_KV;
+        let isRateLimited = false;
+
+        if (rateLimitKv) {
+          // Cloudflare 本番 / Wrangler 環境
+          const kvKey = `rate_limit:${ip}`;
+          const currentCountStr = await rateLimitKv.get(kvKey);
+          const currentCount = currentCountStr ? parseInt(currentCountStr, 10) : 0;
+
+          if (currentCount >= 3) {
+            isRateLimited = true;
+            errorMsg = '短時間に多数の送信が検知されました。1時間ほど時間を置いてから再度お試しください。';
+          } else {
+            await rateLimitKv.put(kvKey, (currentCount + 1).toString(), { expirationTtl: 3600 });
+          }
+        } else {
+          // ローカル開発環境 (npm run dev) 用の検証テスト
+          const currentCount = devKvMap.get(ip) || 0;
+          if (currentCount >= 3) {
+            isRateLimited = true;
+            errorMsg = '短時間に多数の送信が検知されました。1時間ほど時間を置いてから再度お試しください。';
+          } else {
+            devKvMap.set(ip, currentCount + 1);
+          }
+        }
+
+        if (!isRateLimited) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          const baseUrl = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
+          return Astro.redirect(`${baseUrl}/contact/thanks/`);
+        }
       }
     }
   } catch (err) {
@@ -84,11 +128,11 @@ if (Astro.request.method === 'POST') {
 
           <button type="submit" class="btn btn-full submit-btn">送信する</button>
 
-          <div class="cf-turnstile turnstile-container" data-sitekey={siteKey}></div>
+          <div class="cf-turnstile turnstile-container" data-sitekey={siteKey} data-theme="dark"></div>
 
           <p class="dummy-notice">
             ※このフォームはポートフォリオ用のデモ（ダミー）です。<br />
-            実際にはどこにもメールは送信されず、データが保存されることもありません。<br />
+            （Cloudflare KVによる1時間最大3回のレート制限と、1.5秒のモック送信処理が適用されています）<br />
             送信ボタンを押すと、完了ページ（サンクスページ）のデザインサンプルに遷移します。
           </p>
         </form>
@@ -101,12 +145,16 @@ if (Astro.request.method === 'POST') {
 
 <style>
   .error-message {
-    background: #ffcccc;
-    color: #cc0000;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #f87171;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-md, 8px);
+    margin-bottom: 1.5rem;
     text-align: center;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-weight: 500;
   }
   .submit-btn {
     margin: 0 auto;
@@ -116,5 +164,12 @@ if (Astro.request.method === 'POST') {
     margin-bottom: 1.5rem;
     display: flex;
     justify-content: center;
+  }
+  .dummy-notice {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+    text-align: center;
+    line-height: 1.5;
+    margin-top: 1rem;
   }
 </style>

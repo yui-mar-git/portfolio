@@ -1,0 +1,6 @@
+name = "portfolio"
+compatibility_date = "2024-04-05"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "ce76fea549394dc1a83cee7ddcd5cfce"
