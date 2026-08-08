@@ -48,15 +48,10 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   const titleBtn = document.getElementById('title-btn');
   const shareBtn = document.getElementById('share-btn');
   const howtoBtn = document.getElementById('howto-btn');
-  const closeHowtoBtn = document.getElementById('close-howto-btn-x'); // ✕ボタンのID
+  const closeHowtoBtn = document.getElementById('close-howto-btn-x');
   const howtoModal = document.getElementById('howto-modal');
-  const configBtn = document.getElementById('config-btn');
-  const closeConfigBtn = document.getElementById('close-config-btn-x'); // ✕ボタンのID
+  const closeConfigBtn = document.getElementById('close-config-btn-x');
   const configModal = document.getElementById('config-modal');
-
-  const creditsBtn = document.getElementById('credits-btn');
-  const closeCreditsBtn = document.getElementById('close-credits-btn');
-  const creditsModal = document.getElementById('credits-modal');
   const modalOverlay = document.getElementById('modal-overlay');
 
   // State
@@ -65,6 +60,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   let survivalTime = 0;
   let isPaused = false;
   let pauseStartTime = 0;
+  let animFrameCounter = 0;
   let highScore = parseFloat(localStorage.getItem('runaction_highscore')) || 0;
   if (highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
   const startHighscoreElement = document.getElementById('start-highscore-val');
@@ -84,7 +80,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
 
   // Canvas Resize (レスポンシブ対応)
   function resizeCanvas() {
-    // 内部解像度をコンテナのサイズに合わせる
     canvas.width = wrapper.clientWidth;
     canvas.height = wrapper.clientHeight;
   }
@@ -92,48 +87,60 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   resizeCanvas();
 
   // Physics & Game Settings
-  const gravity = 0.5;
-  const jumpPower = -10;
+  const gravity = 0.55;
+  const jumpPower = -10.5;
   let scrollSpeed = 5;
 
   // Game Objects
   const player = {
-    x: 50,
+    x: 60,
     y: 0,
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 34,
     vy: 0,
     jumpCount: 0,
     maxJumps: 2,
+    onGround: false,
+    state: 'RUNNING', // RUNNING, JUMPING, FALLING, GAMEOVER
   };
 
   let blocks = [];
   let obstacles = [];
-  let clouds = []; // 背景の雲
+  let enemies = [];
+  let clouds = [];
   let nextBlockX = 0;
+  let blockSpawnCount = 0;
   const blockWidth = 60;
   const blockHeight = 40;
 
-  // 雲（角丸の長方形）を描画するヘルパー関数
-  // 半円を左右に描き、その間を塗りつぶすことで横長の楕円を表現します
   function drawRoundedRect(ctx, x, y, width, height) {
     const r = height / 2;
     ctx.beginPath();
-    // 左側の半円
     ctx.arc(x + r, y + r, r, Math.PI * 0.5, Math.PI * 1.5);
-    // 右側の半円
     ctx.arc(x + width - r, y + r, r, Math.PI * 1.5, Math.PI * 0.5);
     ctx.closePath();
     ctx.fill();
   }
 
-  // 当たり判定 (AABB: 四角形同士の交差判定)
-  function checkCollision(r1, r2) {
+  // 判定緩和付き当たり判定 (AABB with Inset Margin)
+  function checkCollision(r1, r2, insetX = 4, insetY = 3) {
+    const box1 = {
+      x: r1.x + insetX,
+      y: r1.y + insetY,
+      width: r1.width - insetX * 2,
+      height: r1.height - insetY * 2,
+    };
+    const box2 = {
+      x: r2.x + insetX,
+      y: r2.y + insetY,
+      width: r2.width - insetX * 2,
+      height: r2.height - insetY * 2,
+    };
     return (
-      r1.x < r2.x + r2.width &&
-      r1.x + r1.width > r2.x &&
-      r1.y < r2.y + r2.height &&
-      r1.y + r1.height > r2.y
+      box1.x < box2.x + box2.width &&
+      box1.x + box1.width > box2.x &&
+      box1.y < box2.y + box2.height &&
+      box1.y + box1.height > box2.y
     );
   }
 
@@ -141,31 +148,63 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   function update() {
     if (gameState !== 'playing' || isPaused) return;
 
+    animFrameCounter++;
+
     // Update survival time
     const now = Date.now();
     survivalTime = (now - startTime) / 1000;
-    timeElement.textContent = survivalTime.toFixed(1);
+    if (timeElement) timeElement.textContent = survivalTime.toFixed(1);
 
-    // スピードアップ（徐々に難易度を上げる）
+    // スピードアップ
     scrollSpeed = 5 + survivalTime / 10;
 
     // --- プレイヤーの物理演算 ---
     player.vy += gravity;
     player.y += player.vy;
 
-    // --- 地形・障害物・背景のスクロール ---
+    // アニメーション状態の判定
+    if (player.onGround) {
+      player.state = 'RUNNING';
+    } else if (player.vy < 0) {
+      player.state = 'JUMPING';
+    } else {
+      player.state = 'FALLING';
+    }
+
+    // --- スクロール処理 ---
     for (let i = 0; i < blocks.length; i++) {
       blocks[i].x -= scrollSpeed;
     }
     for (let i = 0; i < obstacles.length; i++) {
       obstacles[i].x -= scrollSpeed;
     }
-    // --- 背景の雲のスクロール（地面よりも少し早い速度で躍動感を出す） ---
-    for (let i = 0; i < clouds.length; i++) {
-      // 地面のスクロール速度(scrollSpeed)より20%早く動かす
-      clouds[i].x -= scrollSpeed * 1.2;
 
-      // 雲が画面の左端から完全に見えなくなったら、右端に再配置してループさせる
+    // エネミーの更新
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      const e = enemies[i];
+      e.x -= scrollSpeed;
+
+      if (e.state === 'alive') {
+        if (e.type === 'flying') {
+          e.y = e.baseY + Math.sin((animFrameCounter + e.phase) * 0.08) * 20;
+        } else if (e.type === 'ground') {
+          e.x += e.patrolDir * 0.8;
+          e.patrolTimer++;
+          if (e.patrolTimer > 45) {
+            e.patrolDir *= -1;
+            e.patrolTimer = 0;
+          }
+        }
+      } else if (e.state === 'defeated') {
+        e.defeatTimer++;
+        if (e.defeatTimer > 25) {
+          enemies.splice(i, 1);
+        }
+      }
+    }
+
+    for (let i = 0; i < clouds.length; i++) {
+      clouds[i].x -= scrollSpeed * 1.2;
       if (clouds[i].x + clouds[i].width < 0) {
         clouds[i].x = canvas.width + Math.random() * 100;
         clouds[i].y = Math.random() * (canvas.height / 3);
@@ -173,17 +212,20 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     }
 
     // --- 当たり判定（地面） ---
-    let onGround = false;
+    player.onGround = false;
     for (const block of blocks) {
-      if (checkCollision(player, block)) {
-        // 上から乗った場合
-        if (player.vy > 0 && player.y + player.height - player.vy <= block.y + 5) {
+      if (
+        player.x < block.x + block.width &&
+        player.x + player.width > block.x &&
+        player.y < block.y + block.height &&
+        player.y + player.height > block.y
+      ) {
+        if (player.vy > 0 && player.y + player.height - player.vy <= block.y + 10) {
           player.y = block.y - player.height;
           player.vy = 0;
-          player.jumpCount = 0; // 着地したらジャンプ回数をリセット
-          onGround = true;
-        } else {
-          // 横からぶつかった場合（壁としてゲームオーバー）
+          player.jumpCount = 0;
+          player.onGround = true;
+        } else if (player.x + player.width - scrollSpeed <= block.x + 5) {
           playSE('collision');
           gameOver();
           return;
@@ -191,9 +233,36 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       }
     }
 
-    // --- 当たり判定（障害物） ---
+    // --- 当たり判定（エネミー ＆ 踏みつけ判定） ---
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
+      if (enemy.state === 'alive') {
+        const isColliding = checkCollision(player, enemy, 3, 2);
+        if (isColliding) {
+          const playerBottom = player.y + player.height;
+          const enemyTop = enemy.y + 14;
+
+          if (player.vy > 0 && playerBottom - player.vy <= enemyTop + 8) {
+            // 👉 踏みつけ成功！ (Stomp Success)
+            playSE('jump');
+            enemy.state = 'defeated';
+            enemy.defeatTimer = 0;
+
+            player.vy = jumpPower * 0.85;
+            player.jumpCount = 1;
+            player.y = enemy.y - player.height;
+          } else {
+            playSE('collision');
+            gameOver();
+            return;
+          }
+        }
+      }
+    }
+
+    // --- 当たり判定（固定障害物） ---
     for (const obs of obstacles) {
-      if (checkCollision(player, obs)) {
+      if (checkCollision(player, obs, 4, 3)) {
         playSE('collision');
         gameOver();
         return;
@@ -201,27 +270,24 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     }
 
     // --- 落下判定 ---
-    if (player.y > canvas.height) {
+    if (player.y > canvas.height + 50) {
       playSE('collision');
       gameOver();
       return;
     }
 
-    // --- メモリ最適化＆新しいブロックの生成 ---
-    // 画面外に出たブロックを削除
+    // --- オブジェクトの画面外削除 ＆ 敵・障害物の生成 ---
     blocks = blocks.filter((b) => b.x + b.width > 0);
     obstacles = obstacles.filter((o) => o.x + o.width > 0);
 
-    // 穴を正しく管理するため、nextBlockXをスクロール量に合わせて減算
     nextBlockX -= scrollSpeed;
 
-    // nextBlockX が画面右端に近づいたら新しいブロックを生成
     while (nextBlockX < canvas.width + blockWidth) {
-      // 穴を作る確率（15%）
-      const isHole = Math.random() < 0.15;
+      blockSpawnCount++;
+      const isHole = blockSpawnCount > 5 && Math.random() < 0.12;
+      const groundY = canvas.height - blockHeight;
 
       if (!isHole) {
-        const groundY = canvas.height - blockHeight;
         blocks.push({
           x: nextBlockX,
           y: groundY,
@@ -229,60 +295,393 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
           height: blockHeight,
         });
 
-        // 障害物を作る確率（10%）
-        if (Math.random() < 0.1 && nextBlockX > canvas.width) {
-          obstacles.push({
-            x: nextBlockX + blockWidth / 2 - 15,
-            y: groundY - 30, // 地面の上に乗るように配置
-            width: 30,
-            height: 30,
-          });
+        if (blockSpawnCount > 3 && nextBlockX > canvas.width * 0.6) {
+          const rand = Math.random();
+          if (rand < 0.28) {
+            // 1. 陸上パトロールエネミー
+            enemies.push({
+              type: 'ground',
+              state: 'alive',
+              x: nextBlockX + 10,
+              y: groundY - 26,
+              width: 28,
+              height: 26,
+              patrolDir: 1,
+              patrolTimer: 0,
+              defeatTimer: 0,
+            });
+          } else if (rand < 0.50) {
+            // 2. 飛行エネミー
+            const flyY = groundY - 55 - Math.random() * 50;
+            enemies.push({
+              type: 'flying',
+              state: 'alive',
+              x: nextBlockX + 10,
+              y: flyY,
+              baseY: flyY,
+              phase: Math.random() * 100,
+              width: 28,
+              height: 26,
+              defeatTimer: 0,
+            });
+          } else if (rand < 0.65) {
+            // 3. 固定障害物 (高さ18px)
+            obstacles.push({
+              x: nextBlockX + blockWidth / 2 - 11,
+              y: groundY - 18,
+              width: 22,
+              height: 18,
+            });
+          }
         }
         nextBlockX += blockWidth;
       } else {
-        // 穴の場合は 2〜3ブロック分の幅を開ける
         const holeBlocks = Math.floor(Math.random() * 2) + 2;
         nextBlockX += blockWidth * holeBlocks;
       }
     }
   }
 
+  // --- 描画処理 ---
+
+  // 1. 操作キャラ (全身青 #2563eb / バイザー白 #ffffff / 白い丸い拳 #ffffff)
+  function drawPlayer(ctx, p) {
+    ctx.save();
+    ctx.translate(p.x + p.width / 2, p.y + p.height / 2);
+
+    // 姿勢の角度計算
+    if (p.state === 'GAMEOVER') {
+      ctx.rotate(-0.38); // 衝突時: 左へ仰け反りノックバック
+    } else {
+      ctx.rotate(0.18);  // 走る/ジャンプ時: 常に右へ前のめり
+    }
+
+    const armAngle = Math.sin(animFrameCounter * 0.35) * 0.5;
+    const legAngle = Math.sin(animFrameCounter * 0.35) * 0.55;
+
+    // ① 足元の影
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, p.height / 2 + 1, 9, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ② 全身青スーツ (青 #2563eb)
+    ctx.fillStyle = '#2563eb';
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+
+    // 二足脚 (青)
+    if (p.state === 'RUNNING') {
+      ctx.beginPath();
+      ctx.moveTo(-3, 4);
+      ctx.lineTo(-3 - Math.sin(legAngle) * 8, p.height / 2 - 2);
+      ctx.moveTo(3, 4);
+      ctx.lineTo(3 + Math.sin(legAngle) * 8, p.height / 2 - 2);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(-3, 4); ctx.lineTo(-6, p.height / 2 - 4);
+      ctx.moveTo(3, 4);  ctx.lineTo(6, p.height / 2 - 4);
+      ctx.stroke();
+    }
+
+    // 胴体 (青)
+    ctx.beginPath();
+    ctx.roundRect(-7, -6, 14, 12, 4);
+    ctx.fill();
+
+    // サイバーヘルメット (青)
+    ctx.beginPath();
+    ctx.arc(0, -11, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 奥側の腕 ＆ 白い丸い拳 (腕: 青 / 拳: 白 #ffffff)
+    if (p.state === 'RUNNING') {
+      const armX1 = -2 - Math.cos(armAngle) * 8;
+      const armY1 = 4;
+      ctx.beginPath();
+      ctx.moveTo(-2, -3); ctx.lineTo(armX1, armY1);
+      ctx.stroke();
+      // 白い丸い拳
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(armX1 - 1, armY1 + 1, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ③ 白いバイザー (白 #ffffff) / GAMEOVER時: 「✕ ✕」
+    if (p.state === 'GAMEOVER') {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(1, -13); ctx.lineTo(5, -9);
+      ctx.moveTo(5, -13); ctx.lineTo(1, -9);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.roundRect(1, -13, 7, 4, 1.5);
+      ctx.fill();
+    }
+
+    // 手前側の腕 ＆ 白い丸い拳 (腕: 青 / 拳: 白 #ffffff)
+    ctx.strokeStyle = '#2563eb';
+    if (p.state === 'RUNNING') {
+      const armX2 = 2 + Math.cos(armAngle) * 8;
+      const armY2 = 4;
+      ctx.beginPath();
+      ctx.moveTo(2, -3); ctx.lineTo(armX2, armY2);
+      ctx.stroke();
+      // 白い丸い拳
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(armX2 + 1, armY2 + 1, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(2, -3); ctx.lineTo(7, -7);
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(8, -8, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  // 2. エネミー描画 (指定された精密なレイヤー構造)
+  function drawEnemies(ctx, enemiesList) {
+    for (const e of enemiesList) {
+      ctx.save();
+      ctx.translate(e.x + e.width / 2, e.y + e.height / 2);
+
+      // 進行方向の決定（陸上はパトロール方向、飛行はプレイヤーに向かうため常に左向き dir = -1）
+      const dir = e.type === 'flying' ? -1 : (e.patrolDir || -1);
+
+      if (e.type === 'ground') {
+        // --- 陸上キャラ (全身紫 #8b5cf6 ＋ 白目 ＋ 赤い楕円尻尾(下レイヤー) ＋ 直線口 ＋ 牙1px) ---
+        const isDefeated = e.state === 'defeated';
+
+        if (isDefeated) {
+          ctx.scale(1.2, 0.45);
+        }
+
+        // Layer 1 [下レイヤー]: 赤い楕円の尻尾 (進行方向と逆側に配置)
+        ctx.fillStyle = '#ef4444'; // 赤い楕円
+        ctx.beginPath();
+        const tailX = -dir * 12;
+        ctx.ellipse(tailX, 2, 6, 3.5, tailDirAngle(dir), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Layer 2 [メインボディ]: 全身紫 (紫 #8b5cf6)
+        ctx.fillStyle = '#8b5cf6';
+        ctx.beginPath();
+        ctx.ellipse(0, -2, e.width / 2 - 2, e.height / 2 - 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 三角耳 (紫 #8b5cf6)
+        ctx.beginPath();
+        ctx.moveTo(-6, -8); ctx.lineTo(-10, -14); ctx.lineTo(-2, -9);
+        ctx.moveTo(2, -8);  ctx.lineTo(10, -14);  ctx.lineTo(6, -9);
+        ctx.fill();
+
+        // 二足歩行の脚 (紫 #8b5cf6)
+        if (!isDefeated) {
+          ctx.strokeStyle = '#8b5cf6';
+          ctx.lineWidth = 3.5;
+          ctx.lineCap = 'round';
+          const legStep = Math.sin(animFrameCounter * 0.35) * 5;
+          ctx.beginPath();
+          ctx.moveTo(-5, 6); ctx.lineTo(-5 - legStep, 13);
+          ctx.moveTo(5, 6);  ctx.lineTo(5 + legStep, 13);
+          ctx.stroke();
+        }
+
+        // Layer 3 [顔パーツ]: 進行方向に少しずらした両眼 ＋ 白い一直線の口 ＋ 逆側1px牙
+        const faceOffsetX = dir * 3; // 進行方向に少しシフト
+
+        if (isDefeated) {
+          // 撃退時: 「✕ ✕」目 ＋ 白い口
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-7 + faceOffsetX, -4); ctx.lineTo(-3 + faceOffsetX, 0);
+          ctx.moveTo(-3 + faceOffsetX, -4); ctx.lineTo(-7 + faceOffsetX, 0);
+          ctx.moveTo(3 + faceOffsetX, -4);  ctx.lineTo(7 + faceOffsetX, 0);
+          ctx.moveTo(7 + faceOffsetX, -4);  ctx.lineTo(3 + faceOffsetX, 0);
+          ctx.stroke();
+          // 一直線の口
+          ctx.beginPath();
+          ctx.moveTo(-4 + faceOffsetX, 4); ctx.lineTo(4 + faceOffsetX, 4);
+          ctx.stroke();
+        } else {
+          // 通常時: 白い目 (進行方向にずらす)
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(-6 + faceOffsetX, -5, 3.5, 4);
+          ctx.fillRect(3 + faceOffsetX, -5, 3.5, 4);
+
+          // 白い一直線の口 (両目の下)
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-4 + faceOffsetX, 2);
+          ctx.lineTo(4 + faceOffsetX, 2);
+          ctx.stroke();
+
+          // 進行方向と逆側に牙を表す1ピクセル (白い下向き突起)
+          ctx.fillStyle = '#ffffff';
+          const fangX = faceOffsetX - dir * 3;
+          ctx.fillRect(fangX, 3, 1.5, 2);
+        }
+
+      } else if (e.type === 'flying') {
+        // --- 飛行キャラ (下レイヤー:紫のコウモリ三角羽＆赤尻尾 / 前レイヤー:白角 / 顔パーツ共通) ---
+        const isDefeated = e.state === 'defeated';
+
+        if (isDefeated) {
+          ctx.rotate(-0.45); // 向いている方向と逆向きに仰け反る
+          if (Math.floor(e.defeatTimer / 3) % 2 === 0) {
+            ctx.globalAlpha = 0.35; // パチパチ点滅
+          }
+        }
+
+        // Layer 1 [下レイヤー]: 紫のコウモリ型三角形の羽 (ボディより下)
+        const wingFlap = isDefeated ? 0 : Math.sin(animFrameCounter * 0.4) * 6;
+        ctx.fillStyle = '#8b5cf6'; // 紫の羽
+        ctx.beginPath();
+        // 左コウモリ翼
+        ctx.moveTo(-4, -2);
+        ctx.lineTo(-15, -9 + wingFlap);
+        ctx.lineTo(-10, 2);
+        ctx.lineTo(-4, 4);
+        // 右コウモリ翼
+        ctx.moveTo(4, -2);
+        ctx.lineTo(15, -9 + wingFlap);
+        ctx.lineTo(10, 2);
+        ctx.lineTo(4, 4);
+        ctx.fill();
+
+        // Layer 1 [下レイヤー]: 赤い尻尾 (ボディより下・進行方向の後ろ側に伸びる)
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        const tailX = -dir * 6; // 左向き(dir=-1)なら右側(+X)へ伸ばす
+        ctx.moveTo(0, 5);
+        ctx.lineTo(tailX, 12);
+        ctx.lineTo(tailX + (-dir * 4), 10);
+        ctx.stroke();
+
+        // Layer 2 [メインボディ]: 全身紫 (紫 #8b5cf6)
+        ctx.fillStyle = '#8b5cf6';
+        ctx.beginPath();
+        ctx.arc(0, 0, e.width / 2 - 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Layer 3 [前レイヤー]: 白い角 (ボディより前)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(-5, -7); ctx.lineTo(-8, -14); ctx.lineTo(-2, -9);
+        ctx.moveTo(5, -7);  ctx.lineTo(8, -14);  ctx.lineTo(2, -9);
+        ctx.fill();
+
+        // Layer 4 [顔パーツ]: 陸上キャラと共通パーツ (進行方向にずらした白目 ＋ 直線口 ＋ 逆側1px牙)
+        const faceOffsetX = dir * 3;
+
+        if (isDefeated) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-6 + faceOffsetX, -3); ctx.lineTo(-2 + faceOffsetX, 1);
+          ctx.moveTo(-2 + faceOffsetX, -3); ctx.lineTo(-6 + faceOffsetX, 1);
+          ctx.moveTo(2 + faceOffsetX, -3);  ctx.lineTo(6 + faceOffsetX, 1);
+          ctx.moveTo(6 + faceOffsetX, -3);  ctx.lineTo(2 + faceOffsetX, 1);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(-4 + faceOffsetX, 4); ctx.lineTo(4 + faceOffsetX, 4);
+          ctx.stroke();
+        } else {
+          // 通常時: 白目
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(-6 + faceOffsetX, -4, 3.5, 4);
+          ctx.fillRect(3 + faceOffsetX, -4, 3.5, 4);
+
+          // 白い一直線の口
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-4 + faceOffsetX, 2);
+          ctx.lineTo(4 + faceOffsetX, 2);
+          ctx.stroke();
+
+          // 逆側に1pxの牙
+          ctx.fillStyle = '#ffffff';
+          const fangX = faceOffsetX - dir * 3;
+          ctx.fillRect(fangX, 3, 1.5, 2);
+        }
+      }
+
+      ctx.restore();
+    }
+  }
+
+  function tailDirAngle(dir) {
+    return dir > 0 ? -0.2 : 0.2;
+  }
+
+  // 3. 固定障害物 (高さ18px・ジャンプ1回で余裕跳び越え)
+  function drawObstacles(ctx, obsList) {
+    for (const obs of obsList) {
+      ctx.save();
+      ctx.translate(obs.x, obs.y);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(obs.width / 2, 0);
+      ctx.lineTo(obs.width, obs.height);
+      ctx.lineTo(0, obs.height);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(3, obs.height - 4, obs.width - 6, 2.5);
+
+      ctx.restore();
+    }
+  }
+
   function draw() {
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (gameState === 'start') return;
 
-    // Draw Clouds (空を流れる雲)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; // 半透明の白
+    // 1. Draw Clouds
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     for (const c of clouds) {
-      // メインとなる横長の雲
       drawRoundedRect(ctx, c.x, c.y, c.width, c.height);
-      // 上に少し短めの雲をずらして重ねることで、モコモコ感（立体感）を出す
-      drawRoundedRect(
-        ctx,
-        c.x + c.width * 0.1,
-        c.y - c.height * 0.4,
-        c.width * 0.8,
-        c.height * 0.8,
-      );
+      drawRoundedRect(ctx, c.x + c.width * 0.1, c.y - c.height * 0.4, c.width * 0.8, c.height * 0.8);
     }
 
-    // Draw Blocks (Ground)
-    ctx.fillStyle = '#28a745'; // 緑色
+    // 2. Draw Blocks (Ground)
     for (const block of blocks) {
+      const gGrad = ctx.createLinearGradient(0, block.y, 0, block.y + block.height);
+      gGrad.addColorStop(0, '#10b981');
+      gGrad.addColorStop(1, '#047857');
+      ctx.fillStyle = gGrad;
       ctx.fillRect(block.x, block.y, block.width, block.height);
+      ctx.fillStyle = '#6ee7b7';
+      ctx.fillRect(block.x, block.y, block.width, 3);
     }
 
-    // Draw Obstacles
-    ctx.fillStyle = '#dc3545'; // 赤色
-    for (const obs of obstacles) {
-      ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-    }
+    // 3. Draw Obstacles
+    drawObstacles(ctx, obstacles);
 
-    // Draw Player (Blue Square)
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    // 4. Draw Enemies
+    drawEnemies(ctx, enemies);
+
+    // 5. Draw Player
+    drawPlayer(ctx, player);
   }
 
   function loop() {
@@ -300,7 +699,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     }
 
     if (gameState === 'playing' && !isPaused) {
-      // Jump Logic (2段ジャンプ)
       if (player.jumpCount < player.maxJumps) {
         playSE('jump');
         player.vy = jumpPower;
@@ -309,7 +707,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     }
   }
 
-  // wrapperに対してイベントを貼ることでCanvas領域内のタップを取得
   wrapper.addEventListener('mousedown', handleTap);
   wrapper.addEventListener('touchstart', handleTap, { passive: false });
 
@@ -325,26 +722,29 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
 
     startTime = Date.now();
     survivalTime = 0;
-    timeElement.textContent = '0.0';
+    if (timeElement) timeElement.textContent = '0.0';
     scrollSpeed = 5;
+    animFrameCounter = 0;
+    blockSpawnCount = 0;
 
     // Reset Player
     player.y = canvas.height - blockHeight - player.height;
     player.vy = 0;
     player.jumpCount = 0;
+    player.state = 'RUNNING';
 
-    // Reset World (初期状態は穴なしで地面を敷き詰める)
+    // Reset World
     blocks = [];
     obstacles = [];
+    enemies = [];
 
-    // 雲の初期配置
     clouds = [];
     for (let i = 0; i < 4; i++) {
       clouds.push({
-        x: Math.random() * canvas.width, // X座標はランダム
-        y: Math.random() * (canvas.height / 3), // Y座標は空の上1/3の範囲
-        width: 80 + Math.random() * 60, // 雲の横幅（80px 〜 140px）
-        height: 25 + Math.random() * 10, // 雲の縦幅（25px 〜 35px）
+        x: Math.random() * canvas.width,
+        y: Math.random() * (canvas.height / 3),
+        width: 80 + Math.random() * 60,
+        height: 25 + Math.random() * 10,
       });
     }
 
@@ -363,10 +763,11 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
   function gameOver() {
     if (gameHud) gameHud.style.display = 'none';
     gameState = 'gameover';
+    player.state = 'GAMEOVER';
     if (resultScreen) resultScreen.style.display = 'flex';
     const bottomHud = document.getElementById('bottom-hud');
     if (bottomHud) bottomHud.style.display = 'none';
-    finalTimeElement.textContent = survivalTime.toFixed(1);
+    if (finalTimeElement) finalTimeElement.textContent = survivalTime.toFixed(1);
 
     if (survivalTime > highScore) {
       highScore = survivalTime;
@@ -374,19 +775,19 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       if (highscoreElement) highscoreElement.textContent = highScore.toFixed(1);
     }
 
-    // Update Share Button
-    const shareText = `記録 ${survivalTime.toFixed(1)} 秒！(ベスト: ${highScore.toFixed(1)}秒) #MyPortfolioAction`;
-    const shareUrl = window.location.href;
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-
-    // ボタンイベントの再登録（重複防止）
-    const newShareBtn = shareBtn.cloneNode(true);
-    shareBtn.parentNode.replaceChild(newShareBtn, shareBtn);
-    newShareBtn.addEventListener('click', () => {
-      window.open(twitterUrl, '_blank', 'noopener,noreferrer');
-    });
+    // Share Button Link Update
+    if (shareBtn) {
+      const shareText = `記録 ${survivalTime.toFixed(1)} 秒！(ベスト: ${highScore.toFixed(1)}秒) #MyPortfolioAction`;
+      const shareUrl = window.location.href;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+      shareBtn.onclick = (e) => {
+        e.stopPropagation();
+        window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+      };
+    }
   }
 
+  // --- 既存UI・各種ボタンイベントハンドラの完全保持 ---
   if (startBtn)
     startBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -418,15 +819,15 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     howtoBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      howtoModal.classList.add('active');
-      modalOverlay.classList.add('active');
+      if (howtoModal) howtoModal.classList.add('active');
+      if (modalOverlay) modalOverlay.classList.add('active');
     });
   if (closeHowtoBtn)
     closeHowtoBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      howtoModal.classList.remove('active');
-      modalOverlay.classList.remove('active');
+      if (howtoModal) howtoModal.classList.remove('active');
+      if (modalOverlay) modalOverlay.classList.remove('active');
     });
 
   const _cfgBtn1 = document.getElementById('config-btn');
@@ -526,9 +927,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     });
   }
 
-  // Start loop
-  requestAnimationFrame(loop);
-
   const _credBtn = document.getElementById('credits-btn');
   if (_credBtn) {
     _credBtn.addEventListener('click', (e) => {
@@ -541,7 +939,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     _credBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     _credBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
-  const _closeCredBtn = document.getElementById('close-credits-btn-x'); // ✕ボタンのID
+  const _closeCredBtn = document.getElementById('close-credits-btn-x');
   if (_closeCredBtn) {
     _closeCredBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -561,13 +959,11 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     _closeCredBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
 
-  // コンフィグモーダル内「遊び方を見る」ボタン
   const _howtoInConfigBtn = document.getElementById('howto-btn-in-config');
   if (_howtoInConfigBtn) {
     _howtoInConfigBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cursor');
-      // コンフィグを閉じて遊び方モーダルを開く
       document.getElementById('config-modal')?.classList.remove('active');
       document.getElementById('howto-modal')?.classList.add('active');
       document.getElementById('modal-overlay')?.classList.add('active');
@@ -576,7 +972,6 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
     _howtoInConfigBtn.addEventListener('touchstart', (e) => e.stopPropagation());
   }
 
-  // グローバルなボタンクリック音
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn, .icon-config');
     if (btn) {
@@ -599,4 +994,7 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       configBgmVolume = parseFloat(e.target.value) / 100;
     });
   }
+
+  // Start Loop
+  loop();
 })();
