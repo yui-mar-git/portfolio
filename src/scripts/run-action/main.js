@@ -835,7 +835,34 @@ import seCancel from '../../assets/games/run-action/audio/se/キャンセル1.mp
       playSE('cursor');
       if (howtoModal) howtoModal.classList.remove('active');
       if (modalOverlay) modalOverlay.classList.remove('active');
+      // ポーズ中に遊び方モーダルを閉じた場合はゲームを再開
+      if (
+        gameState === 'playing' &&
+        isPaused &&
+        !document.getElementById('config-modal')?.classList.contains('active') &&
+        !document.getElementById('credits-modal')?.classList.contains('active') &&
+        !document.getElementById('retire-modal')?.classList.contains('active')
+      ) {
+        resumeGame();
+      }
     });
+
+  // モーダル外（オーバーレイ）クリック時の安全な一括全閉じ＆ポーズ解除
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', () => {
+      if (howtoModal) howtoModal.classList.remove('active');
+      if (configModal) configModal.classList.remove('active');
+      const credM = document.getElementById('credits-modal');
+      if (credM) credM.classList.remove('active');
+      const retM = document.getElementById('retire-modal');
+      if (retM) retM.classList.remove('active');
+      modalOverlay.classList.remove('active');
+
+      if (gameState === 'playing' && isPaused) {
+        resumeGame();
+      }
+    });
+  }
 
   const _cfgBtn1 = document.getElementById('config-btn');
   const _cfgBtn2 = document.getElementById('hud-config-btn');
