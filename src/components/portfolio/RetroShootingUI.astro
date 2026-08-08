@@ -31,6 +31,16 @@ const { gameTitle } = Astro.props;
     </div>
   </div>
 
+  <!-- WAVE Start Announcement Overlay -->
+  <div class="overlay" id="wave-start-modal" style="display: none;">
+    <div class="wave-announce-box">
+      <div class="wave-badge">INVASION ALERT</div>
+      <h2 id="wave-announce-title" class="wave-title">WAVE 1</h2>
+      <p id="wave-announce-desc" class="wave-desc">エネミー接近中！殲滅せよ！</p>
+      <button id="btn-wave-start" class="btn btn-primary btn-wave-start">出撃</button>
+    </div>
+  </div>
+
   <!-- Game UI Header (HUD) -->
   <div class="game-ui-header">
     <div class="status-bar">
@@ -230,5 +240,64 @@ const { gameTitle } = Astro.props;
   .stage-buttons {
     display: flex;
     gap: 1rem;
+  }
+
+  /* WAVE Start Modal Styles */
+  #wave-start-modal {
+    background-color: rgba(15, 23, 42, 0.85);
+    display: none;
+    z-index: 25;
+  }
+
+  .wave-announce-box {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.98));
+    border: 2px solid #00f2fe;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.45);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: wavePopup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes wavePopup {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .wave-badge {
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    color: #00f2fe;
+    background: rgba(0, 242, 254, 0.15);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 242, 254, 0.3);
+  }
+
+  .wave-title {
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0, 242, 254, 0.6);
+    margin: 0;
+  }
+
+  .wave-desc {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  .btn-wave-start {
+    margin-top: 0.5rem;
+    padding: 0.6rem 2.2rem;
+    font-size: 1rem;
+    font-weight: bold;
   }
 </style>

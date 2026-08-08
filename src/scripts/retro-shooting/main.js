@@ -4,19 +4,18 @@
  * ==========================================
  */
 
-import seCursor from '../../assets/games/tower-defense/audio/se/カーソル移動7.mp3';
-import seConfirm from '../../assets/games/tower-defense/audio/se/決定ボタンを押す2.mp3';
-import seCancel from '../../assets/games/tower-defense/audio/se/キャンセル1.mp3';
-import seStrike from '../../assets/games/tower-defense/audio/se/剣で斬る2.mp3';
-import seSmite from '../../assets/games/tower-defense/audio/se/打撃6.mp3';
-import sePunch from '../../assets/games/tower-defense/audio/se/小パンチ.mp3';
-import seMagic from '../../assets/games/tower-defense/audio/se/風魔法1.mp3';
-import seEnergyBall from '../../assets/games/tower-defense/audio/se/気弾1.mp3';
-import seVictory from '../../assets/games/tower-defense/audio/se/maou_game_jingle01.mp3';
-import seDefeat from '../../assets/games/tower-defense/audio/se/maou_game_jingle08.mp3';
+import seCursor from '../../assets/games/retro-shooting/audio/se/カーソル移動7.mp3';
+import seConfirm from '../../assets/games/retro-shooting/audio/se/決定ボタンを押す2.mp3';
+import seWaveStart from '../../assets/games/retro-shooting/audio/se/決定ボタンを押す33.mp3';
+import seCancel from '../../assets/games/retro-shooting/audio/se/キャンセル1.mp3';
+import seShot from '../../assets/games/retro-shooting/audio/se/ショット.mp3';
+import seHit from '../../assets/games/retro-shooting/audio/se/ショット命中.mp3';
+import seExplosion from '../../assets/games/retro-shooting/audio/se/クイズ不正解2.mp3';
+import sePowerUp from '../../assets/games/retro-shooting/audio/se/パワーアップ.mp3';
+import seDamage from '../../assets/games/retro-shooting/audio/se/ニュッ2.mp3';
+import seJump from '../../assets/games/retro-shooting/audio/se/パパッ.mp3';
 
-import bgmWave1 from '../../assets/games/tower-defense/audio/bgm/maou_game_field05.mp3';
-import bgmWave2 from '../../assets/games/tower-defense/audio/bgm/maou_game_field11.mp3';
+import bgmMain from '../../assets/games/retro-shooting/audio/bgm/maou_game_town26.mp3';
 
 const STORAGE_KEY = 'stg_high_score';
 let highScore = 0;
@@ -45,14 +44,14 @@ let currentBgmAudio = null;
 const SE_DB = {
   cursor: seCursor,
   confirm: seConfirm,
+  waveStart: seWaveStart,
   cancel: seCancel,
-  strike: seStrike,
-  smite: seSmite,
-  punch: sePunch,
-  magic: seMagic,
-  energyball: seEnergyBall,
-  victory: seVictory,
-  defeat: seDefeat,
+  shot: seShot,
+  hit: seHit,
+  explosion: seExplosion,
+  powerup: sePowerUp,
+  damage: seDamage,
+  jump: seJump,
 };
 
 function playSE(key) {
@@ -82,6 +81,42 @@ window.setBGMVolume = function (vol) {
   if (currentBgmAudio) currentBgmAudio.volume = vol;
 };
 
+let currentWaveModalConfirmCallback = null;
+
+function showWaveStartModal(wave, onConfirmCallback) {
+  playSE('waveStart');
+
+  const modal = document.getElementById('wave-start-modal');
+  const title = document.getElementById('wave-announce-title');
+  const desc = document.getElementById('wave-announce-desc');
+  const btn = document.getElementById('btn-wave-start');
+
+  if (title) title.textContent = `WAVE ${wave}`;
+  if (desc) {
+    desc.textContent = 'エネミー接近中！殲滅せよ！';
+  }
+
+  if (modal) modal.style.display = 'flex';
+
+  currentWaveModalConfirmCallback = () => {
+    playSE('confirm');
+    if (modal) modal.style.display = 'none';
+    if (onConfirmCallback) onConfirmCallback();
+  };
+}
+
+const btnWaveStart = document.getElementById('btn-wave-start');
+if (btnWaveStart) {
+  btnWaveStart.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (currentWaveModalConfirmCallback) {
+      const cb = currentWaveModalConfirmCallback;
+      currentWaveModalConfirmCallback = null;
+      cb();
+    }
+  });
+}
+
 class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
@@ -107,6 +142,7 @@ class MainScene extends Phaser.Scene {
     this.lives = 3;
     this.currentWave = 1;
     this.isGameOver = false;
+    this.isWavePaused = false;
     this.isInvulnerable = false;
     this.has3WayShot = false;
     this.lastFireTime = 0;
@@ -345,15 +381,38 @@ class MainScene extends Phaser.Scene {
 
   spawnWave(wave) {
     this.enemies.clear(true, true);
-    this.invaderDir = 1;
-    this.invaderSpeedX = 35 + wave * 8;
+    this.playerBullets.clear(true, true);
+    this.enemyBullets.clear(true, true);
+    this.ufos.clear(true, true);
+    this.items.clear(true, true);
 
-    const rows = 4;
-    const cols = 8;
-    const startX = 140;
-    const startY = 90;
+    this.invaderDir = 1;
+
+    // WAVEごとの敵バランス調整
+    let rows = 4;
+    let cols = 8;
+    if (wave === 1) {
+      rows = 3;
+      cols = 6;
+      this.invaderSpeedX = 35;
+    } else if (wave === 2) {
+      rows = 4;
+      cols = 7;
+      this.invaderSpeedX = 50;
+    } else if (wave === 3) {
+      rows = 4;
+      cols = 8;
+      this.invaderSpeedX = 65;
+    } else {
+      rows = 4;
+      cols = 8;
+      this.invaderSpeedX = 65 + (wave - 3) * 10;
+    }
+
     const spacingX = 65;
     const spacingY = 45;
+    const startX = (800 - cols * spacingX) / 2 + 25;
+    const startY = 80;
 
     for (let r = 0; r < rows; r++) {
       const textureKey = r % 2 === 0 ? 'enemy_type_a' : 'enemy_type_b';
@@ -369,10 +428,23 @@ class MainScene extends Phaser.Scene {
         invader.points = points;
       }
     }
+
+    // WAVE開始時のポーズ＆アナウンス演出
+    this.isWavePaused = true;
+    this.physics.pause();
+    showWaveStartModal(wave, () => {
+      this.physics.resume();
+      this.isWavePaused = false;
+      if (this.time) {
+        this.lastFireTime = this.time.now;
+        this.lastEnemyFireTime = this.time.now;
+        this.lastUfoTime = this.time.now;
+      }
+    });
   }
 
   update(time, delta) {
-    if (this.isGameOver) return;
+    if (this.isGameOver || this.isWavePaused) return;
 
     // Scroll Starfield
     const deltaSec = delta / 1000;
@@ -423,7 +495,7 @@ class MainScene extends Phaser.Scene {
         bullet.body.setAllowGravity(false);
         bullet.body.setVelocityY(-650);
       }
-      playSE('punch');
+      playSE('shot');
     }
 
     // Clean Out-of-Bounds Player Bullets
@@ -501,7 +573,6 @@ class MainScene extends Phaser.Scene {
       // Wave Cleared!
       this.currentWave += 1;
       this.spawnWave(this.currentWave);
-      playSE('magic');
       this.updateHUD();
     }
   }
@@ -531,7 +602,7 @@ class MainScene extends Phaser.Scene {
 
     this.score += enemy.points || 50;
     enemy.destroy();
-    playSE('strike');
+    playSE('hit');
 
     // 5% Chance to drop item from regular invader
     if (Math.random() < 0.05) {
@@ -566,7 +637,7 @@ class MainScene extends Phaser.Scene {
 
     this.score += 500; // Bonus points for rare UFO!
     ufo.destroy();
-    playSE('magic');
+    playSE('explosion');
 
     // 100% Chance to drop item from rare UFO!
     this.spawnItemDrop(ufo.x, ufo.y);
@@ -611,10 +682,10 @@ class MainScene extends Phaser.Scene {
 
     if (item.itemType === 'heal') {
       this.lives = Math.min(3, this.lives + 1);
-      playSE('magic');
+      playSE('powerup');
     } else if (item.itemType === 'power') {
       this.has3WayShot = true;
-      playSE('confirm');
+      playSE('powerup');
     }
 
     item.destroy();
@@ -635,7 +706,7 @@ class MainScene extends Phaser.Scene {
   takeDamage() {
     this.lives -= 1;
     this.updateHUD();
-    playSE('smite');
+    playSE('damage');
     this.cameras.main.flash(200, 255, 0, 0);
 
     if (this.lives <= 0) {
@@ -664,7 +735,7 @@ class MainScene extends Phaser.Scene {
     stopBGM();
 
     const isNewHigh = saveHighScore(this.score);
-    playSE('defeat');
+    playSE('explosion');
 
     const resultScreen = document.getElementById('result-screen');
     const finalScore = document.getElementById('final-score');
@@ -751,7 +822,7 @@ if (startBtn) {
     if (resultScreen) resultScreen.style.display = 'none';
     currentScreen = 'game';
     updateGlobalBackButton();
-    playBGM(bgmWave1);
+    playBGM(bgmMain);
 
     game.scene.stop('BootScene');
     game.scene.start('MainScene');
@@ -766,9 +837,9 @@ if (btnRetry) {
     if (resultScreen) resultScreen.style.display = 'none';
     currentScreen = 'game';
     updateGlobalBackButton();
-    playBGM(bgmWave1);
+    playBGM(bgmMain);
 
-    game.scene.stop('MainScene');
+    game.scene.stop('BootScene');
     game.scene.start('MainScene');
   });
 }
