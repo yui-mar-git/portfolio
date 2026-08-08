@@ -16,11 +16,26 @@ export interface TechArticle {
   url: string;
   date: string;
   source: 'Qiita' | 'Zenn' | 'note';
+  thumbnail?: string;
 }
 
 const QIITA_USER_ID = 'yui-mar';
 const ZENN_USER_ID = 'yui_mar';
 const NOTE_USER_ID = 'yui_mar';
+
+function extractThumbnailFromXml(block: string): string | undefined {
+  // 1. Check <media:thumbnail url="..."> or <media:content url="..."> or <enclosure url="...">
+  const mediaMatch =
+    block.match(/<media:(?:thumbnail|content)[^>]*url=["']([^"']+)["']/i) ||
+    block.match(/<enclosure[^>]*url=["']([^"']+)["']/i);
+  if (mediaMatch && mediaMatch[1]) return mediaMatch[1];
+
+  // 2. Check <img> tag inside description or content
+  const imgMatch = block.match(/<img[^>]*src=["']([^"']+)["']/i);
+  if (imgMatch && imgMatch[1]) return imgMatch[1];
+
+  return undefined;
+}
 
 async function fetchQiitaArticles(): Promise<TechArticle[]> {
   try {
@@ -33,12 +48,21 @@ async function fetchQiitaArticles(): Promise<TechArticle[]> {
     const data = await res.json();
     if (!Array.isArray(data)) return [];
 
-    return data.map((item: any) => ({
-      title: item.title || '',
-      url: item.url || '',
-      date: item.created_at ? item.created_at.split('T')[0] : '',
-      source: 'Qiita' as const,
-    }));
+    return data.map((item: any) => {
+      let thumbnail: string | undefined = undefined;
+      if (item.body) {
+        const match = item.body.match(/!\[.*?\]\((https?:\/\/[^\s\)]+)\)/i) || item.body.match(/<img[^>]*src=["']([^"']+)["']/i);
+        if (match && match[1]) thumbnail = match[1];
+      }
+
+      return {
+        title: item.title || '',
+        url: item.url || '',
+        date: item.created_at ? item.created_at.split('T')[0] : '',
+        source: 'Qiita' as const,
+        thumbnail,
+      };
+    });
   } catch (e) {
     console.warn('Failed to fetch Qiita articles:', e);
     return [];
@@ -55,6 +79,14 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
     if (!res.ok) return [];
     const text = await res.text();
     const items: TechArticle[] = [];
+
+    // Extract channel default logo (e.g. note/webfeeds logo)
+    const channelLogoMatch =
+      text.match(/<webfeeds:logo>([\s\S]*?)<\/webfeeds:logo>/i) ||
+      text.match(/<webfeeds:icon>([\s\S]*?)<\/webfeeds:icon>/i) ||
+      text.match(/<image>\s*<url>([\s\S]*?)<\/url>/i);
+    const channelLogo = channelLogoMatch ? channelLogoMatch[1].trim() : undefined;
+
     const matches = text.matchAll(/<item>([\s\S]*?)<\/item>|<entry>([\s\S]*?)<\/entry>/gi);
 
     for (const match of matches) {
@@ -66,6 +98,7 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
       const dateMatch = block.match(
         /<pubDate>([\s\S]*?)<\/pubDate>|<published>([\s\S]*?)<\/published>|<updated>([\s\S]*?)<\/updated>/i,
       );
+      const thumbnail = extractThumbnailFromXml(block) || channelLogo;
 
       const title = titleMatch ? titleMatch[1].trim() : '';
       const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : '';
@@ -86,6 +119,7 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
           url: link,
           date: dateStr,
           source,
+          thumbnail,
         });
       }
     }

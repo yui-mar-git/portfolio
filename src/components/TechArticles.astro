@@ -1,5 +1,8 @@
 ---
 import { getTechArticles, type TechArticle } from '@/lib/notes';
+import zennIcon from '@/assets/icons/brands/zenn.svg';
+import qiitaIcon from '@/assets/icons/brands/qiita.png';
+import noteIcon from '@/assets/icons/brands/note.svg';
 
 interface Props {
   title?: string;
@@ -7,6 +10,12 @@ interface Props {
 }
 
 const { title = '最新技術記事・備忘録', limit = 6 } = Astro.props;
+
+const brandIcons: Record<string, ImageMetadata> = {
+  Qiita: qiitaIcon,
+  Zenn: zennIcon,
+  note: noteIcon,
+};
 
 let articles: TechArticle[] = [];
 
@@ -31,19 +40,37 @@ try {
             rel="noopener noreferrer"
             class="tech-article-card"
           >
-            <div class="tech-article-header">
-              <span class={`source-badge badge-${item.source.toLowerCase()}`}>
-                {item.source}
-              </span>
-              {item.date && (
-                <time class="tech-article-date" datetime={item.date}>
-                  {item.date}
-                </time>
+            <div class="tech-article-eyecatch">
+              {item.thumbnail ? (
+                <img src={item.thumbnail} alt="" class="eyecatch-img" loading="lazy" />
+              ) : (
+                <div class={`eyecatch-placeholder placeholder-${item.source.toLowerCase()}`}>
+                  {brandIcons[item.source] && (
+                    <img
+                      src={brandIcons[item.source].src}
+                      alt={item.source}
+                      class="default-brand-icon"
+                    />
+                  )}
+                </div>
               )}
             </div>
-            <h3 class="tech-article-title" title={item.title}>
-              {item.title}
-            </h3>
+
+            <div class="tech-article-body">
+              <div class="tech-article-header">
+                <span class={`source-badge badge-${item.source.toLowerCase()}`}>
+                  {item.source}
+                </span>
+                {item.date && (
+                  <time class="tech-article-date" datetime={item.date}>
+                    {item.date}
+                  </time>
+                )}
+              </div>
+              <h3 class="tech-article-title" title={item.title}>
+                {item.title}
+              </h3>
+            </div>
           </a>
         ))}
       </div>
@@ -90,8 +117,7 @@ try {
   .tech-article-card {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.25rem;
+    overflow: hidden;
     background: rgba(30, 41, 59, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
@@ -105,6 +131,68 @@ try {
     transform: translateY(-3px);
     border-color: rgba(59, 130, 246, 0.5);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .tech-article-eyecatch {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.8);
+    position: relative;
+  }
+
+  .eyecatch-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .tech-article-card:hover .eyecatch-img {
+    transform: scale(1.05);
+  }
+
+  .eyecatch-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .default-brand-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+  }
+
+  .tech-article-card:hover .default-brand-icon {
+    transform: scale(1.1);
+  }
+
+  .placeholder-qiita {
+    background: linear-gradient(135deg, #2b7a00 0%, #55c500 100%);
+  }
+
+  .placeholder-zenn {
+    background: linear-gradient(135deg, #1d4ed8 0%, #3ea8ff 100%);
+  }
+
+  .placeholder-note {
+    background: linear-gradient(135deg, #134e4a 0%, #2cb696 100%);
+  }
+
+  .tech-article-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
   }
 
   .tech-article-header {
