@@ -82,6 +82,20 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
   // UI Elements
   const startScreen = document.getElementById('start-screen');
   const resultScreen = document.getElementById('result-screen');
+  const stageModeScreen = document.getElementById('stage-mode-screen');
+  const shopScreen = document.getElementById('shop-screen');
+
+  function showScreen(el) {
+    if (!el) return;
+    el.classList.remove('screen-hidden');
+    el.style.display = 'flex';
+  }
+
+  function hideScreen(el) {
+    if (!el) return;
+    el.classList.add('screen-hidden');
+    el.style.display = 'none';
+  }
   const timeElement = document.getElementById('survival-time');
   const highscoreElement = document.getElementById('highscore');
   const finalTimeElement = document.getElementById('final-time');
@@ -99,13 +113,11 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
   const configModal = document.getElementById('config-modal');
   const modalOverlay = document.getElementById('modal-overlay');
 
-  const stageModeScreen = document.getElementById('stage-mode-screen');
   const stageBackBtn = document.getElementById('stage-back-btn');
   const stageListEl = document.getElementById('stage-list');
   const stageCoinsVal = document.getElementById('stage-coins-val');
   const stageActiveItemsEl = document.getElementById('stage-active-items');
 
-  const shopScreen = document.getElementById('shop-screen');
   const shopBackBtn = document.getElementById('shop-back-btn');
   const shopCoinsVal = document.getElementById('shop-coins-val');
   const shopActiveItemsEl = document.getElementById('shop-active-items');
@@ -1267,8 +1279,10 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
 
     gameState = 'playing';
     isPaused = false;
-    startScreen.style.display = 'none';
-    resultScreen.style.display = 'none';
+    hideScreen(startScreen);
+    hideScreen(stageModeScreen);
+    hideScreen(shopScreen);
+    hideScreen(resultScreen);
 
     startTime = Date.now();
     survivalTime = 0;
@@ -1352,7 +1366,7 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     if (stageSelectBtn) stageSelectBtn.style.display = 'block';
     if (shareBtn) shareBtn.style.display = 'none';
 
-    if (resultScreen) resultScreen.style.display = 'flex';
+    showScreen(resultScreen);
   }
 
   function gameOver() {
@@ -1388,7 +1402,7 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     if (stageSelectBtn) stageSelectBtn.style.display = currentMode === 'stage' ? 'block' : 'none';
     if (shareBtn) shareBtn.style.display = currentMode === 'endless' ? 'block' : 'none';
 
-    if (resultScreen) resultScreen.style.display = 'flex';
+    showScreen(resultScreen);
 
     if (currentMode === 'endless' && survivalTime > highScore) {
       highScore = survivalTime;
@@ -1419,6 +1433,9 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     stageListEl.innerHTML = '';
     updateCoinsDisplay();
     playBGM('field');
+    hideScreen(startScreen);
+    hideScreen(shopScreen);
+    showScreen(stageModeScreen);
 
     STAGE_CONFIG.forEach((stage) => {
       const isUnlocked = stage.id <= saveData.unlockedStages;
@@ -1447,6 +1464,8 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     if (!shopItemsGridEl) return;
     shopItemsGridEl.innerHTML = '';
     updateCoinsDisplay();
+    hideScreen(stageModeScreen);
+    showScreen(shopScreen);
 
     ITEM_DB.forEach((item) => {
       const isOwned = saveData.ownedItems.includes(item.id);
@@ -1502,9 +1521,8 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     stageSelectBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cancel');
-      if (resultScreen) resultScreen.style.display = 'none';
+      hideScreen(resultScreen);
       renderStageModeScreen();
-      if (stageModeScreen) stageModeScreen.style.display = 'flex';
     });
   }
 
@@ -1521,8 +1539,6 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
       e.stopPropagation();
       playSE('cursor');
       renderStageModeScreen();
-      if (startScreen) startScreen.style.display = 'none';
-      if (stageModeScreen) stageModeScreen.style.display = 'flex';
     });
 
   if (stageBackBtn) {
@@ -1530,8 +1546,8 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
       e.stopPropagation();
       playSE('cancel');
       stopBGM();
-      if (stageModeScreen) stageModeScreen.style.display = 'none';
-      if (startScreen) startScreen.style.display = 'flex';
+      hideScreen(stageModeScreen);
+      showScreen(startScreen);
     });
     stageBackBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     stageBackBtn.addEventListener('touchstart', (e) => e.stopPropagation());
@@ -1542,17 +1558,14 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
       e.stopPropagation();
       playSE('cursor');
       renderShopScreen();
-      if (stageModeScreen) stageModeScreen.style.display = 'none';
-      if (shopScreen) shopScreen.style.display = 'flex';
     });
 
   if (shopBackBtn) {
     shopBackBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       playSE('cancel');
-      if (shopScreen) shopScreen.style.display = 'none';
+      hideScreen(shopScreen);
       renderStageModeScreen();
-      if (stageModeScreen) stageModeScreen.style.display = 'flex';
     });
     shopBackBtn.addEventListener('mousedown', (e) => e.stopPropagation());
     shopBackBtn.addEventListener('touchstart', (e) => e.stopPropagation());
@@ -1586,8 +1599,10 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
     titleBtn.addEventListener('click', () => {
       playSE('cancel');
       stopBGM();
-      if (resultScreen) resultScreen.style.display = 'none';
-      if (startScreen) startScreen.style.display = 'flex';
+      hideScreen(resultScreen);
+      hideScreen(stageModeScreen);
+      hideScreen(shopScreen);
+      showScreen(startScreen);
       if (gameHud) gameHud.style.display = 'none';
       const bottomHud = document.getElementById('bottom-hud');
       if (bottomHud) bottomHud.style.display = 'none';
@@ -1726,8 +1741,10 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
       document.getElementById('modal-overlay')?.classList.remove('active');
       gameState = 'start';
       isPaused = false;
-      if (resultScreen) resultScreen.style.display = 'none';
-      if (startScreen) startScreen.style.display = 'flex';
+      hideScreen(resultScreen);
+      hideScreen(stageModeScreen);
+      hideScreen(shopScreen);
+      showScreen(startScreen);
       if (gameHud) gameHud.style.display = 'none';
       const bottomHud = document.getElementById('bottom-hud');
       if (bottomHud) bottomHud.style.display = 'none';
