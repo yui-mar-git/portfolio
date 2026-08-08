@@ -19,8 +19,8 @@ export interface TechArticle {
 }
 
 const QIITA_USER_ID = 'yui-mar';
-const ZENN_USER_ID = 'yui-mar';
-const NOTE_USER_ID = 'yui-mar';
+const ZENN_USER_ID = 'yui_mar';
+const NOTE_USER_ID = 'yui_mar';
 
 async function fetchQiitaArticles(): Promise<TechArticle[]> {
   try {
@@ -96,12 +96,26 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
   }
 }
 
+async function parseRssFeedWithFallback(
+  primaryId: string,
+  secondaryId: string,
+  baseUrl: string,
+  pathSuffix: string,
+  source: 'Zenn' | 'note',
+): Promise<TechArticle[]> {
+  let items = await parseRssFeed(`${baseUrl}/${primaryId}/${pathSuffix}`, source);
+  if (items.length === 0 && primaryId !== secondaryId) {
+    items = await parseRssFeed(`${baseUrl}/${secondaryId}/${pathSuffix}`, source);
+  }
+  return items;
+}
+
 export async function getTechArticles(limit: number = 6): Promise<TechArticle[]> {
   try {
     const [qiitaArticles, zennArticles, noteArticles] = await Promise.all([
       fetchQiitaArticles(),
-      parseRssFeed(`https://zenn.dev/${ZENN_USER_ID}/feed`, 'Zenn'),
-      parseRssFeed(`https://note.com/${NOTE_USER_ID}/rss`, 'note'),
+      parseRssFeedWithFallback(ZENN_USER_ID, 'yui-mar', 'https://zenn.dev', 'feed', 'Zenn'),
+      parseRssFeedWithFallback(NOTE_USER_ID, 'yui-mar', 'https://note.com', 'rss', 'note'),
     ]);
 
     const combined = [...qiitaArticles, ...zennArticles, ...noteArticles];
