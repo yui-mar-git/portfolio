@@ -9,6 +9,8 @@ import qiitaIcon from '@/assets/icons/brands/qiita.png';
 import noteIcon from '@/assets/icons/brands/note.svg';
 import hatenaIcon from '@/assets/icons/brands/hatena.svg';
 
+import TechArticles from '@/components/TechArticles.astro';
+
 const brandIconMap: Record<string, ImageMetadata> = {
   Zenn: zennIcon,
   Qiita: qiitaIcon,
@@ -26,59 +28,13 @@ const articles = await getArticles();
     <article>
       <span class="page-label">NOTES</span>
       <h1>備忘録</h1>
-      <section>
-        <div class="article-list-wrap">
-          {
-            articles.length > 0 ? (
-              <div class="article-grid">
-                {articles.map((item) => (
-                  <a
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="article-card"
-                  >
-                    <div class="article-eyecatch">
-                      {item.thumbnail ? (
-                        <img src={item.thumbnail} alt={item.title} class="eyecatch-img" />
-                      ) : (
-                        <div class={`eyecatch-placeholder tag-bg-${item.source.toLowerCase()}`}>
-                          <span class="placeholder-tag">{item.source}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div class="article-body">
-                      <div class="article-header">
-                        <div class="article-tags">
-                          <span class={`article-tag tag-${item.source.toLowerCase()}`}>
-                            {brandIconMap[item.source] && (
-                              <img
-                                src={brandIconMap[item.source].src}
-                                alt=""
-                                aria-hidden="true"
-                                class="tag-brand-icon"
-                              />
-                            )}
-                            {item.source}
-                          </span>
-                        </div>
-                        <time class="pub-date">{item.pubDate}</time>
-                      </div>
-                      <h3 class="article-title" title={item.title}>
-                        {item.title}
-                      </h3>
-                      {item.description && <p class="article-desc">{item.description}</p>}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p class="empty-message">現在表示できる記事はありません。</p>
-            )
-          }
-        </div>
+      <section class="hero">
+        <p>
+          Qiita・Zenn・note に投稿した技術記事や備忘録のフィード一覧です。
+        </p>
       </section>
+
+      <TechArticles title="" limit={6} />
     </article>
   </main>
 

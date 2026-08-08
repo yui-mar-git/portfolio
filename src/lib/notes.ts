@@ -11,25 +11,116 @@ export interface Article {
   thumbnail?: string;
 }
 
-// 登録したい外部RSSフィードのURLリスト（将来的にZenn/Qiita/note/Hatena等を開設した際にURLを追加）
-export const RSS_FEED_URLS: { url: string; source: Article['source'] }[] = [
-  // 例: { url: 'https://zenn.dev/your_username/feed', source: 'Zenn' },
-  // 例: { url: 'https://qiita.com/your_username/feed.atom', source: 'Qiita' },
-  // 例: { url: 'https://note.com/your_username/rss', source: 'note' },
-  // 例: { url: 'https://your_blog.hatenablog.com/rss', source: 'Hatena' },
-];
-
-interface MicroCMSNote {
-  id: string;
+export interface TechArticle {
   title: string;
-  url?: string;
-  content?: string;
-  description?: string;
-  publishedAt?: string;
-  createdAt: string;
+  url: string;
+  date: string;
+  source: 'Qiita' | 'Zenn' | 'note';
 }
 
-async function fetchRssFeed(feedUrl: string, source: Article['source']): Promise<Article[]> {
+const QIITA_USER_ID = 'yui-mar';
+const ZENN_USER_ID = 'yui-mar';
+const NOTE_USER_ID = 'yui-mar';
+
+async function fetchQiitaArticles(): Promise<TechArticle[]> {
+  try {
+    const res = await fetch(`https://qiita.com/api/v2/users/${QIITA_USER_ID}/items?per_page=5`, {
+      headers: {
+        'User-Agent': 'AstroPortfolioApp/1.0',
+      },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+
+    return data.map((item: any) => ({
+      title: item.title || '',
+      url: item.url || '',
+      date: item.created_at ? item.created_at.split('T')[0] : '',
+      source: 'Qiita' as const,
+    }));
+  } catch (e) {
+    console.warn('Failed to fetch Qiita articles:', e);
+    return [];
+  }
+}
+
+async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechArticle[]> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'AstroPortfolioApp/1.0',
+      },
+    });
+    if (!res.ok) return [];
+    const text = await res.text();
+    const items: TechArticle[] = [];
+    const matches = text.matchAll(/<item>([\s\S]*?)<\/item>|<entry>([\s\S]*?)<\/entry>/gi);
+
+    for (const match of matches) {
+      const block = match[1] || match[2];
+      const titleMatch = block.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i);
+      const linkMatch = block.match(
+        /<link[^>]*href="([^"]+)"|<link>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/i,
+      );
+      const dateMatch = block.match(
+        /<pubDate>([\s\S]*?)<\/pubDate>|<published>([\s\S]*?)<\/published>|<updated>([\s\S]*?)<\/updated>/i,
+      );
+
+      const title = titleMatch ? titleMatch[1].trim() : '';
+      const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : '';
+      const dateRaw = dateMatch ? (dateMatch[1] || dateMatch[2] || dateMatch[3] || '').trim() : '';
+
+      if (title && link) {
+        let dateStr = '';
+        if (dateRaw) {
+          try {
+            dateStr = new Date(dateRaw).toISOString().split('T')[0];
+          } catch {
+            dateStr = dateRaw;
+          }
+        }
+
+        items.push({
+          title,
+          url: link,
+          date: dateStr,
+          source,
+        });
+      }
+    }
+    return items;
+  } catch (e) {
+    console.warn(`Failed to fetch RSS feed from ${url}:`, e);
+    return [];
+  }
+}
+
+export async function getTechArticles(limit: number = 6): Promise<TechArticle[]> {
+  try {
+    const [qiitaArticles, zennArticles, noteArticles] = await Promise.all([
+      fetchQiitaArticles(),
+      parseRssFeed(`https://zenn.dev/${ZENN_USER_ID}/feed`, 'Zenn'),
+      parseRssFeed(`https://note.com/${NOTE_USER_ID}/rss`, 'note'),
+    ]);
+
+    const combined = [...qiitaArticles, ...zennArticles, ...noteArticles];
+    combined.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+    return combined.slice(0, limit);
+  } catch (e) {
+    console.error('Failed to get tech articles:', e);
+    return [];
+  }
+}
+
+// 登録したい外部RSSフィードのURLリスト（旧互換用）
+export const RSS_FEED_URLS: { url: string; source: Article['source'] }[] = [
+  { url: `https://zenn.dev/${ZENN_USER_ID}/feed`, source: 'Zenn' },
+  { url: `https://note.com/${NOTE_USER_ID}/rss`, source: 'note' },
+];
+
+async function fetchRssFeedLegacy(feedUrl: string, source: Article['source']): Promise<Article[]> {
   const items: Article[] = [];
   try {
     const res = await fetch(feedUrl);
@@ -74,13 +165,25 @@ async function fetchRssFeed(feedUrl: string, source: Article['source']): Promise
 export async function getArticles(): Promise<Article[]> {
   const articles: Article[] = [];
 
-  // 1. 外部RSSの取得
+  // Qiita API
+  const qiitaTech = await fetchQiitaArticles();
+  qiitaTech.forEach((q) => {
+    articles.push({
+      id: q.url,
+      title: q.title,
+      link: q.url,
+      pubDate: q.date,
+      source: 'Qiita',
+    });
+  });
+
+  // 外部RSS
   for (const feed of RSS_FEED_URLS) {
-    const fetched = await fetchRssFeed(feed.url, feed.source);
+    const fetched = await fetchRssFeedLegacy(feed.url, feed.source);
     articles.push(...fetched);
   }
 
-  // 2. microCMS からの取得 (notes エンドポイントが存在する場合)
+  // microCMS からの取得
   try {
     const cmsRes = await fetchMicroCMS<MicroCMSListResponse<MicroCMSNote>>('notes', {
       limit: '100',
@@ -98,9 +201,8 @@ export async function getArticles(): Promise<Article[]> {
       });
     }
   } catch {
-    // microCMS エンドポイントが未作成の場合は安全に無視
+    // microCMS 未作成時は安全にスルー
   }
 
-  // 日付の降順（新しい順）でソート
   return articles.sort((a, b) => (a.pubDate < b.pubDate ? 1 : -1));
 }

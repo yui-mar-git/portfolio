@@ -1,0 +1,164 @@
+---
+import { getTechArticles, type TechArticle } from '@/lib/notes';
+
+interface Props {
+  title?: string;
+  limit?: number;
+}
+
+const { title = '最新技術記事・備忘録', limit = 6 } = Astro.props;
+
+let articles: TechArticle[] = [];
+
+try {
+  articles = await getTechArticles(limit);
+} catch (e) {
+  console.error('Error in TechArticles component:', e);
+  articles = [];
+}
+---
+
+<section class="tech-articles-section">
+  {title && <h2 class="tech-articles-heading">{title}</h2>}
+
+  {
+    articles.length > 0 ? (
+      <div class="tech-articles-grid">
+        {articles.map((item) => (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tech-article-card"
+          >
+            <div class="tech-article-header">
+              <span class={`source-badge badge-${item.source.toLowerCase()}`}>
+                {item.source}
+              </span>
+              {item.date && (
+                <time class="tech-article-date" datetime={item.date}>
+                  {item.date}
+                </time>
+              )}
+            </div>
+            <h3 class="tech-article-title" title={item.title}>
+              {item.title}
+            </h3>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="tech-articles-fallback">
+        <p>現在記事を取得できません。</p>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .tech-articles-section {
+    width: 100%;
+    margin: 2rem 0;
+  }
+
+  .tech-articles-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color, #f8fafc);
+    margin-bottom: 1.25rem;
+  }
+
+  .tech-articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .tech-articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .tech-articles-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .tech-article-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    backdrop-filter: blur(8px);
+  }
+
+  .tech-article-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .tech-article-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .source-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+  }
+
+  .badge-qiita {
+    background-color: #55c500;
+  }
+
+  .badge-zenn {
+    background-color: #3ea8ff;
+  }
+
+  .badge-note {
+    background-color: #2cb696;
+  }
+
+  .tech-article-date {
+    font-size: 0.8rem;
+    color: var(--text-muted, #94a3b8);
+  }
+
+  .tech-article-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-color, #f8fafc);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tech-articles-fallback {
+    padding: 2rem;
+    text-align: center;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.95rem;
+  }
+</style>
