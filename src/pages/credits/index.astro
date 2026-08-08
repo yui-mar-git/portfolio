@@ -9,7 +9,66 @@ import type { MicroCMSCredits, MicroCMSListResponse } from '@/types/microcms';
 const creditsResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSCredits>>('credits', {
   limit: '100',
 });
-const allCredits = creditsResponse.contents;
+const microCMSCredits = creditsResponse.contents || [];
+
+const STATIC_CREDITS = [
+  {
+    name: '魔王魂',
+    author: '魔王魂',
+    url: 'https://maou.audio/',
+    usage: '制作物（/portfolio/）のゲーム各種 (BGM/ジングル)',
+    license: '無料素材',
+    category: ['SE', 'SE・BGM'],
+  },
+  {
+    name: '効果音ラボ',
+    author: '効果音ラボ',
+    url: 'https://soundeffect-lab.info/',
+    usage: '制作物（/portfolio/）のゲーム各種 (効果音)',
+    license: '無料素材',
+    category: ['SE', 'SE・BGM'],
+  },
+  {
+    name: 'PANICPUMPKIN',
+    author: 'PANICPUMPKIN',
+    url: 'http://pansound.com/panicpumpkin/',
+    usage: '制作物（/portfolio/）のゲーム各種 (SE/BGM)',
+    license: '無料素材',
+    category: ['SE', 'SE・BGM'],
+  },
+  {
+    name: 'いらすとや',
+    author: 'いらすとや',
+    url: 'https://www.irasutoya.com/',
+    usage: '制作物（/portfolio/）のゲーム各種 (イラスト/アイコン)',
+    license: '無料素材',
+    category: ['画像', '画像・イラスト'],
+  },
+  {
+    name: 'Google Fonts',
+    author: 'Google Fonts',
+    url: 'https://fonts.google.com/',
+    usage: 'Webサイト全般 (Inter / Noto Sans JP 等)',
+    license: 'SIL Open Font License 1.1',
+    category: ['フォント'],
+  },
+  {
+    name: 'Simple Icons',
+    author: 'Simple Icons',
+    url: 'https://simpleicons.org/',
+    usage: 'Webサイト全般',
+    license: 'CC0 1.0 Universal',
+    category: ['アイコン'],
+  },
+];
+
+// 重複を除外してマージ
+const staticNames = new Set(STATIC_CREDITS.map((item) => item.name.toLowerCase()));
+const filteredMicroCMS = microCMSCredits.filter(
+  (item) => !staticNames.has((item.name || '').toLowerCase()),
+);
+
+const allCredits = [...STATIC_CREDITS, ...filteredMicroCMS];
 
 const categories = [
   {
@@ -24,9 +83,11 @@ const categories = [
 
 const getItemsByCategory = (label: string, fullLabel: string) => {
   return allCredits.filter((item) => {
-    const cat = Array.isArray(item.category) ? item.category[0] : item.category;
-    if (!cat) return false;
-    return cat.includes(label) || fullLabel.includes(cat);
+    const rawCat = item.category;
+    const catArray = Array.isArray(rawCat) ? rawCat : [rawCat];
+    return catArray.some(
+      (cat) => cat && (cat.includes(label) || fullLabel.includes(cat) || label.includes(cat)),
+    );
   });
 };
 ---
