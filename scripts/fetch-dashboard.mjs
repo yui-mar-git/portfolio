@@ -8,11 +8,48 @@ const AIR_QUALITY_API =
   'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.6895&longitude=139.6917&current=pm2_5,birch_pollen,grass_pollen,mugwort_pollen';
 const SUNSET_API = (y, m, d) =>
   `https://api.sunrise-sunset.org/json?lat=35.6895&lng=139.6917&date=${y}-${m}-${d}&formatted=0`;
-const EGOV_LAWS = [
-  { id: '321CONSTITUTION', name: '日本国憲法' },
-  { id: '405AC0000000047', name: '不正競争防止法' },
-  { id: '415AC0000000057', name: '個人情報保護法' },
-];
+
+// 4つのビジネスドメイン法令プール（基本法系を六法に統一、会社法をビジネス系へ移設）
+const LAW_POOLS = {
+  basic: {
+    categoryName: '基本法系 (六法)',
+    laws: [
+      { id: '321CONSTITUTION', name: '日本国憲法' },
+      { id: '129AC0000000089', name: '民法' },
+      { id: '132AC0000000048', name: '商法' },
+    ],
+  },
+  ip_content: {
+    categoryName: '知的財産・コンテンツ系',
+    laws: [
+      { id: '345AC0000000048', name: '著作権法' },
+      { id: '334AC0000000121', name: '特許法' },
+      { id: '334AC0000000125', name: '意匠法' },
+      { id: '334AC0000000127', name: '商標法' },
+      { id: '405AC0000000047', name: '不正競争防止法' },
+    ],
+  },
+  it_security: {
+    categoryName: 'IT・セキュリティ系',
+    laws: [
+      { id: '426AC0000000104', name: 'サイバーセキュリティ基本法' },
+      { id: '411AC0000000128', name: '不正アクセス禁止法' },
+      { id: '413AC0000000137', name: 'プロバイダ責任制限法' },
+      { id: '415AC0000000057', name: '個人情報保護法' },
+      { id: '412AC0000000102', name: '電子署名法' },
+    ],
+  },
+  business: {
+    categoryName: 'ビジネス・不動産系',
+    laws: [
+      { id: '417AC0000000086', name: '会社法' },
+      { id: '323AC0000000025', name: '金融商品取引法' },
+      { id: '322AC0000000049', name: '労働基準法' },
+      { id: '351AC0000000057', name: '特定商取引法' },
+      { id: '412AC0000000061', name: '消費者契約法' },
+    ],
+  },
+};
 
 const condMap = {
   0: '快晴☀️',
@@ -105,19 +142,18 @@ async function fetchSunset() {
   const data = await fetchWithRetry(SUNSET_API(y, m, d));
   const sunset = new Date(data.results.sunset);
 
-  // Format to HH:mm in JST
   const jst = new Date(sunset.getTime() + 9 * 60 * 60 * 1000);
   const hh = String(jst.getUTCHours()).padStart(2, '0');
   const mm = String(jst.getUTCMinutes()).padStart(2, '0');
   return `${hh}:${mm}`;
 }
 
-async function fetchLaw() {
-  const law = EGOV_LAWS[Math.floor(Math.random() * EGOV_LAWS.length)];
+// 単一の法令からランダムな1条文を取得するヘルパー
+async function fetchSingleArticle(lawObj, categoryName) {
   try {
-    const res = await fetch(`https://elaws.e-gov.go.jp/api/1/lawdata/${law.id}`);
+    const res = await fetch(`https://elaws.e-gov.go.jp/api/1/lawdata/${lawObj.id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    // Very simple regex parsing for e-Gov XML
     const mainText = text.split('<SupplProvision>')[0] || text;
     const articleRegex =
       /<ArticleTitle>(.*?)<\/ArticleTitle>[\s\S]*?<Sentence[^>]*>(.*?)<\/Sentence>/g;
@@ -129,33 +165,74 @@ async function fetchLaw() {
     if (articles.length > 0) {
       const selected = articles[Math.floor(Math.random() * articles.length)];
       return {
-        name: law.name,
+        category: categoryName,
+        lawId: lawObj.id,
+        name: lawObj.name,
         title: selected.title,
-        sentence: selected.sentence.replace(/<[^>]*>?/gm, ''), // strip any internal XML tags
+        sentence: selected.sentence.replace(/<[^>]*>?/gm, '').trim(),
       };
     }
   } catch (e) {
-    console.error('Law fetch failed:', e);
+    console.error(`Law fetch failed for ${lawObj.name}:`, e.message);
   }
-  return {
-    name: '日本国憲法',
-    title: '第一条',
-    sentence:
-      '天皇は、日本国の象徴であり日本国民統合の象徴であつて、この地位は、主権の存する日本国民の総意に基く。',
-  };
+  return null;
+}
+
+// 5ジャンルの法則に従い「5つの条文」を重複なく抽出
+async function fetch5DomainLaws() {
+  const results = [];
+  const usedLawIds = new Set();
+
+  // 1〜4. 4つのプールから指定順（基本法系(六法) ➔ 知的財産・コンテンツ系 ➔ ITセキュリティ ➔ ビジネス・不動産系）で各1つずつ抽出
+  for (const [poolKey, pool] of Object.entries(LAW_POOLS)) {
+    const available = pool.laws.filter((l) => !usedLawIds.has(l.id));
+    if (available.length === 0) continue;
+    const pickedLaw = available[Math.floor(Math.random() * available.length)];
+    const article = await fetchSingleArticle(pickedLaw, pool.categoryName);
+    if (article) {
+      results.push(article);
+      usedLawIds.add(pickedLaw.id);
+    }
+  }
+
+  // 5. ランダム枠（全法令から重複なしで1件抽出）
+  const allLaws = Object.values(LAW_POOLS).flatMap((p) =>
+    p.laws.map((l) => ({ ...l, categoryName: `ピックアップ (${p.categoryName})` }))
+  );
+  const remainingLaws = allLaws.filter((l) => !usedLawIds.has(l.id));
+  if (remainingLaws.length > 0) {
+    const randomLaw = remainingLaws[Math.floor(Math.random() * remainingLaws.length)];
+    const article = await fetchSingleArticle(randomLaw, randomLaw.categoryName);
+    if (article) {
+      results.push(article);
+    }
+  }
+
+  // フォールバック
+  if (results.length === 0) {
+    results.push({
+      category: '基本法系 (六法)',
+      lawId: '321CONSTITUTION',
+      name: '日本国憲法',
+      title: '第一条',
+      sentence: '天皇は、日本国の象徴であり日本国民統合の象徴であつて、この地位は、主権の存する日本国民の総意に基く。',
+    });
+  }
+
+  return results;
 }
 
 async function main() {
   try {
-    console.log('Fetching dashboard data...');
+    console.log('Fetching dashboard data & 5-domain laws (Roppo + Corporate)...');
     const weather = await fetchWeather();
     const air = await fetchAirQuality();
     const sunset = await fetchSunset();
-    const law = await fetchLaw();
+    const laws = await fetch5DomainLaws();
 
     // Get Moon Age
     const today = new Date();
-    const base = new Date(2026, 0, 19, 4, 53, 0); // 2026-01-19 New Moon
+    const base = new Date(2026, 0, 19, 4, 53, 0);
     const diff = (today.getTime() - base.getTime()) / (1000 * 60 * 60 * 24);
     const age = ((diff % 29.53) + 29.53) % 29.53;
     let moonStr = '🌑 新月';
@@ -173,16 +250,17 @@ async function main() {
       air,
       sunset,
       moonStr,
-      law,
+      laws,
+      law: laws[0],
     };
 
     const outPath = path.join(process.cwd(), 'src', 'data', 'dashboard.json');
     await fs.mkdir(path.dirname(outPath), { recursive: true });
     await fs.writeFile(outPath, JSON.stringify(output, null, 2), 'utf-8');
-    console.log('Successfully saved to', outPath);
+    console.log(`Successfully saved ${laws.length} laws to ${outPath}`);
   } catch (err) {
     console.error('Failed to fetch dashboard data:', err);
-    process.exit(1); // Exit with error for GitHub Actions retry
+    process.exit(1);
   }
 }
 

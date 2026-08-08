@@ -9,16 +9,17 @@ export interface WeatherData {
   eveCond: string;
 }
 
-// WMO Weather interpretation codes (WW) を日本語表記に変換
+// WMO Weather interpretation codes (WW) を日本語表記およびアイコン絵文字付きで変換
 function parseWmoCode(code: number): string {
-  if (code === 0) return '快晴';
-  if (code === 1 || code === 2) return '晴れ';
-  if (code === 3) return '曇り';
-  if (code === 45 || code === 48) return '霧';
-  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return '雨';
-  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return '雪';
-  if (code >= 95 && code <= 99) return '雷雨';
-  return '晴れ';
+  if (code === 0) return '快晴☀️';
+  if (code === 1 || code === 2) return '晴れ☀️';
+  if (code === 3) return '曇り☁️';
+  if (code === 45 || code === 48) return '霧🌫️';
+  if (code >= 51 && code <= 55) return '小雨🌦️';
+  if ((code >= 56 && code <= 67) || (code >= 80 && code <= 82)) return '雨🌧️';
+  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return '雪❄️';
+  if (code >= 95 && code <= 99) return '雷雨🌩️';
+  return '晴れ☀️';
 }
 
 /**
@@ -43,7 +44,6 @@ export async function fetchWeatherData(): Promise<WeatherData> {
     const min = Math.round(data.daily?.temperature_2m_min?.[0] ?? fallbackData.weather.min);
 
     // 時間帯別天気 (06:00, 12:00, 18:00)
-    // hourly.weathercode は 0時間目〜 の配列 (06:00 は index 6, 12:00 は index 12, 18:00 は index 18)
     const hourlyCodes: number[] = data.hourly?.weathercode || [];
     const mornCode = hourlyCodes[6] ?? 0;
     const noonCode = hourlyCodes[12] ?? 0;

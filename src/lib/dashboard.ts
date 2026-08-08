@@ -10,7 +10,14 @@ export interface CalendarInfo {
   shichijuniko: string;
 }
 
-export function getCalendarInfo(date: Date = new Date()): CalendarInfo {
+// 日本標準時 (JST: UTC+9) での日時を取得する
+export function getJstDate(inputDate: Date = new Date()): Date {
+  const utc = inputDate.getTime() + inputDate.getTimezoneOffset() * 60000;
+  return new Date(utc + 9 * 3600000);
+}
+
+export function getCalendarInfo(inputDate: Date = new Date()): CalendarInfo {
+  const date = getJstDate(inputDate);
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();

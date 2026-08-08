@@ -1,0 +1,37 @@
+name: Daily Dashboard & Law Update
+
+on:
+  schedule:
+    # 毎日 UTC 15:00 (JST 午前00:00) に自動実行
+    - cron: '0 15 * * *'
+  workflow_dispatch: # GitHub UIからの手動即時実行ボタンを有効化
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch Latest Dashboard & 5-Domain Laws Data
+        run: node scripts/fetch-dashboard.mjs
+
+      - name: Trigger Cloudflare Pages Deploy Hook
+        env:
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+        run: |
+          if [ -n "$DEPLOY_HOOK" ]; then
+            echo "Triggering Cloudflare Pages build via Deploy Hook..."
+            curl -X POST "$DEPLOY_HOOK"
+          else
+            echo "CLOUDFLARE_DEPLOY_HOOK is not set. Skipping deploy hook call."
+          fi

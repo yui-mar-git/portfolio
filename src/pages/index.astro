@@ -1,102 +1,117 @@
 ---
-export const prerender = false;
+export const pageTitle = 'Home';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-import { fetchMicroCMS } from '@/lib/microcms';
-import type { MicroCMSListResponse, MicroCMSPortfolio } from '@/types/microcms';
 import { getCalendarInfo } from '@/lib/dashboard';
 import dashboardData from '@/data/dashboard.json';
+import { fetchMicroCMS } from '@/lib/microcms';
+import type { MicroCMSPortfolio, MicroCMSListResponse } from '@/types/microcms';
 
+const { weather, air, sunset, moonStr, law, laws } = dashboardData;
 const cal = getCalendarInfo();
-const { weather, air, sunset, moonStr, law } = dashboardData;
 
-let portfolioData: MicroCMSPortfolio[] = [];
-try {
-  const portfolioResponse =
-    await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>('portfolio');
-  portfolioData = portfolioResponse.contents;
-} catch (e) {
-  console.error('Failed to fetch microCMS portfolio for TOC', e);
-}
+// 5つの法令データ配列（互換フォールバック付き）
+const lawsList = Array.isArray(laws) && laws.length > 0 ? laws : [law];
 
-const allPages = await Astro.glob('./**/*.astro');
-const nodes = allPages
-  .filter((page) => {
-    if (page.url === '' || page.url === '/') return false;
-    if (page.url?.includes('/contact/thanks')) return false;
-    return !!page.url;
-  })
-  .map((page) => {
-    // Better CMS match: either CMS url includes page url or page url includes CMS url
-    const pageUrlRaw = page.url || '';
-    const cmsEntry = portfolioData.find((c) => {
-      if (!c.url) return false;
-      const cleanCms = c.url.replace(/^\/|\/$/g, '');
-      const cleanPage = pageUrlRaw.replace(/^\/|\/$/g, '');
-      return cleanCms === cleanPage || cleanCms.endsWith(cleanPage) || cleanPage.endsWith(cleanCms);
-    });
+const base = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
 
-    const title = cmsEntry ? cmsEntry.title : page.pageTitle || page.url;
-    const cleanUrl = pageUrlRaw.replace(/^\/|\/$/g, '');
-    const parts = cleanUrl.split('/').filter(Boolean);
-    return {
-      url: page.url,
-      title,
-      parts,
-      depth: parts.length,
-      children: [] as any[],
-    };
-  });
-
-nodes.sort((a, b) => a.depth - b.depth);
-const rawTree: any[] = [];
-for (const node of nodes) {
-  if (node.depth === 1) {
-    rawTree.push(node);
-  } else if (node.depth > 1) {
-    const parentParts = node.parts.slice(0, -1);
-    const parentUrlMatch1 = '/' + parentParts.join('/') + '/';
-    const parentUrlMatch2 = '/' + parentParts.join('/');
-    const parentNode = nodes.find((n) => n.url === parentUrlMatch1 || n.url === parentUrlMatch2);
-    if (parentNode) {
-      parentNode.children.push(node);
-    } else {
-      rawTree.push(node);
-    }
-  }
-}
-
-const rootOrder = ['profile', 'portfolio', 'credits', 'contact'];
-const childOrder = ['minigame', 'run-action', 'roguelike', 'tower-defense'];
-
-function sortNodes(nodesArray: any[], orderList: string[]) {
-  nodesArray.sort((a, b) => {
-    const aKey = a.parts[a.parts.length - 1];
-    const bKey = b.parts[b.parts.length - 1];
-    const aIdx = orderList.indexOf(aKey);
-    const bIdx = orderList.indexOf(bKey);
-    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-    if (aIdx !== -1) return -1;
-    if (bIdx !== -1) return 1;
-    return a.title.localeCompare(b.title);
-  });
-}
-
-sortNodes(rawTree, rootOrder);
-rawTree.forEach((node) => {
-  if (node.children && node.children.length > 0) {
-    sortNodes(node.children, childOrder);
-  }
-});
-
-const rootNode = {
-  url: '/',
-  title: 'ルート',
-  parts: ['root'],
-  children: rawTree,
+// 各ページの日本語表示ラベルマップ
+const titleMap: Record<string, string> = {
+  home: 'ホーム',
+  profile: '自己紹介',
+  portfolio: '制作物',
+  notes: '備忘録',
+  credits: '使用素材',
+  contact: 'お問い合わせ',
 };
-const tree = [rootNode];
+
+// ヘッダーナビゲーションの公式並び順
+const navOrder = ['profile', 'portfolio', 'notes', 'credits', 'contact'];
+
+// 【全自動連動】microCMS から制作物 (Portfolio) のタイトル・URL・並び順を直接取得
+let portfolioChildren: { title: string; url: string; parts: string[]; children: any[] }[] = [];
+try {
+  const portfolioResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSPortfolio>>(
+    'portfolio',
+    { limit: '100' },
+  );
+  if (portfolioResponse && Array.isArray(portfolioResponse.contents)) {
+    portfolioChildren = portfolioResponse.contents.map((proj) => {
+      const url = proj.url || '';
+      const parts = url.split('/').filter(Boolean);
+      return {
+        title: proj.title,
+        url,
+        parts: parts.length > 0 ? parts : ['portfolio'],
+        children: [],
+      };
+    });
+  }
+} catch (err) {
+  console.warn('microCMSからの制作物一覧取得に失敗しました。フォールバックを使用します:', err);
+}
+
+// フォールバック: microCMSが空の場合のみ Astro.glob から自動生成
+if (portfolioChildren.length === 0) {
+  const rawPortfolioFiles = await Astro.glob('./portfolio/**/index.astro');
+  portfolioChildren = rawPortfolioFiles
+    .filter((file) => {
+      const url = file.url || '';
+      return url.includes('/portfolio/') && url !== `${base}/portfolio/` && url !== `${base}/portfolio` && url !== '/portfolio/';
+    })
+    .map((file) => {
+      const parts = (file.url || '').split('/').filter(Boolean);
+      return {
+        title: file.pageTitle || file.frontmatter?.title || parts[parts.length - 1] || '制作物',
+        url: file.url || '',
+        parts,
+        children: [],
+      };
+    });
+}
+
+// Astro.glob で全ページの存在と第一階層ナビを動的フェッチ
+const allPageImports = await Astro.glob('/src/pages/**/index.astro');
+
+// 第一階層のメインページ群を動的に抽出し、ナビ順に自動ソート
+const mainChildren = allPageImports
+  .filter((p) => {
+    const url = p.url || '';
+    if (url === `${base}/` || url === '/' || url === '') return false;
+    const cleanUrl = url.replace(base, '').replace(/^\/+|\/+$/g, '');
+    const parts = cleanUrl.split('/');
+    return parts.length === 1;
+  })
+  .map((p) => {
+    const cleanUrl = (p.url || '').replace(base, '').replace(/^\/+|\/+$/g, '');
+    const key = cleanUrl.split('/')[0] || '';
+    const title = titleMap[key] || p.pageTitle || p.frontmatter?.title || key;
+    const parts = (p.url || '').split('/').filter(Boolean);
+    const children = key === 'portfolio' ? portfolioChildren : [];
+    return {
+      key,
+      title,
+      url: p.url || '',
+      parts,
+      children,
+    };
+  })
+  .sort((a, b) => {
+    const indexA = navOrder.indexOf(a.key);
+    const indexB = navOrder.indexOf(b.key);
+    return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
+  });
+
+// 最親ノード「ホーム」の下に全自動スキャンデータを配置
+const sitemapTree = [
+  {
+    title: 'ホーム',
+    url: `${base}/`,
+    parts: ['home'],
+    children: mainChildren,
+  },
+];
 ---
 
 <BaseLayout title="Home" pageId="home">
@@ -110,182 +125,296 @@ const tree = [rootNode];
         <p>ここは私のポートフォリオのページです。<br />コンテンツは随時追加していきます。</p>
       </section>
 
-      <!-- ダッシュボード (本日) -->
-      <section id="dashboard-today" class="dashboard-section">
-        <div class="profile-card dashboard-card">
-          <div class="dashboard-block">
-            <ul class="tree-list root-tree dashboard-tree">
-              <li class="tree-item">
-                <h3 id="dashboard-date-title" class="tree-node dashboard-date-title">
-                  {cal.dateStr}
-                  {cal.zodiac}
-                </h3>
-                <ul class="tree-list tree-children">
-                  <li class="tree-item">
-                    <div id="dashboard-date-details" class="tree-node text-muted">
-                      {cal.kanshi} / {cal.rokuyo} / {cal.nijushisekki} / {cal.shichijuniko}
-                    </div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-
-          <div class="dashboard-block">
-            <ul class="tree-list root-tree dashboard-tree">
-              <li class="tree-item">
-                <h3 class="tree-node tree-title">予報:</h3>
-                <ul class="tree-list tree-children">
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">
-                      <div class="forecast-row">
-                        <span class="forecast-label">気温:</span>
-                        <div class="forecast-values">
-                          <span class="forecast-item" id="weather-max">最高: {weather.max}°C</span>
-                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item" id="weather-min">最低: {weather.min}°C</span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">
-                      <div class="forecast-row">
-                        <span class="forecast-label">天気:</span>
-                        <div class="forecast-values">
-                          <span class="forecast-item" id="weather-morn">06時台: {weather.mornCond}</span>
-                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item" id="weather-noon">12時台: {weather.noonCond}</span>
-                          <span class="sp-slash-text">&nbsp;/&nbsp;</span>
-                          <span class="forecast-item" id="weather-eve">18時台: {weather.eveCond}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">日没: {sunset} / {moonStr}</div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-
-          <div class="dashboard-block">
-            <ul class="tree-list root-tree dashboard-tree">
-              <li class="tree-item">
-                <h3 class="tree-node tree-title">警報・注意報:</h3>
-                <ul class="tree-list tree-children">
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">
-                      紫外線: {weather.uvIndex} / {weather.uvLabel}
-                    </div>
-                  </li>
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">
-                      大気: PM2.5 {air.pm25}μg/m³ {air.pm25Label}
-                    </div>
-                  </li>
-                  <li class="tree-item">
-                    <div class="tree-node fw-normal">花粉: {air.pollenLabel}</div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-
-          <p class="api-note">
-            ※ このセクションは、Open-Meteo API および Sunrise-Sunset API
-            を使用し、毎時定期バッチにて最新の気象・日没データを取得して表示するデモ実装です。
-          </p>
+      <!-- タブ切り替え UI Widget -->
+      <section class="tabbed-widget-section">
+        <!-- タブナビゲーションバー -->
+        <div class="tab-nav-container" role="tablist" aria-label="ダッシュボードタブ">
+          <button class="tab-btn active" data-tab="sitemap" role="tab" aria-selected="true">
+            サイトマップ
+          </button>
+          <button class="tab-btn" data-tab="dashboard" role="tab" aria-selected="false">
+            今日の天気・暦
+          </button>
+          <button class="tab-btn" data-tab="law" role="tab" aria-selected="false">
+            今日の条文
+          </button>
         </div>
-      </section>
 
-      <!-- 今日の条文 -->
-      <section id="dashboard-law" class="dashboard-section">
-        <h2 class="section-title">今日の条文</h2>
-        <div class="profile-card law-card">
-          <ul class="tree-list root-tree dashboard-tree">
-            <li class="tree-item">
-              <h3 class="tree-node tree-title">📜 {law.name} {law.title}:</h3>
-              <ul class="tree-list tree-children">
-                <li class="tree-item">
-                  <div class="tree-node text-muted law-sentence">
-                    {law.sentence}
-                  </div>
-                </li>
-              </ul>
-            </li>
-          </ul>
+        <!-- タブコンテンツエリア -->
+        <div class="tab-content-container">
+          <!-- タブ1: サイトマップ (元デザイン・100%全自動動的ツリー) -->
+          <div id="tab-pane-sitemap" class="tab-pane active-pane" role="tabpanel">
+            <section class="toc-section">
+              <div class="profile-card toc-card">
+                <ul class="tree-list root-tree">
+                  {
+                    sitemapTree.map((node) => (
+                      <li class="tree-item">
+                        <div class="tree-node parent-node">
+                          <a href={node.url} class="tree-link">
+                            {node.title}
+                          </a>
+                        </div>
+                        {node.children.length > 0 && (
+                          <ul id="children-root" class="tree-list tree-children">
+                            {node.children.map((child) => (
+                              <li class="tree-item">
+                                <div class="tree-node parent-node">
+                                  <a href={child.url} class="tree-link">
+                                    {child.title}
+                                  </a>
+                                  {child.children.length > 0 && (
+                                    <button
+                                      class="toggle-btn"
+                                      onclick={`toggleChildren('${child.parts.join('-')}')`}
+                                    >
+                                      −
+                                    </button>
+                                  )}
+                                </div>
+                                {child.children.length > 0 && (
+                                  <ul
+                                    id={`children-${child.parts.join('-')}`}
+                                    class="tree-list tree-children"
+                                  >
+                                    {child.children.map((subChild) => (
+                                      <li class="tree-item">
+                                        <div class="tree-node child-node">
+                                          <a href={subChild.url} class="tree-link">
+                                            {subChild.title}
+                                          </a>
+                                        </div>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </section>
+          </div>
 
-          <p class="api-note">
-            ※ このセクションは、e-Gov法令API
-            を使用し、毎時定期バッチにて指定の法令（憲法、個人情報保護法など）からランダムな条文を抽出して表示するデモ実装です。
-          </p>
-        </div>
-      </section>
-
-      <section class="toc-section">
-        <h2 class="section-title">サイトマップ</h2>
-        <div class="profile-card toc-card">
-          <ul class="tree-list root-tree">
-            {
-              tree.map((node) => (
-                <li class="tree-item">
-                  <div class="tree-node parent-node">
-                    <a href={node.url} class="tree-link">
-                      {node.title}
-                    </a>
-                  </div>
-                  {node.children.length > 0 && (
-                    <ul id="children-root" class="tree-list tree-children">
-                      {node.children.map((child) => (
+          <!-- タブ2: 今日の天気・暦 -->
+          <div id="tab-pane-dashboard" class="tab-pane" role="tabpanel">
+            <section id="dashboard-today" class="dashboard-section">
+              <div class="profile-card dashboard-card">
+                <div class="dashboard-block">
+                  <ul class="tree-list root-tree dashboard-tree">
+                    <li class="tree-item">
+                      <h3 id="dashboard-date-title" class="tree-node dashboard-date-title">
+                        {cal.dateStr}
+                        {cal.zodiac}
+                      </h3>
+                      <ul class="tree-list tree-children">
                         <li class="tree-item">
-                          <div class="tree-node parent-node">
-                            <a href={child.url} class="tree-link">
-                              {child.title}
-                            </a>
-                            {child.children.length > 0 && (
-                              <button
-                                class="toggle-btn"
-                                onclick={`toggleChildren('${child.parts.join('-')}')`}
-                              >
-                                −
-                              </button>
-                            )}
+                          <div id="dashboard-date-details" class="tree-node text-muted">
+                            {cal.kanshi} / {cal.rokuyo} / {cal.nijushisekki} / {cal.shichijuniko}
                           </div>
-                          {child.children.length > 0 && (
-                            <ul
-                              id={`children-${child.parts.join('-')}`}
-                              class="tree-list tree-children"
-                            >
-                              {child.children.map((subChild) => (
-                                <li class="tree-item">
-                                  <div class="tree-node child-node">
-                                    <a href={subChild.url} class="tree-link">
-                                      {subChild.title}
-                                    </a>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
                         </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))
-            }
-          </ul>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="dashboard-block">
+                  <ul class="tree-list root-tree dashboard-tree">
+                    <li class="tree-item">
+                      <h3 class="tree-node tree-title">予報:</h3>
+                      <ul class="tree-list tree-children">
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal">
+                            <div class="forecast-row">
+                              <span class="forecast-label">気温:</span>
+                              <div class="forecast-values">
+                                <span class="forecast-item" id="weather-max">最高: {weather.max}°C</span>
+                                <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                                <span class="forecast-item" id="weather-min">最低: {weather.min}°C</span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal">
+                            <div class="forecast-row">
+                              <span class="forecast-label">天気:</span>
+                              <div class="forecast-values">
+                                <span class="forecast-item" id="weather-morn">06時台: {weather.mornCond}</span>
+                                <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                                <span class="forecast-item" id="weather-noon">12時台: {weather.noonCond}</span>
+                                <span class="sp-slash-text">&nbsp;/&nbsp;</span>
+                                <span class="forecast-item" id="weather-eve">18時台: {weather.eveCond}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal" id="sunset-text">日没: {sunset} / {moonStr}</div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="dashboard-block">
+                  <ul class="tree-list root-tree dashboard-tree">
+                    <li class="tree-item">
+                      <h3 class="tree-node tree-title">警報・注意報:</h3>
+                      <ul class="tree-list tree-children">
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal" id="uv-index-text">
+                            紫外線: {weather.uvIndex} / {weather.uvLabel}
+                          </div>
+                        </li>
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal" id="air-pm25-text">
+                            大気: PM2.5 {air.pm25}μg/m³ {air.pm25Label}
+                          </div>
+                        </li>
+                        <li class="tree-item">
+                          <div class="tree-node fw-normal" id="pollen-text">
+                            花粉: {air.pollenLabel}
+                          </div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+
+                <p class="api-note">
+                  ※ このセクションは、気象庁(JMA)防災情報API および Open-Meteo API
+                  を使用し、2層構造（JST日付完全保護 ＋ スマートリトライ＆キャッシュ）により自動更新するシステムです。
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <!-- タブ3: 今日の条文 (5つの条文をアイコン・バッジなしでシンプル表示) -->
+          <div id="tab-pane-law" class="tab-pane" role="tabpanel">
+            <section id="dashboard-law" class="dashboard-section">
+              <div class="profile-card law-card">
+                {
+                  lawsList.map((item, index) => (
+                    <div class={`law-item-block ${index > 0 ? 'law-item-divider' : ''}`}>
+                      <ul class="tree-list root-tree dashboard-tree">
+                        <li class="tree-item">
+                          <h3 class="tree-node tree-title">{item.name}: {item.title}</h3>
+                          <ul class="tree-list tree-children">
+                            <li class="tree-item">
+                              <div class="tree-node text-muted law-sentence">
+                                {item.sentence}
+                              </div>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                  ))
+                }
+
+                <p class="api-note">
+                  ※ このセクションは、e-Gov法令API
+                  を使用し、毎時定期バッチにて指定の法令からランダムな条文を抽出して表示するデモ実装です。
+                </p>
+              </div>
+            </section>
+          </div>
         </div>
       </section>
 
       <style>
+        .hero {
+          margin-bottom: 0;
+        }
+
+        /* タブ切り替え UI Widget スタイル */
+        .tabbed-widget-section {
+          padding-top: 0;
+          margin-top: 1rem;
+          margin-bottom: 2.5rem;
+        }
+
+        .tab-nav-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1.25rem;
+          flex-wrap: wrap;
+        }
+
+        .tab-btn {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+          color: var(--text-muted, #94a3b8);
+          padding: 0.5rem 1.1rem;
+          border-radius: var(--radius-md, 12px);
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          user-select: none;
+        }
+
+        .tab-btn:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: var(--text-main, #ffffff);
+          border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .tab-btn.active {
+          background: var(--primary, #6366f1);
+          color: #ffffff;
+          border-color: var(--primary, #6366f1);
+          box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+        }
+
+        .tab-content-container {
+          width: 100%;
+        }
+
+        .tab-pane {
+          display: none;
+          opacity: 0;
+          transition: opacity 0.25s ease-in-out;
+        }
+
+        .tab-pane.active-pane {
+          display: block;
+          opacity: 1;
+        }
+
+        /* 5条文ブロック表示 */
+        .law-item-block {
+          margin-bottom: 0.75rem;
+          text-align: left;
+        }
+
+        .law-item-divider {
+          padding-top: 0.75rem;
+          border-top: 1px dashed var(--border-color);
+        }
+
+        /* 元のCSSスタイルの完全再現 ＆ ツリー縦線の中央位置調整 */
         .dashboard-section {
-          margin-top: 2rem;
-          margin-bottom: 2rem;
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
+          padding-top: 0 !important;
           text-align: center;
         }
+
+        .toc-section {
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
+          padding-top: 0 !important;
+          text-align: center;
+        }
+
         .api-note {
           font-size: 0.85rem;
           color: var(--text-muted);
@@ -295,13 +424,15 @@ const tree = [rootNode];
           line-height: 1.5;
           text-align: left;
         }
+
         .law-sentence {
           line-height: 1.5;
         }
+
         .dashboard-card,
         .law-card,
         .toc-card {
-          margin: 0 auto;
+          margin: 0 auto !important;
           max-width: 640px;
           text-align: left;
           background: rgba(var(--card-bg-rgb), 0.7);
@@ -310,139 +441,149 @@ const tree = [rootNode];
           border-radius: var(--radius-bento);
           border: 1px solid var(--glass-border);
           box-shadow: var(--shadow-bento);
+          display: flow-root;
         }
-        .section-title {
-          font-size: clamp(1.4rem, 3vw, 1.8rem);
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          margin-bottom: 1.5rem;
-          display: inline-block;
-          color: var(--heading-color, var(--text-main));
+
+        .toc-card {
+          margin: 0 auto;
+          max-width: 500px;
         }
+
         .tree-title {
           margin: 0;
           font-size: 1.1rem;
           color: var(--heading-color, var(--text-main));
         }
+
         .dashboard-date-title {
           padding: 0.5rem 0;
           font-size: 1.2rem;
           color: var(--heading-color, var(--text-main));
         }
+
         .dashboard-block {
           margin-bottom: 1rem;
         }
+
         .dashboard-tree .fw-normal {
           font-weight: normal !important;
         }
+
         .dashboard-tree .text-muted {
           color: var(--text-muted);
         }
+
         .forecast-row {
           display: flex;
           align-items: flex-start;
         }
+
         .forecast-label {
           white-space: nowrap;
           margin-right: 0.5rem;
         }
+
         .forecast-values {
           display: flex;
           flex-wrap: wrap;
         }
-        .sp-break {
-          display: none;
+
+        .sp-slash-text {
+          color: var(--text-muted, #94a3b8);
+          user-select: none;
         }
+
         @media (max-width: 768px) {
-          .sp-slash-text {
-            display: none;
-          }
           .forecast-values {
-            flex-direction: column;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
           }
           .sp-break {
-            display: block;
-            height: 0;
-            margin: 0;
+            display: none;
           }
         }
 
-        .toc-section {
-          margin-top: 3rem;
-          text-align: center;
-        }
-        .toc-card {
-          margin: 0 auto;
-          max-width: 500px;
-        }
         .tree-list {
           list-style: none;
           padding: 0;
           margin: 0;
           text-align: left;
         }
+
         .tree-list li {
           position: relative;
           padding-left: 1.5rem;
         }
+
+        /* 縦線の位置を文字1文字目の中心（約0.55rem）へアジャスト */
         .tree-list li::before {
           content: '';
           position: absolute;
-          left: 0;
+          left: 0.55rem;
           top: 0;
           bottom: 0;
           width: 2px;
           background-color: var(--border-color);
         }
+
+        /* 横枝線の開始位置と長さを自然に接続 */
         .tree-list li::after {
           content: '';
           position: absolute;
-          left: 0;
-          top: 1.2rem; /* Adjust if line is not vertically centered */
-          width: 1rem;
+          left: 0.55rem;
+          top: 1.2rem;
+          width: 0.85rem;
           height: 2px;
           background-color: var(--border-color);
         }
+
         .tree-list li:last-child::before {
           bottom: auto;
           height: 1.2rem;
         }
+
         .tree-list.root-tree > li > .tree-node {
           font-weight: bold;
         }
-        /* No vertical line before the single root node "ルート" */
+
         .tree-list.root-tree > li::before {
           display: none;
         }
+
         .tree-list.root-tree > li::after {
           display: none;
         }
+
         .tree-list.root-tree > li {
           padding-left: 0;
         }
+
         .tree-node {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 0.5rem 0;
         }
-        .parent-node {
-          /* optional */
-        }
+
         .child-node {
           padding: 0.3rem 0;
         }
+
         .tree-children {
           display: block;
         }
+
         .tree-link {
           text-decoration: none;
           color: var(--text-main);
           transition: color 0.2s;
         }
+
         .tree-link:hover {
           color: var(--primary);
         }
+
         .toggle-btn {
           background: none;
           border: 1px solid var(--border-color);
@@ -457,6 +598,7 @@ const tree = [rootNode];
           font-size: 0.9rem;
           transition: all 0.2s;
         }
+
         .toggle-btn:hover {
           border-color: var(--primary);
           color: var(--primary);
@@ -478,36 +620,67 @@ const tree = [rootNode];
       </script>
 
       <script>
-        import { getCalendarInfo } from '@/lib/dashboard';
-        import { fetchWeatherData } from '@/lib/weather';
+        import { getFullDashboardData } from '@/lib/dashboardService';
 
-        // AGENTS規約に準拠: ユーザー訪問時の端末現在日時を取得し、日付・暦情報をリアルタイム更新
-        const now = new Date();
-        const cal = getCalendarInfo(now);
+        // --- 1. タブ切り替え制御 ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
 
-        const titleEl = document.getElementById('dashboard-date-title');
-        const detailsEl = document.getElementById('dashboard-date-details');
+        tabBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
 
-        if (titleEl) {
-          titleEl.textContent = `${cal.dateStr} ${cal.zodiac}`;
-        }
-        if (detailsEl) {
-          detailsEl.textContent = `${cal.kanshi} / ${cal.rokuyo} / ${cal.nijushisekki} / ${cal.shichijuniko}`;
-        }
+            tabBtns.forEach((b) => {
+              const isActive = b === btn;
+              b.classList.toggle('active', isActive);
+              b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
 
-        // Open-Meteo API から最新の気象情報を取得・表示更新
-        fetchWeatherData().then((w) => {
+            tabPanes.forEach((pane) => {
+              const isTarget = pane.id === `tab-pane-${targetTab}`;
+              if (isTarget) {
+                pane.style.display = 'block';
+                setTimeout(() => pane.classList.add('active-pane'), 10);
+              } else {
+                pane.classList.remove('active-pane');
+                pane.style.display = 'none';
+              }
+            });
+          });
+        });
+
+        // --- 2. 2層構造ダッシュボード自動更新 ---
+        getFullDashboardData().then((data) => {
+          // Layer A (日付・暦)
+          const titleEl = document.getElementById('dashboard-date-title');
+          const detailsEl = document.getElementById('dashboard-date-details');
+          if (titleEl) titleEl.textContent = `${data.dateStr} ${data.zodiac}`;
+          if (detailsEl)
+            detailsEl.textContent = `${data.kanshi} / ${data.rokuyo} / ${data.nijushisekki} / ${data.shichijuniko}`;
+
+          // Layer B (天気・気温)
           const maxEl = document.getElementById('weather-max');
           const minEl = document.getElementById('weather-min');
           const mornEl = document.getElementById('weather-morn');
           const noonEl = document.getElementById('weather-noon');
           const eveEl = document.getElementById('weather-eve');
 
-          if (maxEl) maxEl.textContent = `最高: ${w.max}°C`;
-          if (minEl) minEl.textContent = `最低: ${w.min}°C`;
-          if (mornEl) mornEl.textContent = `06時台: ${w.mornCond}`;
-          if (noonEl) noonEl.textContent = `12時台: ${w.noonCond}`;
-          if (eveEl) eveEl.textContent = `18時台: ${w.eveCond}`;
+          if (maxEl) maxEl.textContent = `最高: ${data.weather.max}°C`;
+          if (minEl) minEl.textContent = `最低: ${data.weather.min}°C`;
+          if (mornEl) mornEl.textContent = `06時台: ${data.weather.mornCond}`;
+          if (noonEl) noonEl.textContent = `12時台: ${data.weather.noonCond}`;
+          if (eveEl) eveEl.textContent = `18時台: ${data.weather.eveCond}`;
+
+          // Layer B (紫外線・大気・花粉・日没)
+          const sunsetEl = document.getElementById('sunset-text');
+          const uvEl = document.getElementById('uv-index-text');
+          const airEl = document.getElementById('air-pm25-text');
+          const pollenEl = document.getElementById('pollen-text');
+
+          if (sunsetEl) sunsetEl.textContent = `日没: ${data.sunset} / ${data.moonStr}`;
+          if (uvEl) uvEl.textContent = `紫外線: ${data.weather.uvIndex} / ${data.weather.uvLabel}`;
+          if (airEl) airEl.textContent = `大気: PM2.5 ${data.air.pm25}μg/m³ ${data.air.pm25Label}`;
+          if (pollenEl) pollenEl.textContent = `花粉: ${data.air.pollenLabel}`;
         });
       </script>
     </article>
