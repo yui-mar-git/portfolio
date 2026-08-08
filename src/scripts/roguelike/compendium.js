@@ -252,15 +252,14 @@ export function renderCompendium() {
       const cardEl = document.createElement('div');
 
       if (isUnlocked) {
-        cardEl.className = 'battle-card reward-card';
-        cardEl.style.borderColor = '#ef4444';
+        cardEl.className = 'battle-card reward-card comp-monster-card';
         cardEl.innerHTML = `
-          <div class="card-cost card-cost-custom" style="background:#dc2626;">獣</div>
-          <div style="text-align:center; margin: 4px 0;">
-            <img src="${monster.image}" alt="${monster.name}" style="width:32px; height:32px; object-fit:contain;" />
+          <div class="card-cost comp-monster-badge">獣</div>
+          <div class="comp-monster-img-wrap">
+            <img src="${monster.image}" alt="${monster.name}" class="comp-monster-img" />
           </div>
-          <div class="card-name card-name-custom" style="font-size:0.75rem;">${monster.name}</div>
-          <div class="card-desc card-desc-custom" style="font-size:0.65rem;">HP: ${monster.hp} / EXP: ${monster.exp}</div>
+          <div class="card-name comp-monster-name">${monster.name}</div>
+          <div class="card-desc comp-monster-stats">HP: ${monster.hp} / ${monster.exp}G</div>
         `;
         cardEl.addEventListener('click', () => {
           if (window.playSE) window.playSE('cursor');
@@ -269,9 +268,9 @@ export function renderCompendium() {
       } else {
         cardEl.className = 'battle-card comp-card-locked';
         cardEl.innerHTML = `
-          <div class="card-cost card-cost-custom">🔒</div>
-          <div class="card-name card-name-custom">???</div>
-          <div class="card-desc card-desc-custom">未討伐モンスター</div>
+          <div class="card-cost comp-monster-badge">🔒</div>
+          <div class="card-name comp-monster-name">???</div>
+          <div class="card-desc comp-monster-stats">未討伐モンスター</div>
         `;
       }
       grid.appendChild(cardEl);

@@ -338,8 +338,8 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ`;
       break;
     case 'heal':
-      upgradedCard.healSelf = 3 + 2 * level;
-      upgradedCard.desc = `HP +<span class="card-val-up">${upgradedCard.healSelf}</span> 回復`;
+      upgradedCard.healPercent = 0.5;
+      upgradedCard.desc = `HP +<span class="card-val-up">50%</span> 回復`;
       break;
     case 'smite':
       upgradedCard.cost = 1;
@@ -375,10 +375,6 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.value = 1 + 1 * level;
       upgradedCard.poison = 1 + 1 * level;
       upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ <br> 毒<span class="card-val-up">${upgradedCard.poison}</span> を付与`;
-      break;
-    case 'heal':
-      upgradedCard.healPercent = 0.5;
-      upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
       break;
     case 'fortify':
       upgradedCard.healPercent = 0.5;

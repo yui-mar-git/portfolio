@@ -138,7 +138,7 @@ const { projectData } = Astro.props;
       <h3 id="md-name" class="md-name">モンスター名</h3>
       <div class="md-stats-row">
         <span>HP: <strong id="md-hp">0</strong></span>
-        <span>討伐EXP: <strong id="md-exp">0</strong></span>
+        <span>獲得G: <strong id="md-exp">0</strong></span>
       </div>
       <div class="md-attributes">
         <div>弱点: <span id="md-weakness">-</span></div>
@@ -3389,7 +3389,7 @@ const { projectData } = Astro.props;
   }
 
   .compendium-btn-custom {
-    margin-top: 0.8rem;
+    margin-top: 1rem;
   }
 
   .compendium-modal-custom {
@@ -3601,6 +3601,7 @@ const { projectData } = Astro.props;
     color: #cbd5e1;
     margin-bottom: 0.6rem;
     box-sizing: border-box;
+    text-align: left;
   }
 
   .md-skills-box {
@@ -3608,6 +3609,7 @@ const { projectData } = Astro.props;
     font-size: 0.8rem;
     color: #cbd5e1;
     margin-bottom: 0.6rem;
+    text-align: left;
   }
 
   .md-skills-list {
@@ -3615,6 +3617,7 @@ const { projectData } = Astro.props;
     flex-wrap: wrap;
     gap: 0.3rem;
     margin-top: 0.3rem;
+    justify-content: flex-start;
   }
 
   :global(.md-skill-tag) {
@@ -3626,11 +3629,38 @@ const { projectData } = Astro.props;
     font-size: 0.75rem;
   }
 
+  :global(.comp-monster-card) {
+    border-color: #ef4444 !important;
+  }
+
+  :global(.comp-monster-badge) {
+    background: #dc2626;
+  }
+
+  :global(.comp-monster-img-wrap) {
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  :global(.comp-monster-img) {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  :global(.comp-monster-name) {
+    font-size: 0.75rem;
+  }
+
+  :global(.comp-monster-stats) {
+    font-size: 0.65rem;
+  }
+
   .md-flavor {
     font-size: 0.78rem;
     color: #94a3b8;
     line-height: 1.4;
-    text-align: center;
+    text-align: left;
     margin-bottom: 1rem;
     font-style: italic;
   }

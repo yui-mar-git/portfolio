@@ -55,17 +55,16 @@ const materialCategories = [
   <RunActionUI gameTitle={projectData?.title} />
   <div slot="howto-content">
     <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-      <p style="margin-bottom: 0.5rem; color: var(--text-main);"><strong>【基本操作 ＆ 敵の踏みつけ】</strong></p>
+      <p style="margin-bottom: 0.5rem; color: var(--text-main);"><strong>【基本操作】</strong></p>
       <p>自動で走るランナーを操作し、ハイスコアを目指すアクションゲームです。</p>
-      <p>・<strong>画面タップ / スペースキー</strong>: ジャンプ（空中でもう1回で<strong>2段ジャンプ</strong>）</p>
-      <p>・<strong>敵の踏みつけ</strong>: 迫る陸上・飛行エネミーは<strong>上から踏むと撃退！</strong> 高く跳ね上がり大ジャンプの足場にできます。</p>
+      <p><strong>画面タップ / スペースキー</strong>でジャンプして、障害物や落とし穴を避けて進みます。</p>
     </div>
     <div class="howto-page" style="text-align: left; color: var(--text-muted); line-height: 1.6;">
-      <p style="margin-bottom: 0.5rem; color: var(--text-main);"><strong>【障害物 ＆ ゲームオーバー】</strong></p>
-      <p>・<strong>赤トゲ障害物</strong>は踏むことができません。</p>
-      <p>・エネミーの<strong>横や下からの接触</strong>はダメージとなりゲームオーバーです。</p>
-      <p>時間経過でスピードがどんどん加速していきます。敵を上手く踏み台にしながらハイスコアを目指しましょう！</p>
+      <p style="margin-bottom: 0.5rem; color: var(--text-main);"><strong>【エネミー & 障害物】</strong></p>
+      <p>・<strong>エネミー</strong>は、 マップを歩きまわるものや、空中を飛びまわるものがいます。<br>
+      触れるとゲームオーバーになってしまいますが、上から踏むと撃退できます。</p>
+      <p>・<strong>障害物</strong>は、踏んで破壊することはできません。</p>      
     </div>
-  </div>
-  <script src="../../../scripts/run-action/main.js"></script>
 </GameLayout>
+
+<script src="../../../scripts/run-action/main.js"></script>

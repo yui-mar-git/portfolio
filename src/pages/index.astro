@@ -622,66 +622,85 @@ const sitemapTree = [
       <script>
         import { getFullDashboardData } from '@/lib/dashboardService';
 
-        // --- 1. タブ切り替え制御 ---
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const tabPanes = document.querySelectorAll('.tab-pane');
+        // --- 1. タブ切り替え制御 (本番・Hydration対応) ---
+        function initTabs() {
+          const tabBtns = document.querySelectorAll('.tab-btn');
+          const tabPanes = document.querySelectorAll('.tab-pane');
 
-        tabBtns.forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const targetTab = btn.getAttribute('data-tab');
+          if (!tabBtns.length || !tabPanes.length) return;
 
-            tabBtns.forEach((b) => {
-              const isActive = b === btn;
-              b.classList.toggle('active', isActive);
-              b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            });
+          tabBtns.forEach((btn) => {
+            // 二重バインド防止
+            if (btn.hasAttribute('data-tab-initialized')) return;
+            btn.setAttribute('data-tab-initialized', 'true');
 
-            tabPanes.forEach((pane) => {
-              const isTarget = pane.id === `tab-pane-${targetTab}`;
-              if (isTarget) {
-                pane.style.display = 'block';
-                setTimeout(() => pane.classList.add('active-pane'), 10);
-              } else {
-                pane.classList.remove('active-pane');
-                pane.style.display = 'none';
-              }
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              const targetTab = btn.getAttribute('data-tab');
+
+              tabBtns.forEach((b) => {
+                const isActive = b === btn;
+                b.classList.toggle('active', isActive);
+                b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+              });
+
+              tabPanes.forEach((pane) => {
+                const isTarget = pane.id === `tab-pane-${targetTab}`;
+                if (isTarget) {
+                  pane.classList.add('active-pane');
+                } else {
+                  pane.classList.remove('active-pane');
+                }
+              });
             });
           });
-        });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initTabs);
+        } else {
+          initTabs();
+        }
+        document.addEventListener('astro:page-load', initTabs);
 
         // --- 2. 2層構造ダッシュボード自動更新 ---
-        getFullDashboardData().then((data) => {
-          // Layer A (日付・暦)
-          const titleEl = document.getElementById('dashboard-date-title');
-          const detailsEl = document.getElementById('dashboard-date-details');
-          if (titleEl) titleEl.textContent = `${data.dateStr} ${data.zodiac}`;
-          if (detailsEl)
-            detailsEl.textContent = `${data.kanshi} / ${data.rokuyo} / ${data.nijushisekki} / ${data.shichijuniko}`;
+        getFullDashboardData()
+          .then((data) => {
+            if (!data) return;
+            // Layer A (日付・暦)
+            const titleEl = document.getElementById('dashboard-date-title');
+            const detailsEl = document.getElementById('dashboard-date-details');
+            if (titleEl) titleEl.textContent = `${data.dateStr} ${data.zodiac}`;
+            if (detailsEl)
+              detailsEl.textContent = `${data.kanshi} / ${data.rokuyo} / ${data.nijushisekki} / ${data.shichijuniko}`;
 
-          // Layer B (天気・気温)
-          const maxEl = document.getElementById('weather-max');
-          const minEl = document.getElementById('weather-min');
-          const mornEl = document.getElementById('weather-morn');
-          const noonEl = document.getElementById('weather-noon');
-          const eveEl = document.getElementById('weather-eve');
+            // Layer B (天気・気温)
+            const maxEl = document.getElementById('weather-max');
+            const minEl = document.getElementById('weather-min');
+            const mornEl = document.getElementById('weather-morn');
+            const noonEl = document.getElementById('weather-noon');
+            const eveEl = document.getElementById('weather-eve');
 
-          if (maxEl) maxEl.textContent = `最高: ${data.weather.max}°C`;
-          if (minEl) minEl.textContent = `最低: ${data.weather.min}°C`;
-          if (mornEl) mornEl.textContent = `06時台: ${data.weather.mornCond}`;
-          if (noonEl) noonEl.textContent = `12時台: ${data.weather.noonCond}`;
-          if (eveEl) eveEl.textContent = `18時台: ${data.weather.eveCond}`;
+            if (maxEl) maxEl.textContent = `最高: ${data.weather.max}°C`;
+            if (minEl) minEl.textContent = `最低: ${data.weather.min}°C`;
+            if (mornEl) mornEl.textContent = `06時台: ${data.weather.mornCond}`;
+            if (noonEl) noonEl.textContent = `12時台: ${data.weather.noonCond}`;
+            if (eveEl) eveEl.textContent = `18時台: ${data.weather.eveCond}`;
 
-          // Layer B (紫外線・大気・花粉・日没)
-          const sunsetEl = document.getElementById('sunset-text');
-          const uvEl = document.getElementById('uv-index-text');
-          const airEl = document.getElementById('air-pm25-text');
-          const pollenEl = document.getElementById('pollen-text');
+            // Layer B (紫外線・大気・花粉・日没)
+            const sunsetEl = document.getElementById('sunset-text');
+            const uvEl = document.getElementById('uv-index-text');
+            const airEl = document.getElementById('air-pm25-text');
+            const pollenEl = document.getElementById('pollen-text');
 
-          if (sunsetEl) sunsetEl.textContent = `日没: ${data.sunset} / ${data.moonStr}`;
-          if (uvEl) uvEl.textContent = `紫外線: ${data.weather.uvIndex} / ${data.weather.uvLabel}`;
-          if (airEl) airEl.textContent = `大気: PM2.5 ${data.air.pm25}μg/m³ ${data.air.pm25Label}`;
-          if (pollenEl) pollenEl.textContent = `花粉: ${data.air.pollenLabel}`;
-        });
+            if (sunsetEl) sunsetEl.textContent = `日没: ${data.sunset} / ${data.moonStr}`;
+            if (uvEl) uvEl.textContent = `紫外線: ${data.weather.uvIndex} / ${data.weather.uvLabel}`;
+            if (airEl) airEl.textContent = `大気: PM2.5 ${data.air.pm25}μg/m³ ${data.air.pm25Label}`;
+            if (pollenEl) pollenEl.textContent = `花粉: ${data.air.pollenLabel}`;
+          })
+          .catch((err) => {
+            console.warn('Dashboard fetch notice:', err);
+          });
       </script>
     </article>
   </main>
