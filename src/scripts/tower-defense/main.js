@@ -1141,19 +1141,21 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  parent: 'game-container',
-  physics: { default: 'arcade', arcade: { debug: false } },
-  scene: [BootScene, MainScene],
-};
+if (typeof window !== 'undefined' && typeof window.Phaser !== 'undefined') {
+  const config = {
+    type: window.Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'game-container',
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: [BootScene, MainScene],
+  };
 
-if (window.tdGameInstance) {
-  window.tdGameInstance.destroy(true);
+  if (window.tdGameInstance) {
+    window.tdGameInstance.destroy(true);
+  }
+  window.tdGameInstance = new window.Phaser.Game(config);
 }
-window.tdGameInstance = new Phaser.Game(config);
 const game = window.tdGameInstance;
 
 // Initial Load

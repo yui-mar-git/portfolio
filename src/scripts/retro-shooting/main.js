@@ -763,19 +763,21 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  parent: 'game-container',
-  physics: { default: 'arcade', arcade: { debug: false } },
-  scene: [BootScene, MainScene],
-};
+if (typeof window !== 'undefined' && typeof window.Phaser !== 'undefined') {
+  const config = {
+    type: window.Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'game-container',
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: [BootScene, MainScene],
+  };
 
-if (window.stgGameInstance) {
-  window.stgGameInstance.destroy(true);
+  if (window.stgGameInstance) {
+    window.stgGameInstance.destroy(true);
+  }
+  window.stgGameInstance = new window.Phaser.Game(config);
 }
-window.stgGameInstance = new Phaser.Game(config);
 const game = window.stgGameInstance;
 
 // Load High Score

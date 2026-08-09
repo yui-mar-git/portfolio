@@ -619,49 +619,35 @@ const sitemapTree = [
         }
       </script>
 
+      <script is:inline>
+        document.addEventListener('click', function (e) {
+          const btn = e.target ? e.target.closest('.tab-btn') : null;
+          if (!btn) return;
+
+          const targetTab = btn.getAttribute('data-tab');
+          if (!targetTab) return;
+
+          e.preventDefault();
+
+          document.querySelectorAll('.tab-btn').forEach(function (b) {
+            const isActive = b === btn;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+
+          document.querySelectorAll('.tab-pane').forEach(function (pane) {
+            const isTarget = pane.id === 'tab-pane-' + targetTab;
+            if (isTarget) {
+              pane.classList.add('active-pane');
+            } else {
+              pane.classList.remove('active-pane');
+            }
+          });
+        });
+      </script>
+
       <script>
         import { getFullDashboardData } from '@/lib/dashboardService';
-
-        // --- 1. タブ切り替え制御 (本番・Hydration対応) ---
-        function initTabs() {
-          const tabBtns = document.querySelectorAll('.tab-btn');
-          const tabPanes = document.querySelectorAll('.tab-pane');
-
-          if (!tabBtns.length || !tabPanes.length) return;
-
-          tabBtns.forEach((btn) => {
-            // 二重バインド防止
-            if (btn.hasAttribute('data-tab-initialized')) return;
-            btn.setAttribute('data-tab-initialized', 'true');
-
-            btn.addEventListener('click', (e) => {
-              e.preventDefault();
-              const targetTab = btn.getAttribute('data-tab');
-
-              tabBtns.forEach((b) => {
-                const isActive = b === btn;
-                b.classList.toggle('active', isActive);
-                b.setAttribute('aria-selected', isActive ? 'true' : 'false');
-              });
-
-              tabPanes.forEach((pane) => {
-                const isTarget = pane.id === `tab-pane-${targetTab}`;
-                if (isTarget) {
-                  pane.classList.add('active-pane');
-                } else {
-                  pane.classList.remove('active-pane');
-                }
-              });
-            });
-          });
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', initTabs);
-        } else {
-          initTabs();
-        }
-        document.addEventListener('astro:page-load', initTabs);
 
         // --- 2. 2層構造ダッシュボード自動更新 ---
         getFullDashboardData()
