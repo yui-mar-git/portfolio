@@ -107,9 +107,8 @@
 - [x] ESLint, Prettier, Stylelint の導入
 - [x] 共通モーダル（HowToPlayModal / ConfigPanel）のアクセシビリティ（Escapeキー操作、Null安全）向上
 
-1. 共有UI（不可侵モジュール）の固定
-   共通ファイルの作成: 全ゲームで使い回すボタンサイズやデザインを定義した shared-ui.css や SharedButton.js を1本作成する。
-   AI制御ルールの適用: AIエージェントに対して「共有UIファイルは改変禁止（Read-Only）」と指定し、デザイン崩れやインラインスタイルの割り込み、コードの先祖返りを物理的に防ぐ。
+- [x] 1. 共有UI（不可侵モジュール）の固定
+   - [x] 共通ファイルの作成・カプセル化（GameLayout.astro / ConfigPanel.astro / HowToPlayModal.astro / global.css にて統一管理完了）
 2. 各ページの構築
    - [x] Home: 天気API（Open-Meteo API）自動取得とリアルタイム気象データ反映。
    - [x] Home: カルーセル・スライダー UI の構築（1枚目: サイトマップ、2枚目: ダッシュボード、3枚目: 本日の条文、ループ切り替え対応）。
