@@ -24,15 +24,24 @@ const ZENN_USER_ID = 'yui_mar';
 const NOTE_USER_ID = 'yui_mar';
 
 function extractThumbnailFromXml(block: string): string | undefined {
-  // 1. Check <media:thumbnail url="..."> or <media:content url="..."> or <enclosure url="...">
-  const mediaMatch =
-    block.match(/<media:(?:thumbnail|content)[^>]*url=["']([^"']+)["']/i) ||
-    block.match(/<enclosure[^>]*url=["']([^"']+)["']/i);
-  if (mediaMatch && mediaMatch[1]) return mediaMatch[1];
+  // 1. Check <media:thumbnail>http...</media:thumbnail> or <media:thumbnail url="...">
+  const mediaThumbMatch =
+    block.match(/<media:thumbnail[^>]*>([\s\S]*?)<\/media:thumbnail>/i) ||
+    block.match(/<media:thumbnail[^>]*url=["']([^"']+)["']/i);
+  if (mediaThumbMatch && mediaThumbMatch[1]) {
+    const raw = mediaThumbMatch[1].trim();
+    if (raw.startsWith('http')) return raw;
+  }
 
-  // 2. Check <img> tag inside description or content
+  // 2. Check <media:content url="..."> or <enclosure url="...">
+  const mediaContentMatch =
+    block.match(/<media:content[^>]*url=["']([^"']+)["']/i) ||
+    block.match(/<enclosure[^>]*url=["']([^"']+)["']/i);
+  if (mediaContentMatch && mediaContentMatch[1]) return mediaContentMatch[1].trim();
+
+  // 3. Check <img> tag inside description or content
   const imgMatch = block.match(/<img[^>]*src=["']([^"']+)["']/i);
-  if (imgMatch && imgMatch[1]) return imgMatch[1];
+  if (imgMatch && imgMatch[1]) return imgMatch[1].trim();
 
   return undefined;
 }
@@ -51,7 +60,9 @@ async function fetchQiitaArticles(): Promise<TechArticle[]> {
     return data.map((item: any) => {
       let thumbnail: string | undefined = undefined;
       if (item.body) {
-        const match = item.body.match(/!\[.*?\]\((https?:\/\/[^\s\)]+)\)/i) || item.body.match(/<img[^>]*src=["']([^"']+)["']/i);
+        const match =
+          item.body.match(/!\[.*?\]\((https?:\/\/[^\s\)]+)\)/i) ||
+          item.body.match(/<img[^>]*src=["']([^"']+)["']/i);
         if (match && match[1]) thumbnail = match[1];
       }
 
@@ -79,14 +90,6 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
     if (!res.ok) return [];
     const text = await res.text();
     const items: TechArticle[] = [];
-
-    // Extract channel default logo (e.g. note/webfeeds logo)
-    const channelLogoMatch =
-      text.match(/<webfeeds:logo>([\s\S]*?)<\/webfeeds:logo>/i) ||
-      text.match(/<webfeeds:icon>([\s\S]*?)<\/webfeeds:icon>/i) ||
-      text.match(/<image>\s*<url>([\s\S]*?)<\/url>/i);
-    const channelLogo = channelLogoMatch ? channelLogoMatch[1].trim() : undefined;
-
     const matches = text.matchAll(/<item>([\s\S]*?)<\/item>|<entry>([\s\S]*?)<\/entry>/gi);
 
     for (const match of matches) {
@@ -98,7 +101,7 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
       const dateMatch = block.match(
         /<pubDate>([\s\S]*?)<\/pubDate>|<published>([\s\S]*?)<\/published>|<updated>([\s\S]*?)<\/updated>/i,
       );
-      const thumbnail = extractThumbnailFromXml(block) || channelLogo;
+      const thumbnail = extractThumbnailFromXml(block);
 
       const title = titleMatch ? titleMatch[1].trim() : '';
       const link = linkMatch ? (linkMatch[1] || linkMatch[2] || '').trim() : '';

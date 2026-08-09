@@ -1,7 +1,7 @@
 ---
 import { getTechArticles, type TechArticle } from '@/lib/notes';
 import zennIcon from '@/assets/icons/brands/zenn.svg';
-import qiitaIcon from '@/assets/icons/brands/qiita.png';
+import qiitaIcon from '@/assets/icons/brands/qiita-icon.png';
 import noteIcon from '@/assets/icons/brands/note.svg';
 
 interface Props {
@@ -158,34 +158,18 @@ try {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    color: rgba(255, 255, 255, 0.9);
+    background: #ffffff;
   }
 
   .default-brand-icon {
-    width: 48px;
-    height: 48px;
+    height: 50%;
+    max-width: 50%;
     object-fit: contain;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
     transition: transform 0.3s ease;
   }
 
   .tech-article-card:hover .default-brand-icon {
-    transform: scale(1.1);
-  }
-
-  .placeholder-qiita {
-    background: linear-gradient(135deg, #2b7a00 0%, #55c500 100%);
-  }
-
-  .placeholder-zenn {
-    background: linear-gradient(135deg, #1d4ed8 0%, #3ea8ff 100%);
-  }
-
-  .placeholder-note {
-    background: linear-gradient(135deg, #134e4a 0%, #2cb696 100%);
+    transform: scale(1.08);
   }
 
   .tech-article-body {
