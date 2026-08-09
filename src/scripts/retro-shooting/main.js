@@ -117,6 +117,9 @@ if (btnWaveStart) {
   });
 }
 
+// Phaser依存コード全体を関数化し、Phaserロード済みの場合のみ実行する
+function __initGame() {
+
 class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
@@ -763,7 +766,6 @@ class MainScene extends Phaser.Scene {
   }
 }
 
-if (typeof window !== 'undefined' && typeof window.Phaser !== 'undefined') {
   const config = {
     type: window.Phaser.AUTO,
     width: 800,
@@ -777,7 +779,6 @@ if (typeof window !== 'undefined' && typeof window.Phaser !== 'undefined') {
     window.stgGameInstance.destroy(true);
   }
   window.stgGameInstance = new window.Phaser.Game(config);
-}
 const game = window.stgGameInstance;
 
 // Load High Score
@@ -904,4 +905,10 @@ if (modalOverlay) {
       if (scene && scene.scene.isPaused()) scene.scene.resume();
     }
   });
+}
+
+} // end __initGame
+
+if (typeof window !== 'undefined' && typeof window.Phaser !== 'undefined') {
+  __initGame();
 }
