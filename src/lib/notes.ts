@@ -111,7 +111,12 @@ async function parseRssFeed(url: string, source: 'Zenn' | 'note'): Promise<TechA
         let dateStr = '';
         if (dateRaw) {
           try {
-            dateStr = new Date(dateRaw).toISOString().split('T')[0];
+            const parsed = new Date(dateRaw);
+            if (!isNaN(parsed.getTime())) {
+              dateStr = parsed.toISOString().split('T')[0];
+            } else {
+              dateStr = dateRaw.split('T')[0] || dateRaw;
+            }
           } catch {
             dateStr = dateRaw;
           }

@@ -11,11 +11,16 @@ interface Props {
 
 const { title = '最新技術記事・備忘録', limit = 6 } = Astro.props;
 
-const brandIcons: Record<string, ImageMetadata> = {
-  Qiita: qiitaIcon,
-  Zenn: zennIcon,
-  note: noteIcon,
-};
+function getBrandIconSrc(source: string): string {
+  const icons: Record<string, any> = {
+    Qiita: qiitaIcon,
+    Zenn: zennIcon,
+    note: noteIcon,
+  };
+  const icon = icons[source];
+  if (!icon) return '';
+  return typeof icon === 'string' ? icon : icon.src || '';
+}
 
 let articles: TechArticle[] = [];
 
@@ -45,9 +50,9 @@ try {
                 <img src={item.thumbnail} alt="" class="eyecatch-img" loading="lazy" />
               ) : (
                 <div class={`eyecatch-placeholder placeholder-${item.source.toLowerCase()}`}>
-                  {brandIcons[item.source] && (
+                  {getBrandIconSrc(item.source) && (
                     <img
-                      src={brandIcons[item.source].src}
+                      src={getBrandIconSrc(item.source)}
                       alt={item.source}
                       class="default-brand-icon"
                     />
