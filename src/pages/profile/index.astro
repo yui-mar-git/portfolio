@@ -131,13 +131,13 @@ Object.keys(systems).forEach((name) => {
                 <ul>
                   <li class="skill-inactive">jQuery</li>
                   <li class="skill-inactive">Vue.js</li>
-                  <li class="skill-active">Astro [独学]</li>
+                  <li class="skill-active skill-reason">Astro [独学]</li>
                   <li class="skill-active">Phaser 3 [独学]</li>
                 </ul>
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: Astro 選定理由</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">Astro</span> <span class="tips-suffix">選定理由</span></strong><br />
               静的HTML出力による爆速表示と、サーバー維持費ゼロの効率的な構成を実現するため。
             </div>
           </div>
@@ -156,14 +156,14 @@ Object.keys(systems).forEach((name) => {
               <li>
                 CMS
                 <ul>
-                  <li class="skill-active">microCMS [独学]</li>
+                  <li class="skill-active skill-reason">microCMS [独学]</li>
                   <li>WordPress</li>
                   <li>RCMS</li>
                 </ul>
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: microCMS 選定理由</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">microCMS</span> <span class="tips-suffix">選定理由</span></strong><br />
               完全無料枠内で直感的な記事・コンテンツ管理ができ、運用コスト・手間がかからないため。
             </div>
           </div>
@@ -175,7 +175,7 @@ Object.keys(systems).forEach((name) => {
               <li>
                 CDN・ホスティング
                 <ul>
-                  <li class="skill-active">Cloudflare (Pages / Workers)</li>
+                  <li class="skill-active skill-reason">Cloudflare (Pages / Workers)</li>
                   <li>Kinsta</li>
                 </ul>
               </li>
@@ -187,7 +187,7 @@ Object.keys(systems).forEach((name) => {
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: Cloudflare 選定理由</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">Cloudflare</span> <span class="tips-suffix">選定理由</span></strong><br />
               帯域制限なし・完全無料で超高速なエッジCDNとWorkers/KVが利用できるため。
             </div>
           </div>
@@ -208,12 +208,12 @@ Object.keys(systems).forEach((name) => {
               <li>
                 セキュリティ対策
                 <ul>
-                  <li class="skill-active">Cloudflare Turnstile</li>
+                  <li class="skill-active skill-reason">Cloudflare Turnstile</li>
                 </ul>
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: Turnstile 選定理由</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">Turnstile</span> <span class="tips-suffix">選定理由</span></strong><br />
               無料で手軽に導入でき、ユーザーにパズルを解かせずスパム・BOTを強力防止できるため。
             </div>
           </div>
@@ -236,7 +236,7 @@ Object.keys(systems).forEach((name) => {
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: UI/UX設計方針:</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">UI/UX</span> <span class="tips-suffix">設計方針</span></strong><br />
               外部ライブラリやツールに頼らず、Vanilla CSSによる軽量かつ維持費ゼロのレスポンシブ設計。
             </div>
           </div>
@@ -251,7 +251,7 @@ Object.keys(systems).forEach((name) => {
                   <li class="skill-active">
                     Git
                     <ul>
-                      <li class="skill-active">GitHub</li>
+                      <li class="skill-active skill-reason">GitHub</li>
                     </ul>
                   </li>
                 </ul>
@@ -267,7 +267,7 @@ Object.keys(systems).forEach((name) => {
               </li>
             </ul>
             <div class="skill-card-jamstack-note">
-              <strong>Tips: GitHub 選定理由</strong><br />
+              <strong class="tips-header"><span class="tips-bullet"></span>Tips: <span class="tips-target">GitHub</span> <span class="tips-suffix">選定理由</span></strong><br />
               Cloudflare Pagesとの自動連携CI/CDで、Git pushのみの快適な即時デプロイ環境を無料構築できるため。
             </div>
           </div>
@@ -380,6 +380,10 @@ Object.keys(systems).forEach((name) => {
     font-weight: bold;
   }
 
+  .skill-reason {
+    color: var(--primary, #3b82f6);
+  }
+
   .skill-bento-card li:not(.skill-active):not(:has(.skill-active)) {
     opacity: 0.5;
   }
@@ -400,8 +404,27 @@ Object.keys(systems).forEach((name) => {
     line-height: 1.5;
     color: var(--text-muted, #94a3b8);
   }
-  .skill-card-jamstack-note strong {
+  .skill-card-jamstack-note .tips-header {
+    color: var(--text-main, #ffffff);
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    padding-bottom: 0.5rem;
+  }
+  .skill-card-jamstack-note .tips-bullet {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--text-muted, #94a3b8);
+    margin-right: 0.4rem;
+    flex-shrink: 0;
+  }
+  .skill-card-jamstack-note .tips-target {
     color: var(--primary, #3b82f6);
-    font-size: 0.82rem;
+    margin: 0 0.15em;
+  }
+  .skill-card-jamstack-note .tips-suffix {
+    color: var(--text-muted, #94a3b8);
   }
 </style>
