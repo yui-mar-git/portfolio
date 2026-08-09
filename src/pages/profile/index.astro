@@ -97,6 +97,7 @@ Object.keys(systems).forEach((name) => {
       <!-- スキルセット -->
       <section id="skill-section" class="skill-section">
         <h2>スキルセット</h2>
+
         <div class="skill-bento-grid">
           <!-- 1. フロントエンド -->
           <div class="profile-card skill-bento-card">
@@ -135,6 +136,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: Astro 選定理由</strong><br />
+              静的HTML出力による爆速表示と、サーバー維持費ゼロの効率的な構成を実現するため。
+            </div>
           </div>
 
           <!-- 2. バックエンド -->
@@ -157,6 +162,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: microCMS 選定理由</strong><br />
+              完全無料枠内で直感的な記事・コンテンツ管理ができ、運用コスト・手間がかからないため。
+            </div>
           </div>
 
           <!-- 3. ホスティング・ネットワーク -->
@@ -177,6 +186,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: Cloudflare 選定理由</strong><br />
+              帯域制限なし・完全無料で超高速なエッジCDNとWorkers/KVが利用できるため。
+            </div>
           </div>
 
           <!-- 4. インフラ運用・セキュリティ -->
@@ -199,6 +212,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: Turnstile 選定理由</strong><br />
+              無料で手軽に導入でき、ユーザーにパズルを解かせずスパム・BOTを強力防止できるため。
+            </div>
           </div>
 
           <!-- 5. UI/UX・デザイン -->
@@ -218,6 +235,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: UI/UX設計方針:</strong><br />
+              外部ライブラリやツールに頼らず、Vanilla CSSによる軽量かつ維持費ゼロのレスポンシブ設計。
+            </div>
           </div>
 
           <!-- 6. 開発環境・ワークフロー -->
@@ -245,6 +266,10 @@ Object.keys(systems).forEach((name) => {
                 </ul>
               </li>
             </ul>
+            <div class="skill-card-jamstack-note">
+              <strong>Tips: GitHub 選定理由</strong><br />
+              Cloudflare Pagesとの自動連携CI/CDで、Git pushのみの快適な即時デプロイ環境を無料構築できるため。
+            </div>
           </div>
         </div>
         <p class="skill-note">※太字は当サイトの構築に使用している技術です</p>
@@ -367,5 +392,19 @@ Object.keys(systems).forEach((name) => {
     color: var(--text-muted);
     margin-top: 1.5rem;
     text-align: right;
+  }
+
+  /* スキルカード内補足スタイリング（案C採用） */
+  .skill-card-jamstack-note {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-color, rgba(255, 255, 255, 0.15));
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-muted, #94a3b8);
+  }
+  .skill-card-jamstack-note strong {
+    color: #60a5fa;
+    font-size: 0.82rem;
   }
 </style>
