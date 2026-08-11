@@ -71,11 +71,19 @@ function getPm25Label(pm25: number): string {
 }
 
 /**
- * 気象庁 (JMA) 防災情報 API から東京都の最新警報・注意報を取得
+ * Cloudflare Workers Weather Proxy 経由で気象庁 (JMA) 防災情報 API から東京都の最新警報・注意報を取得
  */
 async function fetchJmaWarnings(): Promise<{ title: string; status: string; isAlert: boolean }> {
   try {
-    const res = await fetch('https://www.jma.go.jp/bosai/warning/data/warning/130000.json');
+    const directUrl = 'https://www.jma.go.jp/bosai/warning/data/warning/130000.json';
+    let res: Response;
+    try {
+      res = await fetch('/api/weather?type=jma');
+      if (!res.ok) res = await fetch(directUrl);
+    } catch {
+      res = await fetch(directUrl);
+    }
+
     if (!res.ok) throw new Error(`JMA API status: ${res.status}`);
     const data = await res.json();
 

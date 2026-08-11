@@ -15,6 +15,8 @@ export const GET: APIRoute = async ({ request }) => {
     if (type === 'air') {
       targetUrl =
         'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.6895&longitude=139.6917&current=pm2_5,alder_pollen,birch_pollen,grass_pollen';
+    } else if (type === 'jma') {
+      targetUrl = 'https://www.jma.go.jp/bosai/warning/data/warning/130000.json';
     } else {
       targetUrl =
         'https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=weathercode,temperature_2m_max,temperature_2m_min,uv_index_max,sunset&hourly=weathercode&timezone=Asia%2FTokyo';

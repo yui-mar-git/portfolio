@@ -287,8 +287,7 @@ const sitemapTree = [
                 </div>
 
                 <p class="api-note">
-                  ※ このセクションは、気象庁(JMA)防災情報API および Open-Meteo API
-                  を使用し、2層構造（JST日付完全保護 ＋ スマートリトライ＆キャッシュ）により自動更新するシステムです。
+                  ※ このセクションは、気象庁(JMA)防災情報API および Open-Meteo API 等のデータを Cloudflare Workers（エッジプロキシ ＋ 1時間レスポンスキャッシュ ＋ JST日付保護）を経由して自動更新・表示するデモシステムです。
                 </p>
               </div>
             </section>
