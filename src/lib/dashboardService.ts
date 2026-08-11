@@ -132,13 +132,21 @@ async function fetchJmaWarnings(): Promise<{ title: string; status: string; isAl
 }
 
 /**
- * Open-Meteo Air Quality API から大気質 (PM2.5)・花粉情報を取得
+ * Cloudflare Workers Weather Proxy 経由で大気質 (PM2.5)・花粉情報を取得
  */
 async function fetchAirQuality(): Promise<{ pm25: number; pm25Label: string; pollenLabel: string }> {
   try {
-    const url =
+    const directUrl =
       'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.6895&longitude=139.6917&current=pm2_5,alder_pollen,birch_pollen,grass_pollen';
-    const res = await fetch(url);
+    // プロキシ優先、失敗時はダイレクト通信
+    let res: Response;
+    try {
+      res = await fetch('/api/weather?type=air');
+      if (!res.ok) res = await fetch(directUrl);
+    } catch {
+      res = await fetch(directUrl);
+    }
+
     if (!res.ok) throw new Error(`Air Quality API status: ${res.status}`);
     const data = await res.json();
 
@@ -165,13 +173,20 @@ async function fetchAirQuality(): Promise<{ pm25: number; pm25Label: string; pol
 }
 
 /**
- * Open-Meteo Weather API から天気予報・気温・UVインデックス・日没時刻を取得
+ * Cloudflare Workers Weather Proxy 経由で天気予報・気温・UVインデックス・日没時刻を取得
  */
 async function fetchWeatherDetails() {
   try {
-    const url =
+    const directUrl =
       'https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=weathercode,temperature_2m_max,temperature_2m_min,uv_index_max,sunset&hourly=weathercode&timezone=Asia%2FTokyo';
-    const res = await fetch(url);
+    let res: Response;
+    try {
+      res = await fetch('/api/weather?type=forecast');
+      if (!res.ok) res = await fetch(directUrl);
+    } catch {
+      res = await fetch(directUrl);
+    }
+
     if (!res.ok) throw new Error(`Weather API status: ${res.status}`);
     const data = await res.json();
 

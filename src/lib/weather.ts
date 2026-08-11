@@ -23,18 +23,23 @@ function parseWmoCode(code: number): string {
 }
 
 /**
- * Open-Meteo API から最新の東京エリアの天気予報を取得する
- * (完全無料・APIキー不要)
+ * Cloudflare Workers Weather Proxy 経由で東京エリアの天気予報を取得する
  */
 export async function fetchWeatherData(): Promise<WeatherData> {
   try {
-    // 東京の座標: latitude 35.6895, longitude 139.6917
-    const url =
+    const directUrl =
       'https://api.open-meteo.com/v1/forecast?latitude=35.6895&longitude=139.6917&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weathercode&timezone=Asia%2FTokyo';
 
-    const response = await fetch(url);
+    let response: Response;
+    try {
+      response = await fetch('/api/weather?type=forecast');
+      if (!response.ok) response = await fetch(directUrl);
+    } catch {
+      response = await fetch(directUrl);
+    }
+
     if (!response.ok) {
-      throw new Error(`Open-Meteo API status: ${response.status}`);
+      throw new Error(`Weather API status: ${response.status}`);
     }
 
     const data = await response.json();
