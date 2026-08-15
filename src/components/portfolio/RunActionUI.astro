@@ -684,13 +684,17 @@ const { gameTitle } = Astro.props;
       background-color: var(--bg-color);
     }
 
-    .overlay h2 {
+    /* start / stage / shop 画面の h2 スタイル（実績画面には適用しない） */
+    #start-screen h2,
+    #stage-mode-screen h2,
+    #shop-screen h2 {
       color: #fff;
       margin-bottom: 1rem;
       font-size: 2rem;
     }
 
-    .overlay p {
+    /* start-screen の p スタイル（実績画面には適用しない） */
+    #start-screen p {
       color: #f8f9fa;
       margin-bottom: 2rem;
       font-weight: bold;
@@ -714,73 +718,7 @@ const { gameTitle } = Astro.props;
       margin-left: 10px;
     }
 
-    /* RA固有: 旧実績リスト形式（統計表示用） */
-    .achieve-stats-group {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
-    }
-    .achieve-stat-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-      padding: 3px 0;
-    }
-    .achieve-stat-item strong {
-      color: #fbbf24;
-    }
-    .achieve-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 12px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .achieve-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(30, 41, 59, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 8px 12px;
-    }
-    .achieve-item.unlocked {
-      border-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-    }
-    .achieve-item.locked {
-      opacity: 0.45;
-    }
-    .achieve-icon {
-      font-size: 1.4rem;
-    }
-    .achieve-info {
-      text-align: left;
-    }
-    .achieve-name {
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #f8fafc;
-    }
-    .achieve-desc {
-      font-size: 0.72rem;
-      color: #94a3b8;
-    }
-    .modal-desc-sub {
-      font-size: 0.75rem;
-      color: #ef4444;
-      margin-bottom: 1rem;
-    }
-    .modal-btn-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
+
 
     .bottom-hud-wrap {
       position: absolute;

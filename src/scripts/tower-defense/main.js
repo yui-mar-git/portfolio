@@ -192,6 +192,7 @@ import seHeal from '../../assets/games/tower-defense/audio/se/回復魔法1.mp3'
 import bgmWave1 from '../../assets/games/tower-defense/audio/bgm/maou_game_field05.mp3';
 import bgmWave2 from '../../assets/games/tower-defense/audio/bgm/maou_game_field11.mp3';
 import bgmWave3 from '../../assets/games/tower-defense/audio/bgm/maou_game_boss02.mp3';
+import bgmAchieve from '../../assets/games/tower-defense/audio/bgm/maou_game_town16.mp3';
 
 const SE_DB = {
   cursor: seCursor,
@@ -213,6 +214,7 @@ const BGM_DB = {
   wave1: bgmWave1,
   wave2: bgmWave2,
   wave3: bgmWave3,
+  achieve: bgmAchieve,
 };
 
 function playSE(key) {
@@ -1211,6 +1213,7 @@ const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close'
 if (achievementsBtn) {
   achievementsBtn.addEventListener('click', () => {
     playSE('confirm');
+    playBGM('achieve');
     renderTdAchievements();
     if (achievementsScreen) achievementsScreen.style.display = 'flex';
   });
@@ -1236,6 +1239,7 @@ if (btnAchieveDetailClose) {
 
 function closeAchievementsScreen() {
   playSE('cancel');
+  stopBGM();
   if (achievementsScreen) achievementsScreen.style.display = 'none';
 }
 

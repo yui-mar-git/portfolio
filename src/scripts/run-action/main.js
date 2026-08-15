@@ -7,6 +7,7 @@ import seStageClear from '../../assets/games/run-action/audio/se/maou_game_jingl
 
 import bgmField from '../../assets/games/run-action/audio/bgm/maou_game_field01.mp3';
 import bgmRun from '../../assets/games/run-action/audio/bgm/maou_bgm_cyber37.mp3';
+import bgmAchieve from '../../assets/games/run-action/audio/bgm/maou_game_town16.mp3';
 
 import { RUN_ACHIEVEMENTS } from '../../data/run-action/achievements';
 import { ITEM_DB } from '../../data/run-action/items';
@@ -28,6 +29,7 @@ import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
   const BGM_DB = {
     field: bgmField,
     run: bgmRun,
+    achieve: bgmAchieve,
   };
 
   let currentBgmAudio = null;
@@ -1258,7 +1260,7 @@ import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
     if (bottomHud) bottomHud.style.display = 'none';
 
     // 次のステージ解放
-    if (currentStageId < 3 && saveData.unlockedStages <= currentStageId) {
+    if (currentStageId <= 3 && saveData.unlockedStages <= currentStageId) {
       saveData.unlockedStages = currentStageId + 1;
       saveSaveData();
     }
@@ -1401,6 +1403,7 @@ import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
   if (btnOpenAchievements) {
     btnOpenAchievements.addEventListener('click', () => {
       playSE('confirm');
+      playBGM('achieve');
       renderRunAchievements();
       if (achievementsScreen) achievementsScreen.style.display = 'flex';
     });
@@ -1426,6 +1429,7 @@ import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
 
   function closeAchievementsScreen() {
     playSE('cancel');
+    stopBGM();
     if (achievementsScreen) achievementsScreen.style.display = 'none';
   }
 

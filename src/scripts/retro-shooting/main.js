@@ -16,6 +16,7 @@ import seDamage from '../../assets/games/retro-shooting/audio/se/ニュッ2.mp3'
 import seJump from '../../assets/games/retro-shooting/audio/se/パパッ.mp3';
 
 import bgmMain from '../../assets/games/retro-shooting/audio/bgm/maou_game_town26.mp3';
+import bgmAchieve from '../../assets/games/retro-shooting/audio/bgm/maou_game_town16.mp3';
 import { STG_ACHIEVEMENTS } from '../../data/retro-shooting/achievements';
 import { getWaveConfig, ENEMY_SCORES } from '../../data/retro-shooting/waves';
 
@@ -949,6 +950,7 @@ const btnConfirmReset = document.getElementById('btn-confirm-reset');
 if (btnOpenAchievements) {
   btnOpenAchievements.addEventListener('click', () => {
     playSE('confirm');
+    playBGM(bgmAchieve);
     renderStgAchievements();
     if (achievementsScreen) achievementsScreen.style.display = 'flex';
   });
@@ -974,6 +976,7 @@ if (btnAchieveDetailClose) {
 
 function closeAchievementsScreen() {
   playSE('cancel');
+  stopBGM();
   if (achievementsScreen) achievementsScreen.style.display = 'none';
 }
 

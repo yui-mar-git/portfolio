@@ -73,6 +73,10 @@ const BGM_DB = {
     '../../assets/games/roguelike/audio/bgm/maou_game_dangeon04b.mp3',
     import.meta.url,
   ).href,
+  achieve: new URL(
+    '../../assets/games/roguelike/audio/bgm/maou_game_town16.mp3',
+    import.meta.url,
+  ).href,
 };
 
 const SE_DB = {
@@ -4175,6 +4179,7 @@ const btnConfirmReset = document.getElementById('btn-confirm-reset');
 if (btnOpenAchievements) {
   btnOpenAchievements.addEventListener('click', () => {
     if (window.playSE) window.playSE('cursor');
+    playBGM('achieve');
     renderRlAchievements();
     if (achievementsScreen) achievementsScreen.style.display = 'flex';
   });
@@ -4200,6 +4205,7 @@ if (btnAchieveDetailClose) {
 
 function closeAchievementsScreen() {
   if (window.playSE) window.playSE('cancel');
+  stopBGM();
   if (achievementsScreen) achievementsScreen.style.display = 'none';
 }
 

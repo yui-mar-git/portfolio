@@ -1576,7 +1576,7 @@ ul {
 .achievements-page-header .modal-title {
   margin: 0;
   font-size: 1.3rem;
-  color: #38bdf8;
+  color: #cbd5e1;
   font-weight: bold;
 }
 
@@ -1609,7 +1609,7 @@ ul {
 .achieve-tab.active {
   background: rgba(56, 189, 248, 0.15);
   border-color: #38bdf8;
-  color: #38bdf8;
+  color: #cbd5e1;
   font-weight: bold;
 }
 

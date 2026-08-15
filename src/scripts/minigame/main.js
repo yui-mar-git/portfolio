@@ -5,6 +5,7 @@ import seTapNormal from '../../assets/games/minigame/audio/se/小パンチ.mp3';
 import seTapMinusScore from '../../assets/games/minigame/audio/se/ビープ音4.mp3';
 import seTapHeal from '../../assets/games/minigame/audio/se/statushenkapowerup.wav';
 import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowerdown.wav';
+import bgmAchieve from '../../assets/games/minigame/audio/bgm/maou_game_town16.mp3';
 import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
 
 // is:inline により Astroのバンドル・最適化をスキップ
@@ -12,6 +13,7 @@ import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
 (function () {
   let configBgmVolume = 0.5;
   let configSeVolume = 0.5;
+  let currentBgmAudio = null;
 
   const SE_DB = {
     cursor: seCursor,
@@ -30,12 +32,30 @@ import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
     se.play().catch((e) => console.log('SE play failed:', e));
   }
 
+  function playBGM(bgmPath) {
+    if (currentBgmAudio) currentBgmAudio.pause();
+    currentBgmAudio = new Audio(bgmPath);
+    currentBgmAudio.volume = configBgmVolume;
+    currentBgmAudio.loop = true;
+    currentBgmAudio.play().catch((e) => console.log('BGM Play blocked:', e));
+  }
+
+  function stopBGM() {
+    if (currentBgmAudio) {
+      currentBgmAudio.pause();
+      currentBgmAudio = null;
+    }
+  }
+
   window.playSE = playSE;
+  window.playBGM = playBGM;
+  window.stopBGM = stopBGM;
   window.setSEVolume = function (vol) {
     configSeVolume = vol;
   };
   window.setBGMVolume = function (vol) {
     configBgmVolume = vol;
+    if (currentBgmAudio) currentBgmAudio.volume = vol;
   };
 
   const startBtn = document.getElementById('start-btn');
@@ -579,6 +599,7 @@ import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
   if (btnOpenAchievements) {
     btnOpenAchievements.addEventListener('click', () => {
       playSE('confirm');
+      playBGM(bgmAchieve);
       renderMiniAchievements();
       if (achievementsScreen) achievementsScreen.style.display = 'flex';
     });
@@ -604,6 +625,7 @@ import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
 
   function closeAchievementsScreen() {
     playSE('cancel');
+    stopBGM();
     if (achievementsScreen) achievementsScreen.style.display = 'none';
   }
 
