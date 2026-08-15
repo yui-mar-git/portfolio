@@ -15,6 +15,8 @@ import {
   renderCompendium,
 } from './compendium';
 import { TOOLTIP_DB } from '../../data/roguelike/tooltips';
+import { RL_ACHIEVEMENTS } from '../../data/roguelike/achievements';
+import { MAP_EVENTS } from '../../data/roguelike/events';
 
 // ===================================================
 // Audio マネージャー
@@ -2195,46 +2197,26 @@ function drinkMadScientistPotion() {
   }
 }
 
-const eventsList = [
-  {
-    title: 'マッドサイエンティストの実験',
-    image: new URL(
-      '../../assets/games/roguelike/images/characters/job_scientist_mad.png',
-      import.meta.url,
-    ).href,
-    text: '薄暗い部屋で、怪しげな白衣の男が試験管を振っています。\n「ヒヒヒ…私の特製ドリンクを試してみないか？すごい効果があるぞぉ…？」',
-    options: [
-      {
-        text: '[飲む] 赤色の怪しい液体',
-        action: () => drinkMadScientistPotion(),
-        isCustomNav: true,
-      },
-      {
-        text: '[飲む] 青色の怪しい液体',
-        action: () => drinkMadScientistPotion(),
-        isCustomNav: true,
-      },
-      {
-        text: '[飲む] 緑色の怪しい液体',
-        action: () => drinkMadScientistPotion(),
-        isCustomNav: true,
-      },
-      {
-        text: 'やめておく (立ち去る)',
-        action: () => {
-          showGameAlert(
-            '拒絶',
-            '「ちぇっ、つまらないヤツだ」\nあなたは急いでその場を立ち去りました。',
-            () => {
-              proceedNextFloor();
-            },
-          );
-        },
-        isCustomNav: true,
-      },
-    ],
-  },
-];
+const eventsList = MAP_EVENTS.map((evt) => ({
+  ...evt,
+  options: evt.options.map((opt) => ({
+    text: opt.text,
+    isCustomNav: opt.isCustomNav,
+    action: () => {
+      if (opt.type === 'drink_potion') {
+        drinkMadScientistPotion();
+      } else if (opt.type === 'leave') {
+        showGameAlert(
+          '拒絶',
+          '「ちぇっ、つまらないヤツだ」\nあなたは急いでその場を立ち去りました。',
+          () => {
+            proceedNextFloor();
+          },
+        );
+      }
+    },
+  })),
+}));
 
 function triggerEventNode() {
   showScreen(eventScreen);
@@ -2533,8 +2515,20 @@ const CARD_IMAGES = {
   ).href,
   venom: new URL('../../assets/games/roguelike/images/icons/medical_doku.png', import.meta.url)
     .href,
-  fortify: new URL(
+  cure: new URL(
+    '../../assets/games/roguelike/images/icons/water_shizuku.png',
+    import.meta.url,
+  ).href,
+  regen_hp: new URL(
     '../../assets/games/roguelike/images/icons/math_mark01_plus.png',
+    import.meta.url,
+  ).href,
+  regen_mp: new URL(
+    '../../assets/games/roguelike/images/icons/cardgame_deck_hiku.png',
+    import.meta.url,
+  ).href,
+  meditation: new URL(
+    '../../assets/games/roguelike/images/icons/yaruki_moeru_man.png',
     import.meta.url,
   ).href,
   draw_card: new URL(
@@ -3056,6 +3050,15 @@ function startTurn() {
     logMessage('人魚のネックレス：毎ターンMPが 1 回復した。', 'log-heal');
   }
 
+  if (player.regenHp && player.regenHp > 0) {
+    player.hp = Math.min(player.maxHp, player.hp + player.regenHp);
+    logMessage(`再生効果：毎ターンHPが ${player.regenHp} 回復した。`, 'log-heal');
+  }
+  if (player.regenMp && player.regenMp > 0) {
+    player.mp = Math.min(player.maxMp, player.mp + player.regenMp);
+    logMessage(`活性効果：毎ターンMPが ${player.regenMp} 回復した。`, 'log-heal');
+  }
+
   if (player.poison > 0) {
     player.hp = Math.max(0, player.hp - player.poison);
     logMessage('プレイヤーが毒で ' + player.poison + ' ダメージ！', 'log-poison');
@@ -3335,7 +3338,26 @@ function playCard(index) {
     if (card.poison && card.poison > 0) {
       applyEnemyStatus('poison', card.poison);
     }
-  } else if (card.type === 'skill') {
+    if (card.cleanse) {
+      player.poison = 0;
+      player.paralyze = 0;
+      player.dazzle = 0;
+      player.silence = 0;
+      player.buffDown = 0;
+      logMessage(`${card.name}！ 状態異常とデバフをすべて解除した！`, 'log-heal');
+    }
+    if (card.fullHeal) {
+      player.hp = player.maxHp;
+      logMessage(`${card.name}！ HPが全回復した！`, 'log-heal');
+    }
+    if (card.regenHp) {
+      player.regenHp = (player.regenHp || 0) + card.regenHp;
+      logMessage(`${card.name}！ 毎ターンHPが ${card.regenHp} 回復するようになった！`, 'log-heal');
+    }
+    if (card.regenMp) {
+      player.regenMp = (player.regenMp || 0) + card.regenMp;
+      logMessage(`${card.name}！ 毎ターンMPが ${card.regenMp} 回復するようになった！`, 'log-heal');
+    }
     if (card.draw) {
       drawCards(card.draw);
       player.actions++;
@@ -3759,10 +3781,21 @@ function showResultOverlay(isWin) {
   if (overlay) overlay.style.display = 'flex';
 }
 
+function updateRoguelikeStats(area, floor, isClear = false) {
+  const stats = JSON.parse(localStorage.getItem('roguelike_stats') || '{"clears":0,"maxArea":1,"maxFloor":1}');
+  if (isClear) stats.clears = (stats.clears || 0) + 1;
+  if (area > (stats.maxArea || 1) || (area === stats.maxArea && floor > (stats.maxFloor || 1))) {
+    stats.maxArea = area;
+    stats.maxFloor = floor;
+  }
+  localStorage.setItem('roguelike_stats', JSON.stringify(stats));
+}
+
 function showGameClearScreen() {
   isGameOver = true;
   stopBGM();
   playSE('victory');
+  updateRoguelikeStats(currentArea, currentFloor, true);
   if (resultTitle) {
     resultTitle.textContent = '全面クリア！';
     resultTitle.style.color = '#ffd700';
@@ -3835,6 +3868,8 @@ function startBattle() {
     player.silence = 0;
     player.buffUp = 0;
     player.buffDown = 0;
+    player.regenHp = 0;
+    player.regenMp = 0;
   } else {
     // 通常の戦闘開始：シャッフルのみ
     player.deck = shuffle([...player.deck]);
@@ -3846,6 +3881,8 @@ function startBattle() {
     player.silence = 0;
     player.buffUp = 0;
     player.buffDown = 0;
+    player.regenHp = 0;
+    player.regenMp = 0;
     player.mp = Math.min(player.maxMp, player.mp);
   }
   player.hand = [];
@@ -4054,6 +4091,149 @@ if (btnShare) {
     const shareUrl = window.location.href;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  });
+}
+
+let currentRlAchieveTab = 'all';
+
+function openRlAchieveDetail(item) {
+  const modal = document.getElementById('achieve-detail-modal');
+  const badge = document.getElementById('achieve-detail-badge');
+  const title = document.getElementById('achieve-detail-title');
+  const cond = document.getElementById('achieve-detail-cond');
+  const desc = document.getElementById('achieve-detail-desc');
+  if (!modal) return;
+
+  const unlockedCards = JSON.parse(localStorage.getItem('roguelike_unlocked_cards') || '[]');
+  const unlockedMonsters = JSON.parse(localStorage.getItem('roguelike_unlocked_monsters') || '[]');
+  const unlockedRelics = JSON.parse(localStorage.getItem('roguelike_unlocked_relics') || '[]');
+  const stats = JSON.parse(localStorage.getItem('roguelike_stats') || '{"clears":0,"maxArea":1,"maxFloor":1}');
+
+  const unlocked = item.isUnlocked(stats, unlockedCards, unlockedMonsters, unlockedRelics);
+
+  if (badge) {
+    badge.textContent = unlocked ? '達成済み' : '未達成';
+    badge.className = `achieve-detail-badge ${unlocked ? 'unlocked' : 'locked'}`;
+  }
+  if (title) title.textContent = unlocked ? item.title : '？？？';
+  if (cond) cond.textContent = item.cond;
+  if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+
+  if (window.playSE) window.playSE('cursor');
+  modal.style.display = 'flex';
+}
+
+function renderRlAchievements() {
+  const cardGrid = document.getElementById('achievements-card-grid');
+  const summaryBox = document.getElementById('achievements-summary-box');
+  if (!cardGrid) return;
+
+  const unlockedCards = JSON.parse(localStorage.getItem('roguelike_unlocked_cards') || '[]');
+  const unlockedMonsters = JSON.parse(localStorage.getItem('roguelike_unlocked_monsters') || '[]');
+  const unlockedRelics = JSON.parse(localStorage.getItem('roguelike_unlocked_relics') || '[]');
+  const stats = JSON.parse(localStorage.getItem('roguelike_stats') || '{"clears":0,"maxArea":1,"maxFloor":1}');
+
+  const totalCount = RL_ACHIEVEMENTS.length;
+  const unlockedCount = RL_ACHIEVEMENTS.filter(a => a.isUnlocked(stats, unlockedCards, unlockedMonsters, unlockedRelics)).length;
+
+  if (summaryBox) {
+    summaryBox.innerHTML = `<span class="compendium-progress-text">達成度: <strong>${unlockedCount} / ${totalCount}</strong> (${Math.round((unlockedCount / totalCount) * 100)}%) | 全勝クリア: <strong>${stats.clears || 0} 回</strong></span>`;
+  }
+
+  const filtered = RL_ACHIEVEMENTS.filter(a => currentRlAchieveTab === 'all' || a.cat === currentRlAchieveTab);
+
+  cardGrid.innerHTML = filtered.map(a => {
+    const unlocked = a.isUnlocked(stats, unlockedCards, unlockedMonsters, unlockedRelics);
+    return `
+      <div class="achieve-card ${unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+        <div class="achieve-card-badge">${unlocked ? '達成済み' : '未達成'}</div>
+        <div class="achieve-card-title">${unlocked ? a.title : '？？？'}</div>
+      </div>
+    `;
+  }).join('');
+
+  cardGrid.querySelectorAll('.achieve-card').forEach(cardEl => {
+    cardEl.addEventListener('click', () => {
+      const id = cardEl.dataset.id;
+      const targetItem = RL_ACHIEVEMENTS.find(item => item.id === id);
+      if (targetItem) openRlAchieveDetail(targetItem);
+    });
+  });
+}
+
+const btnOpenAchievements = document.getElementById('btn-open-achievements');
+const achievementsScreen = document.getElementById('achievements-screen');
+const btnCloseAchievements = document.getElementById('btn-close-achievements');
+const btnBackAchievements = document.getElementById('btn-back-achievements');
+const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close');
+
+const btnResetData = document.getElementById('btn-reset-data');
+const dataResetModal = document.getElementById('data-reset-modal');
+const btnCancelReset = document.getElementById('btn-cancel-reset');
+const btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+if (btnOpenAchievements) {
+  btnOpenAchievements.addEventListener('click', () => {
+    if (window.playSE) window.playSE('cursor');
+    renderRlAchievements();
+    if (achievementsScreen) achievementsScreen.style.display = 'flex';
+  });
+}
+
+document.querySelectorAll('#rl-achieve-tab-bar .achieve-tab').forEach(tabBtn => {
+  tabBtn.addEventListener('click', (e) => {
+    if (window.playSE) window.playSE('cursor');
+    document.querySelectorAll('#rl-achieve-tab-bar .achieve-tab').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    currentRlAchieveTab = e.currentTarget.dataset.tab;
+    renderRlAchievements();
+  });
+});
+
+if (btnAchieveDetailClose) {
+  btnAchieveDetailClose.addEventListener('click', () => {
+    if (window.playSE) window.playSE('cancel');
+    const modal = document.getElementById('achieve-detail-modal');
+    if (modal) modal.style.display = 'none';
+  });
+}
+
+function closeAchievementsScreen() {
+  if (window.playSE) window.playSE('cancel');
+  if (achievementsScreen) achievementsScreen.style.display = 'none';
+}
+
+if (btnCloseAchievements) btnCloseAchievements.addEventListener('click', closeAchievementsScreen);
+if (btnBackAchievements) btnBackAchievements.addEventListener('click', closeAchievementsScreen);
+
+if (btnResetData) {
+  btnResetData.addEventListener('click', () => {
+    if (window.playSE) window.playSE('cursor');
+    if (dataResetModal) dataResetModal.style.display = 'flex';
+  });
+}
+
+if (btnCancelReset) {
+  btnCancelReset.addEventListener('click', () => {
+    if (window.playSE) window.playSE('cancel');
+    if (dataResetModal) dataResetModal.style.display = 'none';
+  });
+}
+
+if (btnConfirmReset) {
+  btnConfirmReset.addEventListener('click', () => {
+    if (window.playSE) window.playSE('cursor');
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('roguelike_') || key.startsWith('rl_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    localStorage.removeItem('roguelike_unlocked_cards');
+    localStorage.removeItem('roguelike_unlocked_items');
+    localStorage.removeItem('roguelike_unlocked_relics');
+    localStorage.removeItem('roguelike_unlocked_monsters');
+    localStorage.removeItem('roguelike_stats');
+    location.reload();
   });
 }
 

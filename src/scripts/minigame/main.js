@@ -5,6 +5,7 @@ import seTapNormal from '../../assets/games/minigame/audio/se/小パンチ.mp3';
 import seTapMinusScore from '../../assets/games/minigame/audio/se/ビープ音4.mp3';
 import seTapHeal from '../../assets/games/minigame/audio/se/statushenkapowerup.wav';
 import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowerdown.wav';
+import { MINI_ACHIEVEMENTS } from '../../data/minigame/achievements';
 
 // is:inline により Astroのバンドル・最適化をスキップ
 // DOMContentLoaded は不要（is:inlineはDOMより後に実行される）
@@ -503,6 +504,132 @@ import seTapMinusTime from '../../assets/games/minigame/audio/se/statushenkapowe
     if (bottomHud) bottomHud.style.display = 'none';
 
     if (resultScreen) resultScreen.style.display = 'block';
+  }
+
+  let currentMiniAchieveTab = 'all';
+
+  function openMiniAchieveDetail(item) {
+    const modal = document.getElementById('achieve-detail-modal');
+    const badge = document.getElementById('achieve-detail-badge');
+    const title = document.getElementById('achieve-detail-title');
+    const cond = document.getElementById('achieve-detail-cond');
+    const desc = document.getElementById('achieve-detail-desc');
+    if (!modal) return;
+
+    const hs = parseInt(highScore, 10) || 0;
+    const unlocked = item.isUnlocked(hs);
+
+    if (badge) {
+      badge.textContent = unlocked ? '達成済み' : '未達成';
+      badge.className = `achieve-detail-badge ${unlocked ? 'unlocked' : 'locked'}`;
+    }
+    if (title) title.textContent = unlocked ? item.title : '？？？';
+    if (cond) cond.textContent = item.cond;
+    if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+
+    playSE('confirm');
+    modal.style.display = 'flex';
+  }
+
+  function renderMiniAchievements() {
+    const cardGrid = document.getElementById('achievements-card-grid');
+    const summaryBox = document.getElementById('achievements-summary-box');
+    if (!cardGrid) return;
+
+    const hs = parseInt(highScore, 10) || 0;
+    const totalCount = MINI_ACHIEVEMENTS.length;
+    const unlockedCount = MINI_ACHIEVEMENTS.filter(a => a.isUnlocked(hs)).length;
+
+    if (summaryBox) {
+      summaryBox.innerHTML = `達成度: <strong>${unlockedCount} / ${totalCount}</strong> (${Math.round((unlockedCount / totalCount) * 100)}%) | 最高タップ: <strong>${hs} 回</strong>`;
+    }
+
+    const filtered = MINI_ACHIEVEMENTS.filter(a => currentMiniAchieveTab === 'all' || a.cat === currentMiniAchieveTab);
+
+    cardGrid.innerHTML = filtered.map(a => {
+      const unlocked = a.isUnlocked(hs);
+      return `
+        <div class="achieve-card ${unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+          <div class="achieve-card-badge">${unlocked ? '達成済み' : '未達成'}</div>
+          <div class="achieve-card-title">${unlocked ? a.title : '？？？'}</div>
+        </div>
+      `;
+    }).join('');
+
+    cardGrid.querySelectorAll('.achieve-card').forEach(cardEl => {
+      cardEl.addEventListener('click', () => {
+        const id = cardEl.dataset.id;
+        const targetItem = MINI_ACHIEVEMENTS.find(item => item.id === id);
+        if (targetItem) openMiniAchieveDetail(targetItem);
+      });
+    });
+  }
+
+  const btnOpenAchievements = document.getElementById('btn-open-achievements');
+  const achievementsScreen = document.getElementById('achievements-screen');
+  const btnCloseAchievements = document.getElementById('btn-close-achievements');
+  const btnBackAchievements = document.getElementById('btn-back-achievements');
+  const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close');
+
+  const btnResetData = document.getElementById('btn-reset-data');
+  const dataResetModal = document.getElementById('data-reset-modal');
+  const btnCancelReset = document.getElementById('btn-cancel-reset');
+  const btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+  if (btnOpenAchievements) {
+    btnOpenAchievements.addEventListener('click', () => {
+      playSE('confirm');
+      renderMiniAchievements();
+      if (achievementsScreen) achievementsScreen.style.display = 'flex';
+    });
+  }
+
+  document.querySelectorAll('#mini-achieve-tab-bar .achieve-tab').forEach(tabBtn => {
+    tabBtn.addEventListener('click', (e) => {
+      playSE('confirm');
+      document.querySelectorAll('#mini-achieve-tab-bar .achieve-tab').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      currentMiniAchieveTab = e.currentTarget.dataset.tab;
+      renderMiniAchievements();
+    });
+  });
+
+  if (btnAchieveDetailClose) {
+    btnAchieveDetailClose.addEventListener('click', () => {
+      playSE('cancel');
+      const modal = document.getElementById('achieve-detail-modal');
+      if (modal) modal.style.display = 'none';
+    });
+  }
+
+  function closeAchievementsScreen() {
+    playSE('cancel');
+    if (achievementsScreen) achievementsScreen.style.display = 'none';
+  }
+
+  if (btnCloseAchievements) btnCloseAchievements.addEventListener('click', closeAchievementsScreen);
+  if (btnBackAchievements) btnBackAchievements.addEventListener('click', closeAchievementsScreen);
+
+  if (btnResetData) {
+    btnResetData.addEventListener('click', () => {
+      playSE('confirm');
+      if (dataResetModal) dataResetModal.style.display = 'flex';
+    });
+  }
+
+  if (btnCancelReset) {
+    btnCancelReset.addEventListener('click', () => {
+      playSE('cancel');
+      if (dataResetModal) dataResetModal.style.display = 'none';
+    });
+  }
+
+  if (btnConfirmReset) {
+    btnConfirmReset.addEventListener('click', () => {
+      playSE('confirm');
+      localStorage.removeItem('minigame_highscore');
+      location.reload();
+    });
   }
 
   if (startBtn) startBtn.addEventListener('click', startGame);

@@ -4,6 +4,10 @@
  * ==========================================
  */
 
+import { TD_ACHIEVEMENTS } from '../../data/tower-defense/achievements';
+import { calculateUnitStats } from '../../data/tower-defense/units';
+import { STAGE_CONFIGS } from '../../data/tower-defense/stages';
+
 const STORAGE_KEY = 'td_save_data';
 let saveData = {
   gold: 0,
@@ -38,65 +42,8 @@ function saveGame() {
   updateDeckUI();
 }
 
-const BASE_UNIT_DB = {
-  sword: {
-    cost: 130,
-    hp: 100,
-    attack: 20,
-    cooldown: 666,
-    speed: 50,
-    range: 80,
-    texture: 'unit_sword',
-    height: 80,
-    attackSE: 'strike',
-  },
-  shield: {
-    cost: 50,
-    hp: 200,
-    attack: 20,
-    cooldown: 1000,
-    speed: 30,
-    range: 60,
-    texture: 'unit_shield',
-    height: 90,
-    attackSE: 'smite',
-  },
-  mage: {
-    cost: 90,
-    hp: 30,
-    attack: 15,
-    cooldown: 3000,
-    speed: 25,
-    range: 200,
-    texture: 'unit_mage',
-    height: 80,
-    attackSE: 'energyball',
-  },
-  butouka: {
-    cost: 20,
-    hp: 50,
-    attack: 15,
-    cooldown: 333,
-    speed: 80,
-    range: 60,
-    texture: 'unit_butouka',
-    height: 70,
-    attackSE: 'strike',
-  },
-};
-
 function getUnitData(type) {
-  const base = BASE_UNIT_DB[type];
-  const lv = saveData.levels[type] || 1;
-  const baseStatsLv = saveData.levels['baseStats'] || 1;
-  const globalBuff = 1 + (baseStatsLv - 1) * 0.05;
-  return {
-    ...base,
-    originalType: type,
-    hp: Math.floor(base.hp * (1 + (lv - 1) * 0.2) * globalBuff),
-    attack: Math.floor(base.attack * (1 + (lv - 1) * 0.2) * globalBuff),
-    speed: Math.floor(base.speed * (1 + (lv - 1) * 0.1) * globalBuff),
-  };
+  return calculateUnitStats(type, saveData.levels);
 }
 
 let コスト = 0;
@@ -809,57 +756,20 @@ class MainScene extends Phaser.Scene {
     if (this.isGameOver) return;
     if (this.enemiesSpawned >= this.enemiesToSpawn) return;
 
-    let hp = 30;
-    let attack = 10;
-    let speed = 20;
-    let height = 80;
-    let cooldown = 1500;
-    let textureKey = 'enemy_slime';
-    let attackSE = 'punch';
-    let isBoss = false;
-
     const isFinalWave = this.currentWave === this.maxWaves;
     const spawnBossNow = isFinalWave && this.enemiesSpawned === this.enemiesToSpawn - 1;
 
-    if (activeStage === 2) {
-      if (spawnBossNow) {
-        hp = 1000;
-        attack = 40;
-        speed = 20;
-        height = 160;
-        textureKey = 'enemy_ogre';
-        attackSE = 'smite';
-        cooldown = 2000;
-        isBoss = true;
-      } else {
-        if (Math.random() < 0.5) {
-          hp = 40;
-          attack = 15;
-          textureKey = 'enemy_goblin';
-          speed = 40;
-          cooldown = 1000;
-          height = 80;
-        }
-      }
-    } else if (activeStage === 3) {
-      if (spawnBossNow) {
-        hp = 3500;
-        attack = 60;
-        speed = 20;
-        height = 160;
-        textureKey = 'enemy_orc';
-        attackSE = 'smite';
-        cooldown = 2000;
-        isBoss = true;
-      } else {
-        hp = 40;
-        attack = 15;
-        textureKey = 'enemy_goblin';
-        speed = 40;
-        cooldown = 1000;
-        height = 80;
-      }
-    }
+    const stageCfg = STAGE_CONFIGS[activeStage] || STAGE_CONFIGS[1];
+    const enemyBase = stageCfg.getEnemyForSpawn(this.currentWave, spawnBossNow);
+
+    let hp = enemyBase.hp;
+    let attack = enemyBase.attack;
+    let speed = enemyBase.speed;
+    let height = enemyBase.height;
+    let cooldown = enemyBase.cooldown;
+    let textureKey = enemyBase.textureKey;
+    let attackSE = enemyBase.attackSE;
+    let isBoss = enemyBase.isBoss;
 
     if (!isBoss) {
       const stageBuff = 1 + (activeStage - 1) * 0.5;
@@ -1216,12 +1126,12 @@ document.getElementById('start-btn').addEventListener('click', () => {
 const resetConfirmModal = document.getElementById('reset-confirm-modal');
 document.getElementById('reset-save-btn').addEventListener('click', () => {
   playSE('cursor');
-  if (resetConfirmModal) resetConfirmModal.classList.add('active');
+  if (resetConfirmModal) resetConfirmModal.style.display = 'flex';
 });
 
 document.getElementById('btn-reset-cancel').addEventListener('click', () => {
   playSE('cancel');
-  if (resetConfirmModal) resetConfirmModal.classList.remove('active');
+  if (resetConfirmModal) resetConfirmModal.style.display = 'none';
 });
 
 document.getElementById('btn-reset-execute').addEventListener('click', () => {
@@ -1234,6 +1144,103 @@ document.getElementById('btn-reset-execute').addEventListener('click', () => {
   };
   location.reload();
 });
+
+let currentTdAchieveTab = 'all';
+
+function openTdAchieveDetail(item) {
+  const modal = document.getElementById('achieve-detail-modal');
+  const badge = document.getElementById('achieve-detail-badge');
+  const title = document.getElementById('achieve-detail-title');
+  const cond = document.getElementById('achieve-detail-cond');
+  const desc = document.getElementById('achieve-detail-desc');
+  if (!modal) return;
+
+  const unlocked = item.isUnlocked(saveData);
+
+  if (badge) {
+    badge.textContent = unlocked ? '達成済み' : '未達成';
+    badge.className = `achieve-detail-badge ${unlocked ? 'unlocked' : 'locked'}`;
+  }
+  if (title) title.textContent = unlocked ? item.title : '？？？';
+  if (cond) cond.textContent = item.cond;
+  if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+
+  playSE('confirm');
+  modal.style.display = 'flex';
+}
+
+function renderTdAchievements() {
+  const cardGrid = document.getElementById('achievements-card-grid');
+  const summaryBox = document.getElementById('achievements-summary-box');
+  if (!cardGrid) return;
+
+  const totalCount = TD_ACHIEVEMENTS.length;
+  const unlockedCount = TD_ACHIEVEMENTS.filter(a => a.isUnlocked(saveData)).length;
+
+  if (summaryBox) {
+    summaryBox.innerHTML = `達成度: <strong>${unlockedCount} / ${totalCount}</strong> (${Math.round((unlockedCount / totalCount) * 100)}%) | 所持金: <strong>${saveData.gold || 0} G</strong>`;
+  }
+
+  const filtered = TD_ACHIEVEMENTS.filter(a => currentTdAchieveTab === 'all' || a.cat === currentTdAchieveTab);
+
+  cardGrid.innerHTML = filtered.map(a => {
+    const unlocked = a.isUnlocked(saveData);
+    return `
+      <div class="achieve-card ${unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+        <div class="achieve-card-badge">${unlocked ? '達成済み' : '未達成'}</div>
+        <div class="achieve-card-title">${unlocked ? a.title : '？？？'}</div>
+      </div>
+    `;
+  }).join('');
+
+  cardGrid.querySelectorAll('.achieve-card').forEach(cardEl => {
+    cardEl.addEventListener('click', () => {
+      const id = cardEl.dataset.id;
+      const targetItem = TD_ACHIEVEMENTS.find(item => item.id === id);
+      if (targetItem) openTdAchieveDetail(targetItem);
+    });
+  });
+}
+
+const achievementsBtn = document.getElementById('achievements-btn');
+const achievementsScreen = document.getElementById('achievements-screen');
+const btnAchievementsClose = document.getElementById('btn-achievements-close');
+const btnBackAchievements = document.getElementById('btn-back-achievements');
+const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close');
+
+if (achievementsBtn) {
+  achievementsBtn.addEventListener('click', () => {
+    playSE('confirm');
+    renderTdAchievements();
+    if (achievementsScreen) achievementsScreen.style.display = 'flex';
+  });
+}
+
+document.querySelectorAll('#achieve-tab-bar .achieve-tab').forEach(tabBtn => {
+  tabBtn.addEventListener('click', (e) => {
+    playSE('confirm');
+    document.querySelectorAll('#achieve-tab-bar .achieve-tab').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    currentTdAchieveTab = e.currentTarget.dataset.tab;
+    renderTdAchievements();
+  });
+});
+
+if (btnAchieveDetailClose) {
+  btnAchieveDetailClose.addEventListener('click', () => {
+    playSE('cancel');
+    const modal = document.getElementById('achieve-detail-modal');
+    if (modal) modal.style.display = 'none';
+  });
+}
+
+function closeAchievementsScreen() {
+  playSE('cancel');
+  if (achievementsScreen) achievementsScreen.style.display = 'none';
+}
+
+if (btnAchievementsClose) btnAchievementsClose.addEventListener('click', closeAchievementsScreen);
+if (btnBackAchievements) btnBackAchievements.addEventListener('click', closeAchievementsScreen);
 
 // Map -> Upgrade
 document.getElementById('btn-to-upgrade').addEventListener('click', () => {

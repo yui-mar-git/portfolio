@@ -8,8 +8,9 @@ import seStageClear from '../../assets/games/run-action/audio/se/maou_game_jingl
 import bgmField from '../../assets/games/run-action/audio/bgm/maou_game_field01.mp3';
 import bgmRun from '../../assets/games/run-action/audio/bgm/maou_bgm_cyber37.mp3';
 
-import shoesImg from '../../assets/games/run-action/images/item/shoes_sneaker.png';
-import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg';
+import { RUN_ACHIEVEMENTS } from '../../data/run-action/achievements';
+import { ITEM_DB } from '../../data/run-action/items';
+import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
 
 (function () {
   let configBgmVolume = 0.5;
@@ -130,98 +131,6 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
   const startCoinsVal = document.getElementById('start-coins-val');
   const hudCoinsEl = document.getElementById('hud-coins');
   const hudActiveItemsEl = document.getElementById('hud-active-items');
-
-  // Item DB
-  const ITEM_DB = [
-    {
-      id: 'double_coins',
-      name: 'コイン2倍',
-      desc: '獲得コイン数が 2倍 に増加',
-      price: 40,
-      unlockStage: 1,
-      img: noImg,
-    },
-    {
-      id: 'double_jump',
-      name: '2段ジャンプ',
-      desc: '空中でもう1回ジャンプが可能になる',
-      price: 80,
-      unlockStage: 1,
-      img: shoesImg,
-    },
-    {
-      id: 'magnet_coin',
-      name: 'マグネット',
-      desc: '近くのコインを自動引き寄せる',
-      price: 120,
-      unlockStage: 2,
-      img: noImg,
-    },
-    {
-      id: 'high_jump',
-      name: 'ハイジャンプ',
-      desc: '長押しでより高く跳べる',
-      price: 150,
-      unlockStage: 3,
-      img: shoesImg,
-    },
-    {
-      id: 'infinite_jump',
-      name: '無限ジャンプ',
-      desc: '空中でも何回でも連続ジャンプが可能',
-      price: 250,
-      unlockStage: 4,
-      img: shoesImg,
-    },
-  ];
-
-  // Stage Config (3 Stages like Tower Defense)
-  const STAGE_CONFIG = [
-    { id: 1, name: 'ステージ1 (初級)', targetDistance: 500, desc: '障害物とコインの基本コース' },
-    { id: 2, name: 'ステージ2 (中級)', targetDistance: 800, desc: '二足歩行エネミー登場地帯' },
-    { id: 3, name: 'ステージ3 (上級)', targetDistance: 1200, desc: '飛行敵と高難易度穴コース' },
-  ];
-
-  // 固定ステージレイアウトデータ (スタートから1500px[約5秒間]は完全助走ゾーン)
-  const FIXED_STAGES = {
-    1: {
-      goalX: 4200,
-      holes: [2100, 2700, 3300, 3800],
-      obstacles: [1800, 2400, 3000, 3500],
-      enemies: [
-        { type: 'ground', x: 2250 },
-        { type: 'ground', x: 2850 },
-        { type: 'ground', x: 3400 }
-      ],
-      coins: [1600, 1640, 1680, 2000, 2040, 2500, 2540, 3100, 3140, 3600, 3640]
-    },
-    2: {
-      goalX: 4800,
-      holes: [1800, 2400, 3000, 3600, 4200],
-      obstacles: [1650, 2150, 2750, 3350, 3950],
-      enemies: [
-        { type: 'ground', x: 1950 },
-        { type: 'flying', x: 2550, y: -65 },
-        { type: 'ground', x: 3150 },
-        { type: 'flying', x: 3750, y: -70 }
-      ],
-      coins: [1600, 1640, 2050, 2090, 2650, 2690, 3250, 3850]
-    },
-    3: {
-      goalX: 5400,
-      holes: [1750, 2250, 2750, 3250, 3750, 4250, 4750],
-      obstacles: [1600, 2050, 2550, 3050, 3550, 4050, 4550],
-      enemies: [
-        { type: 'ground', x: 1850 },
-        { type: 'flying', x: 2350, y: -75 },
-        { type: 'ground', x: 2850 },
-        { type: 'flying', x: 3350, y: -80 },
-        { type: 'ground', x: 3850 },
-        { type: 'flying', x: 4350, y: -75 }
-      ],
-      coins: [1600, 1640, 2150, 2190, 2650, 2690, 3150, 3650, 4150, 4650]
-    }
-  };
 
   // Save Data Management
   let saveData = {
@@ -1419,6 +1328,131 @@ import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg
         window.open(twitterUrl, '_blank', 'noopener,noreferrer');
       };
     }
+  }
+
+  let currentRunAchieveTab = 'all';
+
+  function openRunAchieveDetail(item) {
+    const modal = document.getElementById('achieve-detail-modal');
+    const badge = document.getElementById('achieve-detail-badge');
+    const title = document.getElementById('achieve-detail-title');
+    const cond = document.getElementById('achieve-detail-cond');
+    const desc = document.getElementById('achieve-detail-desc');
+    if (!modal) return;
+
+    const unlocked = item.isUnlocked(saveData, highScore);
+
+    if (badge) {
+      badge.textContent = unlocked ? '達成済み' : '未達成';
+      badge.className = `achieve-detail-badge ${unlocked ? 'unlocked' : 'locked'}`;
+    }
+    if (title) title.textContent = unlocked ? item.title : '？？？';
+    if (cond) cond.textContent = item.cond;
+    if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+
+    playSE('confirm');
+    modal.style.display = 'flex';
+  }
+
+  function renderRunAchievements() {
+    const cardGrid = document.getElementById('achievements-card-grid');
+    const summaryBox = document.getElementById('achievements-summary-box');
+    if (!cardGrid) return;
+
+    const totalCount = RUN_ACHIEVEMENTS.length;
+    const unlockedCount = RUN_ACHIEVEMENTS.filter(a => a.isUnlocked(saveData, highScore)).length;
+
+    if (summaryBox) {
+      summaryBox.innerHTML = `達成度: <strong>${unlockedCount} / ${totalCount}</strong> (${Math.round((unlockedCount / totalCount) * 100)}%) | 最高記録: <strong>${highScore > 0 ? highScore.toFixed(1) + '秒' : '未記録'}</strong>`;
+    }
+
+    const filtered = RUN_ACHIEVEMENTS.filter(a => currentRunAchieveTab === 'all' || a.cat === currentRunAchieveTab);
+
+    cardGrid.innerHTML = filtered.map(a => {
+      const unlocked = a.isUnlocked(saveData, highScore);
+      return `
+        <div class="achieve-card ${unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+          <div class="achieve-card-badge">${unlocked ? '達成済み' : '未達成'}</div>
+          <div class="achieve-card-title">${unlocked ? a.title : '？？？'}</div>
+        </div>
+      `;
+    }).join('');
+
+    cardGrid.querySelectorAll('.achieve-card').forEach(cardEl => {
+      cardEl.addEventListener('click', () => {
+        const id = cardEl.dataset.id;
+        const targetItem = RUN_ACHIEVEMENTS.find(item => item.id === id);
+        if (targetItem) openRunAchieveDetail(targetItem);
+      });
+    });
+  }
+
+  const btnOpenAchievements = document.getElementById('btn-open-achievements');
+  const achievementsScreen = document.getElementById('achievements-screen');
+  const btnCloseAchievements = document.getElementById('btn-close-achievements');
+  const btnBackAchievements = document.getElementById('btn-back-achievements');
+  const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close');
+
+  const btnResetData = document.getElementById('btn-reset-data');
+  const dataResetModal = document.getElementById('data-reset-modal');
+  const btnCancelReset = document.getElementById('btn-cancel-reset');
+  const btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+  if (btnOpenAchievements) {
+    btnOpenAchievements.addEventListener('click', () => {
+      playSE('confirm');
+      renderRunAchievements();
+      if (achievementsScreen) achievementsScreen.style.display = 'flex';
+    });
+  }
+
+  document.querySelectorAll('#run-achieve-tab-bar .achieve-tab').forEach(tabBtn => {
+    tabBtn.addEventListener('click', (e) => {
+      playSE('confirm');
+      document.querySelectorAll('#run-achieve-tab-bar .achieve-tab').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      currentRunAchieveTab = e.currentTarget.dataset.tab;
+      renderRunAchievements();
+    });
+  });
+
+  if (btnAchieveDetailClose) {
+    btnAchieveDetailClose.addEventListener('click', () => {
+      playSE('cancel');
+      const modal = document.getElementById('achieve-detail-modal');
+      if (modal) modal.style.display = 'none';
+    });
+  }
+
+  function closeAchievementsScreen() {
+    playSE('cancel');
+    if (achievementsScreen) achievementsScreen.style.display = 'none';
+  }
+
+  if (btnCloseAchievements) btnCloseAchievements.addEventListener('click', closeAchievementsScreen);
+  if (btnBackAchievements) btnBackAchievements.addEventListener('click', closeAchievementsScreen);
+
+  if (btnResetData) {
+    btnResetData.addEventListener('click', () => {
+      playSE('confirm');
+      if (dataResetModal) dataResetModal.style.display = 'flex';
+    });
+  }
+
+  if (btnCancelReset) {
+    btnCancelReset.addEventListener('click', () => {
+      playSE('cancel');
+      if (dataResetModal) dataResetModal.style.display = 'none';
+    });
+  }
+
+  if (btnConfirmReset) {
+    btnConfirmReset.addEventListener('click', () => {
+      playSE('confirm');
+      localStorage.removeItem('runaction_save_v2');
+      localStorage.removeItem('runaction_highscore');
+      location.reload();
+    });
   }
 
   const STAGE_NAMES = {

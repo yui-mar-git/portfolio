@@ -9,6 +9,10 @@ export interface Card {
   element: 'fire' | 'ice' | 'thunder' | 'wind' | 'stone' | 'none';
   healSelf?: number;
   healPercent?: number;
+  cleanse?: boolean; // 状態異常・デバフ解除
+  fullHeal?: boolean; // HP全回復
+  regenHp?: number; // 毎ターンHP回復
+  regenMp?: number; // 毎ターンMP回復
   draw?: number;
   poison?: number;
   paralyze?: boolean; // 麻痺
@@ -31,43 +35,42 @@ export const CARD_DB: Record<string, Card> = {
     name: '攻撃',
     type: 'attack',
     category: 'physical',
-    cost: 0,
+    cost: 1,
     value: 1,
     desc: '敵に 1 ダメージ',
-    color: 'none',
+    color: 'red',
     element: 'none',
-    flavor: '手ごろな武器による基本の一撃。',
+    flavor: '基本にして万能の剣撃。',
   },
   smite: {
     id: 'smite',
     name: '強撃',
     type: 'attack',
     category: 'physical',
-    cost: 1,
+    cost: 2,
     value: 3,
     desc: '敵に 3 ダメージ',
-    color: 'none',
+    color: 'red',
     element: 'none',
-    flavor: '渾身の力を込めて打ち下ろす強烈な斬撃。',
+    flavor: '力を溜めて振り下ろす必殺の一撃。',
   },
   rush: {
     id: 'rush',
     name: '連撃',
     type: 'attack',
     category: 'physical',
-    cost: 1,
+    cost: 2,
     value: 1,
-    desc: '敵に 1×2 ダメージ',
-    color: 'none',
-    element: 'none',
     hits: 2,
-    flavor: '流れるような動作から放たれる連続の斬撃。',
+    desc: '敵に 1×2 ダメージ',
+    color: 'red',
+    element: 'none',
+    flavor: '目にも留まらぬ速さで繰り出される連続攻撃。',
   },
 
   // ===================================================
-  // 2. 呪文カード (Spell)
+  // 2. 攻撃呪文 (Spell Attacks)
   // ===================================================
-  // --- 属性攻撃 ---
   fire: {
     id: 'fire',
     name: '火炎',
@@ -78,31 +81,31 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'red',
     element: 'fire',
-    flavor: '灼熱の炎を生み出し、敵を焼き尽くす。',
+    flavor: '標的を包み込む灼熱の業火。',
   },
   ice: {
     id: 'ice',
     name: '冷気',
     type: 'attack',
     category: 'spell',
-    cost: 2,
-    value: 3,
-    desc: '敵に 3 ダメージ',
+    cost: 1,
+    value: 2,
+    desc: '敵に 2 ダメージ',
     color: 'blue',
     element: 'ice',
-    flavor: '極寒の冷気で敵を氷漬けにする。',
+    flavor: '凍てつく冷気で標的を凍結させる。',
   },
   wind: {
     id: 'wind',
     name: '迅風',
     type: 'attack',
     category: 'spell',
-    cost: 2,
-    value: 3,
-    desc: '敵に 3 ダメージ',
+    cost: 1,
+    value: 2,
+    desc: '敵に 2 ダメージ',
     color: 'green',
     element: 'wind',
-    flavor: '鋭利な風の刃で敵を切り裂く。',
+    flavor: '鋭利な風の刃で標的を切り裂く。',
   },
   stone: {
     id: 'stone',
@@ -114,14 +117,14 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'orange',
     element: 'stone',
-    flavor: '大地の岩石を隆起させて圧砕する。',
+    flavor: '大地の岩石を隆起させて圧殺する。',
   },
   thunder: {
     id: 'thunder',
     name: '雷撃',
     type: 'attack',
     category: 'spell',
-    cost: 3,
+    cost: 2,
     value: 2,
     desc: '敵に 2 ダメージ <br> 30%で麻痺付与',
     color: 'yellow',
@@ -129,7 +132,10 @@ export const CARD_DB: Record<string, Card> = {
     paralyze: true,
     flavor: '電気を放出して攻撃し、感電させる。',
   },
-  // --- 回復 ---
+
+  // ===================================================
+  // 3. 回復・支援呪文 (Healing & Support Spells)
+  // ===================================================
   heal: {
     id: 'heal',
     name: '快癒',
@@ -141,22 +147,51 @@ export const CARD_DB: Record<string, Card> = {
     color: 'white',
     element: 'none',
     healPercent: 0.3,
-    flavor: '聖なる光で創傷を瞬時に癒やす。',
+    flavor: '聖なる光で傷を瞬時に癒やす。',
   },
-  fortify: {
-    id: 'fortify',
-    name: '回復',
+  cure: {
+    id: 'cure',
+    name: '治癒',
     type: 'skill',
     category: 'spell',
-    cost: 3,
+    cost: 1,
     value: 0,
-    desc: 'HP+30%回復',
+    desc: '自分の状態異常とデバフを解除する',
     color: 'white',
     element: 'none',
-    healPercent: 0.3,
-    flavor: '生命の脈動を高めて体力を取り戻す。',
+    cleanse: true,
+    flavor: '清浄なる祈りによって毒や弱体効果を浄化する。',
   },
-  // --- バフ ---
+  regen_hp: {
+    id: 'regen_hp',
+    name: '徐々にHP回復',
+    type: 'skill',
+    category: 'spell',
+    cost: 2,
+    value: 0,
+    desc: 'この戦闘中、毎ターン開始時にHPが1回復する',
+    color: 'white',
+    element: 'none',
+    regenHp: 1,
+    flavor: '生命の脈動を活性化させ、持続的な回復をもたらす。',
+  },
+  regen_mp: {
+    id: 'regen_mp',
+    name: '徐々にMP回復',
+    type: 'skill',
+    category: 'spell',
+    cost: 2,
+    value: 0,
+    desc: 'この戦闘中、毎ターン開始時にMPが1回復する',
+    color: 'white',
+    element: 'none',
+    regenMp: 1,
+    flavor: '周囲の大気から魔力を吸い上げ、精神力を維持する。',
+  },
+
+  // ===================================================
+  // 4. バフ・デバフ・ドロー (Buffs & Utility)
+  // ===================================================
   buff_up: {
     id: 'buff_up',
     name: '能昇',
@@ -168,9 +203,8 @@ export const CARD_DB: Record<string, Card> = {
     color: 'white',
     element: 'none',
     buffUp: 3,
-    flavor: '魔力を体内に巡らせ、全能力を高める。',
+    flavor: '気合を高めて攻撃力と防御力を向上させる。',
   },
-  // --- デバフ ---
   buff_down: {
     id: 'buff_down',
     name: '能降',
@@ -184,7 +218,19 @@ export const CARD_DB: Record<string, Card> = {
     buffDown: 3,
     flavor: '呪詛を浴びせ、相手の戦意と防御を殺ぐ。',
   },
-  // --- 状態異常 ---
+  draw_card: {
+    id: 'draw_card',
+    name: 'ドロー',
+    type: 'skill',
+    category: 'special',
+    cost: 1,
+    value: 0,
+    desc: '行動回数を消費せず、<br>カードを 2 枚引く',
+    color: 'none',
+    element: 'none',
+    draw: 2,
+    flavor: '素早い思考で次の戦術を手繰り寄せる。',
+  },
   venom: {
     id: 'venom',
     name: '毒計',
@@ -192,10 +238,10 @@ export const CARD_DB: Record<string, Card> = {
     category: 'spell',
     cost: 2,
     value: 1,
+    poison: 1,
     desc: '敵に 1 ダメージ <br> 毒1 を付与',
     color: 'black',
     element: 'none',
-    poison: 1,
     flavor: '忍び寄る劇薬で敵の命を蝕む。',
   },
   dazzle: {
@@ -224,21 +270,8 @@ export const CARD_DB: Record<string, Card> = {
   },
 
   // ===================================================
-  // 3. 特殊カード (Special)
+  // 5. 特殊カード (Special)
   // ===================================================
-  draw_card: {
-    id: 'draw_card',
-    name: 'ドロー',
-    type: 'skill',
-    category: 'special',
-    cost: 1,
-    value: 0,
-    desc: '行動回数を消費せず、<br>カードを 2 枚引く',
-    color: 'none',
-    element: 'none',
-    draw: 2,
-    flavor: '素早い思考で次の戦術を手繰り寄せる。',
-  },
   meteor: {
     id: 'meteor',
     name: '流星群',
@@ -268,6 +301,21 @@ export const CARD_DB: Record<string, Card> = {
     oncePerBattle: true,
     flavor: '潜在能力を限界突破させ神域の領域に達する。',
   },
+  meditation: {
+    id: 'meditation',
+    name: '瞑想',
+    type: 'skill',
+    category: 'special',
+    cost: 3,
+    value: 0,
+    desc: 'HPを全回復し、状態異常とデバフを解除する (戦闘中1回のみ使用可能)',
+    color: 'white',
+    element: 'none',
+    fullHeal: true,
+    cleanse: true,
+    oncePerBattle: true,
+    flavor: '深い瞑想に入り、心身の傷と穢れを完全に消し去る。',
+  },
   drain: {
     id: 'drain',
     name: 'ドレイン',
@@ -290,7 +338,6 @@ export const CARD_DB: Record<string, Card> = {
     desc: '相手のバフを全解除し、1ターン行動不能＋水属性大ダメージ',
     color: 'blue',
     element: 'ice',
-    paralyze: true,
     flavor: 'リヴァイアサンが起こす深海の怒涛。',
   },
   ankoku_ken: {
@@ -317,12 +364,16 @@ export const REWARD_POOL = [
   'stone',
   'thunder',
   'venom',
-  'fortify',
+  'heal',
+  'cure',
+  'regen_hp',
+  'regen_mp',
   'draw_card',
   'buff_up',
   'buff_down',
   'meteor',
   'kakusei',
+  'meditation',
 ];
 
 // 初期デッキの定義 (12枚)
@@ -389,14 +440,11 @@ export const INITIAL_DECKS: Record<string, string[]> = {
   ],
 };
 
-/**
- * カードを強化(アップグレード)した時の性能変化を適用する関数
- */
+// 鍛冶屋でのカード強化用関数
 export function upgradeCard(card: Card): Card {
-  const currentCount = card.upgradeCount || 0;
-  if (currentCount >= 3) return card; // 最大強化済み
-
-  const upgradedCard = { ...card, upgraded: true, upgradeCount: currentCount + 1 };
+  const upgradedCard = { ...card };
+  upgradedCard.upgraded = true;
+  upgradedCard.upgradeCount = (card.upgradeCount || 0) + 1;
   upgradedCard.name = card.name + '+';
 
   const level = upgradedCard.upgradeCount!;
@@ -408,7 +456,23 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'heal':
       upgradedCard.healPercent = 0.5;
-      upgradedCard.desc = `HP +<span class="card-val-up">50%</span> 回復`;
+      upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
+      break;
+    case 'cure':
+      upgradedCard.cost = 0;
+      upgradedCard.desc = `自分の状態異常とデバフを解除する`;
+      break;
+    case 'regen_hp':
+      upgradedCard.cost = 1;
+      upgradedCard.desc = `この戦闘中、毎ターン開始時にHPが1回復する`;
+      break;
+    case 'regen_mp':
+      upgradedCard.cost = 1;
+      upgradedCard.desc = `この戦闘中、毎ターン開始時にMPが1回復する`;
+      break;
+    case 'meditation':
+      upgradedCard.cost = 2;
+      upgradedCard.desc = `HPを全回復し、状態異常とデバフを解除する (戦闘中1回のみ使用可能)`;
       break;
     case 'smite':
       upgradedCard.cost = 1;
@@ -450,10 +514,6 @@ export function upgradeCard(card: Card): Card {
       break;
     case 'silence':
       upgradedCard.desc = `相手を <span class="card-val-up">${2 + level}</span> ターンの間、<br>沈黙状態にする`;
-      break;
-    case 'fortify':
-      upgradedCard.healPercent = 0.5;
-      upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
       break;
     case 'draw_card':
       upgradedCard.cost = Math.max(0, upgradedCard.cost - 1);

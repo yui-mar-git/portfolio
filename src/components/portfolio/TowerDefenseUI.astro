@@ -18,23 +18,56 @@ const { gameTitle } = Astro.props;
     </p>
     <button id="start-btn" class="btn btn-primary start-btn-wide">スタート</button>
     <button id="howto-btn" class="btn btn-secondary start-btn-wide howto-margin">遊び方</button>
-    <button id="reset-save-btn" class="btn global-style-kk7pir">データリセット</button>
+    <div class="start-bottom-actions">
+      <button id="reset-save-btn" class="btn btn-sub-reset">データリセット</button>
+      <button id="achievements-btn" class="btn btn-sub-achieve">実績</button>
+    </div>
     <span id="start-config-btn" class="icon-config" title="コンフィグ">⚙️</span>
   </div>
 
-  <!-- Reset Confirm Modal -->
-  <div class="overlay modal-dim" id="reset-confirm-modal">
-    <div class="modal-inner global-style-ffw7dw">
-      <h2 class="modal-title global-style-70wgmu">データリセット</h2>
-      <div class="global-style-08fu0c">
-        <p>セーブデータを初期化しますか？</p>
-        <p class="global-style-6v7fck">この操作は取り消せません。</p>
+  <!-- Achievements Screen (Full Overlay Page) -->
+  <div id="achievements-screen" class="overlay achieve-page-overlay" style="display: none; z-index: 200;">
+    <div id="btn-back-achievements" class="global-back-btn" title="戻る">◀</div>
+    <div class="achievements-page-container">
+      <div class="achievements-page-header">
+        <h2 class="modal-title">実績</h2>
+        <div id="achievements-summary-box" class="achieve-summary-box"></div>
       </div>
-      <div class="global-style-bwkiby">
+      <div class="achieve-tab-bar" id="achieve-tab-bar">
+        <button class="achieve-tab active" data-tab="all">すべて</button>
+        <button class="achieve-tab" data-tab="stage">ステージ</button>
+        <button class="achieve-tab" data-tab="unit">ユニット</button>
+        <button class="achieve-tab" data-tab="base">拠点</button>
+        <button class="achieve-tab" data-tab="gold">ゴールド</button>
+      </div>
+      <div class="achieve-card-grid" id="achievements-card-grid"></div>
+    </div>
+  </div>
+
+  <!-- Achievement Detail Modal -->
+  <div id="achieve-detail-modal" class="overlay achieve-detail-overlay" style="display: none; z-index: 250;">
+    <div class="modal-inner achieve-detail-modal-inner">
+      <div id="achieve-detail-badge" class="achieve-detail-badge"></div>
+      <h3 id="achieve-detail-title" class="modal-title"></h3>
+      <div class="achieve-detail-box">
+        <div class="achieve-detail-label">【解放条件】</div>
+        <div id="achieve-detail-cond" class="achieve-detail-text"></div>
+        <div class="achieve-detail-label">【詳細・解説】</div>
+        <div id="achieve-detail-desc" class="achieve-detail-text"></div>
+      </div>
+      <button id="btn-achieve-detail-close" class="btn btn-secondary btn-full">閉じる</button>
+    </div>
+  </div>
+
+  <!-- Data Reset Confirm Modal -->
+  <div id="reset-confirm-modal" class="overlay data-reset-modal-overlay" style="display: none; z-index: 200;">
+    <div class="modal-inner data-reset-modal-card">
+      <h2 class="modal-title reset-modal-title">データリセット</h2>
+      <p class="reset-modal-desc">セーブデータおよび実績の解禁状況を初期化しますか？</p>
+      <p class="reset-modal-warning">※この操作は取り消せません。</p>
+      <div class="reset-modal-btn-row">
         <button id="btn-reset-cancel" class="btn btn-secondary">キャンセル</button>
-        <button id="btn-reset-execute" class="btn btn-primary global-style-up1w8h"
-          >リセットする</button
-        >
+        <button id="btn-reset-execute" class="btn btn-danger">リセットする</button>
       </div>
     </div>
   </div>
@@ -1043,6 +1076,64 @@ const { gameTitle } = Astro.props;
     }
     .global-style-wtvhhc {
       padding-left: 3.5rem;
+    }
+
+    /* TD固有: 旧実績リスト形式（統計表示用） */
+    .achieve-stats-group {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .achieve-stat-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      padding: 3px 0;
+    }
+    .achieve-stat-item strong {
+      color: #fbbf24;
+    }
+    .achieve-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .achieve-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .achieve-item.unlocked {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+    }
+    .achieve-item.locked {
+      opacity: 0.45;
+    }
+    .achieve-icon {
+      font-size: 1.4rem;
+    }
+    .achieve-info {
+      text-align: left;
+    }
+    .achieve-name {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #f8fafc;
+    }
+    .achieve-desc {
+      font-size: 0.72rem;
+      color: #94a3b8;
     }
   </style>
 </div>

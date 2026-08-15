@@ -16,6 +16,8 @@ import seDamage from '../../assets/games/retro-shooting/audio/se/ニュッ2.mp3'
 import seJump from '../../assets/games/retro-shooting/audio/se/パパッ.mp3';
 
 import bgmMain from '../../assets/games/retro-shooting/audio/bgm/maou_game_town26.mp3';
+import { STG_ACHIEVEMENTS } from '../../data/retro-shooting/achievements';
+import { getWaveConfig, ENEMY_SCORES } from '../../data/retro-shooting/waves';
 
 const STORAGE_KEY = 'stg_high_score';
 let highScore = 0;
@@ -391,40 +393,19 @@ class MainScene extends Phaser.Scene {
 
     this.invaderDir = 1;
 
-    // WAVEごとの敵バランス調整
-    let rows = 4;
-    let cols = 8;
-    if (wave === 1) {
-      rows = 3;
-      cols = 6;
-      this.invaderSpeedX = 35;
-    } else if (wave === 2) {
-      rows = 4;
-      cols = 7;
-      this.invaderSpeedX = 50;
-    } else if (wave === 3) {
-      rows = 4;
-      cols = 8;
-      this.invaderSpeedX = 65;
-    } else {
-      rows = 4;
-      cols = 8;
-      this.invaderSpeedX = 65 + (wave - 3) * 10;
-    }
+    const config = getWaveConfig(wave);
+    this.invaderSpeedX = config.invaderSpeedX;
 
-    const spacingX = 65;
-    const spacingY = 45;
-    const startX = (800 - cols * spacingX) / 2 + 25;
-    const startY = 80;
+    const startX = (800 - config.cols * config.spacingX) / 2 + 25;
 
-    for (let r = 0; r < rows; r++) {
+    for (let r = 0; r < config.rows; r++) {
       const textureKey = r % 2 === 0 ? 'enemy_type_a' : 'enemy_type_b';
-      const points = r % 2 === 0 ? 100 : 50;
+      const points = ENEMY_SCORES[textureKey] || (r % 2 === 0 ? 100 : 50);
 
-      for (let c = 0; c < cols; c++) {
+      for (let c = 0; c < config.cols; c++) {
         const invader = this.enemies.create(
-          startX + c * spacingX,
-          startY + r * spacingY,
+          startX + c * config.spacingX,
+          config.startY + r * config.spacingY,
           textureKey,
         );
         invader.body.setAllowGravity(false);
@@ -897,13 +878,127 @@ if (closeCfgBtn) {
   });
 }
 
-const modalOverlay = document.getElementById('modal-overlay');
-if (modalOverlay) {
-  modalOverlay.addEventListener('click', () => {
-    if (typeof game !== 'undefined') {
-      const scene = game.scene.getScene('MainScene');
-      if (scene && scene.scene.isPaused()) scene.scene.resume();
-    }
+let currentStgAchieveTab = 'all';
+
+function openStgAchieveDetail(item) {
+  const modal = document.getElementById('achieve-detail-modal');
+  const badge = document.getElementById('achieve-detail-badge');
+  const title = document.getElementById('achieve-detail-title');
+  const cond = document.getElementById('achieve-detail-cond');
+  const desc = document.getElementById('achieve-detail-desc');
+  if (!modal) return;
+
+  const unlocked = item.isUnlocked(highScore);
+
+  if (badge) {
+    badge.textContent = unlocked ? '達成済み' : '未達成';
+    badge.className = `achieve-detail-badge ${unlocked ? 'unlocked' : 'locked'}`;
+  }
+  if (title) title.textContent = unlocked ? item.title : '？？？';
+  if (cond) cond.textContent = item.cond;
+  if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+
+  playSE('confirm');
+  modal.style.display = 'flex';
+}
+
+function renderStgAchievements() {
+  const cardGrid = document.getElementById('achievements-card-grid');
+  const summaryBox = document.getElementById('achievements-summary-box');
+  if (!cardGrid) return;
+
+  const totalCount = STG_ACHIEVEMENTS.length;
+  const unlockedCount = STG_ACHIEVEMENTS.filter(a => a.isUnlocked(highScore)).length;
+
+  if (summaryBox) {
+    summaryBox.innerHTML = `達成度: <strong>${unlockedCount} / ${totalCount}</strong> (${Math.round((unlockedCount / totalCount) * 100)}%) | 最高ハイスコア: <strong>${highScore} PTS</strong>`;
+  }
+
+  const filtered = STG_ACHIEVEMENTS.filter(a => currentStgAchieveTab === 'all' || a.cat === currentStgAchieveTab);
+
+  cardGrid.innerHTML = filtered.map(a => {
+    const unlocked = a.isUnlocked(highScore);
+    return `
+      <div class="achieve-card ${unlocked ? 'unlocked' : 'locked'}" data-id="${a.id}">
+        <div class="achieve-card-badge">${unlocked ? '達成済み' : '未達成'}</div>
+        <div class="achieve-card-title">${unlocked ? a.title : '？？？'}</div>
+      </div>
+    `;
+  }).join('');
+
+  cardGrid.querySelectorAll('.achieve-card').forEach(cardEl => {
+    cardEl.addEventListener('click', () => {
+      const id = cardEl.dataset.id;
+      const targetItem = STG_ACHIEVEMENTS.find(item => item.id === id);
+      if (targetItem) openStgAchieveDetail(targetItem);
+    });
+  });
+}
+
+const btnOpenAchievements = document.getElementById('btn-open-achievements');
+const achievementsScreen = document.getElementById('achievements-screen');
+const btnCloseAchievements = document.getElementById('btn-close-achievements');
+const btnBackAchievements = document.getElementById('btn-back-achievements');
+const btnAchieveDetailClose = document.getElementById('btn-achieve-detail-close');
+
+const btnResetData = document.getElementById('btn-reset-data');
+const dataResetModal = document.getElementById('data-reset-modal');
+const btnCancelReset = document.getElementById('btn-cancel-reset');
+const btnConfirmReset = document.getElementById('btn-confirm-reset');
+
+if (btnOpenAchievements) {
+  btnOpenAchievements.addEventListener('click', () => {
+    playSE('confirm');
+    renderStgAchievements();
+    if (achievementsScreen) achievementsScreen.style.display = 'flex';
+  });
+}
+
+document.querySelectorAll('#stg-achieve-tab-bar .achieve-tab').forEach(tabBtn => {
+  tabBtn.addEventListener('click', (e) => {
+    playSE('confirm');
+    document.querySelectorAll('#stg-achieve-tab-bar .achieve-tab').forEach(b => b.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    currentStgAchieveTab = e.currentTarget.dataset.tab;
+    renderStgAchievements();
+  });
+});
+
+if (btnAchieveDetailClose) {
+  btnAchieveDetailClose.addEventListener('click', () => {
+    playSE('cancel');
+    const modal = document.getElementById('achieve-detail-modal');
+    if (modal) modal.style.display = 'none';
+  });
+}
+
+function closeAchievementsScreen() {
+  playSE('cancel');
+  if (achievementsScreen) achievementsScreen.style.display = 'none';
+}
+
+if (btnCloseAchievements) btnCloseAchievements.addEventListener('click', closeAchievementsScreen);
+if (btnBackAchievements) btnBackAchievements.addEventListener('click', closeAchievementsScreen);
+
+if (btnResetData) {
+  btnResetData.addEventListener('click', () => {
+    playSE('confirm');
+    if (dataResetModal) dataResetModal.style.display = 'flex';
+  });
+}
+
+if (btnCancelReset) {
+  btnCancelReset.addEventListener('click', () => {
+    playSE('cancel');
+    if (dataResetModal) dataResetModal.style.display = 'none';
+  });
+}
+
+if (btnConfirmReset) {
+  btnConfirmReset.addEventListener('click', () => {
+    playSE('confirm');
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
   });
 }
 
