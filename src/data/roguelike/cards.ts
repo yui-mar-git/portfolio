@@ -8,6 +8,7 @@ export interface Card {
   color: 'white' | 'black' | 'red' | 'blue' | 'green' | 'orange' | 'yellow' | 'purple' | 'none';
   element: 'fire' | 'ice' | 'thunder' | 'wind' | 'stone' | 'none';
   healSelf?: number;
+  healPercent?: number;
   draw?: number;
   poison?: number;
   paralyze?: boolean; // 麻痺
@@ -22,7 +23,9 @@ export interface Card {
 }
 
 export const CARD_DB: Record<string, Card> = {
-  // ===== 基本カード =====
+  // ===================================================
+  // 1. 物理カード (Physical)
+  // ===================================================
   strike: {
     id: 'strike',
     name: '攻撃',
@@ -33,20 +36,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 1 ダメージ',
     color: 'none',
     element: 'none',
-    flavor: 'フレーバーテキスト準備中',
-  },
-  heal: {
-    id: 'heal',
-    name: '快癒',
-    type: 'skill',
-    category: 'spell',
-    cost: 2,
-    value: 0,
-    desc: 'HP+30%回復',
-    color: 'white',
-    element: 'none',
-    healPercent: 0.3,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '手ごろな武器による基本の一撃。',
   },
   smite: {
     id: 'smite',
@@ -58,7 +48,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'none',
     element: 'none',
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '渾身の力を込めて打ち下ろす強烈な斬撃。',
   },
   rush: {
     id: 'rush',
@@ -71,10 +61,13 @@ export const CARD_DB: Record<string, Card> = {
     color: 'none',
     element: 'none',
     hits: 2,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '流れるような動作から放たれる連続の斬撃。',
   },
 
-  // ===== 呪文カード =====
+  // ===================================================
+  // 2. 呪文カード (Spell)
+  // ===================================================
+  // --- 属性攻撃 ---
   fire: {
     id: 'fire',
     name: '火炎',
@@ -85,7 +78,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'red',
     element: 'fire',
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '灼熱の炎を生み出し、敵を焼き尽くす。',
   },
   ice: {
     id: 'ice',
@@ -97,7 +90,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'blue',
     element: 'ice',
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '極寒の冷気で敵を氷漬けにする。',
   },
   wind: {
     id: 'wind',
@@ -109,7 +102,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'green',
     element: 'wind',
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '鋭利な風の刃で敵を切り裂く。',
   },
   stone: {
     id: 'stone',
@@ -121,7 +114,7 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 3 ダメージ',
     color: 'orange',
     element: 'stone',
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '大地の岩石を隆起させて圧砕する。',
   },
   thunder: {
     id: 'thunder',
@@ -133,23 +126,22 @@ export const CARD_DB: Record<string, Card> = {
     desc: '敵に 2 ダメージ <br> 30%で麻痺付与',
     color: 'yellow',
     element: 'thunder',
-    paralyze: true, //
-    flavor: 'フレーバーテキスト準備中',
+    paralyze: true,
+    flavor: '電気を放出して攻撃し、感電させる。',
   },
-
-  // ===== バフ・デバフ・状態異常 =====
-  venom: {
-    id: 'venom',
-    name: '毒計',
-    type: 'attack',
+  // --- 回復 ---
+  heal: {
+    id: 'heal',
+    name: '快癒',
+    type: 'skill',
     category: 'spell',
     cost: 2,
-    value: 1,
-    desc: '敵に 1 ダメージ <br> 毒1 を付与',
-    color: 'black',
+    value: 0,
+    desc: 'HP+30%回復',
+    color: 'white',
     element: 'none',
-    poison: 1,
-    flavor: 'フレーバーテキスト準備中',
+    healPercent: 0.3,
+    flavor: '聖なる光で創傷を瞬時に癒やす。',
   },
   fortify: {
     id: 'fortify',
@@ -162,21 +154,9 @@ export const CARD_DB: Record<string, Card> = {
     color: 'white',
     element: 'none',
     healPercent: 0.3,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '生命の脈動を高めて体力を取り戻す。',
   },
-  draw_card: {
-    id: 'draw_card',
-    name: 'ドロー',
-    type: 'skill',
-    category: 'special',
-    cost: 1,
-    value: 0,
-    desc: '行動回数を消費せず、<br>カードを 2 枚引く',
-    color: 'none',
-    element: 'none',
-    draw: 2,
-    flavor: 'フレーバーテキスト準備中',
-  },
+  // --- バフ ---
   buff_up: {
     id: 'buff_up',
     name: '能昇',
@@ -188,8 +168,9 @@ export const CARD_DB: Record<string, Card> = {
     color: 'white',
     element: 'none',
     buffUp: 3,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '魔力を体内に巡らせ、全能力を高める。',
   },
+  // --- デバフ ---
   buff_down: {
     id: 'buff_down',
     name: '能降',
@@ -201,10 +182,63 @@ export const CARD_DB: Record<string, Card> = {
     color: 'black',
     element: 'none',
     buffDown: 3,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '呪詛を浴びせ、相手の戦意と防御を殺ぐ。',
+  },
+  // --- 状態異常 ---
+  venom: {
+    id: 'venom',
+    name: '毒計',
+    type: 'attack',
+    category: 'spell',
+    cost: 2,
+    value: 1,
+    desc: '敵に 1 ダメージ <br> 毒1 を付与',
+    color: 'black',
+    element: 'none',
+    poison: 1,
+    flavor: '忍び寄る劇薬で敵の命を蝕む。',
+  },
+  dazzle: {
+    id: 'dazzle',
+    name: '幻惑',
+    type: 'skill',
+    category: 'spell',
+    cost: 2,
+    value: 0,
+    desc: '相手を 2 ターンの間、<br>幻惑状態にする',
+    color: 'purple',
+    element: 'none',
+    flavor: '妖しい光で敵の正気を奪い錯乱させる。',
+  },
+  silence: {
+    id: 'silence',
+    name: '沈黙',
+    type: 'skill',
+    category: 'spell',
+    cost: 2,
+    value: 0,
+    desc: '相手を 2 ターンの間、<br>沈黙状態にする',
+    color: 'black',
+    element: 'none',
+    flavor: '静寂の結界を張り、詠唱を完全遮断する。',
   },
 
-  // ===== スペシャルカード =====
+  // ===================================================
+  // 3. 特殊カード (Special)
+  // ===================================================
+  draw_card: {
+    id: 'draw_card',
+    name: 'ドロー',
+    type: 'skill',
+    category: 'special',
+    cost: 1,
+    value: 0,
+    desc: '行動回数を消費せず、<br>カードを 2 枚引く',
+    color: 'none',
+    element: 'none',
+    draw: 2,
+    flavor: '素早い思考で次の戦術を手繰り寄せる。',
+  },
   meteor: {
     id: 'meteor',
     name: '流星群',
@@ -217,7 +251,7 @@ export const CARD_DB: Record<string, Card> = {
     color: 'purple',
     element: 'none',
     oncePerBattle: true,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '天より降り注ぐ四属性の大流星。',
   },
   kakusei: {
     id: 'kakusei',
@@ -232,7 +266,44 @@ export const CARD_DB: Record<string, Card> = {
     buffUp: 5,
     buffDown: 5,
     oncePerBattle: true,
-    flavor: 'フレーバーテキスト準備中',
+    flavor: '潜在能力を限界突破させ神域の領域に達する。',
+  },
+  drain: {
+    id: 'drain',
+    name: 'ドレイン',
+    type: 'attack',
+    category: 'special',
+    cost: 2,
+    value: 4,
+    desc: '敵の生気を吸い取り、与えたダメージ分自身のHPを回復する',
+    color: 'red',
+    element: 'none',
+    flavor: 'ヴァンパイアの秘術。血肉を喰らい生命を奪う。',
+  },
+  daikaisho: {
+    id: 'daikaisho',
+    name: '大海嘯',
+    type: 'attack',
+    category: 'special',
+    cost: 3,
+    value: 6,
+    desc: '相手のバフを全解除し、1ターン行動不能＋水属性大ダメージ',
+    color: 'blue',
+    element: 'ice',
+    paralyze: true,
+    flavor: 'リヴァイアサンが起こす深海の怒涛。',
+  },
+  ankoku_ken: {
+    id: 'ankoku_ken',
+    name: '暗黒剣',
+    type: 'attack',
+    category: 'special',
+    cost: 3,
+    value: 0,
+    desc: '相手の現在HPを半分(50%)にする魔王の絶望の一撃',
+    color: 'black',
+    element: 'none',
+    flavor: '魔王の暗黒闘気が対象の命運を問答無用で半減させる。',
   },
 };
 
@@ -328,8 +399,6 @@ export function upgradeCard(card: Card): Card {
   const upgradedCard = { ...card, upgraded: true, upgradeCount: currentCount + 1 };
   upgradedCard.name = card.name + '+';
 
-  // 強化回数に応じたスケール計算関数（初期強化幅 = n）
-  // 1回目(currentCount=0)は n、2回目は n*2、3回目は n*3 だけ基礎値に加算される
   const level = upgradedCard.upgradeCount!;
 
   switch (card.id) {
@@ -376,6 +445,12 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.poison = 1 + 1 * level;
       upgradedCard.desc = `敵に <span class="card-val-up">${upgradedCard.value}</span> ダメージ <br> 毒<span class="card-val-up">${upgradedCard.poison}</span> を付与`;
       break;
+    case 'dazzle':
+      upgradedCard.desc = `相手を <span class="card-val-up">${2 + level}</span> ターンの間、<br>幻惑状態にする`;
+      break;
+    case 'silence':
+      upgradedCard.desc = `相手を <span class="card-val-up">${2 + level}</span> ターンの間、<br>沈黙状態にする`;
+      break;
     case 'fortify':
       upgradedCard.healPercent = 0.5;
       upgradedCard.desc = `HP+<span class="card-val-up">50%</span>回復`;
@@ -386,12 +461,12 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.desc = `行動回数を消費せず、<br>カードを <span class="card-val-up">${upgradedCard.draw}</span> 枚引く`;
       break;
     case 'buff_up':
-      upgradedCard.cost = 0; // コストが0に減少
-      upgradedCard.buffUp = 3 + 1 * (level - 1); // 2回目以降で効果ターン増
+      upgradedCard.cost = 0;
+      upgradedCard.buffUp = 3 + 1 * (level - 1);
       upgradedCard.desc = `自分は <span class="card-val-up">${upgradedCard.buffUp}</span> ターンの間、<br>与ダメージ +1、被ダメージ -1`;
       break;
     case 'buff_down':
-      upgradedCard.cost = 0; // コストが0に減少
+      upgradedCard.cost = 0;
       upgradedCard.buffDown = 3 + 1 * (level - 1);
       upgradedCard.desc = `敵は <span class="card-val-up">${upgradedCard.buffDown}</span> ターンの間、<br>与ダメージ -1、被ダメージ +1`;
       break;
@@ -403,6 +478,17 @@ export function upgradeCard(card: Card): Card {
       upgradedCard.buffUp = 5 + level;
       upgradedCard.buffDown = 5 + level;
       upgradedCard.desc = `自分に能昇を <span class="card-val-up">${upgradedCard.buffUp}</span> ターン、敵に能降を <span class="card-val-up">${upgradedCard.buffDown}</span> ターン付与する (戦闘中1回のみ使用可能)`;
+      break;
+    case 'drain':
+      upgradedCard.value = 4 + 2 * level;
+      upgradedCard.desc = `敵の生気を吸い取り、与えた <span class="card-val-up">${upgradedCard.value}</span> ダメージ分自身のHPを回復する`;
+      break;
+    case 'daikaisho':
+      upgradedCard.value = 6 + 3 * level;
+      upgradedCard.desc = `相手のバフを全解除し、1ターン行動不能＋水属性大ダメージ(<span class="card-val-up">${upgradedCard.value}</span>)`;
+      break;
+    case 'ankoku_ken':
+      upgradedCard.desc = `相手の現在HPを半分(50%)にする魔王の絶望の一撃`;
       break;
   }
   return upgradedCard;

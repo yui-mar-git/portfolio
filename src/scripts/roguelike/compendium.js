@@ -137,7 +137,7 @@ export function renderCompendium() {
       if (isUnlocked && makeCardElFn) {
         const cardEl = makeCardElFn(card, () => {
           if (window.playSE) window.playSE('cursor');
-          if (showCardDetailModalFn) showCardDetailModalFn(card);
+          if (showCardDetailModalFn) showCardDetailModalFn(card, true);
         });
         grid.appendChild(cardEl);
       } else {
@@ -170,15 +170,14 @@ export function renderCompendium() {
       const cardEl = document.createElement('div');
 
       if (isUnlocked) {
-        cardEl.className = 'battle-card reward-card';
-        cardEl.style.borderColor = '#60a5fa';
+        cardEl.className = 'battle-card reward-card comp-item-card';
         cardEl.innerHTML = `
-          <div class="card-cost card-cost-custom" style="background:#2563eb;">具</div>
-          <div style="text-align:center; margin: 4px 0;">
-            <img src="${item.image}" alt="${item.name}" style="width:28px; height:28px; object-fit:contain;" />
+          <div class="card-cost comp-item-badge">具</div>
+          <div class="comp-item-img-wrap">
+            <img src="${item.image}" alt="${item.name}" class="comp-item-img" />
           </div>
-          <div class="card-name card-name-custom" style="font-size:0.75rem;">${item.name}</div>
-          <div class="card-desc card-desc-custom" style="font-size:0.65rem;">${item.desc}</div>
+          <div class="card-name comp-item-name">${item.name}</div>
+          <div class="card-desc comp-item-desc">${item.desc}</div>
         `;
         cardEl.addEventListener('click', () => {
           if (window.playSE) window.playSE('cursor');
@@ -211,15 +210,14 @@ export function renderCompendium() {
       const cardEl = document.createElement('div');
 
       if (isUnlocked) {
-        cardEl.className = 'battle-card reward-card';
-        cardEl.style.borderColor = '#f59e0b';
+        cardEl.className = 'battle-card reward-card comp-relic-card';
         cardEl.innerHTML = `
-          <div class="card-cost card-cost-custom" style="background:#d97706;">宝</div>
-          <div style="text-align:center; margin: 4px 0;">
-            <img src="${relic.image}" alt="${relic.name}" style="width:28px; height:28px; object-fit:contain;" />
+          <div class="card-cost comp-relic-badge">宝</div>
+          <div class="comp-relic-img-wrap">
+            <img src="${relic.image}" alt="${relic.name}" class="comp-relic-img" />
           </div>
-          <div class="card-name card-name-custom" style="font-size:0.75rem;">${relic.name}</div>
-          <div class="card-desc card-desc-custom" style="font-size:0.65rem;">${relic.desc}</div>
+          <div class="card-name comp-relic-name">${relic.name}</div>
+          <div class="card-desc comp-relic-desc">${relic.desc}</div>
         `;
         cardEl.addEventListener('click', () => {
           if (window.playSE) window.playSE('cursor');
@@ -254,12 +252,15 @@ export function renderCompendium() {
       if (isUnlocked) {
         cardEl.className = 'battle-card reward-card comp-monster-card';
         cardEl.innerHTML = `
-          <div class="card-cost comp-monster-badge">獣</div>
+          <div class="card-cost comp-monster-badge">敵</div>
           <div class="comp-monster-img-wrap">
             <img src="${monster.image}" alt="${monster.name}" class="comp-monster-img" />
           </div>
           <div class="card-name comp-monster-name">${monster.name}</div>
-          <div class="card-desc comp-monster-stats">HP: ${monster.hp} / ${monster.exp}G</div>
+          <div class="card-desc comp-monster-stats">
+            <div class="comp-stat-line"><span>HP:</span><strong>${monster.hp}</strong></div>
+            <div class="comp-stat-line"><span>G:</span><strong>${monster.rewardGold}</strong></div>
+          </div>
         `;
         cardEl.addEventListener('click', () => {
           if (window.playSE) window.playSE('cursor');
@@ -286,6 +287,14 @@ const ELEMENT_NAMES = {
   stone: '🪨土',
 };
 
+const STATUS_NAMES = {
+  poison: '🟢毒',
+  paralyze: '⚡麻痺',
+  dazzle: '👁️幻惑',
+  silence: '🔇沈黙',
+  buff_down: '📉能降',
+};
+
 export function showMonsterDetailModal(monster) {
   const monsterDetailModal = document.getElementById('monster-detail-modal');
   if (!monsterDetailModal) return;
@@ -297,27 +306,36 @@ export function showMonsterDetailModal(monster) {
   const mdWeakness = document.getElementById('md-weakness');
   const mdResistance = document.getElementById('md-resistance');
   const mdImmunity = document.getElementById('md-immunity');
+  const mdAbsorption = document.getElementById('md-absorption');
+
+  const mdStatusSure = document.getElementById('md-status-sure');
+  const mdStatusWeak = document.getElementById('md-status-weak');
+  const mdStatusRes = document.getElementById('md-status-res');
+  const mdStatusImm = document.getElementById('md-status-imm');
+
   const mdSkills = document.getElementById('md-skills');
   const mdFlavor = document.getElementById('md-flavor');
 
   if (mdImage) mdImage.src = monster.image;
   if (mdName) mdName.textContent = monster.name;
   if (mdHp) mdHp.textContent = monster.hp;
-  if (mdExp) mdExp.textContent = monster.exp;
+  if (mdExp) mdExp.textContent = monster.rewardGold;
 
-  const weakText = monster.weaknesses.length
-    ? monster.weaknesses.map((w) => ELEMENT_NAMES[w] || w).join(', ')
-    : 'なし';
-  const resText = monster.resistances.length
-    ? monster.resistances.map((r) => ELEMENT_NAMES[r] || r).join(', ')
-    : 'なし';
-  const immText = monster.immunities.length
-    ? monster.immunities.map((i) => ELEMENT_NAMES[i] || i).join(', ')
-    : 'なし';
+  const formatElems = (arr) =>
+    arr && arr.length ? arr.map((w) => ELEMENT_NAMES[w] || w).join(', ') : 'なし';
 
-  if (mdWeakness) mdWeakness.textContent = weakText;
-  if (mdResistance) mdResistance.textContent = resText;
-  if (mdImmunity) mdImmunity.textContent = immText;
+  const formatStatuses = (arr) =>
+    arr && arr.length ? arr.map((s) => STATUS_NAMES[s] || s).join(', ') : 'なし';
+
+  if (mdWeakness) mdWeakness.textContent = formatElems(monster.weaknesses);
+  if (mdResistance) mdResistance.textContent = formatElems(monster.resistances);
+  if (mdImmunity) mdImmunity.textContent = formatElems(monster.immunities);
+  if (mdAbsorption) mdAbsorption.textContent = formatElems(monster.absorptions);
+
+  if (mdStatusSure) mdStatusSure.textContent = formatStatuses(monster.statusSureHit);
+  if (mdStatusWeak) mdStatusWeak.textContent = formatStatuses(monster.statusWeaknesses);
+  if (mdStatusRes) mdStatusRes.textContent = formatStatuses(monster.statusResistances);
+  if (mdStatusImm) mdStatusImm.textContent = formatStatuses(monster.statusImmunities);
 
   if (mdSkills) {
     mdSkills.innerHTML = monster.skills

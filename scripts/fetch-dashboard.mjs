@@ -32,7 +32,7 @@ const LAW_POOLS = {
   it_security: {
     categoryName: 'IT・セキュリティ系',
     laws: [
-      { id: '426AC0000000104', name: 'サイバーセキュリティ基本法' },
+      { id: '426AC1000000104', name: 'サイバーセキュリティ基本法' },
       { id: '411AC0000000128', name: '不正アクセス禁止法' },
       { id: '413AC0000000137', name: 'プロバイダ責任制限法' },
       { id: '415AC0000000057', name: '個人情報保護法' },
@@ -185,13 +185,17 @@ async function fetch5DomainLaws() {
 
   // 1〜4. 4つのプールから指定順（基本法系(六法) ➔ 知的財産・コンテンツ系 ➔ ITセキュリティ ➔ ビジネス・不動産系）で各1つずつ抽出
   for (const [poolKey, pool] of Object.entries(LAW_POOLS)) {
-    const available = pool.laws.filter((l) => !usedLawIds.has(l.id));
-    if (available.length === 0) continue;
-    const pickedLaw = available[Math.floor(Math.random() * available.length)];
-    const article = await fetchSingleArticle(pickedLaw, pool.categoryName);
-    if (article) {
-      results.push(article);
-      usedLawIds.add(pickedLaw.id);
+    let available = pool.laws.filter((l) => !usedLawIds.has(l.id));
+    while (available.length > 0) {
+      const idx = Math.floor(Math.random() * available.length);
+      const pickedLaw = available[idx];
+      const article = await fetchSingleArticle(pickedLaw, pool.categoryName);
+      if (article) {
+        results.push(article);
+        usedLawIds.add(pickedLaw.id);
+        break;
+      }
+      available.splice(idx, 1);
     }
   }
 

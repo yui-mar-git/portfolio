@@ -17,7 +17,7 @@ import {
 import { TOOLTIP_DB } from '../../data/roguelike/tooltips';
 
 // ===================================================
-// Audio コストger
+// Audio マネージャー
 // ===================================================
 const BGM_PATH = new URL('../../assets/games/roguelike/audio/bgm/', import.meta.url).href;
 const SE_PATH = new URL('../../assets/games/roguelike/audio/se/', import.meta.url).href;
@@ -656,16 +656,11 @@ if (btnCloseCardDetail) {
   });
 }
 
-function showCardDetailModal(card) {
+function showCardDetailModal(card, isCompendium = false) {
   if (!cardDetailModal) return;
   hideTooltipPopup();
   cardDetailContent.innerHTML = '';
-  const cardEl = makeCardEl(card, false);
-  cardEl.style.transform = 'scale(1.3)';
-  cardEl.style.transformOrigin = 'center top';
-  cardEl.style.cursor = 'default';
-  cardDetailContent.appendChild(cardEl);
-  const descHtml = (card.desc || '').replace(/\n/g, '<br>');
+
   const catLabelMap = {
     physical: '<span class="badge-physical">【物理】</span>',
     spell: '<span class="badge-spell">【呪文】</span>',
@@ -674,45 +669,111 @@ function showCardDetailModal(card) {
   const catPrefix =
     card.category && catLabelMap[card.category] ? `${catLabelMap[card.category]} ` : '';
   const flavorHtml = `<div class="card-flavor-text">${card.flavor || 'フレーバーテキスト準備中'}</div>`;
-  cardDetailDesc.innerHTML = `<div class="card-desc-container">${catPrefix}${descHtml}</div>${flavorHtml}`;
 
-  // 上部カテゴリバッジのツールチップ紐付け
-  const catBadge = cardEl.querySelector('.card-category-badge');
-  if (catBadge && card.category) {
-    attachTooltipToElement(catBadge, card.category);
+  const tagKeyMap = {
+    物理: 'physical',
+    呪文: 'spell',
+    特殊: 'special',
+    炎: 'fire',
+    氷: 'ice',
+    雷: 'thunder',
+    風: 'wind',
+    土: 'stone',
+    毒: 'poison',
+    麻痺: 'paralyze',
+    能昇: 'buff_up',
+    能降: 'buff_down',
+    回復: 'heal',
+    無: 'none',
+  };
+
+  const bindTooltips = (containerEl) => {
+    const catBadge = containerEl.querySelector('.card-category-badge');
+    if (catBadge && card.category) {
+      attachTooltipToElement(catBadge, card.category);
+    }
+    const tagElements = containerEl.querySelectorAll('.card-tag');
+    tagElements.forEach((tagEl) => {
+      const text = tagEl.textContent.trim();
+      const key = tagKeyMap[text];
+      if (key) attachTooltipToElement(tagEl, key);
+    });
+  };
+
+  if (isCompendium) {
+    // 図鑑閲覧時のみ：強化前と強化後(+)を横並び比較表示
+    const wrap = document.createElement('div');
+    wrap.className = 'comp-compare-wrap';
+
+    // 強化前
+    const colBefore = document.createElement('div');
+    colBefore.className = 'comp-compare-col';
+    const labelBefore = document.createElement('span');
+    labelBefore.className = 'comp-compare-label-before';
+    labelBefore.textContent = '【強化前】';
+    const cardBeforeEl = makeCardEl(card, false);
+    cardBeforeEl.classList.add('comp-card-preview');
+    colBefore.appendChild(labelBefore);
+    colBefore.appendChild(cardBeforeEl);
+
+    // 矢印
+    const arrowEl = document.createElement('div');
+    arrowEl.className = 'comp-compare-arrow';
+    arrowEl.textContent = '➔';
+
+    // 強化後(+)
+    const baseCard = CARD_DB[card.id] || card;
+    const upgradedObj = upgradeCard({ ...baseCard });
+    const colAfter = document.createElement('div');
+    colAfter.className = 'comp-compare-col';
+    const labelAfter = document.createElement('span');
+    labelAfter.className = 'comp-compare-label-after';
+    labelAfter.textContent = '【強化後+】';
+    const cardAfterEl = makeCardEl(upgradedObj, false);
+    cardAfterEl.classList.add('comp-card-preview');
+    colAfter.appendChild(labelAfter);
+    colAfter.appendChild(cardAfterEl);
+
+    wrap.appendChild(colBefore);
+    wrap.appendChild(arrowEl);
+    wrap.appendChild(colAfter);
+
+    cardDetailContent.appendChild(wrap);
+
+    const descHtmlBefore = (card.desc || '').replace(/\n/g, '<br>');
+    const descHtmlAfter = (upgradedObj.desc || '').replace(/\n/g, '<br>');
+
+    cardDetailDesc.innerHTML = `
+      <div class="card-desc-container comp-compare-desc">
+        ${catPrefix}<br>
+        <strong>強化前：</strong> ${descHtmlBefore}<br>
+        <strong class="comp-label-after">強化後：</strong> ${descHtmlAfter}
+      </div>
+      ${flavorHtml}
+    `;
+
+    bindTooltips(cardBeforeEl);
+    bindTooltips(cardAfterEl);
+  } else {
+    // 通常の単体カード詳細表示（バトル・ショップ・報酬画面）
+    const cardEl = makeCardEl(card, false);
+    cardEl.style.transform = 'scale(1.3)';
+    cardEl.style.transformOrigin = 'center top';
+    cardEl.style.cursor = 'default';
+    cardDetailContent.appendChild(cardEl);
+
+    const descHtml = (card.desc || '').replace(/\n/g, '<br>');
+    cardDetailDesc.innerHTML = `<div class="card-desc-container">${catPrefix}${descHtml}</div>${flavorHtml}`;
+
+    bindTooltips(cardEl);
   }
+
   const catBadgeDesc = cardDetailDesc.querySelector(
     '.badge-physical, .badge-spell, .badge-special',
   );
   if (catBadgeDesc && card.category) {
     attachTooltipToElement(catBadgeDesc, card.category);
   }
-
-  // 下部タグのツールチップ紐付け
-  const tagElements = cardEl.querySelectorAll('.card-tag');
-  tagElements.forEach((tagEl) => {
-    const text = tagEl.textContent.trim();
-    const tagKeyMap = {
-      物理: 'physical',
-      呪文: 'spell',
-      特殊: 'special',
-      炎: 'fire',
-      氷: 'ice',
-      雷: 'thunder',
-      風: 'wind',
-      土: 'stone',
-      毒: 'poison',
-      麻痺: 'paralyze',
-      能昇: 'buff_up',
-      能降: 'buff_down',
-      回復: 'heal',
-      無: 'none',
-    };
-    const key = tagKeyMap[text];
-    if (key) {
-      attachTooltipToElement(tagEl, key);
-    }
-  });
 
   cardDetailModal.style.display = 'flex';
 }
@@ -748,8 +809,8 @@ function showItemDetailModal(item, type) {
 
   const badgeHtml =
     type === 'relic'
-      ? '<span class="badge-special">【レリック】</span>'
-      : '<span class="badge-spell">【アイテム】</span>';
+      ? '<span class="badge-special">【レリック】<br></span>'
+      : '<span class="badge-spell">【アイテム】<br></span>';
   const descHtml = (item.desc || '').replace(/\n/g, '<br>');
   const flavorHtml = `<div class="card-flavor-text">${item.flavor || 'フレーバーテキスト準備中'}</div>`;
   cardDetailDesc.innerHTML = `<div class="card-desc-container">${badgeHtml} ${descHtml}</div>${flavorHtml}`;
@@ -822,15 +883,11 @@ function showKingEvent() {
         'レリック選択',
         `レリック「${relic.name}」を選択しますか？<br><br><span class="relic-desc-text">${relic.desc}</span>`,
         () => {
-          playSE('relic');
-          unlockRelic(relicId);
-          player.relics.push(relicId);
+          addRelic(relicId);
           if (player.class === 'yuusya') {
             const remaining = allRelicKeys.filter((r) => r !== relicId);
             const extra = remaining[0];
-            playSE('relic');
-            unlockRelic(extra);
-            player.relics.push(extra);
+            addRelic(extra);
             showGameAlert(
               '王からの餞別 ',
               `さらに勇者の幸運により「${RELIC_DB[extra].name}」も追加で手に入りました！`,
@@ -1373,8 +1430,8 @@ const CUTSCENE_PRE_MIDBOSS_AREA1 = [
     ],
     speaker: 'バンディット',
     lines: [
-      'ほぉ…よくここまで来たな。部下を散々やっつけてくれて。',
-      'だが、ここからはオレが直々に相手してやる。\nこの洞窟の奥まで来て、生きて帰れると思うなよ！',
+      'ほぉ…よくここまで来たな。',
+      'いいだろう、オレが直々に相手してやる。\nただで、生きて帰れると思うなよ！',
     ],
   },
 ];
@@ -1429,12 +1486,13 @@ function showInnScreen() {
 
 if (btnInnRestHalf) {
   btnInnRestHalf.addEventListener('click', () => {
-    if (player.gold >= 15) {
+    const cost = player.relics.includes('creditcard_black') ? 7 : 15;
+    if (player.gold >= cost) {
       showGameConfirm(
         '小休憩',
-        '15ゴールドを支払い小休憩しますか？<br>(HPとMPが最大値の50%回復します)',
+        `${cost}ゴールドを支払い小休憩しますか？<br>(HPとMPが最大値の50%回復します)`,
         () => {
-          player.gold -= 15;
+          player.gold -= cost;
           playSE('inn');
           const healHp = Math.floor(player.maxHp * 0.5) || 1;
           const healMp = Math.floor(player.maxMp * 0.5) || 1;
@@ -1453,12 +1511,13 @@ if (btnInnRestHalf) {
 
 if (btnInnRestFull) {
   btnInnRestFull.addEventListener('click', () => {
-    if (player.gold >= 30) {
+    const cost = player.relics.includes('creditcard_black') ? 15 : 30;
+    if (player.gold >= cost) {
       showGameConfirm(
         '宿泊',
-        '30ゴールドを支払い宿泊しますか？<br>(HP・MPが全回復し、状態異常が全解除されます)',
+        `${cost}ゴールドを支払い宿泊しますか？<br>(HP・MPが全回復し、状態異常が全解除されます)`,
         () => {
-          player.gold -= 30;
+          player.gold -= cost;
           playSE('inn');
           player.hp = player.maxHp;
           player.mp = player.maxMp;
@@ -1487,14 +1546,16 @@ const shopServiceCardList = document.getElementById('shop-service-card-list');
 
 function showShopServiceScreen(type) {
   showScreen(shopServiceScreen);
+  const isBlackCard = player.relics.includes('creditcard_black');
+  const cost = isBlackCard ? 10 : 20;
   const title = document.getElementById('shop-service-title');
   const desc = document.getElementById('shop-service-desc');
   if (title) title.textContent = type === 'upgrade' ? 'カード強化' : 'カード削除';
   if (desc)
     desc.textContent =
       type === 'upgrade'
-        ? '20ゴールドを支払い、手札のカードを1枚「強化（+）」します。'
-        : '20ゴールドを支払い、手札のカードを1枚「削除」します。';
+        ? `${cost}ゴールドを支払い、手札のカードを1枚「強化（+）」します。`
+        : `${cost}ゴールドを支払い、手札のカードを1枚「削除」します。`;
 
   if (shopServiceCardList) {
     shopServiceCardList.innerHTML = '';
@@ -1507,7 +1568,7 @@ function showShopServiceScreen(type) {
         const isFullyUpgraded = (cardInstance.upgradeCount || 0) >= 1;
         const btn = makeCardEl(cardInstance, () => {
           if (type === 'upgrade' && isFullyUpgraded) return;
-          if (player.gold >= 20) {
+          if (player.gold >= cost) {
             let compareWrap = null;
             if (type === 'upgrade') {
               compareWrap = document.createElement('div');
@@ -1545,9 +1606,9 @@ function showShopServiceScreen(type) {
 
             showGameConfirm(
               type === 'upgrade' ? 'カードの強化' : 'カードの削除',
-              `「${cardInstance.name}」を 20ゴールドで${type === 'upgrade' ? '強化' : '削除'}しますか？`,
+              `「${cardInstance.name}」を ${cost}ゴールドで${type === 'upgrade' ? '強化' : '削除'}しますか？`,
               () => {
-                player.gold -= 20;
+                player.gold -= cost;
                 let index = player.deck.indexOf(cardInstance);
                 if (index !== -1) {
                   if (type === 'upgrade') player.deck[index] = upgradeCard(player.deck[index]);
@@ -1720,8 +1781,7 @@ function showFairyScreen() {
           if (unowned.length > 0) {
             shuffle(unowned);
             const picked = unowned[0];
-            player.relics.push(picked);
-            playSE('relic');
+            addRelic(picked);
             showGameAlert(
               '妖精の悪戯',
               `${dmg} ダメージを受けたが、レリック「${RELIC_DB[picked].name}」を手に入れた！`,
@@ -1803,6 +1863,8 @@ function showTownScreen() {
 }
 
 function renderShop() {
+  const hasBlackCard = player.relics.includes('creditcard_black');
+
   if (townCards) {
     townCards.innerHTML = '';
     shopCardsPool.forEach((item) => {
@@ -1824,7 +1886,9 @@ function renderShop() {
         el.addEventListener('click', () => {
           showCardDetailModal(card);
         });
-        const price = item.bargain ? 7 : 15;
+        const standardPrice = item.upgraded ? 30 : 20;
+        const basePrice = item.bargain ? Math.floor(standardPrice * 0.5) : standardPrice;
+        const price = hasBlackCard ? Math.floor(basePrice * 0.5) : basePrice;
         const bgColor = '#1976d2';
         const borderColor = '#1565c0';
         const priceColor = item.bargain ? '#4ade80' : '#fff';
@@ -1867,6 +1931,8 @@ function renderShop() {
 
   if (townItems) {
     townItems.innerHTML = '';
+
+    // 1~3. アイテム3つ
     shopItemsPool.forEach((shopItem) => {
       const item = ITEM_DB[shopItem.id];
       const div = document.createElement('div');
@@ -1890,7 +1956,8 @@ function renderShop() {
         btn.addEventListener('click', () => {
           showItemDetailModal(item, 'item');
         });
-        const price = item.price || 20;
+        const basePrice = item.price || 20;
+        const price = hasBlackCard ? Math.floor(basePrice * 0.5) : basePrice;
         const buyBtn = document.createElement('button');
         buyBtn.className = 'btn btn-secondary btn-sm';
         buyBtn.classList.add('rl-js-style-20');
@@ -1912,6 +1979,7 @@ function renderShop() {
                 } else {
                   player.items.push({ id: shopItem.id, used: false });
                 }
+                unlockItem(shopItem.id);
                 shopItem.bought = true;
                 showGameAlert('購入完了', `「${item.name}」を購入しました！`, () => {
                   renderShop();
@@ -1929,6 +1997,106 @@ function renderShop() {
       }
       townItems.appendChild(div);
     });
+
+    // 4. ランダム未所持レリック枠（存在する場合）
+    const unownedRelics = Object.keys(RELIC_DB).filter(
+      (r) => !player.relics.includes(r) && !RELIC_DB[r].isFixed,
+    );
+    if (unownedRelics.length > 0) {
+      const randomRelicId = unownedRelics[0];
+      const relic = RELIC_DB[randomRelicId];
+      const div = document.createElement('div');
+      div.classList.add('rl-js-style-16');
+      const btn = document.createElement('button');
+      btn.classList.add('rl-js-style-17');
+      const img = document.createElement('img');
+      img.src = relic.image;
+      img.alt = relic.name;
+      img.classList.add('rl-js-style-18');
+      btn.appendChild(img);
+      btn.addEventListener('click', () => {
+        showItemDetailModal(relic, 'relic');
+      });
+      const basePrice = 40;
+      const price = hasBlackCard ? Math.floor(basePrice * 0.5) : basePrice;
+      const buyBtn = document.createElement('button');
+      buyBtn.className = 'btn btn-secondary btn-sm';
+      buyBtn.classList.add('rl-js-style-20');
+      buyBtn.textContent = `${price} Gで購入`;
+      buyBtn.addEventListener('click', () => {
+        if (player.gold >= price) {
+          showGameConfirm(
+            '秘宝の購入',
+            `レリック「${relic.name}」を${price}ゴールドで購入しますか？`,
+            () => {
+              player.gold -= price;
+              addRelic(randomRelicId);
+              showGameAlert('購入完了', `レリック「${relic.name}」を購入しました！`, () => {
+                renderShop();
+                updateHeaderBar();
+              });
+            },
+          );
+        } else {
+          showGameAlert('ショップ', 'ゴールドが足りません！');
+        }
+      });
+      div.appendChild(btn);
+      div.appendChild(buyBtn);
+      townItems.appendChild(div);
+    }
+
+    // 5. ブラックカード (定価200G・固定配置最右)
+    const blackCard = RELIC_DB['creditcard_black'];
+    const divB = document.createElement('div');
+    divB.classList.add('rl-js-style-16');
+    const btnB = document.createElement('button');
+    btnB.classList.add('rl-js-style-17');
+    const imgB = document.createElement('img');
+    imgB.src = blackCard.image;
+    imgB.alt = blackCard.name;
+    imgB.classList.add('rl-js-style-18');
+    btnB.appendChild(imgB);
+
+    if (hasBlackCard) {
+      btnB.style.opacity = '0.2';
+      btnB.style.cursor = 'not-allowed';
+      const boughtText = document.createElement('span');
+      boughtText.classList.add('rl-js-style-19');
+      boughtText.textContent = 'SOLDOUT';
+      divB.appendChild(btnB);
+      divB.appendChild(boughtText);
+    } else {
+      btnB.addEventListener('click', () => {
+        showItemDetailModal(blackCard, 'relic');
+      });
+      const priceB = 200;
+      const buyBtnB = document.createElement('button');
+      buyBtnB.className = 'btn btn-secondary btn-sm';
+      buyBtnB.classList.add('rl-js-style-20');
+      buyBtnB.textContent = `${priceB} Gで購入`;
+      buyBtnB.addEventListener('click', () => {
+        if (player.gold >= priceB) {
+          showGameConfirm(
+            'VIP特権の購入',
+            `「${blackCard.name}」を${priceB}ゴールドで購入しますか？<br><br>※買い出し半額＆獲得ゴールド+50%が永続適用されます！`,
+            () => {
+              player.gold -= priceB;
+              addRelic('creditcard_black');
+              showGameAlert('購入完了', `「${blackCard.name}」を入手しました！全施設が半額になります！`, () => {
+                renderShop();
+                updateHeaderBar();
+              });
+            },
+          );
+        } else {
+          showGameAlert('ショップ', 'ゴールドが足りません！');
+        }
+      });
+      divB.appendChild(btnB);
+      divB.appendChild(buyBtnB);
+    }
+    townItems.appendChild(divB);
   }
 }
 
@@ -2387,6 +2555,14 @@ const CARD_IMAGES = {
     .href,
   silence: new URL('../../assets/games/roguelike/images/icons/no_image_square.jpg', import.meta.url)
     .href,
+  kakusei: new URL('../../assets/games/roguelike/images/icons/yaruki_moeru_man.png', import.meta.url)
+    .href,
+  ankoku_ken: new URL('../../assets/games/roguelike/images/icons/game_ken_maken.png', import.meta.url)
+    .href,
+  daikaisho: new URL('../../assets/games/roguelike/images/icons/wave_nami2.png', import.meta.url)
+    .href,
+  drain: new URL('../../assets/games/roguelike/images/icons/medical_ketsueki.png', import.meta.url)
+    .href,
 };
 
 // 属性→ドットクラスのマッピング
@@ -2591,68 +2767,110 @@ let turnInCurrentBattle = 0;
 function setEnemyIntent() {
   if (!enemy || enemy.hp <= 0) return;
 
+  let dmg = enemy.attackBase + Math.floor((battleCount - 1) / 3);
+
+  // 魔王 (Maou) の確定行動ルール
   if (enemy.isMaou) {
     if (turnInCurrentBattle === 1) {
       enemy.intent = { type: 'kakusei_plus', damage: 0, desc: '覚醒+' };
       return;
     }
-    if (enemy.hp <= Math.floor(enemy.maxHp / 2) && !enemy.usedMeteor) {
+    if (enemy.hp <= Math.floor(enemy.maxHp * 0.75) && !enemy.usedAnkoku75) {
+      enemy.usedAnkoku75 = true;
+      enemy.intent = { type: 'ankoku_ken', damage: 0, desc: '暗黒剣' };
+      return;
+    }
+    if (enemy.hp <= Math.floor(enemy.maxHp * 0.5) && !enemy.usedMeteor) {
       enemy.usedMeteor = true;
       enemy.intent = { type: 'meteor_plus', damage: 8, hits: 4, desc: '流星群+' };
       return;
     }
+    if (enemy.hp <= Math.floor(enemy.maxHp * 0.25) && !enemy.usedAnkoku25) {
+      enemy.usedAnkoku25 = true;
+      enemy.intent = { type: 'ankoku_ken', damage: 0, desc: '暗黒剣' };
+      return;
+    }
   }
 
-  const availableSkills = enemy.skills.length > 0 ? enemy.skills : ['attack'];
+  // リヴァイアサン (Leviathan) の確定行動ルール
+  if (enemy.name === 'リヴァイアサン') {
+    if (turnInCurrentBattle === 1) {
+      enemy.intent = { type: 'daikaisho', damage: dmg + 3, desc: '大海嘯' };
+      return;
+    }
+    if (enemy.hp <= Math.floor(enemy.maxHp * 0.5) && !enemy.usedDaikaisho50) {
+      enemy.usedDaikaisho50 = true;
+      enemy.intent = { type: 'daikaisho', damage: dmg + 3, desc: '大海嘯' };
+      return;
+    }
+  }
+
+  // ヴァンパイア (Vampire) のドレインはHP50%以下まで解禁しない
+  let availableSkills = enemy.skills.length > 0 ? [...enemy.skills] : ['攻撃'];
+  if (enemy.isVampire && enemy.hp > Math.floor(enemy.maxHp * 0.5)) {
+    availableSkills = availableSkills.filter((s) => s !== 'drain' && s !== 'ドレイン');
+    if (availableSkills.length === 0) availableSkills = ['攻撃'];
+  }
+
   const chosen = availableSkills[Math.floor(Math.random() * availableSkills.length)];
 
-  let dmg = enemy.attackBase + Math.floor((battleCount - 1) / 3);
-  if (chosen === 'fire_attack') {
-    enemy.intent = { type: 'fire_attack', damage: dmg + 2, desc: '火炎ブレス' };
-  } else if (chosen === 'ice_attack') {
-    enemy.intent = { type: 'ice_attack', damage: dmg + 1, desc: '絶対零度' };
-  } else if (chosen === 'wind_attack') {
-    enemy.intent = { type: 'wind_attack', damage: dmg + 1, desc: 'かまいたち' };
-  } else if (chosen === 'stone_attack') {
-    enemy.intent = { type: 'stone_attack', damage: dmg + 2, desc: '落石' };
-  } else if (chosen === 'dazzle') {
-    enemy.intent = { type: 'dazzle', damage: 0, desc: '幻惑の眼光' };
-  } else if (chosen === 'silence') {
-    enemy.intent = { type: 'silence', damage: 0, desc: '沈黙の呪言' };
-  } else if (chosen === 'rush') {
+  if (chosen === 'ankoku_ken' || chosen === '暗黒剣') {
+    enemy.intent = { type: 'ankoku_ken', damage: 0, desc: '暗黒剣' };
+  } else if (chosen === 'daikaisho' || chosen === '大海嘯') {
+    enemy.intent = { type: 'daikaisho', damage: dmg + 3, desc: '大海嘯' };
+  } else if (chosen === 'drain' || chosen === 'ドレイン') {
+    enemy.intent = { type: 'drain', damage: dmg + 2, desc: 'ドレイン' };
+  } else if (chosen === 'fire' || chosen === 'fire_attack' || chosen === '火炎') {
+    enemy.intent = { type: 'fire_attack', damage: dmg + 2, desc: '火炎' };
+  } else if (chosen === 'ice' || chosen === 'ice_attack' || chosen === '冷気') {
+    enemy.intent = { type: 'ice_attack', damage: dmg + 1, desc: '冷気' };
+  } else if (chosen === 'wind' || chosen === 'wind_attack' || chosen === '迅風') {
+    enemy.intent = { type: 'wind_attack', damage: dmg + 1, desc: '迅風' };
+  } else if (chosen === 'stone' || chosen === 'stone_attack' || chosen === '礫石') {
+    enemy.intent = { type: 'stone_attack', damage: dmg + 2, desc: '礫石' };
+  } else if (chosen === 'dazzle' || chosen === '幻惑') {
+    enemy.intent = { type: 'dazzle', damage: 0, desc: '幻惑' };
+  } else if (chosen === 'silence' || chosen === '沈黙') {
+    enemy.intent = { type: 'silence', damage: 0, desc: '沈黙' };
+  } else if (chosen === 'rush' || chosen === '連撃') {
     enemy.intent = {
       type: 'rush',
       damage: Math.max(1, Math.floor(dmg / 2)),
       hits: 2,
-      desc: '突進連撃',
+      desc: '連撃',
     };
-  } else if (chosen === 'paralyze') {
-    enemy.intent = { type: 'paralyze', damage: 0, desc: '痺れ粉' };
-  } else if (chosen === 'poison') {
-    enemy.intent = { type: 'poison', damage: 0, desc: '毒液' };
-  } else if (chosen === 'heal') {
-    enemy.intent = { type: 'heal', damage: 0, desc: '自己再生' };
-  } else if (chosen === 'buff_up') {
-    enemy.intent = { type: 'buff_up', damage: 0, desc: '魔力昇華' };
-  } else if (chosen === 'buff_down') {
-    enemy.intent = { type: 'buff_down', damage: 0, desc: '重力波' };
+  } else if (chosen === 'smite' || chosen === '強撃') {
+    enemy.intent = { type: 'attack', damage: dmg + 2, desc: '強撃' };
+  } else if (chosen === 'paralyze' || chosen === '麻痺') {
+    enemy.intent = { type: 'paralyze', damage: 0, desc: '麻痺' };
+  } else if (chosen === 'poison' || chosen === '毒計') {
+    enemy.intent = { type: 'poison', damage: 0, desc: '毒計' };
+  } else if (chosen === 'heal' || chosen === '快癒') {
+    enemy.intent = { type: 'heal', damage: 0, desc: '快癒' };
+  } else if (chosen === 'buff_up' || chosen === '能昇') {
+    enemy.intent = { type: 'buff_up', damage: 0, desc: '能昇' };
+  } else if (chosen === 'buff_down' || chosen === '能降') {
+    enemy.intent = { type: 'buff_down', damage: 0, desc: '能降' };
   } else {
     enemy.intent = { type: 'attack', damage: dmg, desc: '攻撃' };
   }
 }
 
 function addRelic(relicId) {
+  if (!relicId || !RELIC_DB[relicId]) return;
+  if (!player.relics.includes(relicId)) {
+    player.relics.push(relicId);
+  }
+  unlockRelic(relicId);
   playSE('relic');
-  player.relics.push(relicId);
   if (relicId === 'yubiwa_gold') {
     player.maxHp += 1;
     player.hp += 1;
-    updateUI();
   } else if (relicId === 'yubiwa_silver') {
     player.maxMp += 1;
     player.mp += 1;
-    updateUI();
   }
+  updateUI();
 }
 
 function getCardCost(card) {
@@ -2666,12 +2884,78 @@ function getCardCost(card) {
   return cost;
 }
 
+function applyEnemyStatus(statusType, baseValue) {
+  if (!enemy || enemy.hp <= 0) return;
+
+  const STATUS_NAMES = {
+    poison: '毒',
+    paralyze: '麻痺',
+    dazzle: '幻惑',
+    silence: '沈黙',
+    buff_down: '能降',
+  };
+
+  const statusName = STATUS_NAMES[statusType] || statusType;
+
+  // 無効チェック (100%遮断)
+  if (enemy.statusImmunities && enemy.statusImmunities.includes(statusType)) {
+    logMessage(`${enemy.name} は【${statusName}】を無効化した。`, 'log-system');
+    return;
+  }
+
+  // 耐性チェック (50%ブロック)
+  if (enemy.statusResistances && enemy.statusResistances.includes(statusType)) {
+    if (Math.random() < 0.5) {
+      logMessage(`${enemy.name} は【${statusName}】を防いだ！`, 'log-system');
+      return;
+    }
+  }
+
+  // 計算（シルクハット持参または弱点・必中でボーナス+1）
+  let finalVal = baseValue;
+  if (player.relics.includes('silkhat')) {
+    finalVal += 1;
+  }
+  if (
+    (enemy.statusWeaknesses && enemy.statusWeaknesses.includes(statusType)) ||
+    (enemy.statusSureHit && enemy.statusSureHit.includes(statusType))
+  ) {
+    finalVal += 1;
+  }
+
+  if (statusType === 'poison') {
+    enemy.poison = (enemy.poison || 0) + finalVal;
+    logMessage(`${enemy.name} に毒 ${finalVal} を付与！`, 'log-poison');
+  } else if (statusType === 'paralyze') {
+    enemy.paralyze = (enemy.paralyze || 0) + finalVal;
+    logMessage(`${enemy.name} に麻痺（${finalVal}ターン）を付与！`, 'log-poison');
+  } else if (statusType === 'buff_down') {
+    enemy.buffDown = finalVal;
+    logMessage(`能降！敵に能降（与ダメ-1/被ダメ+1）を${finalVal}ターン付与！`, 'log-poison');
+  }
+}
+
 function calculateDamage(baseVal, element, isPlayerAttacking, cardId = null) {
   let bonus = 0;
 
   if (isPlayerAttacking) {
     if (player.relics.includes('game_ken') && element === 'none') bonus += 1;
     if (player.relics.includes('game_ken_seiken') && element === 'none') bonus += 1;
+    if (player.relics.includes('fashion_beret_bere-bou') && element !== 'none') bonus += 1;
+    if (
+      player.relics.includes('tsue_sennin') &&
+      (cardId?.includes('fire') ||
+        cardId?.includes('ice') ||
+        cardId?.includes('wind') ||
+        cardId?.includes('stone') ||
+        cardId?.includes('thunder') ||
+        cardId?.includes('venom') ||
+        cardId?.includes('fortify') ||
+        cardId?.includes('heal') ||
+        cardId?.includes('buff'))
+    ) {
+      bonus += 1;
+    }
     // プレイヤーのバフ・デバフ
     if (player.buffUp > 0) bonus += 1;
     if (player.buffDown > 0) bonus -= 1;
@@ -2680,6 +2964,14 @@ function calculateDamage(baseVal, element, isPlayerAttacking, cardId = null) {
     if (enemy.buffUp > 0) bonus -= 1;
 
     let dmg = baseVal + bonus;
+
+    // 吸収判定 (ダメージが敵のHP回復に変化)
+    if (enemy.absorptions && enemy.absorptions.includes(element)) {
+      const healAmt = Math.max(1, dmg);
+      enemy.hp = Math.min(enemy.maxHp, enemy.hp + healAmt);
+      logMessage(`【属性吸収】${enemy.name} は ${element} 属性攻撃を吸収し、HPが ${healAmt} 回復した！`, 'log-heal');
+      return 0;
+    }
 
     if (cardId === 'meteor' || cardId === 'meteor+') {
       // 流星群: 炎・氷・雷のどれかが弱点なら弱点を突く
@@ -2699,17 +2991,12 @@ function calculateDamage(baseVal, element, isPlayerAttacking, cardId = null) {
         dmg = Math.floor(dmg * 0.5);
         logMessage('耐性あり。ダメージ半減', 'log-poison');
       } else if (enemy.immunities.includes(element)) {
-        dmg = 0;
         logMessage('無効化されました！', 'log-poison');
+        return 0;
       }
     }
 
-    if (enemy.isGolem) {
-      dmg = Math.floor(dmg / 2);
-      logMessage('ゴーレムの鉄壁！被ダメージ半減。', 'log-poison');
-    }
-
-    return Math.max(0, dmg);
+    return Math.max(1, dmg);
   } else {
     // プレイヤーのバフ・デバフ
     if (player.buffUp > 0) bonus -= 1;
@@ -2721,7 +3008,7 @@ function calculateDamage(baseVal, element, isPlayerAttacking, cardId = null) {
     if (player.relics.includes('yubiwa_diamond')) bonus -= 1;
 
     let dmg = baseVal + bonus;
-    return Math.max(0, dmg);
+    return Math.max(1, dmg);
   }
 }
 
@@ -2766,7 +3053,7 @@ function startTurn() {
   }
   if (player.relics.includes('mermaid_necklace')) {
     player.mp = Math.min(player.maxMp, player.mp + 1);
-    logMessage('人魚のネックレス：ターン開始時にMPが 1 回復した。', 'log-heal');
+    logMessage('人魚のネックレス：毎ターンMPが 1 回復した。', 'log-heal');
   }
 
   if (player.poison > 0) {
@@ -2782,7 +3069,11 @@ function startTurn() {
   if (player.buffUp > 0) player.buffUp -= 1;
   if (player.buffDown > 0) player.buffDown -= 1;
 
-  const drawCount = player.relics.includes('book_madousyo') ? 5 : 4;
+  let drawCount = player.relics.includes('book_madousyo') ? 5 : 4;
+  if (turnInCurrentBattle === 1 && player.relics.includes('fashion_boot_short')) {
+    drawCount += 1;
+    logMessage('ブーツ：1ターン目のドロー枚数が +1 された。', 'log-heal');
+  }
   drawCards(drawCount);
   updateUI();
   logMessage('【あなたのターン】', 'log-system');
@@ -2839,12 +3130,60 @@ function enemyTurn() {
   if (enemy.intent) {
     let dmg = enemy.intent.damage;
     logMessage(`${enemy.name} の「${enemy.intent.desc}」！`);
+
+    // 敵が使用した技のカードを図鑑で自動解放
+    const intentToCardMap = {
+      fire_attack: 'fire',
+      ice_attack: 'ice',
+      wind_attack: 'wind',
+      stone_attack: 'stone',
+      dazzle: 'dazzle',
+      silence: 'silence',
+      paralyze: 'thunder',
+      poison: 'venom',
+      heal: 'heal',
+      buff_up: 'buff_up',
+      buff_down: 'buff_down',
+      rush: 'rush',
+      ankoku_ken: 'ankoku_ken',
+      daikaisho: 'daikaisho',
+      drain: 'drain',
+      kakusei_plus: 'kakusei',
+      meteor_plus: 'meteor',
+    };
+    const cardIdToUnlock = intentToCardMap[enemy.intent.type];
+    if (cardIdToUnlock && CARD_DB[cardIdToUnlock]) {
+      unlockCard(cardIdToUnlock);
+    }
     if (enemyImageEl) enemyImageEl.classList.add('shake');
 
     setTimeout(() => {
       if (enemyImageEl) enemyImageEl.classList.remove('shake');
 
-      if (enemy.intent.type === 'heal') {
+      if (enemy.intent.type === 'ankoku_ken') {
+        playSE('boss_attack');
+        const currentHp = player.hp;
+        const lostHp = Math.floor(currentHp / 2);
+        player.hp = Math.max(1, currentHp - lostHp);
+        logMessage(`${enemy.name} の「暗黒剣」！プレイヤーの現在HPが ${lostHp} 削り取られた！`, 'log-damage');
+      } else if (enemy.intent.type === 'daikaisho') {
+        playSE('ice');
+        player.buffUp = 0;
+        player.paralyze = 1;
+        const calculatedDmg = calculateDamage(dmg + 3, 'ice', false);
+        if (calculatedDmg > 0) {
+          player.hp = Math.max(0, player.hp - calculatedDmg);
+          logMessage(`${enemy.name} の「大海嘯」！バフが解除され、1ターン行動不能！${calculatedDmg} ダメージ！`, 'log-damage');
+        }
+      } else if (enemy.intent.type === 'drain') {
+        playSE('enemy_attack');
+        const calculatedDmg = calculateDamage(dmg + 2, 'none', false);
+        if (calculatedDmg > 0) {
+          player.hp = Math.max(0, player.hp - calculatedDmg);
+          enemy.hp = Math.min(enemy.maxHp, enemy.hp + calculatedDmg);
+          logMessage(`${enemy.name} の「ドレイン」！${calculatedDmg} ダメージを与え、HPを ${calculatedDmg} 回復した！`, 'log-heal');
+        }
+      } else if (enemy.intent.type === 'heal') {
         playSE('heal');
         enemy.hp = Math.min(enemy.maxHp, enemy.hp + 5);
         logMessage(`${enemy.name} はHPを 5 回復した！`, 'log-heal');
@@ -2994,14 +3333,7 @@ function playCard(index) {
       'log-damage',
     );
     if (card.poison && card.poison > 0) {
-      if (enemy.isGolem || enemy.isVampire) {
-        logMessage(`${enemy.name} は毒を無効化した。`, 'log-system');
-      } else if (enemy.isMaou && Math.random() < 0.5) {
-        logMessage('魔王は状態異常を防いだ。', 'log-system');
-      } else {
-        enemy.poison = (enemy.poison || 0) + card.poison;
-        logMessage(enemy.name + 'に毒' + card.poison + 'を付与！', 'log-poison');
-      }
+      applyEnemyStatus('poison', card.poison);
     }
   } else if (card.type === 'skill') {
     if (card.draw) {
@@ -3018,12 +3350,12 @@ function playCard(index) {
       logMessage(card.name + '！ HP +' + card.healSelf, 'log-heal');
     }
     if (card.buffUp) {
-      player.buffUp = card.buffUp;
-      logMessage(`能昇！能昇（与ダメ+1/被ダメ-1）を${card.buffUp}ターン得た！`, 'log-heal');
+      const buffUpVal = card.buffUp + (player.relics.includes('silkhat') ? 1 : 0);
+      player.buffUp = buffUpVal;
+      logMessage(`能昇！能昇（与ダメ+1/被ダメ-1）を${buffUpVal}ターン得た！`, 'log-heal');
     }
     if (card.buffDown) {
-      enemy.buffDown = card.buffDown;
-      logMessage(`能降！敵に能降（与ダメ-1/被ダメ+1）を${card.buffDown}ターン付与！`, 'log-poison');
+      applyEnemyStatus('buff_down', card.buffDown);
     }
   }
   updateUI();
@@ -3050,19 +3382,8 @@ function giveFixedRelic(relicId, cutsceneScenes, onDone) {
     return;
   }
   showCutscene(cutsceneScenes, () => {
-    if (!player.relics.includes(relicId)) {
-      playSE('relic');
-      player.relics.push(relicId);
-    }
+    addRelic(relicId);
     logMessage(`「${relic.name}」を手に入れた！`, 'log-system');
-    // レリック即時効果の適用
-    if (relicId === 'yubiwa_gold') {
-      player.maxHp += 1;
-      player.hp = Math.min(player.hp, player.maxHp);
-    }
-    if (relicId === 'yubiwa_silver') {
-      player.maxMp += 1;
-    }
     showGameAlert(
       'レリック入手',
       `「${relic.name}」を入手しました！<br><span class="relic-get-desc">${relic.desc}</span>`,
@@ -3089,10 +3410,41 @@ function handleVictory() {
     unlockMonster(enemy.name);
   }
 
-  let goldReward = 10 + Math.floor(Math.random() * 6);
-  if (currentPathType === 'elite' || currentPathType === 'mimic') {
-    goldReward = 20 + Math.floor(Math.random() * 11);
+  // レリックによる戦闘勝利時回復効果の適用
+  let victoryHpHeal = 0;
+  let victoryMpHeal = 0;
+  if (player.relics.includes('ruby_ring')) victoryHpHeal += 2;
+  if (player.relics.includes('game_ken_seiken')) victoryHpHeal += 2;
+  if (player.relics.includes('sapphire_ring')) victoryMpHeal += 2;
+  if (player.relics.includes('yubiwa_diamond')) victoryMpHeal += 2;
+
+  if (victoryHpHeal > 0 && player.hp < player.maxHp) {
+    const oldHp = player.hp;
+    player.hp = Math.min(player.maxHp, player.hp + victoryHpHeal);
+    const healed = player.hp - oldHp;
+    if (healed > 0) {
+      logMessage(`レリック効果によりHPが ${healed} 回復した！`, 'log-heal');
+    }
   }
+  if (victoryMpHeal > 0 && player.mp < player.maxMp) {
+    const oldMp = player.mp;
+    player.mp = Math.min(player.maxMp, player.mp + victoryMpHeal);
+    const recovered = player.mp - oldMp;
+    if (recovered > 0) {
+      logMessage(`レリック効果によりMPが ${recovered} 回復した！`, 'log-heal');
+    }
+  }
+
+  let baseReward = enemy && enemy.rewardGold ? enemy.rewardGold : 10;
+  let variance = Math.max(1, Math.floor(baseReward * 0.1));
+  let goldReward = baseReward + Math.floor(Math.random() * (variance * 2 + 1)) - variance;
+  if (currentPathType === 'elite' || currentPathType === 'mimic') {
+    goldReward = Math.floor(goldReward * 1.5);
+  }
+  let goldMultiplier = 1.0;
+  if (player.relics.includes('creditcard_black')) goldMultiplier += 0.5;
+  if (player.relics.includes('creditcard_gold')) goldMultiplier += 0.5;
+  goldReward = Math.max(1, Math.floor(goldReward * goldMultiplier));
   player.gold += goldReward;
   logMessage(`報酬として 💰${goldReward} ゴールドを獲得！`, 'log-system');
 
@@ -3102,8 +3454,7 @@ function handleVictory() {
     );
     if (unownedRelics.length > 0) {
       shuffle(unownedRelics);
-      playSE('relic');
-      player.relics.push(unownedRelics[0]);
+      addRelic(unownedRelics[0]);
       logMessage(
         `ミミックからレリック「${RELIC_DB[unownedRelics[0]].name}」を手に入れた！`,
         'log-system',
@@ -3148,7 +3499,7 @@ function handleVictory() {
             speaker: '見回りの兵士',
             lines: [
               'ありがとう！町を守るゴーレムが故障で暴走してしまい、誰も近づけなくなっていたんだ。',
-              'おかげで出入りができるようになった。あとで修理してやらないとな。これはお礼だ。',
+              'おかげで出入りができるようになった。……あとでゴーレムは修理してやらないとな。これはお礼だ。',
             ],
           },
         ];
@@ -3267,7 +3618,7 @@ function handleVictory() {
             speaker: 'エルフ',
             lines: [
               '闇に囚われた仲間を正気に戻してくれて、ありがとうございます。',
-              'あなたの勇気に感謝を込めて、この森に古くから伝わる妖精の剣を授けましょう。\n大切にしてください。',
+              'あなたの勇気に感謝を込めて、我らエルフの里で古くから伝わる特産品の剣を授けましょう。\n大切にしてください。',
             ],
           },
         ];
@@ -3293,8 +3644,8 @@ function handleVictory() {
             ],
             speaker: '姫',
             lines: [
-              '助けてくださいまして、誠にありがとうございます。\nあなたのような勇敢な方が来てくださるとは夢にも思いませんでした。',
-              'これはわたくしの形見の品でございます。\nどうかお力になれますように。',
+              '助けてくださいまして、誠にありがとうございます。\nあなたのような勇敢な方が救い出してくれることをずっとお待ちしておりました。',
+              'これはお礼です。私だと思って、この指輪をお持ちください。\nどうか、お力になれますように。',
             ],
           },
         ];
@@ -3374,9 +3725,7 @@ function showBossRelicReward() {
           <div class="card-desc card-desc-custom" >${relic.desc}</div>
         `;
     el.addEventListener('click', () => {
-      playSE('relic');
-      unlockRelic(relicId);
-      player.relics.push(relicId);
+      addRelic(relicId);
       logMessage(`ボス報酬：レリック「${relic.name}」を獲得！`, 'log-system');
       if (rewardOverlay) rewardOverlay.style.display = 'none';
       proceedNextFloor();
@@ -3415,7 +3764,7 @@ function showGameClearScreen() {
   stopBGM();
   playSE('victory');
   if (resultTitle) {
-    resultTitle.textContent = '🎉 全面クリア！';
+    resultTitle.textContent = '全面クリア！';
     resultTitle.style.color = '#ffd700';
   }
   if (resultDetails) {
@@ -3686,6 +4035,28 @@ if (btnTitle) {
   });
 }
 
+if (btnShare) {
+  btnShare.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (window.playSE) window.playSE('cursor');
+    const clsName =
+      player.class === 'yuusya'
+        ? '勇者'
+        : player.class === 'kenshi'
+          ? '戦士'
+          : player.class === 'mahoutsukai'
+            ? '魔法使い'
+            : '格闘家';
+    const isClear = resultTitle && resultTitle.textContent.includes('全面クリア');
+    const shareText = isClear
+      ? `【ローグライクカードRPG】職業「${clsName}」で魔王を撃破し全面クリア達成！(所持金: ${player.gold}G, レリック: ${player.relics.length}個)`
+      : `【ローグライクカードRPG】職業「${clsName}」でエリア${currentArea}-${currentFloor}層まで到達！`;
+    const shareUrl = window.location.href;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  });
+}
+
 if (btnSkipReward) {
   btnSkipReward.addEventListener('click', () => {
     if (rewardOverlay) rewardOverlay.style.display = 'none';
@@ -3901,8 +4272,32 @@ if (seVolumeInput) {
 
 function showEnemySkillCardModal(intent) {
   const cardSkillMap = {
+    ankoku_ken: {
+      name: '暗黒剣',
+      category: 'special',
+      type: 'attack',
+      element: 'none',
+      desc: 'プレイヤーの現在HPを半減(50%)させる',
+      color: 'black',
+    },
+    daikaisho: {
+      name: '大海嘯',
+      category: 'special',
+      type: 'attack',
+      element: 'ice',
+      desc: 'プレイヤーのバフを全解除し、1ターン行動不能＋水属性大ダメージ',
+      color: 'blue',
+    },
+    drain: {
+      name: 'ドレイン',
+      category: 'special',
+      type: 'attack',
+      element: 'none',
+      desc: 'プレイヤーにダメージを与え、与えたダメージ分自身のHPを回復する',
+      color: 'red',
+    },
     fire_attack: {
-      name: '火炎ブレス',
+      name: '火炎',
       category: 'spell',
       type: 'attack',
       element: 'fire',
@@ -3910,7 +4305,7 @@ function showEnemySkillCardModal(intent) {
       color: 'red',
     },
     ice_attack: {
-      name: '絶対零度',
+      name: '冷気',
       category: 'spell',
       type: 'attack',
       element: 'ice',
@@ -3918,7 +4313,7 @@ function showEnemySkillCardModal(intent) {
       color: 'blue',
     },
     wind_attack: {
-      name: 'かまいたち',
+      name: '迅風',
       category: 'spell',
       type: 'attack',
       element: 'wind',
@@ -3926,7 +4321,7 @@ function showEnemySkillCardModal(intent) {
       color: 'green',
     },
     stone_attack: {
-      name: '落石',
+      name: '礫石',
       category: 'physical',
       type: 'attack',
       element: 'stone',
@@ -3934,7 +4329,7 @@ function showEnemySkillCardModal(intent) {
       color: 'brown',
     },
     dazzle: {
-      name: '幻惑の眼光',
+      name: '幻惑',
       category: 'special',
       type: 'skill',
       element: 'dazzle',
@@ -3942,7 +4337,7 @@ function showEnemySkillCardModal(intent) {
       color: 'purple',
     },
     silence: {
-      name: '沈黙の呪言',
+      name: '沈黙',
       category: 'special',
       type: 'skill',
       element: 'silence',
@@ -3966,7 +4361,7 @@ function showEnemySkillCardModal(intent) {
       color: 'purple',
     },
     rush: {
-      name: '突進連撃',
+      name: '連撃',
       category: 'physical',
       type: 'attack',
       element: 'none',
@@ -3974,7 +4369,7 @@ function showEnemySkillCardModal(intent) {
       color: 'red',
     },
     paralyze: {
-      name: '痺れ粉',
+      name: '麻痺',
       category: 'special',
       type: 'skill',
       element: 'paralyze',
@@ -3982,7 +4377,7 @@ function showEnemySkillCardModal(intent) {
       color: 'yellow',
     },
     poison: {
-      name: '毒液',
+      name: '毒計',
       category: 'special',
       type: 'skill',
       element: 'poison',
@@ -3990,7 +4385,7 @@ function showEnemySkillCardModal(intent) {
       color: 'purple',
     },
     heal: {
-      name: '自己再生',
+      name: '快癒',
       category: 'special',
       type: 'skill',
       element: 'none',
@@ -3998,7 +4393,7 @@ function showEnemySkillCardModal(intent) {
       color: 'green',
     },
     buff_up: {
-      name: '魔力昇華',
+      name: '能昇',
       category: 'special',
       type: 'skill',
       element: 'buff_up',
@@ -4006,7 +4401,7 @@ function showEnemySkillCardModal(intent) {
       color: 'white',
     },
     buff_down: {
-      name: '重力波',
+      name: '能降',
       category: 'special',
       type: 'skill',
       element: 'buff_down',

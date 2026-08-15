@@ -52,7 +52,7 @@ const { projectData } = Astro.props;
 
   <!-- カード選択報酬画面 -->
   <div id="reward-overlay" class="rl-overlay reward-overlay-custom">
-    <h2>🎉 戦闘勝利！</h2>
+    <h2>戦闘勝利！</h2>
     <p class="reward-subtitle" id="reward-subtitle-text">1枚カードを選んでデッキに追加</p>
     <div id="reward-cards" class="reward-cards"></div>
     <button class="btn btn-secondary btn-skip-reward-custom" id="btn-skip-reward">スキップ</button>
@@ -140,10 +140,25 @@ const { projectData } = Astro.props;
         <span>HP: <strong id="md-hp">0</strong></span>
         <span>獲得G: <strong id="md-exp">0</strong></span>
       </div>
-      <div class="md-attributes">
-        <div>弱点: <span id="md-weakness">-</span></div>
-        <div>耐性: <span id="md-resistance">-</span></div>
-        <div>無効: <span id="md-immunity">-</span></div>
+      <div class="md-attributes-wrapper">
+        <div class="md-attr-col">
+          <div class="md-attr-header attr-header-elem">【属性耐性】</div>
+          <div class="md-attributes">
+            <div>弱点: <span id="md-weakness">-</span></div>
+            <div>軽減: <span id="md-resistance">-</span></div>
+            <div>無効: <span id="md-immunity">-</span></div>
+            <div>吸収: <span id="md-absorption">-</span></div>
+          </div>
+        </div>
+        <div class="md-attr-col">
+          <div class="md-attr-header attr-header-status">【状態異常耐性】</div>
+          <div class="md-attributes">
+            <div>必中: <span id="md-status-sure">-</span></div>
+            <div>弱点: <span id="md-status-weak">-</span></div>
+            <div>耐性: <span id="md-status-res">-</span></div>
+            <div>無効: <span id="md-status-imm">-</span></div>
+          </div>
+        </div>
       </div>
       <div class="md-skills-box">
         <div>使用行動:</div>
@@ -455,27 +470,24 @@ const { projectData } = Astro.props;
 </div><!-- /.game-container -->
 
 <div slot="howto-content">
-  <div
-    class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
-  >
-    <p>コマンドを選んで敵を倒していくローグライク風RPGです。</p>
-    <p>敵の攻撃パターンを読んで、適切な魔法や攻撃を選択しましょう。</p>
-    <p>HPが尽きないように注意しながら、連戦を勝ち抜いてください！</p>
+  <div class="howto-content">
+    <p>コマンドカードを選んで敵を撃破するダンジョン探索型RPGです。</p>
+    <p>敵の攻撃予告を確認し、適切な行動を選択しましょう。</p>
+    <p>HPを維持しながら階層の最奥に潜む魔王の討伐を目指してください。</p>
   </div>
-  <div
-    class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
-  >
-    <p>毒や火傷などの状態異常はターン終了時にダメージを受けます。</p>
-    <p>回復カードを使って素早く対処しましょう。</p>
+  <div class="howto-content">
+    <p>火・水・風・土・雷の5属性には弱点や軽減、吸収が存在します。</p>
+    <p>相手の耐性を突くことで大ダメージを与えられます。</p>
+    <p>毒や麻痺、幻惑、沈黙などの状態異常を駆使して戦闘を有利に進めましょう。</p>
   </div>
-  <div
-    class="howto-content"
-    style="text-align: left; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;"
-  >
-    <p>「町」や「妖精」でカードを強化できます。</p>
-    <p>自分だけの最強のデッキを作り上げましょう！</p>
+  <div class="howto-content">
+    <p>ショップでのカード購入・強化・削除やイベントでデッキを整えましょう。</p>
+    <p>攻撃は明確な属性無効や吸収を除き、最低1ダメージが必ず通ります。</p>
+    <p>減衰補正がある相手には連撃などの多段攻撃が非常に効果的です。</p>
+  </div>
+  <div class="howto-content">
+    <p>敵の使った技や入手したアイテムは図鑑に記録されます。</p>
+    <p>コンプリートを目指してダンジョンに挑みましょう。</p>
   </div>
 </div>
 
@@ -3034,6 +3046,7 @@ const { projectData } = Astro.props;
     width: 100%;
   }
 
+  .howto-content,
   .howto-content-custom {
     text-align: left;
     color: var(--text-muted);
@@ -3048,6 +3061,49 @@ const { projectData } = Astro.props;
 
   .close-credits-btn-custom {
     width: 100%;
+  }
+
+  :global(.comp-compare-wrap) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  :global(.comp-compare-col) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  :global(.comp-compare-label-before) {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: bold;
+  }
+  :global(.comp-compare-label-after) {
+    font-size: 0.75rem;
+    color: #4ade80;
+    font-weight: bold;
+  }
+  :global(.comp-compare-col .battle-card) {
+    transform: scale(1);
+    cursor: default;
+  }
+  :global(.comp-compare-arrow) {
+    font-size: 1.3rem;
+    color: #38bdf8;
+    font-weight: bold;
+    margin-top: 14px;
+  }
+  :global(.comp-compare-desc) {
+    font-size: 0.75rem;
+    text-align: left;
+    line-height: 1.4;
+  }
+  :global(.comp-label-after) {
+    color: #4ade80;
   }
 
   :global(.card-flavor-text) {
@@ -3500,25 +3556,25 @@ const { projectData } = Astro.props;
   }
 
   :global(.compendium-card-grid .battle-card) {
-    width: 100% !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    aspect-ratio: 90 / 145 !important;
-    height: auto !important;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    aspect-ratio: 90 / 145;
+    height: auto;
     box-sizing: border-box;
   }
 
   :global(.compendium-card-grid .battle-card.comp-card-locked) {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
     opacity: 0.45;
     cursor: not-allowed;
     filter: grayscale(100%);
   }
 
   :global(.compendium-card-grid .battle-card.comp-card-locked:hover) {
-    transform: none !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   :global(.comp-card-desc) {
@@ -3592,16 +3648,47 @@ const { projectData } = Astro.props;
     margin-bottom: 0.6rem;
   }
 
+  .md-attributes-wrapper {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 0.6rem;
+  }
+
+  .md-attr-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .md-attr-header {
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-bottom: 3px;
+    text-align: left;
+  }
+
+  .attr-header-elem {
+    color: #60a5fa;
+  }
+
+  .attr-header-status {
+    color: #a78bfa;
+  }
+
   .md-attributes {
     width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 6px;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
     color: #cbd5e1;
-    margin-bottom: 0.6rem;
     box-sizing: border-box;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .md-skills-box {
@@ -3629,31 +3716,142 @@ const { projectData } = Astro.props;
     font-size: 0.75rem;
   }
 
-  :global(.comp-monster-card) {
-    border-color: #ef4444 !important;
+  /* アイテムカードスタイル */
+  :global(.compendium-card-grid .comp-item-card) {
+    border-color: #3b82f6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 4px;
+  }
+  :global(.compendium-card-grid .comp-item-badge) {
+    background: #2563eb;
+  }
+  :global(.comp-item-img-wrap) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 52px;
+    margin: 2px 0;
+  }
+  :global(.comp-item-img) {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+  :global(.comp-item-name) {
+    font-size: 0.78rem;
+    font-weight: bold;
+    color: #f8fafc;
+    margin-bottom: 2px;
+  }
+  :global(.comp-item-desc) {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    line-height: 1.25;
   }
 
-  :global(.comp-monster-badge) {
+  /* レリックカードスタイル */
+  :global(.compendium-card-grid .comp-relic-card) {
+    border-color: #f59e0b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 4px;
+  }
+  :global(.compendium-card-grid .comp-relic-badge) {
+    background: #d97706;
+  }
+  :global(.comp-relic-img-wrap) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 52px;
+    margin: 2px 0;
+  }
+  :global(.comp-relic-img) {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+  :global(.comp-relic-name) {
+    font-size: 0.78rem;
+    font-weight: bold;
+    color: #fef08a;
+    margin-bottom: 2px;
+  }
+  :global(.comp-relic-desc) {
+    font-size: 0.68rem;
+    color: #cbd5e1;
+    line-height: 1.25;
+  }
+
+  /* モンスターカードスタイル */
+  :global(.compendium-card-grid .comp-monster-card) {
+    border-color: #ef4444;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 4px;
+  }
+  :global(.compendium-card-grid .comp-monster-badge) {
     background: #dc2626;
   }
-
   :global(.comp-monster-img-wrap) {
-    text-align: center;
-    margin: 4px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 54px;
+    margin: 2px 0;
   }
-
   :global(.comp-monster-img) {
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
   }
-
   :global(.comp-monster-name) {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: bold;
+    color: #fca5a5;
+    margin-bottom: 2px;
   }
-
   :global(.comp-monster-stats) {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #fbbf24;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    line-height: 1.25;
+    width: 100%;
+  }
+  :global(.comp-stat-line) {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+  }
+  :global(.comp-stat-line span) {
+    display: inline-block;
+    width: 24px;
+    text-align: right;
+    color: #94a3b8;
+  }
+  :global(.comp-stat-line strong) {
+    display: inline-block;
+    width: 28px;
+    text-align: left;
+    color: #fbbf24;
   }
 
   .md-flavor {
