@@ -1,5 +1,11 @@
-import shoesImg from '../../assets/games/run-action/images/item/shoes_sneaker.png';
-import noImg from '../../assets/games/run-action/images/item/no_image_square.jpg';
+const shoesImg = new URL(
+  '../../assets/games/run-action/images/item/shoes_sneaker.png',
+  import.meta.url,
+).href;
+const noImg = new URL(
+  '../../assets/games/run-action/images/item/no_image_square.jpg',
+  import.meta.url,
+).href;
 
 export interface ShopItem {
   id: string;

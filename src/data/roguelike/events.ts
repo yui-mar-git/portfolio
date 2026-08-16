@@ -1,5 +1,11 @@
-import madScientistImg from '../../assets/games/roguelike/images/characters/job_scientist_mad.png';
-import noImg from '../../assets/games/roguelike/images/icons/no_image_square.jpg';
+const madScientistImg = new URL(
+  '../../assets/games/roguelike/images/characters/job_scientist_mad.png',
+  import.meta.url,
+).href;
+const noImg = new URL(
+  '../../assets/games/roguelike/images/icons/no_image_square.jpg',
+  import.meta.url,
+).href;
 
 export interface EventOption {
   text: string;

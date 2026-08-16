@@ -1165,7 +1165,7 @@ function openTdAchieveDetail(item) {
   }
   if (title) title.textContent = unlocked ? item.title : '？？？';
   if (cond) cond.textContent = item.cond;
-  if (desc) desc.textContent = unlocked ? item.desc : '？？？（実績を達成すると解放されます）';
+  if (desc) desc.textContent = unlocked ? item.desc : '？？？';
 
   playSE('confirm');
   modal.style.display = 'flex';
