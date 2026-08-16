@@ -127,6 +127,7 @@ export const RELIC_DB: Record<string, Relic & { isFixed?: boolean }> = {
       '../../assets/games/roguelike/images/relics/syugei_glass_dome_accessory.png',
       import.meta.url,
     ).href,
+    isFixed: true,
     flavor: '人魚「いずれは陸にも販路を拡げたいと思っています」',
   },
 

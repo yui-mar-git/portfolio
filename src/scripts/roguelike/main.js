@@ -1829,6 +1829,8 @@ const btnTownUpgrade = document.getElementById('btn-town-upgrade');
 const btnTownRemove = document.getElementById('btn-town-remove');
 let shopCardsPool = [];
 let shopItemsPool = [];
+let shopRelicId = null;     // そのショップで入荷したレリック（1訪問で固定）
+let shopRelicBought = false; // 購入済みフラグ
 let shopUpgradeUsed = false;
 let shopRemoveUsed = false;
 
@@ -1865,6 +1867,14 @@ function showTownScreen() {
   const allItemKeys = Object.keys(ITEM_DB).filter((id) => !ITEM_DB[id].notForSale);
   shuffle(allItemKeys);
   shopItemsPool = allItemKeys.slice(0, 3).map((id) => ({ id, bought: false }));
+  // ランダムレリック枠：ショップ入店時に1度だけ決定
+  const unownedRelicsInit = Object.keys(RELIC_DB).filter(
+    (r) => !player.relics.includes(r) && !RELIC_DB[r].isFixed,
+  );
+  shuffle(unownedRelicsInit);
+  shopRelicId = unownedRelicsInit.length > 0 ? unownedRelicsInit[0] : null;
+  shopRelicBought = false;
+
   renderShop();
 }
 
@@ -2004,13 +2014,9 @@ function renderShop() {
       townItems.appendChild(div);
     });
 
-    // 4. ランダム未所持レリック枠（存在する場合）
-    const unownedRelics = Object.keys(RELIC_DB).filter(
-      (r) => !player.relics.includes(r) && !RELIC_DB[r].isFixed,
-    );
-    if (unownedRelics.length > 0) {
-      const randomRelicId = unownedRelics[0];
-      const relic = RELIC_DB[randomRelicId];
+    // 4. ランダム未所持レリック枠（そのショップで固定 / 購入済みはSOLDOUT）
+    if (shopRelicId) {
+      const relic = RELIC_DB[shopRelicId];
       const div = document.createElement('div');
       div.classList.add('rl-js-style-16');
       const btn = document.createElement('button');
@@ -2020,35 +2026,48 @@ function renderShop() {
       img.alt = relic.name;
       img.classList.add('rl-js-style-18');
       btn.appendChild(img);
-      btn.addEventListener('click', () => {
-        showItemDetailModal(relic, 'relic');
-      });
-      const basePrice = 40;
-      const price = hasBlackCard ? Math.floor(basePrice * 0.5) : basePrice;
-      const buyBtn = document.createElement('button');
-      buyBtn.className = 'btn btn-secondary btn-sm';
-      buyBtn.classList.add('rl-js-style-20');
-      buyBtn.textContent = `${price} Gで購入`;
-      buyBtn.addEventListener('click', () => {
-        if (player.gold >= price) {
-          showGameConfirm(
-            '秘宝の購入',
-            `レリック「${relic.name}」を${price}ゴールドで購入しますか？`,
-            () => {
-              player.gold -= price;
-              addRelic(randomRelicId);
-              showGameAlert('購入完了', `レリック「${relic.name}」を購入しました！`, () => {
-                renderShop();
-                updateHeaderBar();
-              });
-            },
-          );
-        } else {
-          showGameAlert('ショップ', 'ゴールドが足りません！');
-        }
-      });
-      div.appendChild(btn);
-      div.appendChild(buyBtn);
+
+      if (shopRelicBought || player.relics.includes(shopRelicId)) {
+        // 購入済み → SOLDOUT
+        btn.style.opacity = '0.2';
+        btn.style.cursor = 'not-allowed';
+        const soldText = document.createElement('span');
+        soldText.classList.add('rl-js-style-19');
+        soldText.textContent = 'SOLDOUT';
+        div.appendChild(btn);
+        div.appendChild(soldText);
+      } else {
+        btn.addEventListener('click', () => {
+          showItemDetailModal(relic, 'relic');
+        });
+        const basePrice = 40;
+        const price = hasBlackCard ? Math.floor(basePrice * 0.5) : basePrice;
+        const buyBtn = document.createElement('button');
+        buyBtn.className = 'btn btn-secondary btn-sm';
+        buyBtn.classList.add('rl-js-style-20');
+        buyBtn.textContent = `${price} Gで購入`;
+        buyBtn.addEventListener('click', () => {
+          if (player.gold >= price) {
+            showGameConfirm(
+              '秘宝の購入',
+              `レリック「${relic.name}」を${price}ゴールドで購入しますか？`,
+              () => {
+                player.gold -= price;
+                addRelic(shopRelicId);
+                shopRelicBought = true;
+                showGameAlert('購入完了', `レリック「${relic.name}」を購入しました！`, () => {
+                  renderShop();
+                  updateHeaderBar();
+                });
+              },
+            );
+          } else {
+            showGameAlert('ショップ', 'ゴールドが足りません！');
+          }
+        });
+        div.appendChild(btn);
+        div.appendChild(buyBtn);
+      }
       townItems.appendChild(div);
     }
 
