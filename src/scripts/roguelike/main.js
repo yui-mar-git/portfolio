@@ -114,15 +114,15 @@ const SE_DB = {
   meteor: new URL('../../assets/games/roguelike/audio/se/ドラゴンが火を吐く.mp3', import.meta.url)
     .href,
   confirm: new URL(
-    '../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/決定ボタンを押す2.mp3',
+    '../../assets/games/roguelike/audio/se/決定ボタンを押す2.mp3',
     import.meta.url,
   ).href,
   cancel: new URL(
-    '../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/キャンセル1.mp3',
+    '../../assets/games/roguelike/audio/se/キャンセル1.mp3',
     import.meta.url,
   ).href,
   cursor: new URL(
-    '../../assets/games/roguelike/audio/se//portfolio/common/assets/audio/se/カーソル移動7.mp3',
+    '../../assets/games/roguelike/audio/se/カーソル移動7.mp3',
     import.meta.url,
   ).href,
   draw: new URL('../../assets/games/roguelike/audio/se/カードをめくる.mp3', import.meta.url).href,
