@@ -3800,7 +3800,11 @@ function showResultOverlay(isWin) {
       ? `第${battleCount}戦を見事に勝ち抜きました！引き続き次の階層を選択してください。`
       : `魔王の軍勢に倒れました（到達階層: エリア ${currentArea} - ${currentFloor}層）。もう一度挑戦しますか？`;
   }
-  if (btnNext) btnNext.textContent = isWin ? 'マップへ戻る' : 'リトライ';
+  if (btnNext) {
+    // showGameClearScreen で非表示にしたボタンを周回時に復帰させる
+    btnNext.style.display = '';
+    btnNext.textContent = isWin ? 'マップへ戻る' : 'リトライ';
+  }
   if (overlay) overlay.style.display = 'flex';
 }
 
