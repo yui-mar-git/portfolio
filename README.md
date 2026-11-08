@@ -60,3 +60,4 @@ Astro と Cloudflare Pages を用いて構築されたモダンなポートフ�
 
 - Cloudflare Turnstileによるボット保護（お問い合わせフォーム）
 - APIキーなどの環境変数はCloudflare Pagesの環境変数管理機能を使用し、セキュアに運用
+- 脆弱性を見つけた場合の報告方法は [SECURITY.md](./SECURITY.md) を参照してください（GitHub の非公開の脆弱性報告を利用します）

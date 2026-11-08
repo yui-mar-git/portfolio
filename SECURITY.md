@@ -1,21 +1,24 @@
-# Security Policy
+# セキュリティポリシー
 
-## Supported Versions
+このリポジトリは個人のポートフォリオサイト（https://portfolio-5ey.pages.dev/ ）のソースコードです。
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## 対象バージョン
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 対象                                                | サポート |
+| --------------------------------------------------- | -------- |
+| 公開中の最新サイト（`main` ブランチ）               | ✅       |
+| 過去のブランチ（`v1-static`, `v1.5-microcms` など） | ❌       |
 
-## Reporting a Vulnerability
+## 脆弱性の報告方法
 
-Use this section to tell people how to report a vulnerability.
+脆弱性を見つけた場合は、このリポジトリの GitHub の
+**Security タブ →「Report a vulnerability」**（非公開の脆弱性報告）からご連絡ください。
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- Issue・Pull Request・SNS などの公開の場には投稿しないでください。
+- サイトのお問い合わせフォームはデモ用で、実際には送信されないため報告には使えません。
+- 再現手順・影響範囲・該当 URL やファイルを添えていただけると助かります。
+
+## 公開について
+
+修正が完了するまでは、脆弱性の内容を公開しないようお願いします。
+個人で運営しているため対応に時間がかかる場合がありますが、確認でき次第、修正と報告者への連絡を行います。
