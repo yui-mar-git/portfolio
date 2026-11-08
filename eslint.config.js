@@ -15,6 +15,7 @@ export default [
         ...globals.browser,
         ...globals.node,
         Phaser: 'readonly',
+        __IS_PRODUCTION_DEPLOY__: 'readonly',
       },
     },
   },
