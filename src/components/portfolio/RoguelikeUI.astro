@@ -1882,13 +1882,7 @@ const { projectData } = Astro.props;
     left: 50%;
     width: 75%;
     aspect-ratio: 1;
-    padding: 2px;
-    box-sizing: border-box;
     object-fit: contain;
-    background: #fff;
-    border: 2px solid #ffd700;
-    border-radius: 50%;
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
     z-index: 5;
     transform: translate(-50%, -50%);
     animation: float-avatar 2s infinite ease-in-out;
@@ -1902,7 +1896,7 @@ const { projectData } = Astro.props;
     }
 
     50% {
-      transform: translate(-50%, calc(-50% - 4px));
+      transform: translate(-50%, calc(-50% - 6px));
     }
   }
 
