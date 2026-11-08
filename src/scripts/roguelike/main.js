@@ -21,9 +21,6 @@ import { MAP_EVENTS } from '../../data/roguelike/events';
 // ===================================================
 // Audio マネージャー
 // ===================================================
-const BGM_PATH = new URL('../../assets/games/roguelike/audio/bgm/', import.meta.url).href;
-const SE_PATH = new URL('../../assets/games/roguelike/audio/se/', import.meta.url).href;
-
 const BGM_DB = {
   start: new URL('../../assets/games/roguelike/audio/bgm/maou_game_theme14.mp3', import.meta.url)
     .href,
@@ -568,14 +565,6 @@ function showScreen(target) {
       if (gameHeader) gameHeader.style.display = 'none';
       if (gameFooter) gameFooter.style.display = 'none';
     }
-  }
-}
-
-function hideGameAlert() {
-  if (gameAlertModal) gameAlertModal.style.display = 'none';
-  if (currentAlertCallback) {
-    currentAlertCallback();
-    currentAlertCallback = null;
   }
 }
 
