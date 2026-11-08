@@ -1870,16 +1870,27 @@ const { projectData } = Astro.props;
     transform: scale(1.15);
   }
 
-  /* プレイヤーコマ */
+  /* 現在地のノードは他の踏破済みノードと区別するため減光しない */
+  :global(.map-node.completed.current) {
+    opacity: 1;
+  }
+
+  /* プレイヤーコマ: ノードサイズに比例させ、中心をノード上辺に置く（上段ノードとの gap 内に収まる） */
   :global(.player-token) {
     position: absolute;
-    top: -24px;
+    top: 0;
     left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    height: 24px;
+    width: 75%;
+    aspect-ratio: 1;
+    padding: 2px;
+    box-sizing: border-box;
     object-fit: contain;
+    background: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
     z-index: 5;
+    transform: translate(-50%, -50%);
     animation: float-avatar 2s infinite ease-in-out;
     pointer-events: none;
   }
@@ -1887,11 +1898,11 @@ const { projectData } = Astro.props;
   @keyframes float-avatar {
     0%,
     100% {
-      transform: translate(-50%, 0);
+      transform: translate(-50%, -50%);
     }
 
     50% {
-      transform: translate(-50%, -6px);
+      transform: translate(-50%, calc(-50% - 4px));
     }
   }
 

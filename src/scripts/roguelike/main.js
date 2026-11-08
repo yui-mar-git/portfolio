@@ -1126,7 +1126,7 @@ function renderBoardMap(container, isBattleModal = false) {
         btn.classList.add('completed');
       } else if (fIndex === currentFloor) {
         if (node.row === currentRow) {
-          btn.classList.add('completed');
+          btn.classList.add('completed', 'current');
           const token = document.createElement('img');
           token.className = 'player-token';
           token.src = AVATAR_IMAGES[player.class];
