@@ -60,18 +60,31 @@ async function isRateLimited(ip: string): Promise<boolean> {
   const rateLimitKv = runtimeEnv.RATE_LIMIT_KV;
 
   if (rateLimitKv) {
-    const kvKey = `rate_limit:${ip}`;
-    const currentCount = parseInt((await rateLimitKv.get(kvKey)) ?? '0', 10) || 0;
-    if (currentCount >= LIMIT) return true;
-    await rateLimitKv.put(kvKey, String(currentCount + 1), { expirationTtl: 3600 });
+    try {
+      const kvKey = `rate_limit:${ip}`;
+      const currentCount = parseInt((await rateLimitKv.get(kvKey)) ?? '0', 10) || 0;
+      if (currentCount >= LIMIT) return true;
+      await rateLimitKv.put(kvKey, String(currentCount + 1), { expirationTtl: 3600 });
+    } catch (err) {
+      // KV 障害（書き込み上限超過など）でフォーム全体を止めないよう、制限をスキップして続行する
+      console.error('[contact] RATE_LIMIT_KV access failed; skipping rate limit:', err);
+    }
     return false;
   }
 
-  // ローカル開発環境(npm run dev)でのレートリミット確認用インメモリキャッシュ
-  const devKvMap = (globalThis.__DEV_RATE_LIMIT_KV__ ??= new Map<string, number>());
-  const currentCount = devKvMap.get(ip) || 0;
-  if (currentCount >= LIMIT) return true;
-  devKvMap.set(ip, currentCount + 1);
+  if (import.meta.env.DEV) {
+    // ローカル開発環境(npm run dev)でのレートリミット確認用インメモリキャッシュ
+    const devKvMap = (globalThis.__DEV_RATE_LIMIT_KV__ ??= new Map<string, number>());
+    const currentCount = devKvMap.get(ip) || 0;
+    if (currentCount >= LIMIT) return true;
+    devKvMap.set(ip, currentCount + 1);
+    return false;
+  }
+
+  console.warn(
+    '[contact] RATE_LIMIT_KV binding is missing; rate limiting is skipped. ' +
+      'Add the KV binding in Cloudflare Pages > Settings > Bindings.',
+  );
   return false;
 }
 
