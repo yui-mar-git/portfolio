@@ -1270,13 +1270,12 @@ function startGame(stageNumber) {
   updateGlobalBackButton();
   mapScreen.style.display = 'none';
 
+  // 画像の読み込みが 100ms 以上かかると create() 前に startWave が走り（spawnTimer 未定義で例外）、
+  // そのまま一時停止状態で止まっていたため、固定の待ち時間ではなく create 完了イベントを待つ。
+  // 読み込み済みの場合は start() 内で同期的に create されるので、リスナーは start() より前に登録する。
+  const scene = game.scene.getScene('MainScene');
+  if (scene) scene.events.once('create', () => scene.startWave(1, true));
   game.scene.start('MainScene');
-  setTimeout(() => {
-    const scene = game.scene.getScene('MainScene');
-    if (scene) {
-      scene.startWave(1, true);
-    }
-  }, 100);
 }
 document.getElementById('btn-stage1').addEventListener('click', () => startGame(1));
 document.getElementById('btn-stage2').addEventListener('click', () => startGame(2));
