@@ -185,7 +185,10 @@ function stopBGM() {
   }
 }
 
-let currentLongSEs = [];
+// ファンファーレ系（数秒〜十数秒のジングル）。画面遷移時に止めるため Audio を保持する。
+// 通常の短い SE は追跡せず、遷移しても最後まで鳴らす。
+const JINGLE_SE_IDS = new Set(['relic', 'inn', 'victory', 'defeat']);
+let playingJingles = [];
 
 function playSE(seId) {
   if (!SE_DB[seId]) return;
@@ -193,20 +196,25 @@ function playSE(seId) {
   const se = new Audio(path);
   se.volume = configSeVolume;
   se.play().catch((e) => console.log('SE Play blocked:', e));
-  if (seId === 'relic' || seId === 'level_up') {
-    currentLongSEs.push(se);
+  if (JINGLE_SE_IDS.has(seId)) {
+    // 「レリック選択 → 即マップ遷移」のように同じ操作内で鳴らした直後の遷移では止めないよう、
+    // 現在のタスクが終わるまでは fresh 扱いにする
+    se.isFresh = true;
+    setTimeout(() => (se.isFresh = false), 0);
+    playingJingles.push(se);
     se.addEventListener('ended', () => {
-      currentLongSEs = currentLongSEs.filter((s) => s !== se);
+      playingJingles = playingJingles.filter((s) => s !== se);
     });
   }
 }
 
-function stopLongSE() {
-  currentLongSEs.forEach((se) => {
+function stopJingles({ keepFresh = false } = {}) {
+  playingJingles = playingJingles.filter((se) => {
+    if (keepFresh && se.isFresh) return true;
     se.pause();
     se.currentTime = 0;
+    return false;
   });
-  currentLongSEs = [];
 }
 
 function setBgmVolume(vol) {
@@ -489,14 +497,14 @@ function showGameConfirm(title, message, onYes, onNo = null, extraElement = null
 
 if (btnDialogOk) {
   btnDialogOk.addEventListener('click', () => {
-    stopLongSE();
+    stopJingles();
     if (gameDialogModal) gameDialogModal.style.display = 'none';
     if (currentDialogCallback) currentDialogCallback();
   });
 }
 if (btnDialogYes) {
   btnDialogYes.addEventListener('click', () => {
-    stopLongSE();
+    stopJingles();
     if (gameDialogModal) gameDialogModal.style.display = 'none';
     if (currentDialogCallback) currentDialogCallback();
   });
@@ -529,6 +537,7 @@ function shuffle(arr) {
 
 // --- 5. 画面切り替え ---
 function showScreen(target) {
+  stopJingles({ keepFresh: true });
   const screens = [
     startScreen,
     classSelectScreen,
@@ -4081,6 +4090,7 @@ if (btnEndTurn) btnEndTurn.addEventListener('click', endTurn);
 
 if (btnNext) {
   btnNext.addEventListener('click', () => {
+    stopJingles();
     if (player.hp <= 0) {
       if (overlay) overlay.style.display = 'none';
       if (startScreen) startScreen.style.display = 'flex';
