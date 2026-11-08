@@ -30,9 +30,9 @@ const STATIC_CREDITS = [
   },
   {
     name: 'PANICPUMPKIN',
-    author: 'PANICPUMPKIN',
+    author: 'PANICPUMPKIN（ぱにぱむ）',
     url: 'http://pansound.com/panicpumpkin/',
-    usage: '制作物のゲーム各種',
+    usage: 'スコアアタックミニゲーム（ステータス上昇・下降SE）',
     license: '無料素材',
     category: ['SE', 'SE・BGM'],
   },
@@ -56,9 +56,46 @@ const STATIC_CREDITS = [
     name: 'Simple Icons',
     author: 'Simple Icons',
     url: 'https://simpleicons.org/',
-    usage: 'Webサイト全般',
+    usage: 'フッターのSNSアイコン',
     license: 'CC0 1.0 Universal',
     category: ['アイコン'],
+  },
+  // 備忘録ページの各サービスのロゴは Simple Icons ではなく各社の公式ロゴ
+  {
+    name: 'Zenn ロゴ',
+    author: '© Classmethod, Inc.',
+    usage: '備忘録ページ',
+    license: 'Classmethod, Inc. の商標',
+    category: ['アイコン'],
+  },
+  {
+    name: 'note ロゴ',
+    author: '© note inc.',
+    usage: '備忘録ページ',
+    license: 'note inc. の商標',
+    category: ['アイコン'],
+  },
+  {
+    name: 'Qiita ロゴ',
+    author: '© Qiita Inc.',
+    usage: '備忘録ページ',
+    license: 'Qiita Inc. の商標',
+    category: ['アイコン'],
+  },
+  {
+    name: 'はてな ロゴ',
+    author: '© Hatena Co., Ltd.',
+    usage: '備忘録ページ',
+    license: '株式会社はてなの商標',
+    category: ['アイコン'],
+  },
+  {
+    name: 'Phaser 3',
+    author: '© Photon Storm Ltd.',
+    url: 'https://phaser.io/',
+    usage: 'タワーディフェンス・レトロシューティング',
+    license: 'MIT License',
+    category: ['ライブラリ'],
   },
 ];
 
@@ -79,6 +116,11 @@ const categories = [
   { label: 'フォント', fullLabel: 'フォント', emptyMsg: '現在、フォントは使用していません。' },
   { label: 'SE', fullLabel: 'SE・BGM', emptyMsg: '現在、SE・BGMは使用していません。' },
   { label: 'アイコン', fullLabel: 'アイコン', emptyMsg: '現在、アイコンは使用していません。' },
+  {
+    label: 'ライブラリ',
+    fullLabel: 'ライブラリ',
+    emptyMsg: '現在、外部ライブラリは使用していません。',
+  },
 ];
 
 const getItemsByCategory = (label: string, fullLabel: string) => {
@@ -102,7 +144,8 @@ const getItemsByCategory = (label: string, fullLabel: string) => {
       <section class="hero">
         <p>
           当サイトで使用している素材の一覧です。<br />
-          各素材は提供元の利用規約に基づき使用しています。
+          各素材は提供元の利用規約に基づき使用しています。<br />
+          各社のロゴは各社の商標です。
         </p>
       </section>
 
