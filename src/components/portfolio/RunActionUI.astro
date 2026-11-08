@@ -711,11 +711,13 @@ const { gameTitle } = Astro.props;
       align-items: center;
     }
 
+    /* 親の .game-hud が pointer-events: none（キャンバス操作を透過させるため）なので、ボタンだけ受け付ける */
     .hud-config-icon {
       position: relative;
       top: auto;
       right: auto;
       margin-left: 10px;
+      pointer-events: auto;
     }
 
 

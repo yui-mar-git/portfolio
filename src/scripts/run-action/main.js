@@ -1072,6 +1072,8 @@ import { STAGE_CONFIG, FIXED_STAGES } from '../../data/run-action/stages';
   window.addEventListener('touchend', handleInputEnd);
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'ArrowUp') {
+      // プレイ中以外はページのスクロール等ブラウザ既定動作を妨げない
+      if (gameState !== 'playing' || isPaused) return;
       if (!isInputHolding) {
         handleInputStart(e);
       }

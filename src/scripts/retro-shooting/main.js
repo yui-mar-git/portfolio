@@ -190,6 +190,18 @@ class MainScene extends Phaser.Scene {
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
+    // Phaser のキー捕捉（preventDefault）はページ全体の keydown に効くため、
+    // 操作中（WAVE 開始待ち・ゲームオーバー・一時停止以外）だけ有効にして、それ以外はページのスクロールを妨げない
+    this.input.keyboard.disableGlobalCapture();
+    const releaseCapture = () => this.input.keyboard.disableGlobalCapture();
+    this.events.on('pause', releaseCapture);
+    this.events.on('sleep', releaseCapture);
+    this.events.once('shutdown', () => {
+      releaseCapture();
+      this.events.off('pause', releaseCapture);
+      this.events.off('sleep', releaseCapture);
+    });
+
     // Mouse / Pointer Input
     this.input.on('pointermove', (pointer) => {
       if (this.isGameOver) return;
@@ -429,7 +441,11 @@ class MainScene extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (this.isGameOver || this.isWavePaused) return;
+    if (this.isGameOver || this.isWavePaused) {
+      this.input.keyboard.disableGlobalCapture();
+      return;
+    }
+    this.input.keyboard.enableGlobalCapture();
 
     // Scroll Starfield
     const deltaSec = delta / 1000;

@@ -278,6 +278,9 @@ class BootScene extends Phaser.Scene {
   }
 }
 
+const COOLDOWN_RING_RADIUS = 9;
+const COOLDOWN_RING_MARGIN = 6;
+
 class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainScene' });
@@ -624,9 +627,7 @@ class MainScene extends Phaser.Scene {
           const elapsed = time - ally.lastAttackTime;
           const progress = Math.min(1, Math.max(0, elapsed / cooldown));
           if (progress < 1) {
-            const h = ally.unitData ? ally.unitData.height : 80;
-            const posY = ally.y - h / 2 - 20;
-            this.drawCooldownRing(ally.x, posY, progress, 0x00bfff);
+            this.drawCooldownRing(ally.x, this.getGaugeY(ally), progress, 0x00bfff);
           }
         }
       });
@@ -639,9 +640,7 @@ class MainScene extends Phaser.Scene {
           const elapsed = time - enemy.lastAttackTime;
           const progress = Math.min(1, Math.max(0, elapsed / cooldown));
           if (progress < 1) {
-            const h = enemy.displayHeight || enemy.height || 80;
-            const posY = enemy.y - h / 2 - 20;
-            this.drawCooldownRing(enemy.x, posY, progress, 0xff4d4d);
+            this.drawCooldownRing(enemy.x, this.getGaugeY(enemy), progress, 0xff4d4d);
           }
         }
       });
@@ -685,9 +684,16 @@ class MainScene extends Phaser.Scene {
     this.fogGraphics.fillPath();
   }
 
+  // スプライトは setOrigin(0.5, 1)（足元基準）なので、頭頂 = y - displayHeight。
+  // リング半径＋線幅＋余白ぶん上に置き、アイコンと重ならないようにする。
+  getGaugeY(sprite) {
+    const top = sprite.y - sprite.displayHeight * (sprite.originY ?? 1);
+    return top - COOLDOWN_RING_RADIUS - COOLDOWN_RING_MARGIN;
+  }
+
   drawCooldownRing(x, y, progress, colorHex) {
     if (!this.meterGraphics) return;
-    const radius = 9;
+    const radius = COOLDOWN_RING_RADIUS;
     const startAngle = Phaser.Math.DegToRad(-90);
     const endAngle = startAngle + Phaser.Math.DegToRad(360 * progress);
 
@@ -1264,13 +1270,12 @@ function startGame(stageNumber) {
   updateGlobalBackButton();
   mapScreen.style.display = 'none';
 
+  // 画像の読み込みが 100ms 以上かかると create() 前に startWave が走り（spawnTimer 未定義で例外）、
+  // そのまま一時停止状態で止まっていたため、固定の待ち時間ではなく create 完了イベントを待つ。
+  // 読み込み済みの場合は start() 内で同期的に create されるので、リスナーは start() より前に登録する。
+  const scene = game.scene.getScene('MainScene');
+  if (scene) scene.events.once('create', () => scene.startWave(1, true));
   game.scene.start('MainScene');
-  setTimeout(() => {
-    const scene = game.scene.getScene('MainScene');
-    if (scene) {
-      scene.startWave(1, true);
-    }
-  }, 100);
 }
 document.getElementById('btn-stage1').addEventListener('click', () => startGame(1));
 document.getElementById('btn-stage2').addEventListener('click', () => startGame(2));
