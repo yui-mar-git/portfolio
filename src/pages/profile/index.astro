@@ -7,11 +7,36 @@ import CertTree from '@/components/CertTree.astro';
 import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSSettings, MicroCMSProfile, MicroCMSListResponse } from '@/types/microcms';
 
-const settings = await fetchMicroCMS<MicroCMSSettings>('settings');
-const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', {
-  limit: '100',
-});
-const allProfileItems = profileResponse.contents;
+// microCMS からプロフィール設定を取得（取得失敗時はプレースホルダーでフォールバック）
+let settings: MicroCMSSettings = {
+  name: '鋭意制作中です',
+  title: '',
+  bio: '鋭意制作中です。',
+};
+try {
+  const settingsResponse = await fetchMicroCMS<MicroCMSSettings>('settings');
+  if (settingsResponse) {
+    settings = settingsResponse;
+  }
+} catch (err) {
+  console.warn(
+    'microCMSからのプロフィール設定取得に失敗しました。フォールバックを使用します:',
+    err,
+  );
+}
+
+// microCMS から資格データを取得（取得失敗時は空配列でフォールバック）
+let allProfileItems: MicroCMSProfile[] = [];
+try {
+  const profileResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSProfile>>('profile', {
+    limit: '100',
+  });
+  if (profileResponse && Array.isArray(profileResponse.contents)) {
+    allProfileItems = profileResponse.contents;
+  }
+} catch (err) {
+  console.warn('microCMSからの資格一覧取得に失敗しました。フォールバックを使用します:', err);
+}
 
 // 資格以外のアイテムは静的にハードコードするため、ここではフェッチしたデータからフィルタリングしません。
 

@@ -32,6 +32,7 @@ Astro と Cloudflare Pages を用いて構築されたモダンなポートフ�
 2. **タワーディフェンス** - ユニットを配置して拠点を防衛するストラテジーゲーム
 3. **ランアクション** - ジャンプと魔法で敵を倒しながら進む横スクロールアクション
 4. **スコアアタックミニゲーム** - 動く的をタップするカジュアルゲーム
+5. **レトロシューティング** - WAVEを重ねて敵機を撃ち落とすインベーダー系シューティング
 
 ## 📁 ブランチ構成
 
@@ -50,6 +51,7 @@ Astro と Cloudflare Pages を用いて構築されたモダンなポートフ�
   - `/portfolio/tower-defense`
   - `/portfolio/run-action`
   - `/portfolio/minigame`
+  - `/portfolio/retro-shooting`
 - `/contact` - お問い合わせ
 - `/credits` - 使用素材・クレジット表記
 

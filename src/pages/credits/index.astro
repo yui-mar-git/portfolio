@@ -6,10 +6,18 @@ import Footer from '@/components/Footer.astro';
 import { fetchMicroCMS } from '@/lib/microcms';
 import type { MicroCMSCredits, MicroCMSListResponse } from '@/types/microcms';
 
-const creditsResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSCredits>>('credits', {
-  limit: '100',
-});
-const microCMSCredits = creditsResponse.contents || [];
+// microCMS から使用素材データを取得（取得失敗時は静的素材のみでフォールバック表示）
+let microCMSCredits: MicroCMSCredits[] = [];
+try {
+  const creditsResponse = await fetchMicroCMS<MicroCMSListResponse<MicroCMSCredits>>('credits', {
+    limit: '100',
+  });
+  if (creditsResponse && Array.isArray(creditsResponse.contents)) {
+    microCMSCredits = creditsResponse.contents;
+  }
+} catch (err) {
+  console.warn('microCMSからの使用素材一覧取得に失敗しました。フォールバックを使用します:', err);
+}
 
 const STATIC_CREDITS = [
   {
