@@ -1,21 +1,20 @@
-# Security Policy
+# セキュリティポリシー
 
-## Supported Versions
+## 概要
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+本リポジトリは個人のポートフォリオサイトです。セキュリティ方針として「攻撃対象領域(Attack Surface)の最小化」を最優先に据え、次の設計で運用しています。
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+- **ユーザー向けの書き込みAPIを持たない。** 生の投稿・書き込みを受け付けるエンドポイントは意図的に実装していません。ゲームのハイスコア等はクライアント側の LocalStorage で完結させ、永続DBへの書き込み経路を設けていません。
+- **外部APIは読み取り専用のGETプロキシ経由。** 外部データの取得はCloudflareのエッジで中継し、公開するのはGETのみです。書き込みプロキシは存在しません。
+- **シークレットはサーバー側のみで保持。** microCMSのAPIキー等の秘匿情報は環境変数(Cloudflare Pagesの環境変数)としてサーバー側でのみ扱い、ブラウザには一切露出させません。未設定時は早期に例外を投げ、不正なリクエストを送らない作りにしています。
+- **ボット対策とレートリミット。** 連絡フォームは Cloudflare Turnstile によるサーバー側検証に加え、Cloudflare KV による同一IPあたりのレートリミット(1時間あたり3回まで)を実施しています。なお連絡フォームの送信処理自体はデモ(ダミー)であり、実際のメール送信は行いません。
+- **意図的な noindex。** サイト全体を `noindex, nofollow` に設定しており、検索エンジンへのインデックスは行いません。
 
-## Reporting a Vulnerability
+## 脆弱性の報告方法
 
-Use this section to tell people how to report a vulnerability.
+このプロジェクトに関するセキュリティ上の問題を見つけた場合は、GitHub を通じてご連絡ください。
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- **GitHub の非公開報告(推奨):** リポジトリの **Security → Advisories → Report a vulnerability**(Private vulnerability reporting / Security Advisories)から非公開で報告してください。
+- **Issue:** 機微な情報を含まない内容であれば、GitHub の **Issue** として起票していただいても構いません。
+
+報告の際は、再現手順・影響範囲・該当箇所(ファイルやエンドポイント)をできるだけ具体的にご記載ください。内容を確認のうえ、必要に応じて修正を行います。
